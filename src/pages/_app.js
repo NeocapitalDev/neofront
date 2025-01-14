@@ -11,12 +11,12 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }) {
   return (
     <>
       <Head>
-        <title>Wazend</title>
+        <title>{process.env.NEXT_PUBLIC_NAME_APP}</title>
       </Head>
       <SessionProvider session={session}>
         <ProgressBar
           height="4px"
-          color="#059669"
+          color="#ffb800"
           options={{ showSpinner: false }}
           shallowRouting
         />

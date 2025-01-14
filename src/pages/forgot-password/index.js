@@ -9,7 +9,7 @@ import { getSession } from 'next-auth/react';
 
 const strapiUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-export default function ForgotPassword (){
+export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
@@ -51,19 +51,19 @@ export default function ForgotPassword (){
   };
 
   return (
-    <Layout>
-      <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-gray-900">
+    <Layout className="bg-black min-h-screen">
+      <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-white">
         Recuperar contraseña
       </h2>
 
-      <p className="mt-2 text-sm leading-6 text-gray-500">
+      <p className="mt-2 text-sm leading-6 text-gray-400">
         Escribe tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
       </p>
 
       <div className="mt-8">
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+            <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-300">
               Correo electrónico
             </label>
             <div className="mt-2">
@@ -76,32 +76,32 @@ export default function ForgotPassword (){
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@ejemplo.com"
                 required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-emerald-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 bg-gray-800 text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
               />
             </div>
           </div>
 
           <div>
-            {/* Deshabilitar el botón de envío mientras se está enviando el formulario */}
             <button
               type="submit"
-              className={`text-white flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-600'}`}
-              disabled={isSubmitting} // Deshabilitar el botón si se está enviando el formulario
+              className={`text-black flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${isSubmitting ? 'bg-gray-600 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-400 focus:ring-amber-400'
+                }`}
+              disabled={isSubmitting}
             >
               {isSubmitting ? 'Enviando...' : 'Enviar correo de reinicio'}
             </button>
           </div>
         </form>
 
-        <p className="mt-10 text-sm text-center leading-6 text-gray-500">
+        <p className="mt-10 text-sm text-center leading-6 text-gray-400">
           ¿Ya tienes una cuenta?{' '}
-          <Link href="/login" className="font-semibold leading-6 text-emerald-600 hover:text-emerald-500">
+          <Link href="/login" className="font-semibold leading-6 text-amber-400 hover:text-amber-300">
             Iniciar sesión
           </Link>
         </p>
-
       </div>
     </Layout>
+
   );
 };
 

@@ -88,9 +88,10 @@ export default function SignUp() {
 
   return (
     <>
-      <Layout>
 
-        <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-gray-900">
+
+      <Layout className="bg-black min-h-screen">
+        <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-white">
           🎉 Crea una cuenta nueva
         </h2>
 
@@ -99,7 +100,7 @@ export default function SignUp() {
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+              <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-300">
                 Correo electrónico
               </label>
               <div className="mt-2">
@@ -112,14 +113,14 @@ export default function SignUp() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-emerald-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 bg-gray-800 text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
 
             {/* Contraseña */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+              <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-300">
                 Contraseña
               </label>
               <div className="mt-2 relative">
@@ -132,11 +133,11 @@ export default function SignUp() {
                   value={formData.password}
                   onChange={handleChange}
                   onFocus={handlePasswordFocus}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-emerald-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 bg-gray-800 text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 focus:outline-none"
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-300 focus:outline-none"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -149,39 +150,40 @@ export default function SignUp() {
             </div>
 
             {/* Condiciones de contraseña */}
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-400">
               {showPasswordConditions && (
                 <ul>
-                  <li className={`${passwordConditions.uppercase ? 'text-green-600' : 'text-gray-500'}`}>
-                    <div className='inline-flex items-center'>
+                  <li className={`${passwordConditions.uppercase ? 'text-amber-500' : 'text-gray-500'}`}>
+                    <div className="inline-flex items-center">
                       <CheckCircleIcon className="h-4 w-4 mr-1" aria-hidden="true" />
                       Una letra mayúscula
                     </div>
                   </li>
-                  <li className={`${passwordConditions.lowercase ? 'text-green-600' : 'text-gray-500'}`}>
-                    <div className='inline-flex items-center'>
+                  <li className={`${passwordConditions.lowercase ? 'text-amber-500' : 'text-gray-500'}`}>
+                    <div className="inline-flex items-center">
                       <CheckCircleIcon className="h-4 w-4 mr-1" aria-hidden="true" />
                       Una letra minúscula
                     </div>
                   </li>
-                  <li className={`${passwordConditions.number ? 'text-green-600' : 'text-gray-500'}`}>
-                    <div className='inline-flex items-center'>
+                  <li className={`${passwordConditions.number ? 'text-amber-500' : 'text-gray-500'}`}>
+                    <div className="inline-flex items-center">
                       <CheckCircleIcon className="h-4 w-4 mr-1" aria-hidden="true" />
                       Un número
                     </div>
                   </li>
-                  <li className={`${passwordConditions.specialChar ? 'text-green-600' : 'text-gray-500'}`}>
-                    <div className='inline-flex items-center'>
+                  <li className={`${passwordConditions.specialChar ? 'text-amber-500' : 'text-gray-500'}`}>
+                    <div className="inline-flex items-center">
                       <CheckCircleIcon className="h-4 w-4 mr-1" aria-hidden="true" />
                       Un carácter especial
                     </div>
                   </li>
-                  <li className={`${passwordConditions.length ? 'text-green-600' : 'text-gray-500'}`}>
-                    <div className='inline-flex items-center'>
+                  <li className={`${passwordConditions.length ? 'text-amber-500' : 'text-gray-500'}`}>
+                    <div className="inline-flex items-center">
                       <CheckCircleIcon className="h-4 w-4 mr-1" aria-hidden="true" />
                       6 caracteres o más
                     </div>
                   </li>
+
                 </ul>
               )}
             </div>
@@ -190,7 +192,8 @@ export default function SignUp() {
               <button
                 type="submit"
                 disabled={isSubmitting || !isPasswordValid()}
-                className={`text-white w-full justify-center inline-flex items-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 ${isSubmitting || !isPasswordValid() ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-600'}`}
+                className={`text-black w-full justify-center inline-flex items-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 ${isSubmitting || !isPasswordValid() ? 'bg-gray-600 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-400 focus:ring-amber-400'
+                  }`}
               >
                 {isSubmitting ? (
                   <>
@@ -207,15 +210,16 @@ export default function SignUp() {
             </div>
           </form>
 
-          <p className="mt-10 text-sm text-center leading-6 text-gray-500">
+          <p className="mt-10 text-sm text-center leading-6 text-gray-400">
             ¿Tienes una cuenta?{' '}
-            <Link href="/login" className="font-semibold leading-6 text-emerald-600 hover:text-emerald-500">
+            <Link href="/login" className="font-semibold leading-6 text-amber-400 hover:text-amber-300">
               Iniciar sesión
             </Link>
           </p>
         </div>
-
       </Layout>
+
+
     </>
   );
 };
