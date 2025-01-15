@@ -11,7 +11,7 @@ export default function Layout({ children, title, showButton, NoTab }) {
 
                 <Navbar />
 
-                <header className="bg-white shadow-sm">
+                {/* <header className="bg-white shadow-sm">
 
                     {!NoTab && (
                         <div className="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -30,7 +30,7 @@ export default function Layout({ children, title, showButton, NoTab }) {
                             )}
                         </div>
                     )}
-                </header>
+                </header> */}
 
                 <main>
                     <div className="mx-auto max-w-7xl py-12 px-4 sm:px-6 lg:px-8">{children}</div>
