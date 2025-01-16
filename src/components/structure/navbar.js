@@ -10,18 +10,9 @@ import Image from 'next/image'
 
 import LogoGravatar from '../LogoGravatar'
 
-const navigation = [
-  { name: 'Prueba gratis', href: '/trial', trial: true },
-  { name: 'Dashboard', href: '/' },
-  { name: 'API Docs', href: 'https://docs.wazend.net/', external: true },
-  { name: 'Integraciones', href: '/integrations' }
-]
+import { navigation, userNavigation } from './links';
 
-const userNavigation = [
-  { name: 'Tu perfil', href: '/profile' },
-  { name: 'Facturación', href: 'https://wazend.net/my-account', external: true },
-  { name: 'Cerrar sesión', href: '/', signOut: true }
-]
+
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -69,7 +60,11 @@ export default function Navbar() {
     <>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 justify-between items-center">
+
+
           {/* Menú móvil y logo */}
+          
+          
           <div className="flex items-center gap-x-4">
             <div className="lg:hidden">
               <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-zinc-900 p-2 text-white hover:bg-zinc-800 hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
@@ -108,7 +103,7 @@ export default function Navbar() {
               </p>
 
               {/* Foto de perfil */}
-              <Menu as="div" className="relative ml-4 flex-shrink-0">
+              <Menu as="div" className="relative ml-2 flex-shrink-0">
                 <Menu.Button className="flex rounded-full bg-zinc-900 p-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
                   <span className="sr-only">Open user menu</span>
                   <LogoGravatar email={session.user.email} size={40} />
@@ -150,7 +145,7 @@ export default function Navbar() {
                 </Transition>
               </Menu>
 
-              {/* Ícono de notificaciones (a la derecha de la imagen de perfil) */}
+              {/* Ícono de notificaciones (a la izquierda de la imagen de perfil) */}
               <BellIcon
                 className="h-6  w-6 text-white hover:text-zinc-300 transition duration-200"
                 aria-hidden="true"
@@ -185,14 +180,6 @@ export default function Navbar() {
     </>
   )}
 </Disclosure>
-
-
-
-
-
-
-
-
     </>
   )
 }
