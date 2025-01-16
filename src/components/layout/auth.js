@@ -39,8 +39,6 @@ const Layout = ({ children }) => {
     alt="Moneda"
     width={960}
     height={1080}
-
-    layout="intrinsic" // Asegura que la relación de aspecto se mantenga
   />
 </div>
 
