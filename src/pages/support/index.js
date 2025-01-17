@@ -4,7 +4,7 @@ import Layout from '../../components/layout/dashboard';
 const Billing = () => {
     return (
         <Layout title="Billing">
-     
+            
         </Layout>
     );
 };

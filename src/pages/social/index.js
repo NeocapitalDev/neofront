@@ -1,13 +1,12 @@
 import React from "react";
 import Layout from "../../components/layout/dashboard";
-import Image from 'next/image';
+import Image from "next/image";
 import {
     ChatBubbleOvalLeftEllipsisIcon,
     GlobeAltIcon,
     CameraIcon,
     BuildingOfficeIcon,
     HashtagIcon,
-    PlayIcon,
 } from "@heroicons/react/24/outline";
 
 const plataformas = [
@@ -15,41 +14,40 @@ const plataformas = [
         nombre: "Discord",
         url: "#",
         accion: "Unirse",
-        icono: "discord.svg"
+        icono: "discord.svg",
     },
     {
         nombre: "Facebook",
         url: "#",
         accion: "Seguir",
-        icono: <GlobeAltIcon className="h-10 w-10 text-blue-600" />,
+        icono: "facebook.svg",
     },
     {
         nombre: "Instagram",
         url: "#",
         accion: "Seguir",
-        icono: <CameraIcon className="h-10 w-10 text-pink-600" />,
+        icono: "instagram.svg",
     },
     {
         nombre: "LinkedIn",
         url: "#",
         accion: "Seguir",
-        icono: <BuildingOfficeIcon className="h-10 w-10 text-blue-700" />,
+        icono: "linkendin.svg",
     },
     {
         nombre: "X",
         url: "#",
         accion: "Seguir",
-        icono: <HashtagIcon className="h-10 w-10 text-black" />,
+        icono: "x.svg",
     },
     {
         nombre: "YouTube",
         url: "#",
         accion: "Suscribirse",
-        icono: "youtube.png"
+        icono: "youtube.svg",
     },
 ];
 const Social = () => {
-
     return (
         <Layout title="Social">
             <div className="p-6 bg-white shadow-md rounded-lg">
@@ -70,22 +68,24 @@ const Social = () => {
                             {/* Contenedor Horizontal para el Icono y el Texto */}
                             <div className="flex items-center mb-4 w-full">
                                 {/* Icono */}
-                                {/* <div className="flex-shrink-0 bg-gray-100 p-4 rounded-full flex items-center justify-center">
-                                    {plataforma.icono}
-                                </div> */}
-
-                                <Image
-                                    src={`/images/social/${plataforma.icono}`}
-                                    alt={plataforma.nombre}
-                                    width={200}
-                                    height={100}
-                                    className="h-10 w-10 mr-4"
-                                />
-
-                                {/* Información de la Plataforma */}
+                                <div className="flex-shrink-0 bg-gray-100 p-3 rounded-full flex items-center justify-center">
+                                    {typeof plataforma.icono === "string" ? (
+                                        <Image
+                                            src={`/images/social/${plataforma.icono}`}
+                                            alt={plataforma.nombre}
+                                            width={51}
+                                            height={51}
+                                            className="w-[51px] h-[51px]"
+                                        />
+                                    ) : plataforma.icono}
+                                </div>
                                 <div className="ml-4">
-                                    <span className="block text-gray-700 font-medium">Plataforma</span>
-                                    <p className="text-gray-900 font-bold text-lg">{plataforma.nombre}</p>
+                                    <span className="block text-gray-700 font-medium">
+                                        Plataforma
+                                    </span>
+                                    <p className="text-gray-900 font-bold text-lg">
+                                        {plataforma.nombre}
+                                    </p>
                                 </div>
                             </div>
 
@@ -99,23 +99,16 @@ const Social = () => {
                                 {plataforma.accion}
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={2}
-                                    stroke="currentColor"
-                                    className="ml-2 w-5 h-5"
+                                    className="ml-2 w-3 h-3"
+                                    viewBox="0 0 512 512"
+                                    fill="#000000"
                                 >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M13.5 10.5L21 3m0 0h-7.5m7.5 0v7.5M21 13v6.75A2.25 2.25 0 0118.75 22H5.25A2.25 2.25 0 013 19.75V5.25A2.25 2.25 0 015.25 3H12"
-                                    />
+                                    <path d="M352 0c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9L370.7 96 201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L416 141.3l41.4 41.4c9.2 9.2 22.9 11.9 34.9 6.9s19.8-16.6 19.8-29.6V32c0-17.7-14.3-32-32-32H352zM80 32C35.8 32 0 67.8 0 112V432c0 44.2 35.8 80 80 80H400c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32V432c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16H192c17.7 0 32-14.3 32-32s-14.3-32-32-32H80z"></path>
                                 </svg>
                             </a>
                         </div>
                     ))}
                 </div>
-
             </div>
         </Layout>
     );
