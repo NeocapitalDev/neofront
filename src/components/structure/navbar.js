@@ -96,14 +96,14 @@ export default function Navbar() {
 
           {/* Menú de usuario y notificaciones */}
           {session && (
-            <div className="flex items-center gap-x-3">
+            <div className="flex items-center gap-x-2">
               {/* Correo electrónico (solo visible en escritorio) */}
               <p className="hidden lg:block text-white text-sm font-medium">
                 {session.user.email}
               </p>
 
               {/* Foto de perfil */}
-              <Menu as="div" className="relative ml-2 flex-shrink-0">
+              <Menu as="div" className="relative ml-1 flex-shrink-0">
                 <Menu.Button className="flex rounded-full bg-zinc-900 p-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
                   <span className="sr-only">Open user menu</span>
                   <LogoGravatar email={session.user.email} size={40} />
