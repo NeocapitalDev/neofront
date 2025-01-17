@@ -8,7 +8,7 @@ export default function CredencialesModal() {
 
     const data = [
         { label: 'Login', value: '1420126402' },
-        { label: 'Contraseña', value: '**********' },
+        { label: 'Contraseña', value: 'asAS*9@Pa9' },
         { label: 'Contraseña de solo lectura', value: 'YrI*9@IqHa9' },
         { label: 'Servidor', value: 'FTMO-Demo2' },
         { label: 'Plataforma', value: 'MT4' },
@@ -74,72 +74,71 @@ export default function CredencialesModal() {
 
                                         {/* Tabla de credenciales */}
                                         <div className="">
-                                            {data.map((item, index) => {
-                                                const isLast = index === data.length - 1;
+                                        {data.map((item, index) => {
+    const isLast = index === data.length - 1;
 
-                                                return (
-                                                    <div
-                                                        key={index}
-                                                        className={`flex items-center justify-between ${!isLast && 'border-b'} pb-2`}
-                                                    >
-                                                        <div className="text-sm font-medium text-gray-900">
-                                                            {item.label}:
-                                                        </div>
+    return (
+        <div
+            key={index}
+            className={`flex items-center justify-between ${!isLast && 'border-b'} pb-2`}
+        >
+            <div className="text-sm font-medium text-gray-900">
+                {item.label}:
+            </div>
 
-                                                        <div className="flex items-center py-1 space-x-20">
-                                                            {/* Contraseña y ojito */}
-                                                            {index === 1 ? (
-                                                                <div className="flex items-center space-x-1">
-                                                                    <span className="text-sm text-gray-600">
-                                                                        {showPassword ? 'asAS*9@Pa9' : '********'}
-                                                                    </span>
-                                                                    <button
-                                                                        className="flex items-center justify-center"
-                                                                        onClick={() => setShowPassword(!showPassword)}
-                                                                    >
-                                                                        {showPassword ? (
-                                                                            <EyeSlashIcon className="h-5 w-5 text-gray-600" />
-                                                                        ) : (
-                                                                            <EyeIcon className="h-5 w-5 text-gray-600" />
-                                                                        )}
-                                                                    </button>
-                                                                </div>
-                                                            ) : (
-                                                                <span className="text-sm text-gray-600">{item.value}</span>
-                                                            )}
+            <div className="flex items-center py-1 space-x-20">
+                {/* Contraseña principal con opción de ocultar */}
+                {item.label === 'Contraseña' ? (
+                    <div className="flex items-center space-x-1">
+                        <span className="text-sm text-gray-600">
+                            {showPassword ? item.value : '********'}
+                        </span>
+                        <button
+                            className="flex items-center justify-center"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? (
+                                <EyeSlashIcon className="h-5 w-5 text-gray-600" />
+                            ) : (
+                                <EyeIcon className="h-5 w-5 text-gray-600" />
+                            )}
+                        </button>
+                    </div>
+                ) : (
+                    <span className="text-sm text-gray-600">{item.value}</span>
+                )}
 
-                                                            {!isLast && (
-                                                                <div className="flex flex-col space-y-2 w-[120px]"> {/* Ancho definido para el contenedor */}
-                                                                    {/* Botón de copiar */}
-                                                                    <div className="flex items-center space-x-3">
-                                                                        <button
-                                                                            className="p-2 bg-white rounded border hover:bg-gray-200 w-12 h-12 flex items-center justify-center"
-                                                                            onClick={() => handleCopy(item.value)}
-                                                                        >
-                                                                            <ClipboardDocumentIcon className="h-5 w-5 text-gray-600" />
-                                                                        </button>
-                                                                        <span className="text-sm text-gray-600 truncate">Copiar</span>
-                                                                    </div>
+                {!isLast && (
+                    <div className="flex flex-col space-y-2 w-[120px]">
+                        {/* Botón de copiar */}
+                        <div className="flex items-center space-x-3">
+                            <button
+                                className="p-2 bg-white rounded border hover:bg-gray-200 w-12 h-12 flex items-center justify-center"
+                                onClick={() => handleCopy(item.value)}
+                            >
+                                <ClipboardDocumentIcon className="h-5 w-5 text-gray-600" />
+                            </button>
+                            <span className="text-sm text-gray-600 truncate">Copiar</span>
+                        </div>
 
-                                                                    {/* Botón de cambio */}
-                                                                    {['Contraseña', 'Contraseña de solo lectura'].includes(item.label) && (
-                                                                        <div className="flex items-center space-x-3">
-                                                                            <button
-                                                                                className="p-2 border bg-white rounded hover:bg-gray-200 w-12 h-12 flex items-center justify-center"
-                                                                            >
-                                                                                <PencilIcon className="h-5 w-5 text-gray-600" />
-                                                                            </button>
-                                                                            <span className="text-sm text-gray-600 truncate">Cambio</span>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            )}
+                        {/* Botón de cambio */}
+                        {['Contraseña', 'Contraseña de solo lectura'].includes(item.label) && (
+                            <div className="flex items-center space-x-3">
+                                <button
+                                    className="p-2 border bg-white rounded hover:bg-gray-200 w-12 h-12 flex items-center justify-center"
+                                >
+                                    <PencilIcon className="h-5 w-5 text-gray-600" />
+                                </button>
+                                <span className="text-sm text-gray-600 truncate">Cambio</span>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+})}
 
-
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
                                         </div>
                                     </div>
 
