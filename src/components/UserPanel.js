@@ -1,6 +1,7 @@
 import Layout from '../components/layout/dashboard';
 import { KeyIcon, ChartBarIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
+import CredencialesModal from './structure/dashboard/credentials';
 
 export default function Index() {
     const accountData = [
@@ -96,10 +97,8 @@ export default function Index() {
                     {/* Mostrar botones solo si está visible */}
                     {visibility[index] && (
                         <div className="mt-4 flex flex-col items-start space-y-2 lg:flex-row lg:space-y-0 lg:space-x-4">
-                            <button className="flex items-center justify-center space-x-2 px-2 py-1 border rounded-sm shadow-md bg-gray-0 hover:bg-gray-200 w-auto">
-                                <KeyIcon className="h-6 w-6 text-gray-600" />
-                                <span className="text-xs lg:text-sm">Credenciales</span>
-                            </button>
+                            <CredencialesModal />
+
                             <button className="flex items-center justify-center space-x-2 px-2 py-1 border rounded-sm shadow-md bg-gray-0 hover:bg-gray-200 w-auto">
                                 <ChartBarIcon className="h-6 w-6 text-gray-600" />
                                 <span className="text-xs lg:text-sm">MetriX</span>
