@@ -1,5 +1,6 @@
 import React from "react";
 import Layout from "../../components/layout/dashboard";
+import Image from 'next/image';
 import {
     ChatBubbleOvalLeftEllipsisIcon,
     GlobeAltIcon,
@@ -14,9 +15,7 @@ const plataformas = [
         nombre: "Discord",
         url: "#",
         accion: "Unirse",
-        icono: (
-            <ChatBubbleOvalLeftEllipsisIcon className="h-10 w-10 text-purple-600" />
-        ),
+        icono: "discord.svg"
     },
     {
         nombre: "Facebook",
@@ -46,7 +45,7 @@ const plataformas = [
         nombre: "YouTube",
         url: "#",
         accion: "Suscribirse",
-        icono: <PlayIcon className="h-10 w-10 text-red-600" />,
+        icono: "youtube.png"
     },
 ];
 const Social = () => {
@@ -71,9 +70,17 @@ const Social = () => {
                             {/* Contenedor Horizontal para el Icono y el Texto */}
                             <div className="flex items-center mb-4 w-full">
                                 {/* Icono */}
-                                <div className="flex-shrink-0 bg-gray-100 p-4 rounded-full flex items-center justify-center">
+                                {/* <div className="flex-shrink-0 bg-gray-100 p-4 rounded-full flex items-center justify-center">
                                     {plataforma.icono}
-                                </div>
+                                </div> */}
+
+                                <Image
+                                    src={`/images/social/${plataforma.icono}`}
+                                    alt={plataforma.nombre}
+                                    width={200}
+                                    height={100}
+                                    className="h-10 w-10 mr-4"
+                                />
 
                                 {/* Información de la Plataforma */}
                                 <div className="ml-4">
@@ -87,7 +94,7 @@ const Social = () => {
                                 href={plataforma.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center justify-center bg-blue-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-blue-700 transition w-full"
+                                className="inline-flex items-center justify-center bg-amber-500 text-black font-medium py-2 px-4 rounded-lg hover:bg-amber-600 transition w-full"
                             >
                                 {plataforma.accion}
                                 <svg

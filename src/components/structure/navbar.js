@@ -2,15 +2,13 @@ import { Fragment, useEffect, useState } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
 import { useRouter } from 'next/router'
-
 import Link from 'next/link'
 // import md5 from 'md5'
 import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
-
 import LogoGravatar from '../LogoGravatar'
-
 import { navigation, userNavigation } from './links';
+import Notifications from './notifications';
 
 
 
@@ -146,10 +144,7 @@ export default function Navbar() {
               </Menu>
 
               {/* Ícono de notificaciones (a la izquierda de la imagen de perfil) */}
-              <BellIcon
-                className="h-6  w-6 text-white hover:text-zinc-300 transition duration-200"
-                aria-hidden="true"
-              />
+              <Notifications />
             </div>
           )}
         </div>

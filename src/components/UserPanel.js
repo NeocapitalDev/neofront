@@ -53,12 +53,12 @@ export default function Index() {
 
     return (
         <div>
-            <h2 className="text-lg font-semibold mb-4 text-gray-800">FTMO Accounts</h2>
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">NEOCAPITAL Accounts</h2>
 
             {accountData.map((account, index) => (
                 <div
                     key={index}
-                    className="bg-white shadow-md rounded-lg p-4 relative mb-6"
+                    className="bg-white shadow-md rounded-lg p-6 relative mb-6"
                 >
                     {/* Login */}
                     <p className="text-sm text-black mb-2">
