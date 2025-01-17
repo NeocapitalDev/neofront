@@ -109,7 +109,7 @@ export default function CredencialesModal() {
                                                                 </div>
                                                             ) : (
                                                                 isLast ? (
-                                                                    <span className="text-md font-bold text-gray-900">{item.value}</span>
+                                                                    <span className="text-md font-bold mx-2 text-gray-900">{item.value}</span>
                                                                 ) : (
                                                                     <span className="text-sm text-gray-600">{item.value}</span>
                                                                 )
