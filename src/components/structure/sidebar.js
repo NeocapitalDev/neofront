@@ -1,7 +1,6 @@
+import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { sidebarButtons } from './links';
-
-
+import { navigation } from './links'; // Importar desde links.js
 
 export default function Sidebar() {
     const router = useRouter();
@@ -18,16 +17,44 @@ export default function Sidebar() {
                 </p>
             </div>
 
-            <div className="flex flex-col gap-0">
-                {sidebarButtons.map(({ icon: Icon, label, id, link }) => (
-                    <button
+            <div className="flex flex-col">
+                {navigation.map(({ icon: Icon, name, id, href }) => (
+                    <Link
+                        href={href}
                         key={id}
-                        className={`w-full flex items-center py-7 px-6 text-gray-700 font-semibold hover:bg-zinc-300 hover:text-black transition duration-200 last:rounded-b-md ${router.pathname === link ? 'bg-zinc-200 border-l-4 border-amber-500' : ''}`}
-                        onClick={() => router.push(link)}
+                        className={`w-full flex items-center py-7 px-6 font-semibold transition duration-200 last:rounded-b-md relative ${
+                            router.pathname === href
+                                ? 'bg-gradient-to-r from-amber-50 via-white to-transparent border-l-4 border-amber-500'
+                                : 'hover:bg-zinc-300'
+                        }`}
                     >
-                        <Icon className="h-7 w-7 mr-4" />
-                        <p className="text-black font-medium text-md">{label}</p>
-                    </button>
+                        <div
+                            className={`absolute inset-0 ${
+                                router.pathname === href
+                                    ? 'opacity-100'
+                                    : 'opacity-0 hover:opacity-50'
+                            } transition-opacity duration-200`}
+                            style={{
+                                clipPath: 'polygon(0 0, 90% 0, 10% 100%, 0 100%)',
+                            }}
+                        ></div>
+                        <Icon
+                            className={`h-7 w-7 mr-4 z-10 ${
+                                router.pathname === href
+                                    ? 'text-amber-500'
+                                    : 'text-gray-700'
+                            }`}
+                        />
+                        <p
+                            className={`text-md z-10 font-medium ${
+                                router.pathname === href
+                                    ? 'text-amber-500'
+                                    : 'text-gray-700'
+                            }`}
+                        >
+                            {name}
+                        </p>
+                    </Link>
                 ))}
             </div>
         </div>

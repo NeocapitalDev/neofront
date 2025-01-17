@@ -19,7 +19,7 @@ export default function Layout({ children, title, showButton, NoTab }) {
                                 {/* Columna 2 (25%) */}
                                 <Sidebar />
                             </div>
-                            <div className="flex-1 lg:basis-3/4 bg-green-100">
+                            <div className="flex-1 lg:basis-3/4">
                                 {/* Columna 2 (75%) */}
                                 {children}
                                 <FooterInfo />
