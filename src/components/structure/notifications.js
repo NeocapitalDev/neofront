@@ -2,7 +2,7 @@ import { useState, Fragment } from 'react'; // Agregada la importación de Fragm
 import { BellIcon } from '@heroicons/react/24/outline';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-
+import NotificationsList from '../structure/notificationsList'; // Importa el componente NotificationsList
 const BellIconButton = ({ onClick }) => {
   return (
     <button
@@ -44,7 +44,7 @@ export default function Example() {
                       <div className="px-4 sm:px-6">
                         <div className="flex items-start justify-between">
                           <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
-                            Panel title
+                            <h2 className="text-xl font-semibold text-gray-900">Notificaciones</h2>
                           </Dialog.Title>
                           <div className="ml-3 flex h-7 items-center">
                             <button
@@ -59,7 +59,9 @@ export default function Example() {
                           </div>
                         </div>
                       </div>
-                      <div className="relative mt-6 flex-1 px-4 sm:px-6">{/* Your content */}</div>
+                      <div className="relative mt-6 flex-1 px-4 sm:px-6">
+                        <NotificationsList />
+                      </div>
                     </div>
                   </Dialog.Panel>
                 </Transition.Child>
