@@ -69,26 +69,34 @@ export default function CredencialesModal() {
 
                                     <div className="mt-3 sm:mt-0">
                                         <Dialog.Title as="h3" className="text-base font-semibold leading-6 border-b pb-5 text-gray-900 text-left mb-4">
-                                            Credenciales de inicio de sesion
+                                            Credenciales de inicio de sesión
                                         </Dialog.Title>
 
                                         {/* Tabla de credenciales */}
                                         <div className="">
                                             {data.map((item, index) => {
                                                 const isLast = index === data.length - 1;
-
-
-
-
                                                 return (
                                                     <div
                                                         key={index}
                                                         className={`flex items-center ${!isLast ? 'justify-between' : ''} ${!isLast && 'border-b'} pb-2`}
                                                     >
-                                                        <div className="text-sm font-medium text-gray-900">
+                                                        <div className="text-sm font-medium text-gray-900 flex items-center">
                                                             {item.label}:
+                                                            {['Contraseña', 'Contraseña de solo lectura'].includes(item.label) && (
+                                                                <svg
+                                                                    className="w-4 h-4 text-gray-600 ml-1"
+                                                                    viewBox="0 0 512 512"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                >
+                                                                    <path
+                                                                        fill="#808080"
+                                                                        d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"
+                                                                    ></path>
+                                                                </svg>
+                                                            )}
                                                         </div>
-                                                
+
                                                         <div className={`flex items-center py-1 ${!isLast ? 'space-x-20' : 'space-x-2'}`}>
                                                             {/* Contraseña principal con opción de ocultar */}
                                                             {item.label === 'Contraseña' ? (
@@ -114,7 +122,7 @@ export default function CredencialesModal() {
                                                                     <span className="text-sm text-gray-600">{item.value}</span>
                                                                 )
                                                             )}
-                                                
+
                                                             {!isLast && (
                                                                 <div className="flex flex-col space-y-2 w-[120px]">
                                                                     {/* Botón de copiar */}
@@ -127,7 +135,7 @@ export default function CredencialesModal() {
                                                                         </button>
                                                                         <span className="text-sm text-gray-600 truncate">Copiar</span>
                                                                     </div>
-                                                
+
                                                                     {/* Botón de cambio */}
                                                                     {['Contraseña', 'Contraseña de solo lectura'].includes(item.label) && (
                                                                         <div className="flex items-center space-x-3">
@@ -144,14 +152,7 @@ export default function CredencialesModal() {
                                                         </div>
                                                     </div>
                                                 );
-                                                
-
-
-
-
-
                                             })}
-
                                         </div>
                                     </div>
 
