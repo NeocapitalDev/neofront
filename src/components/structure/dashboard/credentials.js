@@ -77,66 +77,79 @@ export default function CredencialesModal() {
                                         {data.map((item, index) => {
     const isLast = index === data.length - 1;
 
-    return (
-        <div
-            key={index}
-            className={`flex items-center justify-between ${!isLast && 'border-b'} pb-2`}
-        >
-            <div className="text-sm font-medium text-gray-900">
-                {item.label}:
-            </div>
+    
 
-            <div className="flex items-center py-1 space-x-20">
-                {/* Contraseña principal con opción de ocultar */}
-                {item.label === 'Contraseña' ? (
-                    <div className="flex items-center space-x-1">
-                        <span className="text-sm text-gray-600">
-                            {showPassword ? item.value : '********'}
-                        </span>
-                        <button
-                            className="flex items-center justify-center"
-                            onClick={() => setShowPassword(!showPassword)}
-                        >
-                            {showPassword ? (
-                                <EyeSlashIcon className="h-5 w-5 text-gray-600" />
-                            ) : (
-                                <EyeIcon className="h-5 w-5 text-gray-600" />
-                            )}
-                        </button>
-                    </div>
+
+
+return (
+    <div
+        key={index}
+        className={`flex items-center justify-between ${!isLast && 'border-b'} pb-2`}
+    >
+        <div className="text-sm font-medium text-gray-900">
+            {item.label}:
+        </div>
+
+        <div className="flex items-center py-1 space-x-20">
+            {/* Contraseña principal con opción de ocultar */}
+            {item.label === 'Contraseña' ? (
+                <div className="flex items-center space-x-1">
+                    <span className="text-sm text-gray-600">
+                        {showPassword ? item.value : '********'}
+                    </span>
+                    <button
+                        className="flex items-center justify-center"
+                        onClick={() => setShowPassword(!showPassword)}
+                    >
+                        {showPassword ? (
+                            <EyeSlashIcon className="h-5 w-5 text-gray-600" />
+                        ) : (
+                            <EyeIcon className="h-5 w-5 text-gray-600" />
+                        )}
+                    </button>
+                </div>
+            ) : (
+                isLast ? (
+                    <span className="text-sm font-bold text-gray-900">{item.value}</span>
                 ) : (
                     <span className="text-sm text-gray-600">{item.value}</span>
-                )}
+                )
+            )}
 
-                {!isLast && (
-                    <div className="flex flex-col space-y-2 w-[120px]">
-                        {/* Botón de copiar */}
+            {!isLast && (
+                <div className="flex flex-col space-y-2 w-[120px]">
+                    {/* Botón de copiar */}
+                    <div className="flex items-center space-x-3">
+                        <button
+                            className="p-2 bg-white rounded border hover:bg-gray-200 w-12 h-12 flex items-center justify-center"
+                            onClick={() => handleCopy(item.value)}
+                        >
+                            <ClipboardDocumentIcon className="h-5 w-5 text-gray-600" />
+                        </button>
+                        <span className="text-sm text-gray-600 truncate">Copiar</span>
+                    </div>
+
+                    {/* Botón de cambio */}
+                    {['Contraseña', 'Contraseña de solo lectura'].includes(item.label) && (
                         <div className="flex items-center space-x-3">
                             <button
-                                className="p-2 bg-white rounded border hover:bg-gray-200 w-12 h-12 flex items-center justify-center"
-                                onClick={() => handleCopy(item.value)}
+                                className="p-2 border bg-white rounded hover:bg-gray-200 w-12 h-12 flex items-center justify-center"
                             >
-                                <ClipboardDocumentIcon className="h-5 w-5 text-gray-600" />
+                                <PencilIcon className="h-5 w-5 text-gray-600" />
                             </button>
-                            <span className="text-sm text-gray-600 truncate">Copiar</span>
+                            <span className="text-sm text-gray-600 truncate">Cambio</span>
                         </div>
-
-                        {/* Botón de cambio */}
-                        {['Contraseña', 'Contraseña de solo lectura'].includes(item.label) && (
-                            <div className="flex items-center space-x-3">
-                                <button
-                                    className="p-2 border bg-white rounded hover:bg-gray-200 w-12 h-12 flex items-center justify-center"
-                                >
-                                    <PencilIcon className="h-5 w-5 text-gray-600" />
-                                </button>
-                                <span className="text-sm text-gray-600 truncate">Cambio</span>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
+            )}
         </div>
-    );
+    </div>
+);
+
+
+
+
+
 })}
 
                                         </div>
