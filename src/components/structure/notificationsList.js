@@ -36,7 +36,7 @@ const NotificationsList = () => {
                         <span className="text-2xl mr-3">{notification.icon}</span>
                         <div>
                             <h3 className="font-bold text-blue-600">{notification.title}</h3>
-                            <p className="text-gray-600">{notification.description}</p>
+                            <p className="text-black">{notification.description}</p>
                             <p className="text-sm text-gray-400">{notification.time}</p>
                         </div>
                     </div>
@@ -52,7 +52,7 @@ const NotificationsList = () => {
                     <div>
                         <a
                             href={notification.buttonLink}
-                            className="block text-center bg-amber-400 text-white font-semibold py-2 px-4 rounded hover:bg-amber-500 transition"
+                            className="block text-center bg-amber-400 text-black font-semibold py-2 px-4 rounded hover:bg-amber-500 transition"
                         >
                             {notification.buttonText}
                         </a>
