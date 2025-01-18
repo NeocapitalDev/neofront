@@ -35,7 +35,7 @@ const NotificationsList = () => {
                     <div className="flex items-start">
                         <span className="text-2xl mr-3">{notification.icon}</span>
                         <div>
-                            <h3 className="font-bold text-blue-600">{notification.title}</h3>
+                            <h3 className="font-bold text-amber-400">{notification.title}</h3>
                             <p className="text-black">{notification.description}</p>
                             <p className="text-sm text-gray-400">{notification.time}</p>
                         </div>
