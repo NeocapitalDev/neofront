@@ -8,7 +8,7 @@ import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
 const SocialsPage = () => {
     // Usamos el hook que creamos para obtener los datos de 'socials'
     const { data: socials, error, isLoading } = useStrapiData('socials');
-
+    console.log(socials);
     // Si está cargando, mostramos un mensaje de carga
     if (isLoading) {
         return <Layout><Loader /></Layout>;
@@ -45,7 +45,7 @@ const SocialsPage = () => {
                                     <div className="flex-shrink-0 bg-gray-100 p-3 rounded-full flex items-center justify-center">
                                         {typeof plataforma.icono === 'string' ? (
                                             <Image
-                                                src={`/images/social/${plataforma.icono}`} // Asegúrate de que la imagen se encuentre en la ruta correcta
+                                                src={`${plataforma.icono}`} // Asegúrate de que la imagen se encuentre en la ruta correcta
                                                 alt={plataforma.nombre}
                                                 width={51}
                                                 height={51}

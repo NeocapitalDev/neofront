@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['localhost'], // Agrega aquí el dominio de las imágenes
+    domains: ['localhost','minio.neocapitalfunding.com'], // Agrega aquí el dominio de las imágenes
   },
 };
 

@@ -3,36 +3,21 @@ import Layout from "../../components/layout/dashboard";
 import Image from "next/image";
 import { useStrapiData } from "../../lib/strapiService";
 import { ArrowLongRightIcon } from "@heroicons/react/24/solid";
+import Loader from '../../components/loaders/loader';
 
 const Billing = () => {
-    const { data: supports, error, isLoading } = useStrapiData("supports?populate=*");
-    console.log(supports);
-    
-    const constructImageUrl = (url) => {
-        const baseUrl = process.env.NEXT_PUBLIC_STRAPI_BASE_URL || "http://localhost:1337";
-        console.log(`${baseUrl}${url}`)
-        return `${baseUrl}${url}`;
-    };
-
+    const { data: supports, error, isLoading } = useStrapiData("supports");
+    // Si está cargando, mostramos un mensaje de carga
     if (isLoading) {
-        return (
-            <Layout title="Billing">
-                <div className="p-6 bg-white shadow-md rounded-lg">
-                    <p className="text-gray-600">Cargando plataformas de soporte...</p>
-                </div>
-            </Layout>
-        );
+        return <Layout><Loader /></Layout>;
     }
 
+    // Si hay un error, mostramos el mensaje de error
     if (error) {
-        return (
-            <Layout title="Billing">
-                <div className="p-6 bg-white shadow-md rounded-lg">
-                    <p className="text-red-600">Error al cargar las plataformas de soporte.</p>
-                </div>
-            </Layout>
-        );
+        return <Layout>Error al cargar los datos: {error.message}</Layout>;
     }
+
+
 
     return (
         <Layout title="Billing">
@@ -63,7 +48,7 @@ const Billing = () => {
                                 {/* Icono */}
                                 <div className="flex-shrink-0 bg-gray-100 p-3 rounded-full flex items-center justify-center">
                                     <Image
-                                        src={constructImageUrl(plataforma.icon.url)}
+                                        src={`${plataforma.icono}`} // Asegúrate de que la imagen se encuentre en la ruta correcta
                                         alt={plataforma.nombre}
                                         width={51}
                                         height={51}
