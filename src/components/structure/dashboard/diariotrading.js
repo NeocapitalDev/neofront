@@ -1,5 +1,10 @@
 import { useState } from 'react';
 import Image from 'next/image';
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "../../ui/hover-card.tsx"
 
 export default function Diariotrading() {
     const [search, setSearch] = useState("");
@@ -37,33 +42,33 @@ export default function Diariotrading() {
         <>
             <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center space-x-3 relative">
-                    <h1 className="text-xl font-semibold text-gray-800">Diario de Trading</h1>
-                    <Image
-                        src="/images/informacion/info.svg"
-                        alt="Más información"
-                        width={16}
-                        height={16}
-                        className="inline-block ml-1 cursor-pointer"
-                        onMouseEnter={() => setShowInfo(true)}  // Mostrar información al pasar el mouse
-                        onMouseLeave={() => setShowInfo(false)} // Ocultar información cuando se quita el mouse
-                    />
+                    {/* Título con la imagen de información */}
+                    <div className="relative flex items-center">
+                        <h1 className="text-xl font-semibold text-gray-800">Diario de Trading</h1>
 
-                    {/* Ventana flotante con información */}
-                    {showInfo && (
-                        <div className="absolute bg-black text-white text-sm rounded-lg py-2 px-3 w-64 top-1/2 left-full transform translate-x-2 -translate-y-1/2 shadow-lg z-30">
-                            <p>
-                                El "Diario de Trading" te permite llevar un registro detallado de tus operaciones, ayudando
-                                a mejorar tu disciplina y análisis de las decisiones que tomas en cada trade. Es una herramienta
-                                clave para el crecimiento como trader.
-                            </p>
-                        </div>
-                    )}
+                        {/* HoverCard para la información */}
+                        <HoverCard>
+                            <HoverCardTrigger className="inline-block ml-1 cursor-pointer">
+                                <Image
+                                    src="/images/informacion/info.svg"
+                                    alt="Más información"
+                                    width={16}
+                                    height={16}
+                                />
+                            </HoverCardTrigger>
+                            <HoverCardContent className="w-64 bg-black text-white text-sm rounded-lg py-2 px-3 shadow-lg z-30">
+                                <p>
+                                    El "Diario de Trading" te permite llevar un registro detallado de tus operaciones, ayudando
+                                    a mejorar tu disciplina y análisis de las decisiones que tomas en cada trade. Es una herramienta
+                                    clave para el crecimiento como trader.
+                                </p>
+                            </HoverCardContent>
+                        </HoverCard>
+                    </div>
                 </div>
             </div>
 
             <div className="p-4 bg-white rounded-lg shadow-md max-w-5xl mx-auto">
-
-
                 {/* Filtros */}
                 <div className="mb-4 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center">
                     {/* Orden */}
@@ -148,27 +153,24 @@ export default function Diariotrading() {
                                         {header}
                                         {header === "Pips" && (
                                             <>
-                                                {/* Imagen para información de Pips */}
-                                                <Image
-                                                    src="/images/informacion/info.svg"
-                                                    alt="Más información"
-                                                    width={16}
-                                                    height={16}
-                                                    className="inline-block ml-1 cursor-pointer"
-                                                    onMouseEnter={() => setShowTooltip(true)}  // Mostrar tooltip al pasar el mouse
-                                                    onMouseLeave={() => setShowTooltip(false)} // Ocultar tooltip cuando se quita el mouse
-                                                />
-
-                                                {/* Ventana flotante con información */}
-                                                {showTooltip && (
-                                                    <div className="absolute bg-black text-white text-sm rounded-lg py-2 px-3 w-60 top-0 left-full transform translate-x-3 shadow-lg z-30">
+                                                {/* HoverCard para información de Pips */}
+                                                <HoverCard>
+                                                    <HoverCardTrigger className="inline-block ml-1 cursor-pointer">
+                                                        <Image
+                                                            src="/images/informacion/info.svg"
+                                                            alt="Más información"
+                                                            width={16}
+                                                            height={16}
+                                                        />
+                                                    </HoverCardTrigger>
+                                                    <HoverCardContent className="w-60 bg-black text-white">
                                                         <p>
-                                                            Los pips se muestran para los pares FX. Para los símbolos no FX, el valor muestra el cambio de precio
-                                                            en su denotación por defecto. Por ejemplo, si el precio del oro cambió de 1800,00 a 1801,50 y la
-                                                            posición era de compra, el valor mostrará 1,50. Más información en el enlace.
+                                                            Los pips se muestran para los pares FX. Para los símbolos no FX, el valor muestra el cambio de
+                                                            precio en su denotación por defecto. Por ejemplo, si el precio del oro cambió de 1800,00 a 1801,50 y
+                                                            la posición era de compra, el valor mostrará 1,50. Más información en el enlace.
                                                         </p>
-                                                    </div>
-                                                )}
+                                                    </HoverCardContent>
+                                                </HoverCard>
                                             </>
                                         )}
 
@@ -229,6 +231,6 @@ export default function Diariotrading() {
                     </table>
                 </div>
             </div>
-    </>
+        </>
     );
 }

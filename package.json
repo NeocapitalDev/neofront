@@ -11,8 +11,10 @@
   "dependencies": {
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
+    "@radix-ui/react-hover-card": "^1.1.4",
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "axios": "^1.6.7",
+    "clsx": "^2.1.1",
     "md5": "^2.3.0",
     "next": "14.1.3",
     "next-auth": "^4.24.6",
@@ -21,7 +23,8 @@
     "react-dom": "^18",
     "react-phone-input-2": "^2.15.1",
     "sonner": "^1.4.41",
-    "swr": "^2.2.5"
+    "swr": "^2.2.5",
+    "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
