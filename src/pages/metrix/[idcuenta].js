@@ -32,12 +32,15 @@ const Metrix = () => {
 
                     <div className="w-1/4">
                         <h2 className="text-lg font-semibold">Free Trial {idcuenta}</h2>
-                        <div className="border rounded-md p-4 mb-4 bg-white shadow-md">
                             <MetrixInfo />
-                        </div>
                     </div>
                 </div>
+                <h2 className="text-lg mt-5 font-semibold">Objetivos</h2>
+
                 <Objetivos />
+
+                <br />
+
 
                 <Diariotrading />
 

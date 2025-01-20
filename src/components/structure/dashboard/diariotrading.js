@@ -12,7 +12,7 @@ export default function Diariotrading() {
     ];
 
     return (
-        <div className="p-3 bg-white rounded-md shadow-sm">
+        <div className="p-3 bg-white  rounded-md shadow-sm">
             <table className="w-full border-collapse text-sm">
                 <tbody>
                     {data.map((item, index) => (

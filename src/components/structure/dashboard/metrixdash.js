@@ -5,7 +5,7 @@ export default function MetrixDash() {
     const labels = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'];
 
     return (
-        <div className="flex items-center justify-center bg-gray-100">
+        <div className="flex items-center justify-center  bg-gray-100">
             <div className="w-full  bg-white rounded-lg shadow-lg p-6">
                 <h2 className="text-lg font-bold mb-4">Gráfica de Ventas</h2>
                 <div className="flex justify-between">
@@ -15,7 +15,8 @@ export default function MetrixDash() {
                                 style={{
                                     height: `${value * 10}px`, // Escalar la altura
                                     width: '100%', // Llenar el ancho disponible
-                                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                                    backgroundColor: 'rgba(255, 193, 7, 1)', // Ámbar sólido
+
                                     borderRadius: '4px',
                                 }}
                             />
