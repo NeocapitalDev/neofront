@@ -54,8 +54,7 @@ export default function Index() {
 
     return (
         <div>
-            <h2 className="text-lg font-semibold mb-4 text-gray-800">NEOCAPITAL Accounts</h2>
-
+            
             {accountData.map((account, index) => (
                 <div
                     key={index}

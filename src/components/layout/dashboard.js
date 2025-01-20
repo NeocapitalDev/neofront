@@ -5,6 +5,7 @@ import Sidebar from '../structure/sidebar';
 
 
 import WhatsAppButton from "../structure/WhatsAppButton";
+import Breadcrumb from '../Breadcrumb';
 
 export default function Layout({ children, title, showButton, NoTab }) {
     return (
@@ -19,9 +20,12 @@ export default function Layout({ children, title, showButton, NoTab }) {
                                 {/* Columna 2 (25%) */}
                                 <Sidebar />
                             </div>
+
                             <div className="flex-1 lg:basis-3/4">
+                                <Breadcrumb/>
                                 {/* Columna 2 (75%) */}
                                 {children}
+
                                 <FooterInfo />
                             </div>
                         </div>

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { navigation } from './links'; // Importar desde links.js
+import PrincipalButton from './principalButton';
 
 export default function Sidebar() {
     const router = useRouter();
@@ -8,9 +9,9 @@ export default function Sidebar() {
     return (
         <div>
             <div className="p-4 border-b border-gray-200">
-                <button className="bg-amber-500 rounded-md text-black font-semibold px-4 py-3 w-full hover:bg-amber-600 transition duration-200">
-                    Nuevo desafío NEO
-                </button>
+                {/* Aquí se utiliza el nuevo componente con los props correspondientes */}
+                <PrincipalButton/>
+
 
                 <p className="text-black font-semibold text-lg mt-8">
                     Menú principal
