@@ -38,7 +38,7 @@ const data = [
 const Billing = () => {
     return (
         <Layout title="Billing">
-            <div className="p-6">
+            <div className="p-0">
                 <div className="flex bg-white p-5 justify-between items-center mb-4">
                     <div className="flex items-center space-x-2">
                         <DocumentTextIcon className="w-6 h-6 text-gray-600" />
