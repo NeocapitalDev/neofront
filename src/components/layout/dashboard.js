@@ -14,7 +14,7 @@ export default function Layout({ children, title, showButton, NoTab }) {
                 <main>
                     {/* Estructura central */}
                     <div className="mx-auto max-w-7xl py-12 px-4 sm:px-6 lg:px-8">
-                        <div className="flex flex-col md:flex-row gap-4">
+                        <div className="flex flex-col md:flex-row gap-8">
                             <div className="hidden lg:block basis-1/4 h-full bg-white rounded-xl shadow-lg">
                                 {/* Columna 2 (25%) */}
                                 <Sidebar />
