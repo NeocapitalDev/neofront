@@ -1,39 +1,234 @@
 import { useState } from 'react';
+import Image from 'next/image';
 
 export default function Diariotrading() {
-    const data = [
-        { label: "Estado", value: "Listo" },
-        { label: "Iniciar", value: "-" },
-        { label: "Fin", value: "-" },
-        { label: "Tamaño de cuenta", value: "$50,000.00" },
-        { label: "Tipo de Cuenta", value: "FTMO" },
-        { label: "Plataforma (MT4)", value: "Descargar", isLink: true },
-        { label: "Última actualización", value: "-" },
+    const [search, setSearch] = useState("");
+    const [order, setOrder] = useState("Hora de Cierre");
+    const [showTooltip, setShowTooltip] = useState(false);
+    const [dropdown, setDropdown] = useState(null);
+    const [showInfo, setShowInfo] = useState(false);  // Estado para mostrar la ventana de información
+
+    const orderOptions = [
+        "Hora de apertura",
+        "Hora de Apertura ↓",
+        "Tipo de Orden",
+        "Símbolo",
+        "Volumen",
+        "Hora de Cierre",
+        "Ticket",
+        "Objetivo de Ganancia",
+        "Ganancia",
+        "Duración",
     ];
 
+    const dropdownOptions = {
+        Tipo: ["Compra", "Venta", "Pendiente"],
+        Volumen: ["1.0", "0.5", "0.25", "0.1"],
+        Símbolo: ["EUR/USD", "GBP/USD", "XAU/USD"],
+    };
+
+    const data = []; // Aquí puedes agregar tus datos reales
+
+    const toggleDropdown = (key) => {
+        setDropdown(dropdown === key ? null : key);
+    };
+
     return (
-        <div className="p-3 bg-white  rounded-md shadow-sm">
-            <table className="w-full border-collapse text-sm">
-                <tbody>
-                    {data.map((item, index) => (
-                        <tr key={index} className="border-b last:border-none">
-                            <td className="py-1 font-medium text-gray-500">{item.label}</td>
-                            <td className="py-1 text-right">
-                                {item.isLink ? (
-                                    <a
-                                        href="#"
-                                        className="text-blue-400 hover:underline"
+        <>
+            <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center space-x-3 relative">
+                    <h1 className="text-xl font-semibold text-gray-800">Diario de Trading</h1>
+                    <Image
+                        src="/images/informacion/info.svg"
+                        alt="Más información"
+                        width={16}
+                        height={16}
+                        className="inline-block ml-1 cursor-pointer"
+                        onMouseEnter={() => setShowInfo(true)}  // Mostrar información al pasar el mouse
+                        onMouseLeave={() => setShowInfo(false)} // Ocultar información cuando se quita el mouse
+                    />
+
+                    {/* Ventana flotante con información */}
+                    {showInfo && (
+                        <div className="absolute bg-black text-white text-sm rounded-lg py-2 px-3 w-64 top-1/2 left-full transform translate-x-2 -translate-y-1/2 shadow-lg z-30">
+                            <p>
+                                El "Diario de Trading" te permite llevar un registro detallado de tus operaciones, ayudando
+                                a mejorar tu disciplina y análisis de las decisiones que tomas en cada trade. Es una herramienta
+                                clave para el crecimiento como trader.
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="p-4 bg-white rounded-lg shadow-md max-w-5xl mx-auto">
+
+
+                {/* Filtros */}
+                <div className="mb-4 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center">
+                    {/* Orden */}
+                    <div className="flex items-center space-x-3 w-full md:w-auto">
+                        <label htmlFor="order" className="text-sm font-medium text-gray-700">
+                            Orden:
+                        </label>
+                        <select
+                            id="order"
+                            value={order}
+                            onChange={(e) => setOrder(e.target.value)}
+                            className="border border-gray-300 rounded-md p-2 text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            {orderOptions.map((option, index) => (
+                                <option key={index} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Buscar */}
+                    <div className="flex items-center space-x-3 w-full md:w-auto">
+                        <label htmlFor="search" className="text-sm font-medium text-gray-700">
+                            Buscar:
+                        </label>
+                        <input
+                            id="search"
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Buscar tickets o etiquetas..."
+                            className="border border-gray-300 rounded-md p-2 text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                </div>
+
+                {/* Tabla */}
+                <div className="overflow-x-auto border border-gray-300 rounded-md">
+                    <table className="w-full h-60 min-w-max text-sm text-left">
+                        <thead className="bg-gray-100 sticky top-0 z-10">
+                            <tr>
+                                {[
+                                    "Ticket",
+                                    "Abrir",
+                                    "Tipo",
+                                    "Volumen",
+                                    "Símbolo",
+                                    "Precio",
+                                    "SL",
+                                    "TP",
+                                    "Cierre",
+                                    "Swap",
+                                    "Comisión",
+                                    "Beneficio",
+                                    "Pips",
+                                    "Tiempo de duración",
+                                    "Registro",
+                                ].map((header, index) => (
+                                    <th
+                                        key={index}
+                                        className={`border-b p-3 ${["Tipo", "Volumen", "Símbolo"].includes(header)
+                                            ? "text-amber-400 cursor-pointer relative"
+                                            : header === "Pips"
+                                                ? "text-amber-400 relative"
+                                                : "text-gray-700"
+                                            }`}
+                                        onClick={() => {
+                                            if (
+                                                ["Tipo", "Volumen", "Símbolo"].includes(header)
+                                            ) {
+                                                toggleDropdown(header);
+                                            }
+                                        }}
+                                        onMouseEnter={() =>
+                                            header === "Pips" && setShowTooltip(true)
+                                        }
+                                        onMouseLeave={() =>
+                                            header === "Pips" && setShowTooltip(false)
+                                        }
                                     >
-                                        {item.value}
-                                    </a>
-                                ) : (
-                                    item.value
-                                )}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+                                        {header}
+                                        {header === "Pips" && (
+                                            <>
+                                                {/* Imagen para información de Pips */}
+                                                <Image
+                                                    src="/images/informacion/info.svg"
+                                                    alt="Más información"
+                                                    width={16}
+                                                    height={16}
+                                                    className="inline-block ml-1 cursor-pointer"
+                                                    onMouseEnter={() => setShowTooltip(true)}  // Mostrar tooltip al pasar el mouse
+                                                    onMouseLeave={() => setShowTooltip(false)} // Ocultar tooltip cuando se quita el mouse
+                                                />
+
+                                                {/* Ventana flotante con información */}
+                                                {showTooltip && (
+                                                    <div className="absolute bg-black text-white text-sm rounded-lg py-2 px-3 w-60 top-0 left-full transform translate-x-3 shadow-lg z-30">
+                                                        <p>
+                                                            Los pips se muestran para los pares FX. Para los símbolos no FX, el valor muestra el cambio de precio
+                                                            en su denotación por defecto. Por ejemplo, si el precio del oro cambió de 1800,00 a 1801,50 y la
+                                                            posición era de compra, el valor mostrará 1,50. Más información en el enlace.
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+
+                                        {/* Dropdown */}
+                                        {dropdown === header && (
+                                            <div className="absolute bg-white border border-gray-300 rounded-lg shadow-md mt-2 z-20 p-3 w-40">
+                                                {dropdownOptions[header]?.map((item, i) => (
+                                                    <div
+                                                        key={i}
+                                                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                                                        onClick={() => alert(`Seleccionaste: ${item}`)}
+                                                    >
+                                                        {item}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {data.length === 0 ? (
+                                <tr>
+                                    <td
+                                        colSpan="15"
+                                        className="text-center p-6 text-gray-500 italic"
+                                    >
+                                        Sin resultados
+                                    </td>
+                                </tr>
+                            ) : (
+                                data.map((row, index) => (
+                                    <tr
+                                        key={index}
+                                        className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                                            }`}
+                                    >
+                                        <td className="border-b p-3">{row.ticket}</td>
+                                        <td className="border-b p-3">{row.abrir}</td>
+                                        <td className="border-b p-3">{row.tipo}</td>
+                                        <td className="border-b p-3">{row.volumen}</td>
+                                        <td className="border-b p-3">{row.simbolo}</td>
+                                        <td className="border-b p-3">{row.precio}</td>
+                                        <td className="border-b p-3">{row.sl}</td>
+                                        <td className="border-b p-3">{row.tp}</td>
+                                        <td className="border-b p-3">{row.cierre}</td>
+                                        <td className="border-b p-3">{row.swap}</td>
+                                        <td className="border-b p-3">{row.comision}</td>
+                                        <td className="border-b p-3">{row.beneficio}</td>
+                                        <td className="border-b p-3">{row.pips}</td>
+                                        <td className="border-b p-3">{row.duracion}</td>
+                                        <td className="border-b p-3">{row.registro}</td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </>
     );
 }
