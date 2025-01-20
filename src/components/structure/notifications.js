@@ -44,7 +44,7 @@ export default function Example() {
                       <div className="px-4 sm:px-6">
                         <div className="flex items-start justify-between">
                           <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
-                            <h2 className="text-xl font-semibold text-gray-900">Notificaciones</h2>
+                            <h2 className="text-xl font-semibold text-gray-900">🔔 Notificaciones</h2>
                           </Dialog.Title>
                           <div className="ml-3 flex h-7 items-center">
                             <button

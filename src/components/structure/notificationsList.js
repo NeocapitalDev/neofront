@@ -1,66 +1,73 @@
-import React from "react";
+import Layout from '../../components/layout/dashboard';
+import Loader from '../../components/loaders/loader';
+import { useStrapiData } from '../../lib/strapiService';
+import Image from 'next/image';
 
-const notifications = [
-    {
-        id: 1,
-        icon: "⚠️", // Icono representativo
-        title: "Actualizaciones importantes",
-        description: "¡No se pierda las actualizaciones de trading!",
-        time: "hace 10 horas",
-        image: "/images/icon-dark.png", // Imagen de ejemplo
-        buttonText: "Más información",
-        buttonLink: "#",
-    },
-    {
-        id: 2,
-        icon: "🔑", // Icono representativo
-        title: "Free Trial",
-        description:
-            "Gracias por realizar su Free Trial. Las credenciales de acceso a su cuenta de trading se encuentran directamente en su Área de Cliente o en su Account MetriX. Buena suerte en su trading.",
-        time: "hace 20 horas",
-        image: null,
-        buttonText: "Credenciales",
-        buttonLink: "#",
-    },
-];
+const NotificationsPage = () => {
+    // Usamos el hook que creamos para obtener los datos de 'notifications'
+    const { data: notifications, error, isLoading } = useStrapiData('notifications');
 
-const NotificationsList = () => {
+    // Si está cargando, mostramos un mensaje de carga
+    if (isLoading) {
+        return (
+            <Loader />
+        );
+    }
+
+    // Si hay un error, mostramos el mensaje de error
+    if (error) {
+        return <p>Error al cargar las notificaciones: {error.message}</p>;
+    }
+
+    // Renderizamos las notificaciones si los datos están disponibles
     return (
-        <div className="p-4 space-y-4">
-            {notifications.map((notification) => (
-                <div
-                    key={notification.id}
-                    className="border rounded-lg p-4 shadow-sm bg-white space-y-2"
-                >
-                    <div className="flex items-start">
-                        <span className="text-2xl mr-3">{notification.icon}</span>
-                        <div>
-                            <h3 className="font-bold text-amber-400">{notification.title}</h3>
-                            <p className="text-black">{notification.description}</p>
-                            <p className="text-sm text-gray-400">{notification.time}</p>
-                        </div>
-                    </div>
-                    {notification.image && (
-                        <div className="flex justify-center mt-2">
-                            <img
-                                src={notification.image}
-                                alt={notification.title}
-                                className="w-24 h-24 rounded-lg"
-                            />
-                        </div>
-                    )}
-                    <div>
-                        <a
-                            href={notification.buttonLink}
-                            className="block text-center bg-amber-400 text-black font-semibold py-2 px-4 rounded hover:bg-amber-500 transition"
+
+        <div className="p-6 bg-white shadow-md rounded-lg">
+            <div className="space-y-4">
+                {notifications && notifications.length > 0 ? (
+                    notifications.map((notification) => (
+                        <div
+                            key={notification.id}
+                            className="border rounded-lg p-4 shadow-sm bg-white space-y-2"
                         >
-                            {notification.buttonText}
-                        </a>
-                    </div>
-                </div>
-            ))}
+                            <div className="flex items-start">
+                                <span className="text-2xl mr-3">{notification.icon}</span>
+                                <div>
+                                    <h3 className="font-bold text-amber-400">
+                                        {notification.title}
+                                    </h3>
+                                    <p className="text-black">{notification.description}</p>
+                                    <p className="text-sm text-gray-400">{notification.time}</p>
+                                </div>
+                            </div>
+                            {notification.image && (
+                                <div className="flex justify-center mt-2">
+                                    <Image
+                                        src={notification.image}
+                                        alt={notification.title}
+                                        width={96}
+                                        height={96}
+                                        className="w-24 h-24 rounded-lg"
+                                    />
+                                </div>
+                            )}
+                            <div>
+                                <a
+                                    href={notification.buttonLink}
+                                    className="block text-center bg-amber-400 text-black font-semibold py-2 px-4 rounded hover:bg-amber-500 transition"
+                                >
+                                    {notification.buttonText}
+                                </a>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div>No hay notificaciones para mostrar.</div>
+                )}
+            </div>
         </div>
+
     );
 };
 
-export default NotificationsList;
+export default NotificationsPage;

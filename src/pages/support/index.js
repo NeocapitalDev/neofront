@@ -47,7 +47,7 @@ const SupportPage = () => {
                                                 alt={plataforma.nombre}
                                                 width={51}
                                                 height={51}
-                                                className="w-[51px] h-[51px]"
+                                                className="w-[51px] h-[51px] rounded-full"
                                             />
                                         ) : (
                                             plataforma.icono
