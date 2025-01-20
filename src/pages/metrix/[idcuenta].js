@@ -4,6 +4,8 @@ import Layout from '../../components/layout/dashboard';
 import { ChartBarIcon } from '@heroicons/react/24/outline'; 
 import MetrixDash from '../../components/structure/dashboard/metrixdash';
 import MetrixInfo from '../../components/structure/dashboard/metrixinfo';
+import Objetivos from '../../components/structure/dashboard/objetivos';
+import Diariotrading from '../../components/structure/dashboard/diariotrading';
 
 const Metrix = () => {
     const router = useRouter();
@@ -35,6 +37,10 @@ const Metrix = () => {
                         </div>
                     </div>
                 </div>
+                <Objetivos />
+
+                <Diariotrading />
+
             </div>
         </Layout>
     );
