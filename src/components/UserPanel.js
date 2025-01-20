@@ -2,6 +2,7 @@ import Layout from '../components/layout/dashboard';
 import { KeyIcon, ChartBarIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import CredencialesModal from './structure/dashboard/credentials';
+import Link from 'next/link';
 
 export default function Index() {
     const accountData = [
@@ -54,7 +55,6 @@ export default function Index() {
 
     return (
         <div>
-            
             {accountData.map((account, index) => (
                 <div
                     key={index}
@@ -92,19 +92,18 @@ export default function Index() {
                         </div>
                     )}
 
-
                     {/* Mostrar botones solo si está visible */}
                     {visibility[index] && (
                         <div className="mt-4 flex flex-col items-start space-y-2 lg:flex-row lg:space-y-0 lg:space-x-4">
                             <CredencialesModal />
 
-                            <button className="flex items-center justify-center space-x-2 px-2 py-1 border rounded-sm shadow-md bg-gray-0 hover:bg-gray-200 w-auto">
-                                <ChartBarIcon className="h-6 w-6 text-gray-600" />
-                                <span className="text-xs lg:text-sm">MetriX</span>
-                            </button>
+                            <Link href={`/metrix/${account.login}`}>
+                                <button className="flex items-center justify-center space-x-2 px-2 py-1 border rounded-sm shadow-md bg-gray-0 hover:bg-gray-200 w-auto">
+                                    <ChartBarIcon className="h-6 w-6 text-gray-600" />
+                                    <span className="text-xs lg:text-sm">MetriX</span>
+                                </button>
+                            </Link>
                         </div>
-
-
                     )}
 
                     {/* Toggle Visible */}
@@ -118,12 +117,10 @@ export default function Index() {
                                 className="sr-only peer"
                             />
                             <div
-                                className={`w-11 h-6 rounded-full peer-focus:outline-none transition-all ${visibility[index] ? 'bg-green-500' : 'bg-zinc-500'
-                                    }`}
+                                className={`w-11 h-6 rounded-full peer-focus:outline-none transition-all ${visibility[index] ? 'bg-green-500' : 'bg-zinc-500'}`}
                             >
                                 <div
-                                    className={`absolute top-[2px] left-[2px] h-5 w-5 rounded-full transition-transform ${visibility[index] ? 'translate-x-5 bg-white' : 'translate-x-0 bg-gray-300'
-                                        }`}
+                                    className={`absolute top-[2px] left-[2px] h-5 w-5 rounded-full transition-transform ${visibility[index] ? 'translate-x-5 bg-white' : 'translate-x-0 bg-gray-300'}`}
                                 ></div>
                             </div>
                         </label>
@@ -132,6 +129,4 @@ export default function Index() {
             ))}
         </div>
     );
-
-
 }
