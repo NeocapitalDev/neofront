@@ -1,4 +1,4 @@
-// components/NeoChallengeButton.js
+// components/PrincipalButton.js
 import React from 'react';
 import Link from 'next/link';
 
