@@ -50,9 +50,9 @@ export default function User() {
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg dark:bg-zinc-800 dark:shadow-black">
-      <div className="border-b pt-8 px-6">
+      <div className="border-b mt-4 pt-8 px-6">
         <div className="flex gap-8 justify-center">
-          <button className="pb-4 px-1 border-b-2 border-emerald-600 text-emerald-600 font-bold">
+          <button className="pb-4 px-1 mb-7 border-b-2 border-emerald-600 text-emerald-600 font-bold">
             Cuenta
           </button>
         </div>
@@ -92,22 +92,22 @@ export default function User() {
         </p>
 
 
-        <div className="w-full space-y-6 bg-gray-100 p-6 rounded-lg dark:bg-gray-900">
+        <div className="w-full space-y-6 bg-gray-100 p-6 rounded-lg dark:bg-zinc-600">
           <div className="flex flex-col md:flex-row items-center">
             <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <label className="text-base font-semibold text-black">Username</label>
+              <label className="text-base font-semibold dark:text-white  text-black">Username</label>
             </div>
             <div className="w-full md:w-3/4">
-              <p className="text-gray-700">{data.username || 'Username no disponible'}</p>
+              <p className="text-gray-700 dark:text-white">{data.username || 'Username no disponible'}</p>
             </div>
           </div>
 
           <div className="flex flex-col md:flex-row items-center">
             <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <label className="text-base font-semibold text-black">Email</label>
+              <label className="text-base font-semibold text-black dark:text-white">Email</label>
             </div>
             <div className="w-full md:w-3/4">
-              <p className="text-gray-700">{data.email || 'Correo no disponible'}</p>
+              <p className="text-gray-700 dark:text-white">{data.email || 'Correo no disponible'}</p>
             </div>
           </div>
         </div>
