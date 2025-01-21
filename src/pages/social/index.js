@@ -32,32 +32,32 @@ const SocialsPage = () => {
                     encontrarnos en las principales plataformas, ¡solo elige tu favorita!
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
                     {socials && socials.length > 0 ? (
                         socials.map((plataforma, index) => (
                             <div
                                 key={index}
-                                className="p-6 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition flex flex-col items-center"
+                                className="p-6 dark:border-0 dark:bg-zinc-700 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition flex flex-col items-center"
                             >
                                 {/* Contenedor Horizontal para el Icono y el Texto */}
                                 <div className="flex items-center mb-4 w-full">
                                     {/* Icono */}
-                                    <div className="flex-shrink-0 bg-gray-100 p-3 rounded-full flex items-center justify-center">
+                                    <div className="flex-shrink-0 dark:bg-zinc-700 bg-gray-100 p-3 rounded-full flex items-center justify-center">
                                         {typeof plataforma.icono === 'string' ? (
                                             <Image
                                                 src={`${plataforma.icono}`} // Asegúrate de que la imagen se encuentre en la ruta correcta
                                                 alt={plataforma.nombre}
-                                                width={51}
-                                                height={51}
-                                                className="w-[51px] h-[51px] rounded-full"
+                                                width={60}
+                                                height={60}
+                                                className="w-[60px] h-[60px] rounded-full"
                                             />
                                         ) : (
                                             plataforma.icono
                                         )}
                                     </div>
                                     <div className="ml-4">
-                                        <span className="block text-gray-700 font-medium">Plataforma</span>
-                                        <p className="text-gray-900 font-bold text-lg">{plataforma.nombre}</p>
+                                        <span className="block dark:text-white text-gray-700 font-medium">Plataforma</span>
+                                        <p className="text-gray-900 dark:text-white font-bold text-lg">{plataforma.nombre}</p>
                                     </div>
                                 </div>
 

@@ -49,7 +49,7 @@ export default function User() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg dark:bg-gray-900 dark:shadow-white">
+    <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg dark:bg-zinc-800 dark:shadow-black">
       <div className="border-b pt-8 px-6">
         <div className="flex gap-8 justify-center">
           <button className="pb-4 px-1 border-b-2 border-emerald-600 text-emerald-600 font-bold">
@@ -86,8 +86,8 @@ export default function User() {
 
 
 
-        <h1 className="text-3xl font-bold text-slate-700 mb-2">{data.name || 'Nombre no disponible'}</h1>
-        <p className="text-gray-400 text-sm mb-8">
+        <h1 className="text-3xl font-bold dark:text-white text-slate-700 mb-2">{data.name || 'Nombre no disponible'}</h1>
+        <p className="dark:text-white text-gray-400 text-sm mb-8">
           Fecha de creación: {data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'No disponible'}
         </p>
 
