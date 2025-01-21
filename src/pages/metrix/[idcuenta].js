@@ -36,12 +36,8 @@ const Metrix = () => {
                     </div>
                 </div>
                 <h2 className="text-lg mt-5 font-semibold">Objetivos</h2>
-
                 <Objetivos />
-
                 <br />
-
-
                 <Diariotrading />
 
             </div>

@@ -4,14 +4,14 @@ import {
     HoverCard,
     HoverCardContent,
     HoverCardTrigger,
-} from "../../ui/hover-card.tsx"
+} from "../../ui/hover-card.tsx";
 
 export default function Diariotrading() {
     const [search, setSearch] = useState("");
     const [order, setOrder] = useState("Hora de Cierre");
     const [showTooltip, setShowTooltip] = useState(false);
     const [dropdown, setDropdown] = useState(null);
-    const [showInfo, setShowInfo] = useState(false);  // Estado para mostrar la ventana de información
+    const [showInfo, setShowInfo] = useState(false);
 
     const orderOptions = [
         "Hora de apertura",
@@ -68,7 +68,7 @@ export default function Diariotrading() {
                 </div>
             </div>
 
-            <div className="p-4 bg-white rounded-lg shadow-md max-w-5xl mx-auto">
+            <div className="p-4 bg-white rounded-lg shadow-md max-w-4xl mx-auto"> {/* Reducido aún más el max-w */}
                 {/* Filtros */}
                 <div className="mb-4 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center">
                     {/* Orden */}
@@ -106,9 +106,9 @@ export default function Diariotrading() {
                     </div>
                 </div>
 
-                {/* Tabla */}
-                <div className="overflow-x-auto border border-gray-300 rounded-md">
-                    <table className="w-full h-60 min-w-max text-sm text-left">
+                {/* Contenedor con scroll horizontal */}
+                <div className="overflow-x-auto border border-gray-300 rounded-md max-h-[350px]">
+                    <table className="min-w-[1200px] text-xs text-left"> {/* Mantener min-width para el scroll */}
                         <thead className="bg-gray-100 sticky top-0 z-10">
                             <tr>
                                 {[
@@ -121,6 +121,7 @@ export default function Diariotrading() {
                                     "SL",
                                     "TP",
                                     "Cierre",
+                                    "Precio",
                                     "Swap",
                                     "Comisión",
                                     "Beneficio",
@@ -130,7 +131,7 @@ export default function Diariotrading() {
                                 ].map((header, index) => (
                                     <th
                                         key={index}
-                                        className={`border-b p-3 ${["Tipo", "Volumen", "Símbolo"].includes(header)
+                                        className={`border-b p-4 ${["Tipo", "Volumen", "Símbolo"].includes(header)
                                             ? "text-amber-400 cursor-pointer relative"
                                             : header === "Pips"
                                                 ? "text-amber-400 relative"
@@ -159,8 +160,8 @@ export default function Diariotrading() {
                                                         <Image
                                                             src="/images/informacion/info.svg"
                                                             alt="Más información"
-                                                            width={16}
-                                                            height={16}
+                                                            width={12}
+                                                            height={12}
                                                         />
                                                     </HoverCardTrigger>
                                                     <HoverCardContent className="w-60 bg-black text-white">
@@ -196,7 +197,7 @@ export default function Diariotrading() {
                             {data.length === 0 ? (
                                 <tr>
                                     <td
-                                        colSpan="15"
+                                        colSpan="16"
                                         className="text-center p-6 text-gray-500 italic"
                                     >
                                         Sin resultados
@@ -206,24 +207,24 @@ export default function Diariotrading() {
                                 data.map((row, index) => (
                                     <tr
                                         key={index}
-                                        className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                                            }`}
+                                        className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
                                     >
-                                        <td className="border-b p-3">{row.ticket}</td>
-                                        <td className="border-b p-3">{row.abrir}</td>
-                                        <td className="border-b p-3">{row.tipo}</td>
-                                        <td className="border-b p-3">{row.volumen}</td>
-                                        <td className="border-b p-3">{row.simbolo}</td>
-                                        <td className="border-b p-3">{row.precio}</td>
-                                        <td className="border-b p-3">{row.sl}</td>
-                                        <td className="border-b p-3">{row.tp}</td>
-                                        <td className="border-b p-3">{row.cierre}</td>
-                                        <td className="border-b p-3">{row.swap}</td>
-                                        <td className="border-b p-3">{row.comision}</td>
-                                        <td className="border-b p-3">{row.beneficio}</td>
-                                        <td className="border-b p-3">{row.pips}</td>
-                                        <td className="border-b p-3">{row.duracion}</td>
-                                        <td className="border-b p-3">{row.registro}</td>
+                                        <td className="border-b p-4">{row.ticket}</td>
+                                        <td className="border-b p-4">{row.abrir}</td>
+                                        <td className="border-b p-4">{row.tipo}</td>
+                                        <td className="border-b p-4">{row.volumen}</td>
+                                        <td className="border-b p-4">{row.simbolo}</td>
+                                        <td className="border-b p-4">{row.precio}</td>
+                                        <td className="border-b p-4">{row.sl}</td>
+                                        <td className="border-b p-4">{row.tp}</td>
+                                        <td className="border-b p-4">{row.cierre}</td>
+                                        <td className="border-b p-4">{row.precio}</td>
+                                        <td className="border-b p-4">{row.swap}</td>
+                                        <td className="border-b p-4">{row.comision}</td>
+                                        <td className="border-b p-4">{row.beneficio}</td>
+                                        <td className="border-b p-4">{row.pips}</td>
+                                        <td className="border-b p-4">{row.duracion}</td>
+                                        <td className="border-b p-4">{row.registro}</td>
                                     </tr>
                                 ))
                             )}
