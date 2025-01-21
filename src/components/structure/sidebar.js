@@ -8,7 +8,7 @@ export default function Sidebar() {
     const router = useRouter();
 
     return (
-        <div className='dark:bg-zinc-800 rounded-xl dark:text-white'>
+        <div className='dark:bg-zinc-800 rounded-xl border-2 dark:border-zinc-700 border-gray-200 dark:text-white'>
             <div className="p-4 border-b border-gray-200">
                 {/* Aquí se utiliza el nuevo componente con los props correspondientes */}
                 <PrincipalButton />
@@ -25,7 +25,7 @@ export default function Sidebar() {
                         href={href}
                         key={id}
                         className={`w-full flex items-center py-7 px-6 font-semibold transition duration-200 last:rounded-b-md relative ${router.pathname === href
-                                ? 'bg-gradient-to-r  from-amber-50 via-white to-transparent border-l-4 border-amber-500'
+                                ? 'bg-gradient-to-r  from-amber-100 via-white to-transparent border-l-4 border-amber-500'
                                 : 'hover:bg-zinc-300 dark:hover:bg-zinc-600'
                             }`}
                     >
