@@ -19,15 +19,15 @@ const Metrix = () => {
                     Account Metrix {idcuenta ? idcuenta : 'Cargando...'}
                 </h1>
                 <div className="flex justify-start gap-3 mb-4">
-                    <button className="flex items-center p-6 dark:bg-zinc-800 border-gray-200 dark:text-white dark:border-zinc-800 dark:shadow-black bg-white border-2 hover:border-slate-400 py-2 px-4 rounded-md shadow-md transition duration-300">
+                    <button className="flex items-center p-6 dark:bg-zinc-800 border-gray-200 dark:text-white dark:border-zinc-800 dark:shadow-black bg-white border-2 hover:border-slate-400 py-2 px-4 rounded-md shadow-md ">
                         <UserIcon className="w-5 h-5 mr-2 text-zinc-800 dark:text-white" />
                         Credenciales
                     </button>
-                    <button className="flex items-center p-6 dark:bg-zinc-800 border-gray-200 dark:text-white dark:border-zinc-800 dark:shadow-black bg-white border-2 hover:border-slate-400 py-2 px-4 rounded-md shadow-md transition duration-300">
+                    <button className="flex items-center p-6 dark:bg-zinc-800 border-gray-200 dark:text-white dark:border-zinc-800 dark:shadow-black bg-white border-2 hover:border-slate-400 py-2 px-4 rounded-md shadow-md  ">
                         <PhoneIcon className="w-5 h-5 mr-2 text-zinc-800 dark:text-white" />
                         Contacte con nosotros
                     </button>
-                    <button className="flex items-center p-6 dark:bg-zinc-800 border-gray-200 dark:text-white dark:border-zinc-800 dark:shadow-black bg-white border-2 hover:border-slate-400 py-2 px-4 rounded-md shadow-md transition duration-300">
+                    <button className="flex items-center p-6 dark:bg-zinc-800 border-gray-200 dark:text-white dark:border-zinc-800 dark:shadow-black bg-white border-2 hover:border-slate-400 py-2 px-4 rounded-md shadow-md  ">
                         <ArrowPathIcon className="w-5 h-5 mr-2 text-zinc-800 dark:text-white" />
                         Actualizar
                     </button>
