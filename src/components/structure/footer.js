@@ -1,6 +1,6 @@
 const FooterInfo = () => {
     return (
-        <div className="mt-6 text-sm dark:text-white">
+        <div className="mt-10 text-sm dark:text-white">
             <div className="flex flex-col">
                 <div className="font-bold text-md mb-4 border-b pb-1 border-gray-300 dark:border-zinc-600">
                     <a href="#" className="text-zinc-600 hover:underline dark:text-white">Política de Privacidad</a> &nbsp; | &nbsp;

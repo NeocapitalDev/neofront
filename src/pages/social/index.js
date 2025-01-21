@@ -4,6 +4,7 @@ import Loader from '../../components/loaders/loader';
 import { useStrapiData } from '../../lib/strapiService';
 import Image from 'next/image';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
+import { HeartIcon } from '@heroicons/react/24/outline';
 
 const SocialsPage = () => {
     // Usamos el hook que creamos para obtener los datos de 'socials'
@@ -22,62 +23,63 @@ const SocialsPage = () => {
     // Si los datos se cargaron correctamente, los mostramos
     return (
         <Layout>
-            <div className="p-6 dark:bg-zinc-800 border-gray-200  border-2  bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black">
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-                    <span className="mr-2">📢</span> Redes Sociales
+            <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+                <h2 className="text-xl font-semibold mb-4 flex items-center">
+                    <HeartIcon className="h-6 w-6 mr-2" />
+                    Redes Sociales
                 </h2>
-                <p className="text-gray-600 dark:text-white mb-6">
+                <p className="text-gray-600 dark:text-white">
                     Síguenos en nuestras redes sociales, donde podrás ver las
                     actualizaciones de nuestra comunidad, eventos y mucho más. Puedes
                     encontrarnos en las principales plataformas, ¡solo elige tu favorita!
                 </p>
+            </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
-                    {socials && socials.length > 0 ? (
-                        socials.map((plataforma, index) => (
-                            <div
-                                key={index}
-                                className="p-6 dark:border-0 dark:bg-zinc-700 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition flex flex-col items-center"
-                            >
-                                {/* Contenedor Horizontal para el Icono y el Texto */}
-                                <div className="flex items-center mb-4 w-full">
-                                    {/* Icono */}
-                                    <div className="flex-shrink-0 dark:bg-zinc-700 bg-gray-100 p-3 rounded-full flex items-center justify-center">
-                                        {typeof plataforma.icono === 'string' ? (
-                                            <Image
-                                                src={`${plataforma.icono}`} // Asegúrate de que la imagen se encuentre en la ruta correcta
-                                                alt={plataforma.nombre}
-                                                width={60}
-                                                height={60}
-                                                className="w-[60px] h-[60px] rounded-full"
-                                            />
-                                        ) : (
-                                            plataforma.icono
-                                        )}
-                                    </div>
-                                    <div className="ml-4">
-                                        <span className="block dark:text-white text-gray-700 font-medium">Plataforma</span>
-                                        <p className="text-gray-900 dark:text-white font-bold text-lg">{plataforma.nombre}</p>
-                                    </div>
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
+                {socials && socials.length > 0 ? (
+                    socials.map((plataforma, index) => (
+                        <div
+                            key={index}
+                            className="p-6 bg-white rounded-lg shadow-lg dark:bg-zinc-800 dark:border-zinc-800 dark:text-white dark:shadow-black transition flex flex-col items-center"
+                        >
+                            {/* Contenedor Horizontal para el Icono y el Texto */}
+                            <div className="flex items-center mb-4 w-full">
+                                {/* Icono */}
+                                <div className="flex-shrink-0 dark:bg-zinc-700 bg-gray-100 p-3 rounded-full flex items-center justify-center">
+                                    {typeof plataforma.icono === 'string' ? (
+                                        <Image
+                                            src={`${plataforma.icono}`} // Asegúrate de que la imagen se encuentre en la ruta correcta
+                                            alt={plataforma.nombre}
+                                            width={60}
+                                            height={60}
+                                            className="w-[60px] h-[60px] rounded-full"
+                                        />
+                                    ) : (
+                                        plataforma.icono
+                                    )}
                                 </div>
-
-                                {/* Botón de Acción */}
-                                <a
-                                    href={plataforma.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center justify-center bg-amber-500 text-black font-medium py-2 px-4 rounded-lg hover:bg-amber-600 transition w-full"
-                                >
-                                    {plataforma.accion}
-                                    {/* Icono de redirección usando ArrowTopRightOnSquareIcon */}
-                                    <ArrowTopRightOnSquareIcon className="ml-2 w-4 h-4" />
-                                </a>
+                                <div className="ml-4">
+                                    <span className="block dark:text-white text-gray-700 font-medium">Plataforma</span>
+                                    <p className="text-gray-900 dark:text-white font-bold text-lg">{plataforma.nombre}</p>
+                                </div>
                             </div>
-                        ))
-                    ) : (
-                        <div>No hay datos para mostrar.</div>
-                    )}
-                </div>
+
+                            {/* Botón de Acción */}
+                            <a
+                                href={plataforma.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center justify-center bg-amber-500 text-black font-medium py-2 px-4 rounded-lg hover:bg-amber-600 transition w-full"
+                            >
+                                {plataforma.accion}
+                                {/* Icono de redirección usando ArrowTopRightOnSquareIcon */}
+                                <ArrowTopRightOnSquareIcon className="ml-2 w-4 h-4" />
+                            </a>
+                        </div>
+                    ))
+                ) : (
+                    <div>No hay datos para mostrar.</div>
+                )}
             </div>
         </Layout>
     );
