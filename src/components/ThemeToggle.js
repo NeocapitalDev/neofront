@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 
 export default function ThemeToggle() {
     const [isDarkMode, setIsDarkMode] = useState(false);
-
     useEffect(() => {
         // Verificar el tema almacenado en localStorage al cargar la página
         const storedTheme = localStorage.getItem('theme');

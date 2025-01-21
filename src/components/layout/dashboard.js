@@ -2,6 +2,7 @@ import Navbar from "../structure/navbar";
 import FooterInfo from "../structure/footer";
 import Sidebar from '../structure/sidebar';
 import Breadcrumb from "../Breadcrumb";
+import Theme from '../ui/theme-provider'
 
 export default function Layout({ children, title, showButton, NoTab }) {
     return (
