@@ -8,7 +8,7 @@ export default function Sidebar() {
     const router = useRouter();
 
     return (
-        <div className='dark:bg-zinc-800 rounded-xl border-2 dark:border-zinc-700 border-gray-200 dark:text-white'>
+        <div className='dark:bg-zinc-800 rounded-xl border-2 dark:border-0 dark:border-zinc-700 dark:shadow-black border-gray-200 dark:text-white'>
             <div className="p-4 border-b border-gray-200">
                 {/* Aquí se utiliza el nuevo componente con los props correspondientes */}
                 <PrincipalButton />

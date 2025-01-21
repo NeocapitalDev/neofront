@@ -6,13 +6,13 @@ import Theme from '../ui/theme-provider'
 
 export default function Layout({ children, title, showButton, NoTab }) {
     return (
-        <div className="min-h-full bg-white dark:bg-zinc-900">
+        <div className="min-h-full bg-gray-100 dark:bg-zinc-900">
             <Navbar />
             <main className="text-black dark:text-white">
                 {/* Estructura central */}
                 <div className="mx-auto max-w-7xl py-12 px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col lg:flex-row gap-8">
-                        <div className="hidden lg:block lg:basis-1/4 h-full bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+                        <div className="hidden lg:block lg:basis-1/4 dark:shadow-black h-full bg-white dark:bg-gray-800 rounded-xl shadow-lg">
                             {/* Columna 1 (Sidebar) */}
                             <Sidebar />
                         </div>
