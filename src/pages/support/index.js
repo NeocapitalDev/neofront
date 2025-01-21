@@ -22,7 +22,7 @@ const SupportPage = () => {
     // Si los datos se cargaron correctamente, los mostramos
     return (
         <Layout>
-            <div className="p-6 bg-white shadow-md rounded-lg dark:text-white dark:bg-gray-900 dark:shadow-white">
+            <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                 <h2 className="text-xl font-semibold mb-4 flex items-center">
                     <span className="mr-2">🆘</span> Soporte al cliente
                 </h2>
