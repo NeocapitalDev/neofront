@@ -38,8 +38,8 @@ const data = [
 const Billing = () => {
     return (
         <Layout title="Billing">
-            <div className="p-0">
-                <div className="flex bg-white p-5 justify-between items-center mb-4">
+            <div className="p-6 dark:bg-zinc-800 border-gray-200  border-2  bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black">
+            <div className="flex p-5 justify-between items-center mb-4">
                     <div className="flex items-center space-x-2">
                         <DocumentTextIcon className="w-6 h-6 text-gray-600" />
                         <h1 className="text-xl font-semibold">Facturación</h1>
@@ -50,7 +50,7 @@ const Billing = () => {
                     </button>
                 </div>
 
-                <div className="overflow-x-auto bg-white rounded-lg shadow-sm">
+                <div className="overflow-x-auto rounded-lg shadow-sm">
                     <table className="w-full table-auto text-left border-collapse">
                         <thead className="border-b">
                             <tr>

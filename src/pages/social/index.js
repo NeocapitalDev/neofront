@@ -22,11 +22,11 @@ const SocialsPage = () => {
     // Si los datos se cargaron correctamente, los mostramos
     return (
         <Layout>
-            <div className="p-6 bg-white shadow-md rounded-lg">
-                <h2 className="text-xl font-semibold mb-4 flex items-center">
+            <div className="p-6 dark:bg-zinc-800 border-gray-200  border-2  bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black">
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
                     <span className="mr-2">📢</span> Redes Sociales
                 </h2>
-                <p className="text-gray-600 mb-6">
+                <p className="text-gray-600 dark:text-white mb-6">
                     Síguenos en nuestras redes sociales, donde podrás ver las
                     actualizaciones de nuestra comunidad, eventos y mucho más. Puedes
                     encontrarnos en las principales plataformas, ¡solo elige tu favorita!
