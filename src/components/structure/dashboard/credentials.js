@@ -26,7 +26,7 @@ export default function CredencialesModal() {
                 onClick={() => setOpen(true)}
             >
                 <KeyIcon className="h-6 w-6 text-gray-600" />
-                <span className="text-xs lg:text-sm">Credenciales</span>
+                <span className="text-xs lg:text-sm dark:text-zinc-700">Credenciales</span>
             </button>
 
             {/* Modal */}

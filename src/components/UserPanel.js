@@ -54,16 +54,21 @@ export default function Index() {
     };
 
     return (
-        <div>
+        
+        <div className="p-6 dark:bg-zinc-800 border-gray-200  border-2  bg-white shadow-md rounded-lg dark:text-white
+        dark:border-zinc-800 dark:shadow-black">
             {accountData.map((account, index) => (
+
+
+
                 <div
                     key={index}
-                    className="bg-white shadow-md rounded-lg p-6 relative mb-6"
+                    className="bg-gray-50 border shadow-md rounded-lg p-6 relative mb-6"
                 >
                     {/* Login */}
-                    <p className="text-sm text-black mb-2">
+                    <p className="text-sm font-bold text-zinc-800 mb-2">
                         Login:{' '}
-                        <span className="font-medium text-slate-800">
+                        <span className="font-semibold  ">
                             {account.login}
                         </span>
                     </p>
@@ -71,21 +76,21 @@ export default function Index() {
                     {/* Mostrar Balance, RewardDate y Result si está visible */}
                     {visibility[index] && (
                         <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
-                            <p className="text-sm text-gray-400">
+                            <p className="text-sm font-semibold text-gray-500">
                                 Balance:{' '}
-                                <span className="font-medium text-slate-800">
+                                <span className="font-bold  text-slate-800">
                                     {account.balance}
                                 </span>
                             </p>
-                            <p className="text-sm text-gray-400">
+                            <p className="text-sm  font-semibold text-gray-500">
                                 Día de Recompensa:{' '}
-                                <span className="font-medium text-slate-800">
+                                <span className="font-bold text-slate-800">
                                     {account.rewardDate}
                                 </span>
                             </p>
-                            <p className="text-sm text-gray-400">
+                            <p className="text-sm  font-semibold text-gray-500">
                                 Resultado:{' '}
-                                <span className={`font-medium ${account.resultClass}`}>
+                                <span className={`font-bold ${account.resultClass}`}>
                                     {account.result}
                                 </span>
                             </p>
@@ -100,7 +105,7 @@ export default function Index() {
                             <Link href={`/metrix/${account.login}`}>
                                 <button className="flex items-center justify-center space-x-2 px-2 py-1 border rounded-sm shadow-md bg-gray-0 hover:bg-gray-200 w-auto">
                                     <ChartBarIcon className="h-6 w-6 text-gray-600" />
-                                    <span className="text-xs lg:text-sm">MetriX</span>
+                                    <span className="text-xs lg:text-sm dark:text-zinc-700">MetriX</span>
                                 </button>
                             </Link>
                         </div>
