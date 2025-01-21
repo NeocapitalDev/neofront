@@ -1,34 +1,39 @@
-import Layout from '../../components/layout/dashboard';
-import Loader from '../../components/loaders/loader';
-import { useStrapiData } from '../../lib/strapiService';
 import Image from 'next/image';
 
 const NotificationsPage = () => {
-    // Usamos el hook que creamos para obtener los datos de 'notifications'
-    const { data: notifications, error, isLoading } = useStrapiData('notifications');
+    // Datos de ejemplo
+    const notifications = [
+        {
+            id: 1,
+            icon: '🔔',
+            title: 'Nueva actualización disponible',
+            description: 'La versión 2.0 de la aplicación ya está disponible. Descárgala ahora para acceder a las nuevas funciones.',
+            time: 'Hace 2 horas',
+            image: '/images/updates/update-icon.png',
+            buttonLink: '#',
+            buttonText: 'Actualizar ahora',
+        },
+        {
+            id: 2,
+            icon: '📢',
+            title: 'Mantenimiento programado',
+            description: 'El sistema estará en mantenimiento el próximo sábado de 2:00 AM a 6:00 AM.',
+            time: 'Hace 1 día',
+            image: '/images/maintenance/maintenance-icon.png',
+            buttonLink: '#',
+            buttonText: 'Más información',
+        },
+    ];
 
-    // Si está cargando, mostramos un mensaje de carga
-    if (isLoading) {
-        return (
-            <Loader />
-        );
-    }
-
-    // Si hay un error, mostramos el mensaje de error
-    if (error) {
-        return <p>Error al cargar las notificaciones: {error.message}</p>;
-    }
-
-    // Renderizamos las notificaciones si los datos están disponibles
+    // Renderizamos las notificaciones
     return (
-
-        <div className="p-6 bg-white shadow-md rounded-lg">
-            <div className="space-y-4">
+        <div className="p-4 dark:bg-zinc-800 bg-white dark:text-white rounded-lg">
+            <div className="space-y-4 dark:text-white">
                 {notifications && notifications.length > 0 ? (
                     notifications.map((notification) => (
                         <div
                             key={notification.id}
-                            className="border rounded-lg p-4 shadow-sm bg-white space-y-2"
+                            className="border rounded-lg p-4 shadow-sm bg-white dark:bg-zinc-700 dark:border-gray-600 dark:shadow-black space-y-2"
                         >
                             <div className="flex items-start">
                                 <span className="text-2xl mr-3">{notification.icon}</span>
@@ -36,7 +41,7 @@ const NotificationsPage = () => {
                                     <h3 className="font-bold text-amber-400">
                                         {notification.title}
                                     </h3>
-                                    <p className="text-black">{notification.description}</p>
+                                    <p className="text-black dark:text-white">{notification.description}</p>
                                     <p className="text-sm text-gray-400">{notification.time}</p>
                                 </div>
                             </div>
@@ -62,11 +67,10 @@ const NotificationsPage = () => {
                         </div>
                     ))
                 ) : (
-                    <div>No hay notificaciones para mostrar.</div>
+                    <div className="dark:text-white">No hay notificaciones para mostrar.</div>
                 )}
             </div>
         </div>
-
     );
 };
 

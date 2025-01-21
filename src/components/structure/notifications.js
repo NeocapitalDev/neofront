@@ -1,8 +1,9 @@
-import { useState, Fragment } from 'react'; // Agregada la importación de Fragment
+import { useState, Fragment } from 'react'; 
 import { BellIcon } from '@heroicons/react/24/outline';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import NotificationsList from '../structure/notificationsList'; // Importa el componente NotificationsList
+import NotificationsList from '../structure/notificationsList'; 
+
 const BellIconButton = ({ onClick }) => {
   return (
     <button
@@ -40,16 +41,17 @@ export default function Example() {
                   leaveTo="translate-x-full"
                 >
                   <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                    <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
+                    {/* Contenedor con borde y sombra */}
+                    <div className="flex h-full flex-col overflow-y-scroll dark:bg-zinc-800 bg-white py-6 shadow-xl border dark:border-gray-600 dark:shadow-black border-gray-300 rounded-lg">
                       <div className="px-4 sm:px-6">
                         <div className="flex items-start justify-between">
                           <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
-                            <h2 className="text-xl font-semibold text-gray-900">🔔 Notificaciones</h2>
+                            <h2 className="text-xl font-semibold dark:text-white text-gray-900">🔔 Notificaciones</h2>
                           </Dialog.Title>
                           <div className="ml-3 flex h-7 items-center">
                             <button
                               type="button"
-                              className="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                              className="relative rounded-md dark:bg-zinc-800 bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                               onClick={() => setOpen(false)}
                             >
                               <span className="absolute -inset-2.5" />
