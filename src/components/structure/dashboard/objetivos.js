@@ -40,7 +40,7 @@ export default function Objetivos() {
     };
 
     return (
-        <div className="p-3 bg-white rounded-md shadow-lg">
+        <div className="p-3 dark:bg-zinc-800 bg-white rounded-md shadow-lg">
             <table className="min-w-full">
                 <thead>
                     <tr className="border-b">
@@ -53,7 +53,7 @@ export default function Objetivos() {
                     {objetivos.map((obj, index) => (
                         <React.Fragment key={index}>
                             <tr
-                                className="border-b cursor-pointer hover:bg-gray-100"
+                                className="border-b cursor-pointer dark:hover:bg-zinc-700 hover:bg-gray-100"
                                 onClick={() => toggleExpand(index)}
                             >
                                 <td className="px-4 py-2 text-amber-500 font-semibold">
