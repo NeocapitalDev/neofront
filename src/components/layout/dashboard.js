@@ -2,10 +2,11 @@ import Navbar from "../structure/navbar";
 import FooterInfo from "../structure/footer";
 import Sidebar from '../structure/sidebar';
 import Breadcrumb from "../Breadcrumb";
+import Theme from '../ui/theme-provider'
 
 export default function Layout({ children, title, showButton, NoTab }) {
     return (
-        <div className="min-h-full bg-white dark:bg-gray-900">
+        <div className="min-h-full bg-white dark:bg-zinc-900" suppressHydrationWarning>
             <Navbar />
             <main className="text-black dark:text-white">
                 {/* Estructura central */}
