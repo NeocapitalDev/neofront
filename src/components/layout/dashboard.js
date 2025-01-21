@@ -5,7 +5,7 @@ import Breadcrumb from "../Breadcrumb";
 
 export default function Layout({ children, title, showButton, NoTab }) {
     return (
-        <div className="min-h-full bg-white dark:bg-gray-900">
+        <div className="min-h-full bg-white dark:bg-zinc-900">
             <Navbar />
             <main className="text-black dark:text-white">
                 {/* Estructura central */}
