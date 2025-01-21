@@ -1,33 +1,27 @@
+import Layout from '../../components/layout/dashboard';
+import Loader from '../../components/loaders/loader';
+import { useStrapiData } from '../../lib/strapiService';
 import Image from 'next/image';
-
 const NotificationsPage = () => {
-    // Datos de ejemplo
-    const notifications = [
-        {
-            id: 1,
-            icon: '🔔',
-            title: 'Nueva actualización disponible',
-            description: 'La versión 2.0 de la aplicación ya está disponible. Descárgala ahora para acceder a las nuevas funciones.',
-            time: 'Hace 2 horas',
-            image: '/images/updates/update-icon.png',
-            buttonLink: '#',
-            buttonText: 'Actualizar ahora',
-        },
-        {
-            id: 2,
-            icon: '📢',
-            title: 'Mantenimiento programado',
-            description: 'El sistema estará en mantenimiento el próximo sábado de 2:00 AM a 6:00 AM.',
-            time: 'Hace 1 día',
-            image: '/images/maintenance/maintenance-icon.png',
-            buttonLink: '#',
-            buttonText: 'Más información',
-        },
-    ];
+    // Usamos el hook que creamos para obtener los datos de 'notifications'
+    const { data: notifications, error, isLoading } = useStrapiData('notifications');
 
+    // Si está cargando, mostramos un mensaje de carga
+    if (isLoading) {
+        return (
+            <Loader />
+        );
+    }
+
+    // Si hay un error, mostramos el mensaje de error
+    if (error) {
+        return <p>Error al cargar las notificaciones: {error.message}</p>;
+    }
+
+    // Renderizamos las notificaciones si los datos están disponibles
     // Renderizamos las notificaciones
     return (
-        <div className="p-4 dark:bg-zinc-800 bg-white dark:text-white rounded-lg">
+        <div className="p-6 bg-white dark:text-white shadow-md rounded-lg dark:bg-zinc-800">
             <div className="space-y-4 dark:text-white">
                 {notifications && notifications.length > 0 ? (
                     notifications.map((notification) => (
