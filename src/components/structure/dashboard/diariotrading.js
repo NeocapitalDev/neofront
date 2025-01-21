@@ -40,11 +40,11 @@ export default function Diariotrading() {
 
     return (
         <>
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between ">
                 <div className="flex items-center space-x-3 relative">
                     {/* Título con la imagen de información */}
                     <div className="relative flex items-center">
-                        <h1 className="text-xl font-semibold text-gray-800">Diario de Trading</h1>
+                        <h1 className="text-xl font-semibold dark:text-white text-gray-800">Diario de Trading</h1>
 
                         {/* HoverCard para la información */}
                         <HoverCard>
@@ -67,20 +67,20 @@ export default function Diariotrading() {
                     </div>
                 </div>
             </div>
-
-            <div className="p-4 bg-white rounded-lg shadow-md max-w-4xl mx-auto"> {/* Reducido aún más el max-w */}
+            {/* Contenedor de la tabla */}
+            <div className="p-4 dark:bg-zinc-800 bg-white rounded-lg shadow-md max-w-4xl mx-auto">
                 {/* Filtros */}
                 <div className="mb-4 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center">
                     {/* Orden */}
                     <div className="flex items-center space-x-3 w-full md:w-auto">
-                        <label htmlFor="order" className="text-sm font-medium text-gray-700">
+                        <label htmlFor="order" className="text-sm font-medium dark:text-white text-gray-700">
                             Orden:
                         </label>
                         <select
                             id="order"
                             value={order}
                             onChange={(e) => setOrder(e.target.value)}
-                            className="border border-gray-300 rounded-md p-2 text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border dark:border-0 dark:bg-zinc-700 dark:focus: border-gray-300 rounded-md p-2 text-sm w-full md:w-64 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         >
                             {orderOptions.map((option, index) => (
                                 <option key={index} value={option}>
@@ -92,7 +92,7 @@ export default function Diariotrading() {
 
                     {/* Buscar */}
                     <div className="flex items-center space-x-3 w-full md:w-auto">
-                        <label htmlFor="search" className="text-sm font-medium text-gray-700">
+                        <label htmlFor="search" className="text-sm font-medium dark:text-white text-gray-700">
                             Buscar:
                         </label>
                         <input
@@ -101,15 +101,16 @@ export default function Diariotrading() {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Buscar tickets o etiquetas..."
-                            className="border border-gray-300 rounded-md p-2 text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border dark:bg-zinc-700 dark:border-0 dark:text-wrap border-gray-300 rounded-md p-2 text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                 </div>
 
                 {/* Contenedor con scroll horizontal */}
-                <div className="overflow-x-auto border border-gray-300 rounded-md max-h-[350px]">
-                    <table className="min-w-[1200px] text-xs text-left"> {/* Mantener min-width para el scroll */}
-                        <thead className="bg-gray-100 sticky top-0 z-10">
+                <div className="overflow-x-auto border border-gray-300 rounded-md max-h-[400px] dark:border-zinc-700 dark:shadow-black">
+                    <table className="min-w-[1200px] text-xs text-left h-52">
+                        {/* Encabezado */}
+                        <thead className="bg-gray-100 sticky  top-0 z-10 dark:bg-zinc-700 dark:text-white">
                             <tr>
                                 {[
                                     "Ticket",
@@ -131,25 +132,17 @@ export default function Diariotrading() {
                                 ].map((header, index) => (
                                     <th
                                         key={index}
-                                        className={`border-b p-4 ${["Tipo", "Volumen", "Símbolo"].includes(header)
-                                            ? "text-amber-400 cursor-pointer relative"
-                                            : header === "Pips"
-                                                ? "text-amber-400 relative"
-                                                : "text-gray-700"
+                                        className={`border-b p-4 ${["Tipo", "Volumen", "Símbolo","Pips"].includes(header)
+                                                ? "text-amber-400 cursor-pointer relative"
+                                                : "text-gray-700 dark:text-white"
                                             }`}
                                         onClick={() => {
-                                            if (
-                                                ["Tipo", "Volumen", "Símbolo"].includes(header)
-                                            ) {
+                                            if (["Tipo", "Volumen", "Símbolo"].includes(header)) {
                                                 toggleDropdown(header);
                                             }
                                         }}
-                                        onMouseEnter={() =>
-                                            header === "Pips" && setShowTooltip(true)
-                                        }
-                                        onMouseLeave={() =>
-                                            header === "Pips" && setShowTooltip(false)
-                                        }
+                                        onMouseEnter={() => header === "Pips" && setShowTooltip(true)}
+                                        onMouseLeave={() => header === "Pips" && setShowTooltip(false)}
                                     >
                                         {header}
                                         {header === "Pips" && (
@@ -177,11 +170,11 @@ export default function Diariotrading() {
 
                                         {/* Dropdown */}
                                         {dropdown === header && (
-                                            <div className="absolute bg-white border border-gray-300 rounded-lg shadow-md mt-2 z-20 p-3 w-40">
+                                            <div className="absolute bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg shadow-md mt-2 z-20 p-3 w-40">
                                                 {dropdownOptions[header]?.map((item, i) => (
                                                     <div
                                                         key={i}
-                                                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                                                        className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-700 cursor-pointer"
                                                         onClick={() => alert(`Seleccionaste: ${item}`)}
                                                     >
                                                         {item}
@@ -193,12 +186,13 @@ export default function Diariotrading() {
                                 ))}
                             </tr>
                         </thead>
+                        {/* Cuerpo */}
                         <tbody>
                             {data.length === 0 ? (
                                 <tr>
                                     <td
                                         colSpan="16"
-                                        className="text-center p-6 text-gray-500 italic"
+                                        className="text-center dark:text-white p-6 text-gray-500 italic"
                                     >
                                         Sin resultados
                                     </td>
@@ -207,30 +201,34 @@ export default function Diariotrading() {
                                 data.map((row, index) => (
                                     <tr
                                         key={index}
-                                        className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                                        className={`${index % 2 === 0
+                                                ? "bg-white dark:bg-zinc-800"
+                                                : "bg-gray-50 dark:bg-zinc-700"
+                                            }`}
                                     >
-                                        <td className="border-b p-4">{row.ticket}</td>
-                                        <td className="border-b p-4">{row.abrir}</td>
-                                        <td className="border-b p-4">{row.tipo}</td>
-                                        <td className="border-b p-4">{row.volumen}</td>
-                                        <td className="border-b p-4">{row.simbolo}</td>
-                                        <td className="border-b p-4">{row.precio}</td>
-                                        <td className="border-b p-4">{row.sl}</td>
-                                        <td className="border-b p-4">{row.tp}</td>
-                                        <td className="border-b p-4">{row.cierre}</td>
-                                        <td className="border-b p-4">{row.precio}</td>
-                                        <td className="border-b p-4">{row.swap}</td>
-                                        <td className="border-b p-4">{row.comision}</td>
-                                        <td className="border-b p-4">{row.beneficio}</td>
-                                        <td className="border-b p-4">{row.pips}</td>
-                                        <td className="border-b p-4">{row.duracion}</td>
-                                        <td className="border-b p-4">{row.registro}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.ticket}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.abrir}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.tipo}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.volumen}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.simbolo}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.precio}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.sl}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.tp}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.cierre}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.precio}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.swap}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.comision}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.beneficio}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.pips}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.duracion}</td>
+                                        <td className="border-b p-4 dark:text-white">{row.registro}</td>
                                     </tr>
                                 ))
                             )}
                         </tbody>
                     </table>
                 </div>
+
             </div>
         </>
     );
