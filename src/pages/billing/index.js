@@ -38,14 +38,14 @@ const data = [
 const Billing = () => {
     return (
         <Layout title="Billing">
-            <div className="p-6 dark:bg-zinc-800 border-gray-200  border-2  bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black">
+            <div className="p-6 dark:bg-zinc-800 border-gray-200  border-2   shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black">
                 <div className="flex p-5 justify-between items-center mb-4   border-b-2 dark:border-b">
                     <div className="flex items-center space-x-2 ">
                         <DocumentTextIcon className="w-6 h-6 text-gray-600 dark:text-gray-200" />
                         <h1 className="text-xl font-semibold">Facturación</h1>
                     </div>
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200">
-                        <FunnelIcon className="w-6 h-6 text-white" />
+                    <button className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-zinc-200">
+                        <FunnelIcon className="w-6 h-6 text-zinc-800 dark:text-white" />
                         <span>Filtro</span>
                     </button>
                 </div>
@@ -84,7 +84,7 @@ const Billing = () => {
                                     <tr
                                         key={index}
                                         className={`${index === data.length - 1 ? '' : 'border-b-2 dark:border-b'
-                                            } hover:bg-gray-100 transition`}
+                                            } hover:bg-gray-100 dark:hover:bg-zinc-700 transition`}
                                     >
                                         <td className="px-4 py-3 text-sm font-medium text-gray-800 dark:text-white">{row.challenge}</td>
                                         <td className="px-4 py-3 text-sm text-gray-600 dark:text-white ">{row.dates}</td>
