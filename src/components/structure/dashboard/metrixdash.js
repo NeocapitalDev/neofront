@@ -5,8 +5,8 @@ export default function MetrixDash() {
     const labels = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'];
 
     return (
-        <div className="flex items-center justify-center  bg-gray-100">
-            <div className="w-full  bg-white rounded-lg shadow-lg p-6">
+        <div className="   border-gray-200  border-2   dark:border-zinc-800 dark:shadow-black   p-3  bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white ">
+            <div className="w-full   rounded-lg  p-6">
                 <h2 className="text-lg font-bold mb-4">Gráfica de Ventas</h2>
                 <div className="flex justify-between">
                     {data.map((value, index) => (

@@ -19,9 +19,10 @@ const Metrix = () => {
                     Account Metrix {idcuenta ? idcuenta : 'Cargando...'}
                 </h1>
                 <div className="flex justify-start gap-3 mb-4">
-                    <button className="bg-white border-2 border-slate-200 hover:border-slate-400 py-2 px-4 rounded-md shadow-sm transition duration-300">Credenciales</button>
-                    <button className="bg-white border-2 border-slate-200 hover:border-slate-400 py-2 px-4 rounded-md shadow-sm transition duration-300">Contacte con nosotros</button>
-                    <button className="bg-white border-2 border-slate-200 hover:border-slate-400 py-2 px-4 rounded-md shadow-sm transition duration-300">Actualizar</button>
+                    <button className="p-6 dark:bg-zinc-800 border-gray-200  dark:text-white dark:border-zinc-800 dark:shadow-black bg-white border-2  hover:border-slate-400 py-2 px-4 rounded-md shadow-md transition duration-300">Credenciales</button>
+                    <button className="p-6 dark:bg-zinc-800 border-gray-200  dark:text-white dark:border-zinc-800 dark:shadow-black bg-white border-2  hover:border-slate-400 py-2 px-4 rounded-md shadow-md transition duration-300">Contacte con nosotros</button>
+                    <button className="p-6 dark:bg-zinc-800 border-gray-200  dark:text-white dark:border-zinc-800 dark:shadow-black bg-white border-2  hover:border-slate-400 py-2 px-4 rounded-md shadow-md transition duration-300">Actualizar</button>
+
                 </div>
 
                 <div className="flex space-x-4">

@@ -25,7 +25,7 @@ export default function Sidebar() {
                         href={href}
                         key={id}
                         className={`w-full flex items-center py-7 px-6 font-semibold transition duration-200 last:rounded-b-md relative ${router.pathname === href
-                                ? 'bg-gradient-to-r  from-amber-100 via-white to-transparent border-l-4 border-amber-500'
+                                ? 'bg-gradient-to-r  from-amber-50 via-white to-transparent border-l-4 border-amber-500'
                                 : 'hover:bg-zinc-300 dark:hover:bg-zinc-700'
                             }`}
                     >

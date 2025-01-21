@@ -68,7 +68,7 @@ export default function Diariotrading() {
                 </div>
             </div>
             {/* Contenedor de la tabla */}
-            <div className="p-4 dark:bg-zinc-800 bg-white rounded-lg shadow-md max-w-4xl mx-auto">
+            <div className=" dark:bg-zinc-800 border-gray-200  border-2  bg-white dark:text-white dark:border-zinc-800 dark:shadow-black p-4 rounded-lg shadow-md max-w-4xl mx-auto">
                 {/* Filtros */}
                 <div className="mb-4 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center">
                     {/* Orden */}
