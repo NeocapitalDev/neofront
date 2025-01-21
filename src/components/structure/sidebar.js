@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { navigation } from './links'; // Importar desde links.js
 import PrincipalButton from './principalButton';
-import ThemeToggle from '../ThemeToggle';
+
 
 export default function Sidebar() {
     const router = useRouter();
@@ -56,9 +56,6 @@ export default function Sidebar() {
                     
                 ))}
 
-                {/* Coloca el ThemeToggle aquí */}
-                <ThemeToggle />
-                {/* Contenido principal */}
 
             </div>
         </div>

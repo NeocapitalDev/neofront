@@ -28,7 +28,7 @@ export default function ThemeToggle() {
     };
 
     return (
-        <div className="h-16 w-full flex justify-center items-center mt-8">
+        <div className="h-16 w-full flex justify-center items-center mt-8 pb-9">
             <button
                 onClick={handleThemeToggle}
                 className="h-10 w-10 rounded-full flex justify-center items-center bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition duration-300"

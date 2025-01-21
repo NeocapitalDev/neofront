@@ -22,11 +22,11 @@ const SupportPage = () => {
     // Si los datos se cargaron correctamente, los mostramos
     return (
         <Layout>
-            <div className="p-6 bg-white shadow-md rounded-lg">
+            <div className="p-6 bg-white shadow-md rounded-lg dark:text-white dark:bg-gray-900 dark:shadow-white">
                 <h2 className="text-xl font-semibold mb-4 flex items-center">
                     <span className="mr-2">🆘</span> Soporte al cliente
                 </h2>
-                <p className="text-gray-600 mb-6">
+                <p className="text-gray-600 mb-6 dark:text-white ">
                 Si necesitas ayuda, no dudes en contactarnos a través de nuestras principales plataformas. Estamos aquí para responder tus preguntas y brindarte el soporte que necesitas. ¡Conéctate con nosotros ahora!
                 </p>
 

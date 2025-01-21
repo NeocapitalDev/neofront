@@ -10,11 +10,11 @@ const Breadcrumb = () => {
     const isHomePage = pathSegments.length === 0; // Detecta si estamos en la página principal
 
     return (
-        <nav className="flex items-center space-x-2 text-gray-500 mb-3">
+        <nav className="flex items-center space-x-2 text-gray-500 mb-3 dark:text-white">
             {/* Icono de inicio con texto */}
             <a href="/" className="flex items-center text-gray-400 hover:text-gray-600 transition">
                 <HomeIcon className="w-5 h-5" />
-                {isHomePage && <span className="ml-2 text-gray-700 font-medium">Inicio</span>}
+                {isHomePage && <span className="ml-2 text-gray-700 dark:text-white  font-medium">Inicio</span>}
             </a>
 
             {/* Generación de rutas dinámicas */}
@@ -36,8 +36,8 @@ const Breadcrumb = () => {
 
                     return (
                         <React.Fragment key={index}>
-                            <span className="text-gray-400">/</span>
-                            <span className={`text-gray-700 font-medium ${isLast ? "" : "capitalize"}`}>
+                            <span className="text-gray-400 dark:text-white">/</span>
+                            <span className={`text-gray-700 dark:text-white font-medium ${isLast ? "" : "capitalize"}`}>
                                 {displaySegment}
                             </span>
                         </React.Fragment>

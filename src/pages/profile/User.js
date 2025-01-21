@@ -49,7 +49,7 @@ export default function User() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg">
+    <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg dark:bg-gray-900 dark:shadow-white">
       <div className="border-b pt-8 px-6">
         <div className="flex gap-8 justify-center">
           <button className="pb-4 px-1 border-b-2 border-emerald-600 text-emerald-600 font-bold">
@@ -92,7 +92,7 @@ export default function User() {
         </p>
 
 
-        <div className="w-full space-y-6 bg-gray-100 p-6 rounded-lg">
+        <div className="w-full space-y-6 bg-gray-100 p-6 rounded-lg dark:bg-gray-900">
           <div className="flex flex-col md:flex-row items-center">
             <div className="w-full md:w-1/4 mb-2 md:mb-0">
               <label className="text-base font-semibold text-black">Username</label>

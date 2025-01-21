@@ -1,6 +1,7 @@
 import Navbar from "../structure/navbar";
 import FooterInfo from "../structure/footer";
 import Sidebar from '../structure/sidebar';
+import Breadcrumb from "../Breadcrumb";
 
 export default function Layout({ children, title, showButton, NoTab }) {
     return (
@@ -14,9 +15,9 @@ export default function Layout({ children, title, showButton, NoTab }) {
                             {/* Columna 1 (Sidebar) */}
                             <Sidebar />
                         </div>
-
                         <div className="flex-1 lg:basis-3/4">
                             {/* Columna 2 (Contenido) */}
+                            <Breadcrumb />
                             {children}
                             <FooterInfo />
                         </div>
