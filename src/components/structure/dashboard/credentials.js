@@ -41,7 +41,7 @@ export default function CredencialesModal() {
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                     >
-                        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+                        <div className="fixed inset-0 bg-gray-700 bg-opacity-75 transition-opacity" />
                     </Transition.Child>
 
                     <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -55,11 +55,11 @@ export default function CredencialesModal() {
                                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
-                                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-xl sm:p-6">
+                                <Dialog.Panel className=" p-6  dark:bg-zinc-900 border-gray-200  border-2  dark:text-white dark:border-zinc-800 dark:shadow-black relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-xl sm:p-6">
                                     <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
                                         <button
                                             type="button"
-                                            className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none"
+                                            className="rounded-md bg-red-500 text-zinc-50 hover:text-gray-500 focus:outline-none"
                                             onClick={() => setOpen(false)}
                                         >
                                             <span className="sr-only">Cerrar</span>
@@ -67,8 +67,8 @@ export default function CredencialesModal() {
                                         </button>
                                     </div>
 
-                                    <div className="mt-3 sm:mt-0">
-                                        <Dialog.Title as="h3" className="text-base font-semibold leading-6 border-b pb-5 text-gray-900 text-left mb-4">
+                                    <div className="mt-3 sm:mt-0 ">
+                                        <Dialog.Title as="h3" className="text-base font-semibold leading-6 border-b pb-5 text-gray-900 text-left mb-4 dark:text-white ">
                                             Credenciales de inicio de sesión
                                         </Dialog.Title>
 
@@ -79,9 +79,9 @@ export default function CredencialesModal() {
                                                 return (
                                                     <div
                                                         key={index}
-                                                        className={`flex items-center ${!isLast ? 'justify-between' : ''} ${!isLast && 'border-b'} pb-2`}
+                                                        className={`flex  items-center ${!isLast ? 'justify-between' : ''} ${!isLast && 'border-b'} pb-2`}
                                                     >
-                                                        <div className="text-sm font-medium text-gray-900 flex items-center">
+                                                        <div className="text-sm dark:text-white font-medium text-gray-900 flex items-center">
                                                             {item.label}:
                                                             {['Contraseña', 'Contraseña de solo lectura'].includes(item.label) && (
                                                                 <svg
@@ -97,29 +97,29 @@ export default function CredencialesModal() {
                                                             )}
                                                         </div>
 
-                                                        <div className={`flex items-center py-1 ${!isLast ? 'space-x-20' : 'space-x-2'}`}>
+                                                        <div className={`flex  items-center py-1 ${!isLast ? 'space-x-20' : 'space-x-2'}`}>
                                                             {/* Contraseña principal con opción de ocultar */}
                                                             {item.label === 'Contraseña' ? (
-                                                                <div className="flex items-center space-x-1">
-                                                                    <span className="text-sm text-gray-600">
+                                                                <div className="flex  items-center space-x-1">
+                                                                    <span className="text-sm dark:text-white text-gray-600">
                                                                         {showPassword ? item.value : '********'}
                                                                     </span>
                                                                     <button
-                                                                        className="flex items-center justify-center"
+                                                                        className="flex   items-center justify-center"
                                                                         onClick={() => setShowPassword(!showPassword)}
                                                                     >
                                                                         {showPassword ? (
-                                                                            <EyeSlashIcon className="h-5 w-5 text-gray-600" />
+                                                                            <EyeSlashIcon className="h-5 w-5 dark:text-white text-gray-600" />
                                                                         ) : (
-                                                                            <EyeIcon className="h-5 w-5 text-gray-600" />
+                                                                            <EyeIcon className="h-5 w-5 dark:text-white text-gray-600" />
                                                                         )}
                                                                     </button>
                                                                 </div>
                                                             ) : (
                                                                 isLast ? (
-                                                                    <span className="text-md font-bold mx-2 text-gray-900">{item.value}</span>
+                                                                    <span className="text-md font-bold mx-2 dark:text-white  text-gray-900">{item.value}</span>
                                                                 ) : (
-                                                                    <span className="text-sm text-gray-600">{item.value}</span>
+                                                                    <span className="text-sm dark:text-white text-gray-600">{item.value}</span>
                                                                 )
                                                             )}
 
@@ -133,7 +133,7 @@ export default function CredencialesModal() {
                                                                         >
                                                                             <ClipboardDocumentIcon className="h-5 w-5 text-gray-600" />
                                                                         </button>
-                                                                        <span className="text-sm text-gray-600 truncate">Copiar</span>
+                                                                        <span className="text-sm text-gray-600 dark:text-white  truncate">Copiar</span>
                                                                     </div>
 
                                                                     {/* Botón de cambio */}
@@ -144,7 +144,7 @@ export default function CredencialesModal() {
                                                                             >
                                                                                 <PencilIcon className="h-5 w-5 text-gray-600" />
                                                                             </button>
-                                                                            <span className="text-sm text-gray-600 truncate">Cambio</span>
+                                                                            <span className="text-sm text-gray-600 dark:text-white truncate">Cambio</span>
                                                                         </div>
                                                                     )}
                                                                 </div>
