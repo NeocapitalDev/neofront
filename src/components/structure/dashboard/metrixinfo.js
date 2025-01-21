@@ -12,12 +12,12 @@ export default function MetrixInfo() {
     ];
 
     return (
-        <div className="p-3  bg-white rounded-md shadow-lg ">
+        <div className="p-3  bg-white rounded-md shadow-lg dark:bg-zinc-800 dark:text-white ">
             <table className="w-full border-collapse text-sm">
                 <tbody>
                     {data.map((item, index) => (
                         <tr key={index} className="border-b last:border-none">
-                            <td className="py-1 font-medium text-gray-500">{item.label}</td>
+                            <td className="py-1 font-medium dark:text-white  text-gray-500">{item.label}</td>
                             <td className="py-1 text-right">
                                 {item.isLink ? (
                                     <a
