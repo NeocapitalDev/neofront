@@ -44,7 +44,7 @@ const Billing = () => {
                         <DocumentTextIcon className="w-6 h-6 text-gray-600 dark:text-gray-200" />
                         <h1 className="text-xl font-semibold">Facturación</h1>
                     </div>
-                    <button className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-zinc-200">
+                    <button className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-zinc-200 dark:hover:bg-zinc-700">
                         <FunnelIcon className="w-6 h-6 text-zinc-800 dark:text-white" />
                         <span>Filtro</span>
                     </button>
