@@ -14,8 +14,8 @@ const Metrix = () => {
     return (
         <Layout title="Metrix">
             <div className="p-0 ">
-                <h1 className="bg-white rounded-md p-4 text-xl font-bold mb-4 shadow-md flex items-center">
-                    <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700" />
+                <h1 className="bg-white rounded-md p-4 text-xl font-bold mb-4 flex items-center  dark:bg-zinc-800 border-gray-200  border-2  shadow-md dark:text-white dark:border-zinc-800 dark:shadow-black">
+                    <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 " />
                     Account Metrix {idcuenta ? idcuenta : 'Cargando...'}
                 </h1>
                 <div className="flex justify-start gap-3 mb-4">
