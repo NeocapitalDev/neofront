@@ -1,8 +1,8 @@
-import { useState, Fragment } from 'react'; 
+import { useState, Fragment } from 'react';
 import { BellIcon } from '@heroicons/react/24/outline';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import NotificationsList from '../structure/notificationsList'; 
+import NotificationsList from '../structure/notificationsList';
 
 const BellIconButton = ({ onClick }) => {
   return (
@@ -42,22 +42,24 @@ export default function Example() {
                 >
                   <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
                     {/* Contenedor con borde y sombra */}
-                    <div className="flex h-full flex-col overflow-y-scroll dark:bg-zinc-800 bg-white py-6 shadow-xl border dark:border-gray-600 dark:shadow-black border-gray-300 rounded-lg">
+                    <div className="flex h-full flex-col overflow-y-scroll dark:bg-zinc-800 bg-white py-6 shadow-xl border dark:border-gray-600 dark:shadow-black dark:border-0 border-gray-300 ">
                       <div className="px-4 sm:px-6">
                         <div className="flex items-start justify-between">
                           <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
                             <h2 className="text-xl font-semibold dark:text-white text-gray-900">🔔 Notificaciones</h2>
                           </Dialog.Title>
-                          <div className="ml-3 flex h-7 items-center">
+                          <div className="ml-3 flex h-7 items-center pl-3 dark:bg-zinc-800">
                             <button
                               type="button"
-                              className="relative rounded-md dark:bg-zinc-800 bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                              className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 border-0 dark:border-0 dark:text-gray-400"
                               onClick={() => setOpen(false)}
                             >
-                              <span className="absolute -inset-2.5" />
-                              <span className="sr-only">Close panel</span>
+                              <span className="absolute -inset-2.5 " />
+                              <span className="sr-only">Cerrar panel</span>
                               <XMarkIcon className="h-6 w-6" aria-hidden="true" />
                             </button>
+
+
                           </div>
                         </div>
                       </div>
