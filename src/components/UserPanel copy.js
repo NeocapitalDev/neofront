@@ -54,13 +54,8 @@ export default function Index() {
     };
 
     return (
-<<<<<<< HEAD:src/components/UserPanel copy.js
 
         <div>
-=======
-        
-        <div className="p-6 dark:bg-zinc-800 border-gray-200  border-2  bg-white shadow-md rounded-lg dark:text-white">
->>>>>>> 976c70dc3e096a0dd1727e9e92b1f83148a759c5:src/components/UserPanel.js
             {accountData.map((account, index) => (
                 <div
                     key={index}
