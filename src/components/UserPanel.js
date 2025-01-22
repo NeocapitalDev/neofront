@@ -54,8 +54,8 @@ export default function Index() {
     };
 
     return (
-
-        <div>
+        
+        <div className="p-6 dark:bg-zinc-800 border-gray-200  border-2  bg-white shadow-md rounded-lg dark:text-white">
             {accountData.map((account, index) => (
                 <div
                     key={index}
