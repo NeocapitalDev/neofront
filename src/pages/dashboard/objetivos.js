@@ -40,6 +40,8 @@ export default function Objetivos() {
     };
 
     return (
+        <>
+        <h2 className="text-lg my-4 font-semibold">Objetivos</h2>
         <div className="   border-gray-200  border-2   dark:border-zinc-800 dark:shadow-black   p-3  bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white ">
             <table className="min-w-full">
                 <thead>
@@ -105,5 +107,6 @@ export default function Objetivos() {
                 </tbody>
             </table>
         </div>
+        </>
     );
 }
