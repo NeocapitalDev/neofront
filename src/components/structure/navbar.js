@@ -141,6 +141,8 @@ export default function Navbar() {
                         </Menu.Items>
                       </Transition>
                     </Menu>
+                    {/* Coloca el ThemeToggle aquí */}
+                    <ThemeToggle />
 
                     {/* Ícono de notificaciones (a la izquierda de la imagen de perfil) */}
                     <Notifications />

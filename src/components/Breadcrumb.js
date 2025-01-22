@@ -12,7 +12,7 @@ const Breadcrumb = () => {
     return (
         <nav className="flex items-center space-x-2 text-gray-500 mb-3 dark:text-white">
             {/* Icono de inicio con texto */}
-            <a href="/" className="flex items-center text-gray-400 hover:text-gray-600 transition">
+            <a href="/dashboard" className="flex items-center text-gray-400 hover:text-gray-600 transition">
                 <HomeIcon className="w-5 h-5" />
                 {isHomePage && <span className="ml-2 text-gray-700 dark:text-white  font-medium">Inicio</span>}
             </a>
