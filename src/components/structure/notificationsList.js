@@ -4,7 +4,7 @@ import { useStrapiData } from '../../lib/strapiService';
 import Image from 'next/image';
 const NotificationsPage = () => {
     // Usamos el hook que creamos para obtener los datos de 'notifications'
-    const { data: notifications, error, isLoading } = useStrapiData('notifications');
+    const { data: notifications, error, isLoading } = useStrapiData('news');
 
     // Si está cargando, mostramos un mensaje de carga
     if (isLoading) {
@@ -52,10 +52,10 @@ const NotificationsPage = () => {
                             )}
                             <div>
                                 <a
-                                    href={notification.buttonLink}
+                                    href={notification.url}
                                     className="block text-center bg-amber-400 text-black font-semibold py-2 px-4 rounded hover:bg-amber-500 transition"
                                 >
-                                    {notification.buttonText}
+                                    Ver más
                                 </a>
                             </div>
                         </div>
