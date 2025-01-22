@@ -1,5 +1,9 @@
+import Profile from '../../../pages/profile/index';
+
 function Identity() {
   return (
+    <Profile >
+
     <div className="bg-zinc-800 text-white p-6 rounded-lg shadow-lg shadow-black">
       <h2 className="text-xl font-bold mb-4">NEO Identity</h2>
       <div className="flex items-start space-x-4">
@@ -30,6 +34,8 @@ function Identity() {
         </p>
       </div>
     </div>
+    </Profile>
+
   );
 }
 
