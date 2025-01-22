@@ -1,7 +1,7 @@
 import Profile from '../../../pages/profile/index';
 
 // Account.js
-function Account() {
+function Security() {
     return (
       <Profile >
 
@@ -14,5 +14,5 @@ function Account() {
     );
   }
   
-  export default Account;
+  export default Security;
   

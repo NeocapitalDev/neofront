@@ -14,7 +14,12 @@ const nextConfig = {
         hostname: 'minio.neocapitalfunding.com',
         pathname: '/**', // Permitir todas las rutas de imágenes
       },
-    ],
+      {
+        protocol: 'https',
+        hostname: 'neocapitalfunding.com', // Nuevo hostname agregado
+        pathname: '/**', // Permitir todas las rutas de imágenes
+      },
+    ], 
   },
 };
 
