@@ -19,7 +19,7 @@ function Account() {
   };
 
   return (
-    <div className="flex flex-col items-center p-6 rounded-xl bg-white text-black dark:text-white dark:bg-zinc-800 dark:shadow-black w-full max-w-7xl mx-auto shadow-md">
+    <div className="flex flex-col items-center p-6  bg-white text-black dark:text-white dark:bg-zinc-800 dark:shadow-black w-full max-w-7xl mx-auto ">
       <form
         onSubmit={handleSubmit}
         className="w-full space-y-4"
