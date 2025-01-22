@@ -22,12 +22,13 @@ export default function CredencialesModal() {
         <div>
             {/* Botón para abrir el modal */}
             <button
-                className="flex items-center justify-center space-x-2 px-2 py-1 border rounded-sm shadow-md bg-gray-0 hover:bg-gray-200 w-auto"
+                className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 w-auto dark:bg-zinc-700 dark:hover:bg-zinc-600 dark:border-zinc-500"
                 onClick={() => setOpen(true)}
             >
-                <KeyIcon className="h-6 w-6 text-gray-600" />
-                <span className="text-xs lg:text-sm dark:text-zinc-700">Credenciales</span>
+                <KeyIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+                <span className="text-xs lg:text-sm dark:text-zinc-200">Credenciales</span>
             </button>
+
 
             {/* Modal */}
             <Transition.Root show={open} as={Fragment}>

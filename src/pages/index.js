@@ -14,12 +14,8 @@ export default function Index() {
 
 
   return (
-    <Layout title="Dashboard" showButton={true}>
-
-      <div>
+    <Layout>
         <UserPanel />
-      </div>
-
     </Layout>
   );
 };
