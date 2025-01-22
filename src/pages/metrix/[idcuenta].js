@@ -2,10 +2,10 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../../components/layout/dashboard';
 import { ArrowPathIcon, ChartBarIcon, PhoneIcon, UserIcon } from '@heroicons/react/24/outline';
-import MetrixDash from '../../components/structure/dashboard/metrixdash';
-import MetrixInfo from '../../components/structure/dashboard/metrixinfo';
-import Objetivos from '../../components/structure/dashboard/objetivos';
-import Diariotrading from '../../components/structure/dashboard/diariotrading';
+import MetrixDash from '../dashboard/metrixdash';
+import MetrixInfo from '../dashboard/metrixinfo';
+import Objetivos from '../dashboard/objetivos';
+import Diariotrading from '../dashboard/diariotrading';
 
 const Metrix = () => {
     const router = useRouter();

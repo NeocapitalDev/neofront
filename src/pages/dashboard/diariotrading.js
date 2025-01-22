@@ -4,7 +4,7 @@ import {
     HoverCard,
     HoverCardContent,
     HoverCardTrigger,
-} from "../../ui/hover-card.tsx";
+} from "../../components/ui/hover-card";
 
 export default function Diariotrading() {
     const [search, setSearch] = useState("");
