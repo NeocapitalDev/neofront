@@ -1,7 +1,6 @@
 function Identity() {
   return (
-    <div className="bg-zinc-800 text-white p-6 rounded-lg shadow-lg shadow-black">
-      <h2 className="text-xl font-bold mb-4">NEO Identity</h2>
+    <div className="bg-zinc-800 text-white p-6 ">
       <div className="flex items-start space-x-4">
         {/* Icono */}
         <div className="flex items-center justify-center bg-gray-800 p-3 rounded-full">

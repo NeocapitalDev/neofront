@@ -1,5 +1,5 @@
 // Account.js
-function Account() {
+function Security() {
     return (
       <div>
         <h2 className="text-xl font-semibold">Información de Cuenta</h2>
@@ -8,5 +8,5 @@ function Account() {
     );
   }
   
-  export default Account;
+  export default Security;
   

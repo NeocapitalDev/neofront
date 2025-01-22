@@ -49,7 +49,7 @@ export default function User() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg dark:bg-zinc-800 dark:shadow-black">
+    <div className="w-full max-w-4xl mx-auto bg-white  dark:bg-zinc-800 dark:shadow-black">
 
       <div className="flex flex-col items-center p-8">
 
