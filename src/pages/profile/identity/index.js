@@ -1,13 +1,12 @@
-import Profile from '../../../pages/profile/index';
+import Profile from "../../../pages/profile/index";
 
 function Identity() {
   return (
-    <Profile >
-
-    <div className="bg-zinc-800 text-white p-6 rounded-lg shadow-lg shadow-black">
-      <h2 className="text-xl font-bold mb-4">NEO Identity</h2>
-      <div className="flex items-start space-x-4">
-        {/* Icono */}
+    <Profile>
+      <div className="bg-white dark:bg-zinc-800 text-gray-900 dark:text-white p-6 rounded-lg shadow-lg dark:shadow-black shadow-gray-200 ">
+        <h2 className="text-xl font-bold mb-4">NEO Identity</h2>
+        <div className="flex items-start space-x-4">
+           {/* Icono */}
         <div className="flex items-center justify-center bg-gray-800 p-3 rounded-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -24,18 +23,17 @@ function Identity() {
             />
           </svg>
         </div>
-        {/* Contenido */}
-        <p className="text-sm">
-          La sección de NEO Identity se desbloqueará para usted una vez que esté a
-          punto de firmar o cambiar un contrato con nosotros. Se desbloqueará
-          automáticamente una vez que cumpla un Objetivo de Ganancia en una
-          Verificación que no haya violado la Pérdida Máxima Diaria o la Pérdida
-          Máxima.
-        </p>
+          {/* Contenido */}
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            La sección de NEO Identity se desbloqueará para usted una vez que
+            esté a punto de firmar o cambiar un contrato con nosotros. Se
+            desbloqueará automáticamente una vez que cumpla un Objetivo de
+            Ganancia en una Verificación que no haya violado la Pérdida Máxima
+            Diaria o la Pérdida Máxima.
+          </p>
+        </div>
       </div>
-    </div>
     </Profile>
-
   );
 }
 
