@@ -67,7 +67,7 @@ function Index({ children }) {
               tab.href === currentTab.href
                 ? 'text-amber-500 relative'
                 : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-              'w-full px-11 py-4 h-12 text-center text-sm font-medium'
+              'w-full px-11 py-4 h-16 text-center text-sm font-medium'
             )}
           >
             {tab.name}
