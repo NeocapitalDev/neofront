@@ -1,4 +1,4 @@
-import { useState } from 'react';  // Importamos useState
+import { useState, useEffect } from 'react';  // Importamos useState y useEffect
 import User from './User';
 import Account from './account/index';
 import Identity from './identity/index';
@@ -17,10 +17,13 @@ function classNames(...classes) {
 }
 
 function Index() {
-  // Definir el estado para manejar la pestaña activa
   const [currentTab, setCurrentTab] = useState(tabs[0]);
 
-  // Función para actualizar el tab activo
+  // Actualizar la URL cuando el tab cambia
+  useEffect(() => {
+    window.history.pushState(null, '', currentTab.href);
+  }, [currentTab]);
+
   const handleTabClick = (tab) => {
     setCurrentTab(tab);
   };
@@ -28,7 +31,6 @@ function Index() {
   return (
     <Layout title="Perfil" NoTab={true}>
       <div className="space-y-6">
-        {/* Tabs Component */}
         <div className='p-6 dark:bg-zinc-800 border-gray-200 border-2 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black'>
           <div className="sm:hidden">
             <label htmlFor="tabs" className="sr-only">
@@ -55,8 +57,8 @@ function Index() {
                   <a
                     key={tab.name}
                     onClick={(e) => {
-                      e.preventDefault();  // Evitar el comportamiento por defecto de los enlaces
-                      handleTabClick(tab);  // Actualizar la pestaña activa
+                      e.preventDefault();
+                      handleTabClick(tab);
                     }}
                     className={classNames(
                       tab.name === currentTab.name
@@ -64,7 +66,7 @@ function Index() {
                         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
                       'w-1/4 border-b-2 py-4 px-1 text-center text-sm font-medium'
                     )}
-                    href="#"
+                    href={tab.href}
                   >
                     {tab.name}
                   </a>
@@ -74,7 +76,6 @@ function Index() {
           </div>
         </div>
 
-        {/* Conditionally Rendered Components Based on Active Tab */}
         <div className="mt-6">
           {currentTab.name === 'Información Personal' && <User />}
           {currentTab.name === 'Información de Cuenta' && <Account />}
