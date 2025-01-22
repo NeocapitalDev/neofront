@@ -40,7 +40,7 @@ function Index({ children }) {
   return (
     <Layout title="Perfil" NoTab={true}>
       {/* Tabs */}
-      <div className="p-6 dark:bg-zinc-800 border-gray-200 border-2 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black">
+      <div className="p-6 dark:bg-zinc-800 border-gray-200 border-2 shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black">
         {/* Mobile View */}
         <div className="sm:hidden">
           <label htmlFor="tabs" className="sr-only">
@@ -49,7 +49,7 @@ function Index({ children }) {
           <select
             id="tabs"
             name="tabs"
-            className="block w-full rounded-md border-gray-300 focus:border-amber-400 focus:ring-amber-400"
+            className="block dark:bg-zinc-800 w-full rounded-md border-gray-300 focus:border-amber-400 focus:ring-amber-400"
             value={currentTab.name}
             onChange={(e) => handleTabClick(tabs.find((tab) => tab.name === e.target.value))}
           >
