@@ -19,47 +19,53 @@ function Account() {
   };
 
   return (
-    <div className="min-h-60 rounded-xl dark:text-white dark:bg-zinc-800 dark:shadow-black bg-white text-black flex flex-col items-center p-6">
-      <h2 className="text-xl font-semibold">Información de Cuenta</h2>
-      <p className="mt-2 text-gray-400">
-        Aquí puedes ver y editar los detalles de tu cuenta.
-      </p>
-
+    <div className="flex flex-col items-center p-6 rounded-xl bg-white text-black dark:text-white dark:bg-zinc-800 dark:shadow-black w-full max-w-7xl mx-auto shadow-md">
       <form
         onSubmit={handleSubmit}
-        className="bg-gray-800 p-6 mt-6 rounded shadow-md w-full max-w-md"
+        className="w-full space-y-4"
       >
-        <div className="mb-4">
-          <label htmlFor="nombreUsuario" className="block mb-2 text-sm font-bold">
-            Nombre de usuario
-          </label>
-          <input
-            type="email"
-            id="nombreUsuario"
-            name="nombreUsuario"
-            value={formData.nombreUsuario}
-            onChange={handleChange}
-            className="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white"
-            disabled
-          />
+        <div className="flex flex-col md:flex-row md:space-x-4">
+          <div className="flex-1">
+            <label
+              htmlFor="nombreUsuario"
+              className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300"
+            >
+              Nombre de usuario
+            </label>
+            <input
+              type="email"
+              id="nombreUsuario"
+              name="nombreUsuario"
+              value={formData.nombreUsuario}
+              onChange={handleChange}
+              className="w-full p-3 rounded-lg bg-gray-100 border border-gray-300 text-gray-900 dark:bg-zinc-700 dark:border-zinc-600 dark:text-white"
+              disabled
+            />
+          </div>
+          <div className="flex-1">
+            <label
+              htmlFor="idioma"
+              className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300"
+            >
+              Idioma
+            </label>
+            <select
+              id="idioma"
+              name="idioma"
+              value={formData.idioma}
+              onChange={handleChange}
+              className="w-full p-3 rounded-lg bg-gray-100 border border-gray-300 text-gray-900 dark:bg-zinc-700 dark:border-zinc-600 dark:text-white"
+            >
+              <option value="Español">Español</option>
+              <option value="Inglés">Inglés</option>
+            </select>
+          </div>
         </div>
-        <div className="mb-4">
-          <label htmlFor="idioma" className="block mb-2 text-sm font-bold">
-            Idioma
-          </label>
-          <select
-            id="idioma"
-            name="idioma"
-            value={formData.idioma}
-            onChange={handleChange}
-            className="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white"
+        <div>
+          <label
+            htmlFor="zonaHoraria"
+            className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
-            <option value="Español">Español</option>
-            <option value="Inglés">Inglés</option>
-          </select>
-        </div>
-        <div className="mb-4">
-          <label htmlFor="zonaHoraria" className="block mb-2 text-sm font-bold">
             Zona horaria
           </label>
           <select
@@ -67,19 +73,21 @@ function Account() {
             name="zonaHoraria"
             value={formData.zonaHoraria}
             onChange={handleChange}
-            className="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white"
+            className="w-full p-3 rounded-lg bg-gray-100 border border-gray-300 text-gray-900 dark:bg-zinc-700 dark:border-zinc-600 dark:text-white"
           >
             <option value="Autodetectada">Autodetectada</option>
             <option value="GMT-5">GMT-5</option>
             <option value="GMT+1">GMT+1</option>
           </select>
         </div>
-        <button
-          type="submit"
-          className="w-full p-2 mt-4 bg-blue-600 rounded text-white font-bold hover:bg-blue-700"
-        >
-          Guardar
-        </button>
+        <div className="flex justify-center mt-6">
+          <button
+            type="submit"
+            className="w-40 p-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+          >
+            Guardar
+          </button>
+        </div>
       </form>
     </div>
   );
