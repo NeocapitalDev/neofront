@@ -50,34 +50,14 @@ export default function User() {
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg dark:bg-zinc-800 dark:shadow-black">
-      <div className="border-b mt-4 pt-8 px-6">
-        <div className="flex gap-8 justify-center">
-          <button className="pb-4 px-1 mb-7 border-b-2 border-emerald-600 text-emerald-600 font-bold">
-            Cuenta
-          </button>
-        </div>
-      </div>
+
+
+      
+   
 
       <div className="flex flex-col items-center p-8">
 
-        {/* <div className="w-24 h-24 bg-gray-700 rounded-full flex items-center justify-center mb-4">
-
-          {data.image ? (
-            <img
-              src={data.image}
-              alt={data.name || 'Usuario'}
-              className="w-full h-full rounded-full object-cover"
-            />
-          ) : (
-            <span className="text-white text-4xl font-medium">
-              {data.name
-                ?.split(' ')
-                .map((word) => word[0])
-                .join('') || 'NN'}
-            </span>
-          )}
-          
-        </div> */}
+  
 
         <LogoGravatar
           email={session.user.email || 'usuario@example.com'}
