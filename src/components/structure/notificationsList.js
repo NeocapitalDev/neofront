@@ -1,7 +1,6 @@
-import Layout from '../../components/layout/dashboard';
-import Loader from '../../components/loaders/loader';
 import { useStrapiData } from '../../lib/strapiService';
 import Image from 'next/image';
+import SkeletonLoader from '../loaders/skeleton';
 const NotificationsPage = () => {
     // Usamos el hook que creamos para obtener los datos de 'notifications'
     const { data: notifications, error, isLoading } = useStrapiData('news');
@@ -9,7 +8,7 @@ const NotificationsPage = () => {
     // Si está cargando, mostramos un mensaje de carga
     if (isLoading) {
         return (
-            <Loader />
+            <div className='px-4 sm:px-6'><SkeletonLoader /></div>
         );
     }
 
@@ -30,13 +29,12 @@ const NotificationsPage = () => {
                             className="border rounded-lg p-4 shadow-sm bg-white dark:bg-zinc-700 dark:border-gray-600 dark:shadow-black space-y-2"
                         >
                             <div className="flex items-start">
-                                <span className="text-2xl mr-3">{notification.icon}</span>
                                 <div>
-                                    <h3 className="font-bold text-amber-400">
+                                    <h3 className="font-bold text-amber-400 mb-4">
                                         {notification.title}
                                     </h3>
                                     <p className="text-black dark:text-white">{notification.description}</p>
-                                    <p className="text-sm text-gray-400">{notification.time}</p>
+                                    <p className="text-sm text-gray-400">24 febrero</p>
                                 </div>
                             </div>
                             {notification.image && (
@@ -46,18 +44,24 @@ const NotificationsPage = () => {
                                         alt={notification.title}
                                         width={96}
                                         height={96}
-                                        className="w-24 h-24 rounded-lg"
+                                        className="w-full h-32 rounded-lg my-4"
                                     />
                                 </div>
                             )}
-                            <div>
-                                <a
-                                    href={notification.url}
-                                    className="block text-center bg-amber-400 text-black font-semibold py-2 px-4 rounded hover:bg-amber-500 transition"
-                                >
-                                    Ver más
-                                </a>
-                            </div>
+
+                            {notification.url && (
+                                <div>
+                                    <a
+                                        href={notification.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block text-center bg-amber-400 text-black font-semibold py-2 px-4 rounded hover:bg-amber-500 transition"
+                                    >
+                                        Ver más
+                                    </a>
+                                </div>
+                            )}
+
                         </div>
                     ))
                 ) : (
