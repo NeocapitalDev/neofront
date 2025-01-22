@@ -1,7 +1,6 @@
-import Layout from '../components/layout/dashboard';
 import { KeyIcon, ChartBarIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
-import CredencialesModal from './structure/dashboard/credentials';
+import CredencialesModal from '../../components/structure/dashboard/credentials';
 import Link from 'next/link';
 
 export default function Index() {
