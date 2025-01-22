@@ -102,7 +102,7 @@ export default function Navbar() {
 
                     {/* Foto de perfil */}
                     <Menu as="div" className="relative ml-1 flex-shrink-0">
-                      <Menu.Button className="flex rounded-full bg-zinc-900 p-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
+                      <Menu.Button className="flex rounded-full  text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
                         <span className="sr-only">Open user menu</span>
                         <LogoGravatar email={session.user.email} size={40} />
                       </Menu.Button>
@@ -141,8 +141,6 @@ export default function Navbar() {
                         </Menu.Items>
                       </Transition>
                     </Menu>
-                    {/* Coloca el ThemeToggle aquí */}
-                    <ThemeToggle />
 
                     {/* Ícono de notificaciones (a la izquierda de la imagen de perfil) */}
                     <Notifications />
