@@ -11,7 +11,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }) {
   return (
     <>
       <Head>
-        <title>{process.env.NEXT_PUBLIC_NAME_APP}</title>
+      <title>{String(process.env.NEXT_PUBLIC_NAME_APP || "")}</title>
       </Head>
       <SessionProvider session={session}>
         <ProgressBar

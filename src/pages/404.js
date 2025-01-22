@@ -5,7 +5,7 @@ export default function Error404() {
     return (
         <>
             <Head>
-                <title>404 - {process.env.NEXT_PUBLIC_NAME_APP}</title>
+            <title>{String(404 - process.env.NEXT_PUBLIC_NAME_APP || "")}</title>
             </Head>
             <div className="h-screen">
                 <main className="grid min-h-full place-items-center bg-zinc-900 px-6 py-24 sm:py-32 lg:px-8">
