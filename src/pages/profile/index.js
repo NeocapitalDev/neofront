@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from '../../components/layout/dashboard';
+import User from '../../pages/profile/User';
 
 const tabs = [
   { name: 'Información Personal', href: '/profile', current: false },
@@ -14,9 +15,11 @@ function classNames(...classes) {
 
 function Index({ children }) {
   const [currentTab, setCurrentTab] = useState(tabs[0]);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // Establecer el tab según la URL al cargar el componente
+    // Aseguramos que estamos en el cliente (navegador)
+    setIsClient(true);
     const currentPath = window.location.pathname;
     const selectedTab = tabs.find((tab) => tab.href === currentPath);
     if (selectedTab) {
@@ -28,6 +31,11 @@ function Index({ children }) {
     setCurrentTab(tab);
     window.location.href = tab.href; // Cambiar la URL directamente
   };
+
+  // Solo mostramos contenido si estamos en el cliente (navegador)
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <Layout title="Perfil" NoTab={true}>
@@ -81,7 +89,8 @@ function Index({ children }) {
 
       {/* Tab content */}
       <div className="tab-content pt-5">
-        {children}
+        {/* Mostrar el componente User por defecto si la ruta es '/profile' */}
+        {window.location.pathname === '/profile' ? <User /> : children}
       </div>
     </Layout>
   );
