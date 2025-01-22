@@ -1,8 +1,8 @@
+import { useState } from 'react';  // Importamos useState
 import User from './User';
 import Account from './account/index';
 import Identity from './identity/index';
 import Security from './security/index';
-
 import Layout from '../../components/layout/dashboard';
 
 const tabs = [
@@ -17,13 +17,19 @@ function classNames(...classes) {
 }
 
 function Index() {
-  const currentTab = tabs.find((tab) => tab.current);
+  // Definir el estado para manejar la pestaña activa
+  const [currentTab, setCurrentTab] = useState(tabs[0]);
+
+  // Función para actualizar el tab activo
+  const handleTabClick = (tab) => {
+    setCurrentTab(tab);
+  };
 
   return (
     <Layout title="Perfil" NoTab={true}>
       <div className="space-y-6">
         {/* Tabs Component */}
-        <div className='p-6 dark:bg-zinc-800 border-gray-200  border-2  bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black'>
+        <div className='p-6 dark:bg-zinc-800 border-gray-200 border-2 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black'>
           <div className="sm:hidden">
             <label htmlFor="tabs" className="sr-only">
               Select a tab
@@ -32,10 +38,11 @@ function Index() {
               id="tabs"
               name="tabs"
               className="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
-              defaultValue={currentTab.name}
+              value={currentTab.name}
+              onChange={(e) => handleTabClick(tabs.find(tab => tab.name === e.target.value))}
             >
               {tabs.map((tab) => (
-                <option key={tab.name} value={tab.href}>
+                <option key={tab.name} value={tab.name}>
                   {tab.name}
                 </option>
               ))}
@@ -47,14 +54,17 @@ function Index() {
                 {tabs.map((tab) => (
                   <a
                     key={tab.name}
-                    href={tab.href}
+                    onClick={(e) => {
+                      e.preventDefault();  // Evitar el comportamiento por defecto de los enlaces
+                      handleTabClick(tab);  // Actualizar la pestaña activa
+                    }}
                     className={classNames(
-                      tab.current
+                      tab.name === currentTab.name
                         ? 'border-indigo-500 text-indigo-600'
                         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
                       'w-1/4 border-b-2 py-4 px-1 text-center text-sm font-medium'
                     )}
-                    aria-current={tab.current ? 'page' : undefined}
+                    href="#"
                   >
                     {tab.name}
                   </a>

@@ -51,27 +51,18 @@ export default function User() {
   return (
     <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg dark:bg-zinc-800 dark:shadow-black">
 
-
-      
-   
-
       <div className="flex flex-col items-center p-8">
-
-  
 
         <LogoGravatar
           email={session.user.email || 'usuario@example.com'}
           className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4"
         />
 
-
-
         <h1 className="text-3xl font-bold dark:text-white text-slate-700 mb-2">{data.name || 'Nombre no disponible'}</h1>
         <p className="dark:text-white text-gray-400 text-sm mb-8">
           Fecha de creación: {data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'No disponible'}
         </p>
-
-
+        
         <div className="w-full space-y-6 bg-gray-100 p-6 rounded-lg dark:bg-zinc-600">
           <div className="flex flex-col md:flex-row items-center">
             <div className="w-full md:w-1/4 mb-2 md:mb-0">
