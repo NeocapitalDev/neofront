@@ -46,12 +46,12 @@ export default function Example() {
                       <div className="px-4 sm:px-6">
                         <div className="flex items-start justify-between">
                           <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
-                            <h2 className="text-xl font-semibold dark:text-white text-gray-900">🔔 Notificaciones</h2>
+                            <h2 className="text-md font-semibold dark:text-white text-gray-900">Notificaciones</h2>
                           </Dialog.Title>
                           <div className="ml-3 flex h-7 items-center pl-3 dark:bg-zinc-800">
                             <button
                               type="button"
-                              className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 border-0 dark:border-0 dark:text-gray-400"
+                              className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 border-0 dark:border-0 dark:text-gray-400"
                               onClick={() => setOpen(false)}
                             >
                               <span className="absolute -inset-2.5 " />
@@ -63,7 +63,7 @@ export default function Example() {
                           </div>
                         </div>
                       </div>
-                      <div className="relative mt-6 flex-1 px-4 sm:px-6">
+                      <div className="relative mt-6 flex-1">
                         <NotificationsList />
                       </div>
                     </div>
