@@ -1,7 +1,6 @@
 import React from 'react';
 import Layout from '../../components/layout/dashboard';
-import Icono from '../../components/layout/dashboard';
-import { FunnelIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 
 const data = [
@@ -21,7 +20,7 @@ const data = [
         order: "#12346",
         account: "Cuenta 2",
         status: "Pendiente",
-        documents: "Descargar documentos",
+        documents: "Descargar",
     },
     {
         challenge: "FTMO Challenge 3",
@@ -38,80 +37,88 @@ const data = [
 const Billing = () => {
     return (
         <Layout title="Billing">
-            <div className="p-6 dark:bg-zinc-800 border-gray-200  border-2   shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black">
-                <div className="flex p-5 justify-between items-center mb-4   border-b-2 dark:border-b">
-                    <div className="flex items-center space-x-2 ">
+            <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+                <div className="flex justify-between items-center ">
+                    <div className="flex items-center space-x-2">
                         <DocumentTextIcon className="w-6 h-6 text-gray-600 dark:text-gray-200" />
                         <h1 className="text-xl font-semibold">Facturación</h1>
                     </div>
-                    <button className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-zinc-200 dark:hover:bg-zinc-700">
-                        <FunnelIcon className="w-6 h-6 text-zinc-800 dark:text-white" />
-                        <span>Filtro</span>
-                    </button>
                 </div>
+            </div>
 
-                <div className="overflow-x-auto rounded-lg shadow-sm">
-                    <table className="w-full table-auto text-left border-collapse">
-                        <thead className="border-b-2 dark:border-b">
+            <div className="mt-6 overflow-x-auto dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+                <table className="w-full table-auto text-left border-collapse">
+                    <thead className="text-zinc-800 dark:text-white text-sm font-semibold border-b border-gray-200 dark:border-zinc-600">
+                        <tr>
+                            <th className="p-4">Challenge</th>
+                            <th className="p-4">Fechas</th>
+                            <th className="p-4">Monto</th>
+                            <th className="p-4">Orden</th>
+                            <th className="p-4">Cuenta</th>
+                            <th className="p-4">Estado</th>
+                            <th className="p-4">Factura</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {data.length === 0 ? (
                             <tr>
-                                <th className="px-4 py-3 text-zinc-800 dark:text-white font-semibold">FTMO Challenge</th>
-                                <th className="px-4 py-3 text-zinc-800 dark:text-white font-semibold">Fechas</th>
-                                <th className="px-4 py-3 text-zinc-800 dark:text-white font-semibold">Monto a pagar</th>
-                                <th className="px-4 py-3 text-zinc-800 dark:text-white font-semibold">Orden</th>
-                                <th className="px-4 py-3 text-zinc-800 dark:text-white font-semibold">Cuenta</th>
-                                <th className="px-4 py-3 text-zinc-800 dark:text-white font-semibold">Estado</th>
-                                <th className="px-4 py-3 text-zinc-800 dark:text-white font-semibold">Factura y Documentos</th>
+                                <td colSpan="7" className="px-4 py-6 text-center">
+                                    <div className="flex flex-col items-center justify-center h-[300px]">
+                                        <Image
+                                            src="/images/billing/descarga.svg"
+                                            width={300}
+                                            height={300}
+                                            className="w-[300px] h-[300px] relative -mt-20"
+                                            alt="No data icon"
+                                        />
+                                        <p className="-mt-20 text-gray-500 relative">No hay órdenes ni transacciones disponibles</p>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {data.length === 0 ? (
-                                <tr>
-                                    <td colSpan="7" className="px-4 py-6 text-center">
-                                        <div className="flex flex-col items-center justify-center h-[300px]">
-                                            <Image
-                                                src="/images/billing/icono.svg"
-                                                width={300}
-                                                height={300}
-                                                className="w-[300px] h-[300px] relative -mt-20"
-                                                alt="No data icon"
-                                            />
-                                            <p className="-mt-20 text-gray-500 relative">No hay órdenes ni transacciones disponibles</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : (
-                                data.map((row, index) => (
-                                    <tr
-                                        key={index}
-                                        className={`${index === data.length - 1 ? '' : 'border-b-2 dark:border-b'
-                                            } hover:bg-gray-100 dark:hover:bg-zinc-700 transition`}
-                                    >
-                                        <td className="px-4 py-3 text-sm font-medium text-gray-800 dark:text-white">{row.challenge}</td>
-                                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-white ">{row.dates}</td>
-                                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-white">{row.amount}</td>
-                                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-white">{row.order}</td>
-                                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-white">{row.account}</td>
-                                        <td
-                                            className={`px-4 py-3 text-sm font-semibold ${row.status === "Pagado"
-                                                    ? "text-green-600"
-                                                    : row.status === "Pendiente"
-                                                        ? "text-yellow-600"
-                                                        : "text-red-600"
+                        ) : (
+                            data.map((row, index) => (
+                                <tr
+                                    key={index}
+                                    className={`${index === data.length - 1 ? '' : 'border-b dark:border-zinc-700'
+                                        } transition`}
+                                >
+                                    <td className="p-4 text-sm font-medium text-gray-800 dark:text-white">{row.challenge}</td>
+                                    <td className="p-4 text-sm text-gray-600 dark:text-white ">{row.dates}</td>
+                                    <td className="p-4 text-sm text-gray-600 dark:text-white">{row.amount}</td>
+                                    <td className="p-4 text-sm text-gray-600 dark:text-white">{row.order}</td>
+                                    <td className="p-4 text-sm text-gray-600 dark:text-white">{row.account}</td>
+                                    <td className="p-4 text-xs font-semibold text-white">
+                                        <span
+                                            className={`inline-block rounded-lg px-2 py-1 ${row.status === "Pagado"
+                                                ? "bg-green-600 "
+                                                : row.status === "Pendiente"
+                                                    ? "bg-yellow-600 "
+                                                    : "bg-red-600 "
                                                 }`}
                                         >
                                             {row.status}
-                                        </td>
-                                        <td className="px-4 py-3 text-sm text-blue-600 underline cursor-pointer hover:text-blue-800">
-                                            {row.documents}
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
+                                        </span>
+                                    </td>
 
-                    </table>
-                </div>
+                                    <td className="p-4 text-xs font-semibold text-white">
+                                        <button
+                                            className="inline-block px-4 py-2 text-xs text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
+                                        >
+                                            {row.documents}
+                                        </button>
+                                    </td>
+
+
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+
+                </table>
             </div>
+
+
         </Layout>
     );
 };

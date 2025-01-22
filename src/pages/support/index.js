@@ -38,7 +38,7 @@ const SupportPage = () => {
                     socials.map((plataforma, index) => (
                         <div
                             key={index}
-                            className="p-6 bg-white rounded-lg shadow-lg dark:bg-zinc-800 dark:border-zinc-800 dark:text-white dark:shadow-black transition flex flex-col items-center"
+                            className="p-6 bg-white rounded-lg shadow-md dark:bg-zinc-800 dark:border-zinc-800 dark:text-white dark:shadow-black transition flex flex-col items-center"
 >
                             {/* Contenedor Horizontal para el Icono y el Texto */}
                             <div className="flex items-center mb-4 w-full">

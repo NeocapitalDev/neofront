@@ -9,7 +9,7 @@ export default function Sidebar() {
 
     return (
         <div className='dark:bg-zinc-800 rounded-xl border-2 dark:border-0 dark:border-zinc-700 dark:shadow-black border-gray-200 dark:text-white'>
-            <div className="p-4 border-b border-gray-200">
+            <div className="p-4 border-b border-gray-200 dark:border-zinc-700">
                 {/* Aquí se utiliza el nuevo componente con los props correspondientes */}
                 <PrincipalButton />
 
@@ -24,15 +24,16 @@ export default function Sidebar() {
                     <Link
                         href={href}
                         key={id}
-                        className={`w-full flex items-center py-7 px-6 font-semibold transition duration-200 last:rounded-b-md relative ${router.pathname === href
-                                ? 'bg-gradient-to-r  from-amber-50 via-white to-transparent border-l-4 border-amber-500'
+                        className={`w-full flex items-center py-7 px-6 font-semibold transition duration-200 last:rounded-b-md relative 
+             ${router.pathname === href
+                                ? 'bg-gradient-to-r from-amber-50 via-white to-transparent border-l-4 border-amber-500 dark:bg-gradient-to-r dark:from-amber-800 dark:via-zinc-800 dark:to-transparent dark:border-l-4 dark:border-amber-500'
                                 : 'hover:bg-zinc-300 dark:hover:bg-zinc-700'
                             }`}
                     >
                         <div
                             className={`absolute inset-0 ${router.pathname === href
-                                    ? 'opacity-100'
-                                    : 'opacity-0 hover:opacity-50'
+                                ? 'opacity-100'
+                                : 'opacity-0 hover:opacity-50'
                                 } transition-opacity duration-200`}
                             style={{
                                 clipPath: 'polygon(0 0, 90% 0, 10% 100%, 0 100%)',
@@ -40,20 +41,21 @@ export default function Sidebar() {
                         ></div>
                         <Icon
                             className={`h-7 w-7 mr-4 z-10 ${router.pathname === href
-                                    ? 'text-amber-500'
-                                    : 'text-gray-700'
+                                ? 'text-amber-500 dark:text-amber-400'
+                                : 'text-gray-700 dark:text-gray-300'
                                 }`}
                         />
                         <p
                             className={`text-md z-10 font-medium ${router.pathname === href
-                                    ? 'text-amber-500'
-                                    : 'text-gray-700 dark:text-white'
+                                ? 'text-amber-500 dark:text-amber-400'
+                                : 'text-gray-700 dark:text-white'
                                 }`}
                         >
                             {name}
                         </p>
                     </Link>
-                    
+
+
                 ))}
             </div>
         </div>
