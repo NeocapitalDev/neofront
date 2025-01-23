@@ -17,3 +17,8 @@ export const userNavigation = [
     { name: 'Cerrar sesión', href: '/', signOut: true },
 ];
 
+// Puedes colocar esta constante en un archivo de configuración o en el mismo componente
+
+export const principalButton = [
+    { name: 'Nuevo desafío NEO', href: 'https://neocapitalfunding.com/desafio-neo/' }
+];
