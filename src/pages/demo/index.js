@@ -5,7 +5,7 @@ const Page = () => {
 
     return (
         <>
-            <Diariotrading />
+        <Diariotrading />
         </>
     );
 };

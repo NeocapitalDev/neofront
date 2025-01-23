@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import Layout from '../../components/layout/dashboard';
 import User from '../../pages/profile/User';
 import Link from 'next/link';
+import { UserIcon } from '@heroicons/react/24/outline';
+
 const tabs = [
   { name: 'Información Personal', href: '/profile', current: false },
   { name: 'Información de Cuenta', href: '/profile/account', current: false },
@@ -25,18 +27,28 @@ function Index({ children }) {
     if (selectedTab) {
       setCurrentTab(selectedTab);
     }
-  }, []); 
+  }, []);
 
   if (!isClient) {
     return null;
   }
 
   return (
-    <Layout title="Perfil" NoTab={true}>
+    <Layout title="Perfil">
+
       {/* Tabs */}
-      <div className="p-6 dark:bg-zinc-800 border-gray-200 border-2 shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black">
+      <div className="dark:bg-zinc-800 border-gray-200 border-2 shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black">
+
+
+        <div className='p-4'>
+          <h2 className="p-2 text-xl font-semibold flex items-center">
+            <UserIcon className="h-6 w-6 mr-2" />
+            Perfil
+          </h2>
+        </div>
+
         {/* Mobile View */}
-        <div className="sm:hidden">
+        <div className="sm:hidden p-4">
           <label htmlFor="tabs" className="sr-only">
             Select a tab
           </label>
@@ -57,29 +69,27 @@ function Index({ children }) {
 
         {/* Desktop View */}
         <div className="hidden sm:block">
-  <div className="border-b border-gray-200">
-    <nav className="-mb-px flex justify-between" aria-label="Tabs">
-      {tabs.map((tab) => (
-        <Link key={tab.name} href={tab.href} passHref>
-          <button
-            onClick={() => setCurrentTab(tab)} // Cambiar la pestaña activa
-            className={classNames(
-              tab.href === currentTab.href
-                ? 'text-amber-500 relative'
-                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-              'w-full px-11 py-4 h-16 text-center text-sm font-medium'
-            )}
-          >
-            {tab.name}
-            {tab.href === currentTab.href && (
-              <span className="absolute  bottom-0 left-0 w-full h-1 bg-amber-400"></span> // Custom bottom border
-            )}
-          </button>
-        </Link>
-      ))}
-    </nav>
-  </div>
-</div>
+            <nav className="-mb-px flex justify-between" aria-label="Tabs">
+              {tabs.map((tab) => (
+                <Link key={tab.name} href={tab.href} passHref>
+                  <button
+                    onClick={() => setCurrentTab(tab)} // Cambiar la pestaña activa
+                    className={classNames(
+                      tab.href === currentTab.href
+                        ? 'text-amber-500 relative'
+                        : 'border-transparent text-gray-400 hover:text-white',
+                      'w-full px-11 py-4 h-16 text-center text-sm font-medium'
+                    )}
+                  >
+                    {tab.name}
+                    {tab.href === currentTab.href && (
+                      <span className="absolute  bottom-0 left-0 w-full h-1 bg-amber-400"></span> // Custom bottom border
+                    )}
+                  </button>
+                </Link>
+              ))}
+            </nav>
+        </div>
 
       </div>
 

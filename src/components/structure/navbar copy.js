@@ -42,16 +42,20 @@ export default function Navbar() {
       {/* <Disclosure as='nav' className='bg-white shadow-sm border-b border-gray-100'></Disclosure> */}
 
 
-      <Disclosure as="nav" className="bg-black dark:bg-zinc-800 shadow-sm border-b border-zinc-700">
+      <Disclosure as="nav" className="bg-zinc-900 dark:bg-zinc-800 shadow-sm border-b border-zinc-700">
         {({ open }) => (
           <>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 dark:text-white">
               <div className="flex h-16 justify-between items-center">
+
+
                 {/* Menú móvil y logo */}
+
+
                 <div className="flex items-center gap-x-4">
                   <div className="lg:hidden">
                     <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-zinc-900 p-2 text-white hover:bg-zinc-800 hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
-                      <span className="sr-only">Abrir menú principal</span>
+                      <span className="sr-only">Open main menu</span>
                       {open ? (
                         <XMarkIcon className="h-6 w-6" aria-hidden="true" />
                       ) : (
@@ -80,15 +84,15 @@ export default function Navbar() {
                 {/* Menú de usuario y notificaciones */}
                 {session && (
                   <div className="flex items-center gap-x-4">
-                    {/* Correo electrónico (visible solo en escritorio) */}
+                    {/* Correo electrónico (solo visible en escritorio) */}
                     <p className="hidden lg:block text-white text-sm font-medium">
                       {session.user.email}
                     </p>
 
-                    {/* Foto de perfil y menú */}
-                    <Menu as="div" className="relative">
-                      <Menu.Button className="flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
-                        <span className="sr-only">Abrir menú de usuario</span>
+                    {/* Foto de perfil */}
+                    <Menu as="div" className="relative flex-shrink-0">
+                      <Menu.Button className="flex rounded-full  text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
+                        <span className="sr-only">Open user menu</span>
                         <LogoGravatar email={session.user.email} size={40} />
                       </Menu.Button>
                       <Transition
@@ -106,8 +110,10 @@ export default function Navbar() {
                               {({ active }) => (
                                 <Link
                                   href={item.href}
-                                  className={`block px-4 py-2 text-sm ${item.signOut ? 'text-red-400' : 'text-white'} ${active ? 'bg-zinc-700' : ''
-                                    }`}
+                                  className={`block px-4 py-2 text-sm ${item.signOut
+                                      ? 'text-red-400'
+                                      : 'text-white'
+                                    } ${active ? 'bg-zinc-700' : ''}`}
                                   onClick={item.signOut ? handleSignOut : undefined}
                                   target={item.external ? '_blank' : undefined}
                                 >
@@ -124,11 +130,10 @@ export default function Navbar() {
                         </Menu.Items>
                       </Transition>
                     </Menu>
-
-                    {/* Theme Toggle */}
+                    {/* Coloca el ThemeToggle aquí */}
                     <ThemeToggle />
 
-                    {/* Notificaciones */}
+                    {/* Ícono de notificaciones (a la izquierda de la imagen de perfil) */}
                     <Notifications />
                   </div>
                 )}
@@ -159,8 +164,6 @@ export default function Navbar() {
           </>
         )}
       </Disclosure>
-
-
     </>
   )
 }
