@@ -40,35 +40,33 @@ export default function Diariotrading() {
 
     return (
         <>
-            <div className="mb-4 flex items-center justify-between ">
-                <div className="flex items-center space-x-3 relative">
-                    {/* Título con la imagen de información */}
-                    <div className="relative flex items-center">
-                        <h1 className="text-xl font-semibold dark:text-white text-gray-800">Diario de Trading</h1>
+            <div className="my-4 flex items-center space-x-3 relative">
+                <h2 className="text-lg font-semibold">Diario de trading</h2>
 
-                        {/* HoverCard para la información */}
-                        <HoverCard>
-                            <HoverCardTrigger className="inline-block ml-1 cursor-pointer">
-                                <Image
-                                    src="/images/informacion/info.svg"
-                                    alt="Más información"
-                                    width={16}
-                                    height={16}
-                                />
-                            </HoverCardTrigger>
-                            <HoverCardContent className="w-64 bg-black text-white text-sm rounded-lg py-2 px-3 shadow-lg z-30">
-                                <p>
-                                    El "Diario de Trading" te permite llevar un registro detallado de tus operaciones, ayudando
-                                    a mejorar tu disciplina y análisis de las decisiones que tomas en cada trade. Es una herramienta
-                                    clave para el crecimiento como trader.
-                                </p>
-                            </HoverCardContent>
-                        </HoverCard>
-                    </div>
-                </div>
+                {/* HoverCard para la información */}
+                <HoverCard>
+                    <HoverCardTrigger className="ml-2 cursor-pointer">
+                        <Image
+                            src="/images/informacion/info.svg"
+                            alt="Más información"
+                            width={16}
+                            height={16}
+                        />
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-64 bg-black text-white text-sm rounded-lg py-2 px-3 shadow-lg z-30">
+                        <p>
+                            El "Diario de Trading" te permite llevar un registro detallado de tus
+                            operaciones, ayudando a mejorar tu disciplina y análisis de las
+                            decisiones que tomas en cada trade. Es una herramienta clave para el
+                            crecimiento como trader.
+                        </p>
+                    </HoverCardContent>
+                </HoverCard>
             </div>
+
+
             {/* Contenedor de la tabla */}
-            <div className=" dark:bg-zinc-800 border-gray-200  border-2  bg-white dark:text-white dark:border-zinc-800 dark:shadow-black p-4 rounded-lg shadow-md max-w-4xl mx-auto">
+            <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black max-w-4xl mx-auto">
                 {/* Filtros */}
                 <div className="mb-4 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center">
                     {/* Orden */}
@@ -132,9 +130,9 @@ export default function Diariotrading() {
                                 ].map((header, index) => (
                                     <th
                                         key={index}
-                                        className={`border-b p-4 ${["Tipo", "Volumen", "Símbolo","Pips"].includes(header)
-                                                ? "text-amber-400 cursor-pointer relative"
-                                                : "text-gray-700 dark:text-white"
+                                        className={`border-b p-4 ${["Tipo", "Volumen", "Símbolo", "Pips"].includes(header)
+                                            ? "text-amber-400 cursor-pointer relative"
+                                            : "text-gray-700 dark:text-white"
                                             }`}
                                         onClick={() => {
                                             if (["Tipo", "Volumen", "Símbolo"].includes(header)) {
@@ -202,8 +200,8 @@ export default function Diariotrading() {
                                     <tr
                                         key={index}
                                         className={`${index % 2 === 0
-                                                ? "bg-white dark:bg-zinc-800"
-                                                : "bg-gray-50 dark:bg-zinc-700"
+                                            ? "bg-white dark:bg-zinc-800"
+                                            : "bg-gray-50 dark:bg-zinc-700"
                                             }`}
                                     >
                                         <td className="border-b p-4 dark:text-white">{row.ticket}</td>

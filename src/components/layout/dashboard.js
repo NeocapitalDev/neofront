@@ -5,7 +5,7 @@ import Breadcrumb from "../Breadcrumb";
 
 export default function Layout({ children }) {
     return (
-        <div className="min-h-full bg-gray-100 dark:bg-zinc-900">
+        <div className="min-h-full">
             <Navbar />
             <main className="text-black dark:text-white">
 
