@@ -25,7 +25,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "src/components/Recaptcha.js"  ],
   "exclude": [
     "node_modules"
   ]

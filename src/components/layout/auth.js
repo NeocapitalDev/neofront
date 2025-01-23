@@ -39,6 +39,7 @@ const Layout = ({ children }) => {
             alt="Moneda"
             width={960}
             height={1080}
+            unoptimized={true}
           />
         </div>
 
