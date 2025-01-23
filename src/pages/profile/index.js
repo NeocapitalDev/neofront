@@ -31,6 +31,11 @@ function Index({ children }) {
     return null;
   }
 
+   // Función para manejar el cambio de pestaña en el select
+   const handleTabClick = (tab) => {
+    setCurrentTab(tab); // Cambiar la pestaña activa
+  };
+
   return (
     <Layout title="Perfil" NoTab={true}>
       {/* Tabs */}
