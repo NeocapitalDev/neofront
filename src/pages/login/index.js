@@ -48,79 +48,81 @@ export default function SignIn() {
   };
 
   return (
-    <Layout className="bg-black min-h-screen">
-      <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-white">
-        Iniciar sesión 👋
-      </h2>
+<Layout className="min-h-screen bg-white dark:bg-black">
+  <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-white">
+    Iniciar sesión 👋
+  </h2>
 
-      <div className="mt-8">
-        <form className="space-y-6" onSubmit={onSubmit}>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-300">
-              Correo electrónico
-            </label>
-            <div className="mt-2">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                placeholder="tu@ejemplo.com"
-                required
-                className="block w-full rounded-md border-0 py-1.5 bg-gray-800 text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
-              />
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between">
-              <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-300">
-                Contraseña
-              </label>
-              <div className="text-sm">
-                <Link href="/forgot-password" className="font-normal text-amber-400 hover:text-amber-300">
-                  ¿Has olvidado tu contraseña?
-                </Link>
-              </div>
-            </div>
-            <div className="mt-2">
-              <input
-                id="password"
-                name="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                placeholder="••••••••"
-                required
-                className="block w-full rounded-md border-0 py-1.5 bg-gray-800 text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
-              />
-            </div>
-          </div>
-
-          {/* Componente Turnstile */}
-          <Recaptcha onVerify={handleCaptcha} />
-
-          <div>
-            <button
-              type="submit"
-              disabled={isSubmitting || !captchaToken}  // Deshabilitar si no hay token o si está enviando
-              className={`text-black flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 ${isSubmitting ? "bg-gray-600 cursor-not-allowed" : "bg-amber-500 hover:bg-amber-400 focus:ring-amber-400"}`}
-            >
-              {isSubmitting ? 'Ingresando...' : 'Ingresar'}
-            </button>
-          </div>
-        </form>
-
-        <p className="mt-10 text-sm text-center leading-6 text-gray-400">
-          ¿No tienes una cuenta?{" "}
-          <Link href="/register" className="font-semibold leading-6 text-amber-400 hover:text-amber-300">
-            Regístrate ahora
-          </Link>
-        </p>
+  <div className="mt-8">
+    <form className="space-y-6" onSubmit={onSubmit}>
+      <div>
+        <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-700 dark:text-gray-300">
+          Correo electrónico
+        </label>
+        <div className="mt-2">
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            placeholder="tu@ejemplo.com"
+            required
+            className="block w-full rounded-md border border-gray-300 dark:border-gray-600 py-1.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+          />
+        </div>
       </div>
-    </Layout>
+
+      <div>
+        <div className="flex items-center justify-between">
+          <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-700 dark:text-gray-300">
+            Contraseña
+          </label>
+          <div className="text-sm">
+            <Link href="/forgot-password" className="font-normal text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300">
+              ¿Has olvidado tu contraseña?
+            </Link>
+          </div>
+        </div>
+        <div className="mt-2">
+          <input
+            id="password"
+            name="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            placeholder="••••••••"
+            required
+            className="block w-full rounded-md border border-gray-300 dark:border-gray-600 py-1.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+          />
+        </div>
+      </div>
+
+      {/* Componente Turnstile */}
+      <Recaptcha onVerify={handleCaptcha} />
+
+      <div>
+        <button
+          type="submit"
+          disabled={isSubmitting || !captchaToken}  // Deshabilitar si no hay token o si está enviando
+          className={`text-white flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 ${isSubmitting ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed" : "bg-amber-500 hover:bg-amber-400 focus:ring-amber-400"}`}
+        >
+          {isSubmitting ? 'Ingresando...' : 'Ingresar'}
+        </button>
+      </div>
+    </form>
+
+    <p className="mt-10 text-sm text-center leading-6 text-gray-500 dark:text-gray-400">
+      ¿No tienes una cuenta?{" "}
+      <Link href="/register" className="font-semibold leading-6 text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300">
+        Regístrate ahora
+      </Link>
+    </p>
+  </div>
+</Layout>
+
+
   );
 }

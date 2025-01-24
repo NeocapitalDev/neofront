@@ -8,7 +8,7 @@ import Image from 'next/image';
 
 const Layout = ({ children }) => {
   return (
-    <div className="h-screen bg-zinc-900">
+    <div className="h-screen bg-white dark:bg-zinc-900">
       <div className="flex min-h-full flex-1">
 
 
