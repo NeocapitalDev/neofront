@@ -9,6 +9,7 @@ export default function CredencialesModal({ login, password, server, platform })
     const data = [
         { label: 'Login', value: login },
         { label: 'Contraseña', value: password },
+        { label: 'Contraseña de solo lectura', value: 'YrI*9@IqHa9' },
         { label: 'Servidor', value: server },
         { label: 'Plataforma', value: platform },
     ];
