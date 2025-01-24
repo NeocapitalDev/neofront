@@ -2,17 +2,17 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, ClipboardDocumentIcon, PencilIcon, KeyIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
-export default function CredencialesModal() {
+export default function CredencialesModal({ login, password, server, platform }) {
     const [open, setOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar la contraseña
     const [copied, setCopied] = useState({}); // Estado para el mensaje de "Copiado" para cada item
 
     // Elimino la "Contraseña de solo lectura" del array de datos
     const data = [
-        { label: 'Login', value: '1420126402' },
-        { label: 'Contraseña', value: 'asAS*9@Pa9' },
-        { label: 'Servidor', value: 'FTMO-Demo2' },
-        { label: 'Plataforma', value: 'MT4' },
+        { label: 'Login', value: login },
+        { label: 'Contraseña', value: password },
+        { label: 'Servidor', value: server },
+        { label: 'Plataforma', value: platform },
     ];
 
     const handleCopy = (label, value) => {
@@ -131,6 +131,16 @@ export default function CredencialesModal() {
                                                                     {copied[item.label] && (
                                                                         <div className="text-sm text-green-500 mt-1">¡Copiado!</div>
                                                                     )}
+
+                                                                    {/* Botón de cambio (solo para Contraseña) */}
+                                                                    {item.label === 'Contraseña' && (
+                                                                        <div className="flex items-center space-x-3">
+                                                                            <button className="p-2 border bg-white rounded hover:bg-gray-200 w-12 h-12 flex items-center justify-center">
+                                                                                <PencilIcon className="h-5 w-5 text-gray-600" />
+                                                                            </button>
+                                                                            <span className="text-sm text-gray-600 dark:text-white truncate">Cambio</span>
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -140,7 +150,15 @@ export default function CredencialesModal() {
                                         </div>
                                     </div>
 
-                              
+                                    <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                                        <button
+                                            type="button"
+                                            className="inline-flex w-full justify-center rounded-md bg-amber-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-600 sm:ml-3 sm:w-auto"
+                                            onClick={() => setOpen(false)}
+                                        >
+                                            Cerrar
+                                        </button>
+                                    </div>
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>
