@@ -72,7 +72,7 @@ export default function ForgotPassword() {
       <div className="mt-8">
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium leading-6 text-black dark:text-gray-300">
+            <label htmlFor="email" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">
               Correo electrónico
             </label>
             <div className="mt-2">
@@ -85,7 +85,7 @@ export default function ForgotPassword() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@ejemplo.com"
                 required
-                className="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 py-2 pr-10 shadow-sm text-gray-900 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5  dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-600 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
               />
             </div>
           </div>
@@ -95,8 +95,7 @@ export default function ForgotPassword() {
           <div>
             <button
               type="submit"
-              className={`text-black flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${isSubmitting ? 'bg-gray-600 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-400 focus:ring-amber-400'
-                }`}
+              className={`dark:text-white text-zinc-900 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 ${isSubmitting ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed" : "bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400"}`}
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Enviando...' : 'Enviar correo de reinicio'}

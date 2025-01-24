@@ -63,7 +63,7 @@ export default function ResetPassword() {
       <div className="mt-8 bg-zinc-200">
         <form className="space-y-6" onSubmit={handleResetPassword}>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium leading-6 text-black dark:text-gray-300">
+            <label htmlFor="password" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">
               Contraseña
             </label>
             <div className="mt-2 relative">
@@ -76,7 +76,7 @@ export default function ResetPassword() {
                 onChange={(e) => setPassword(e.target.value)}
                 minLength={6}
                 required
-                className="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 py-2 pr-10 shadow-sm text-gray-900 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5  dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-600 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
               />
               <button
                 type="button"
@@ -93,7 +93,7 @@ export default function ResetPassword() {
           </div>
 
           <div>
-            <label htmlFor="confirm-password" className="block text-sm text-black font-medium leading-6 dark:text-gray-300">
+            <label htmlFor="confirm-password" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">
               Confirmar contraseña
             </label>
             <div className="mt-2 relative">
@@ -106,7 +106,7 @@ export default function ResetPassword() {
                 onChange={(e) => setpasswordConfirmation(e.target.value)}
                 minLength={6}
                 required
-                className="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 py-2 pr-10 shadow-sm text-gray-900 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5  dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-600 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
               />
               <button
                 type="button"
