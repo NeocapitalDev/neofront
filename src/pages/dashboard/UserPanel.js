@@ -77,8 +77,15 @@ export default function Index() {
 
                     <p className="text-sm text-gray-500 dark:text-gray-300">{challenge.description}</p>
                     <div className="mt-4 flex space-x-4">
-                        <CredencialesModal />
-                        <Link href={`/challenges/${challenge.id}`}>
+                        <CredencialesModal
+                            login={challenge.login}
+                            password={challenge.password}
+                            server={challenge.server}
+                            platform={challenge.platform}
+                        />
+
+
+                        <Link href={`/challenges/${challenge.login}`}>
                             <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
                                 <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
                                 <span className="text-xs lg:text-sm dark:text-zinc-200">Ver Detalles</span>
