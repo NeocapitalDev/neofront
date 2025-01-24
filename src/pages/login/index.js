@@ -71,7 +71,7 @@ export default function SignIn() {
             autoComplete="email"
             placeholder="tu@ejemplo.com"
             required
-            className="block  w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+            className="block w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:focus:ring-amber-500 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
             />
         </div>
       </div>
@@ -119,8 +119,8 @@ export default function SignIn() {
       <div>
         <button
           type="submit"
-          disabled={isSubmitting || !captchaToken}
-          className={`dark:text-white text-zinc-900 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400  ${isSubmitting ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed" : "bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400"}`}
+          disabled={isSubmitting || !captchaToken}  // Deshabilitar si no hay token o si está enviando
+          className={`dark:text-black text-zinc-900 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400  ${isSubmitting ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed" : "bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400"}`}
         >
           {isSubmitting ? 'Ingresando...' : 'Ingresar'}
         </button>
