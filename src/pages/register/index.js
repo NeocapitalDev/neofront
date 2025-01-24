@@ -70,7 +70,14 @@ export default function SignUp() {
         username,
         email: formData.email,
         password: formData.password
-      });
+      },
+        {
+          headers: {
+            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
       console.log('Registration successful:', response.data);
       toast.success('Registro exitoso.');
       router.replace('/email-confirmation');
@@ -112,7 +119,7 @@ export default function SignUp() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="block w-full rounded-md border-0 py-1.5  dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-600 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5  dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-600 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
@@ -132,7 +139,7 @@ export default function SignUp() {
                   value={formData.password}
                   onChange={handleChange}
                   onFocus={handlePasswordFocus}
-                  className="block w-full rounded-md border-0 py-1.5  dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-600 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5  dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-600 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
                 />
                 <button
                   type="button"
@@ -209,7 +216,7 @@ export default function SignUp() {
             </div>
           </form>
 
-          <p className="mt-10 text-sm text-center leading-6 text-gray-400">
+          <p className="mt-10 text-sm text-center leading-6 text-gray-600 dark:text-gray-400">
             ¿Tienes una cuenta?{' '}
             <Link href="/login" className="font-semibold leading-6 text-amber-500 hover:text-amber-400 dark:text-amber-400 dark:hover:text-amber-300">
               Iniciar sesión
