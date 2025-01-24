@@ -16,7 +16,8 @@ export default function ResetPassword() {
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setpasswordConfirmation] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Controla el campo de contraseña
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Controla el campo de confirmación de contraseña
   const [captchaToken, setCaptchaToken] = useState('');  // Nuevo estado para el token del CAPTCHA
 
   const handleResetPassword = async (event) => {
@@ -80,7 +81,7 @@ export default function ResetPassword() {
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-black dark:text-gray-400 hover:text-gray-300 focus:outline-none"
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-black dark:text-gray-400 hover:text-gray-500 focus:outline-none"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -100,7 +101,7 @@ export default function ResetPassword() {
               <input
                 id="confirm-password"
                 name="confirmPassword"
-                type={showPassword ? 'text' : 'password'}
+                type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 value={passwordConfirmation}
                 onChange={(e) => setpasswordConfirmation(e.target.value)}
@@ -110,10 +111,10 @@ export default function ResetPassword() {
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 flex items-center px-3  text-black dark:text-gray-400 hover:text-gray-300 focus:outline-none"
-                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center px-3  text-black dark:text-gray-400 hover:text-gray-500 focus:outline-none"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
-                {showPassword ? (
+                {showConfirmPassword ? (
                   <EyeSlashIcon className="h-5 w-5" aria-hidden="true" />
                 ) : (
                   <EyeIcon className="h-5 w-5" aria-hidden="true" />
