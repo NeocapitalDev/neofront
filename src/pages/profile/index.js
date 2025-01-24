@@ -42,7 +42,7 @@ function Index({ children }) {
     <Layout title="Perfil">
 
       {/* Tabs */}
-      <div className="dark:bg-zinc-800 border-gray-200 border-2 shadow-md rounded-lg dark:text-white dark:border-zinc-800 dark:shadow-black">
+      <div className="dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
 
 
         <div className='p-4'>
@@ -82,7 +82,7 @@ function Index({ children }) {
                     className={classNames(
                       tab.href === currentTab.href
                         ? 'text-amber-500 relative'
-                        : 'border-transparent text-gray-400 hover:text-white',
+                        : 'border-transparent text-gray-400',
                       'w-full px-11 py-4 h-16 text-center text-sm font-medium'
                     )}
                   >

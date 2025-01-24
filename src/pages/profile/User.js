@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 
-import OrderSkeleton from '../../components/OrderSkeleton';
+import Skeleton from '../../components/loaders/loader';
 
 import LogoGravatar from '../../components/LogoGravatar'
 
@@ -40,12 +40,12 @@ export default function User() {
     fetchData();
   }, [status, session]);
 
-  if (status === 'loading' || loading) return <OrderSkeleton />;
+  if (status === 'loading' || loading) return <Skeleton />;
   if (error) return <div>Error: {error}</div>;
 
   // Asegúrate de que `data` no sea nulo antes de renderizar
   if (!data) {
-    return <OrderSkeleton />;
+    return <Skeleton />;
   }
 
   return (
