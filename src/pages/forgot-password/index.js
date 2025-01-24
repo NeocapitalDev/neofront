@@ -60,19 +60,19 @@ export default function ForgotPassword() {
   };
 
   return (
-    <Layout className="bg-black min-h-screen">
-      <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-white">
+    <Layout className=" min-h-screen">
+      <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-black dark:text-white">
         Recuperar contraseña
       </h2>
 
-      <p className="mt-2 text-sm leading-6 text-gray-400">
+      <p className="mt-2 text-sm leading-6 text-black dark:text-gray-400">
         Escribe tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
       </p>
 
       <div className="mt-8">
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-300">
+            <label htmlFor="email" className="block text-sm font-medium leading-6 text-black dark:text-gray-300">
               Correo electrónico
             </label>
             <div className="mt-2">
@@ -85,7 +85,7 @@ export default function ForgotPassword() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@ejemplo.com"
                 required
-                className="block w-full rounded-md border-0 py-1.5 bg-gray-800 text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 py-2 pr-10 shadow-sm text-gray-900 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 sm:text-sm sm:leading-6"
               />
             </div>
           </div>
@@ -104,9 +104,9 @@ export default function ForgotPassword() {
           </div>
         </form>
 
-        <p className="mt-10 text-sm text-center leading-6 text-gray-400">
+        <p className="mt-10 text-sm text-center leading-6 text-black dark:text-gray-400">
           ¿Ya tienes una cuenta?{' '}
-          <Link href="/login" className="font-semibold leading-6 text-amber-400 hover:text-amber-300">
+          <Link href="/login" className="font-semibold leading-6 text-amber-500 hover:text-amber-400 dark:text-amber-400 dark:hover:text-amber-300">
             Iniciar sesión
           </Link>
         </p>
