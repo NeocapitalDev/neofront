@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { useRouter } from 'next/router';
+import Recaptcha from '../../components/Recaptcha';  // Importar el componente de Recaptcha
 
 import Layout from '../../components/layout/auth';
 
@@ -10,14 +11,22 @@ import { getSession } from 'next-auth/react';
 const strapiUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export default function ForgotPassword() {
+  const [captchaToken, setCaptchaToken] = useState('');
+
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
   const router = useRouter();
-
+  const handleCaptcha = (token) => {
+    console.log("Token del CAPTCHA:", token);  // Verificar el token
+    setCaptchaToken(token);  // Guardar el token del CAPTCHA
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (!captchaToken) {
+      toast.error('Por favor, completa el CAPTCHA.');
+      return;
+    }
     try {
       // Habilitar el estado de envío
       setIsSubmitting(true);
@@ -80,6 +89,8 @@ export default function ForgotPassword() {
               />
             </div>
           </div>
+          {/* Componente Turnstile */}
+          <Recaptcha onVerify={handleCaptcha} />
 
           <div>
             <button
