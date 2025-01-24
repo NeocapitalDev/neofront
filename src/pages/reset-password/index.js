@@ -64,7 +64,7 @@ export default function ResetPassword() {
 
   return (
     <Layout className=" min-h-screen">
-      <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-black">
+      <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-black dark:text-white">
         Restablecer contraseña
       </h2>
 
@@ -84,7 +84,7 @@ export default function ResetPassword() {
                 onChange={(e) => setPassword(e.target.value)}
                 minLength={6}
                 required
-                className="block w-full rounded-md border-0 py-1.5  dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-600 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:focus:ring-amber-500 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
               />
               <button
                 type="button"
@@ -114,7 +114,7 @@ export default function ResetPassword() {
                 onChange={(e) => setpasswordConfirmation(e.target.value)}
                 minLength={6}
                 required
-                className="block w-full rounded-md border-0 py-1.5  dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-600 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:focus:ring-amber-500 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
               />
               <button
                 type="button"
