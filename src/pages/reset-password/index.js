@@ -61,7 +61,7 @@ export default function ResetPassword() {
         Restablecer contraseña
       </h2>
 
-      <div className="mt-8 bg-zinc-200">
+      <div className="mt-8">
         <form className="space-y-6" onSubmit={handleResetPassword}>
           <div>
             <label htmlFor="password" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">
