@@ -93,7 +93,7 @@ export default function CredencialesModal() {
                                                             {item.label === 'Contraseña' ? (
                                                                 <div className="flex items-center space-x-1">
                                                                     <span className="text-sm dark:text-white text-gray-600">
-                                                                        {showPassword ? item.value : '****'}
+                                                                        {showPassword ? item.value : '********'}
                                                                     </span>
                                                                     <button
                                                                         className="flex items-center justify-center"
@@ -130,16 +130,6 @@ export default function CredencialesModal() {
                                                                     {/* Mensaje de copiado */}
                                                                     {copied[item.label] && (
                                                                         <div className="text-sm text-green-500 mt-1">¡Copiado!</div>
-                                                                    )}
-
-                                                                    {/* Botón de cambio (solo para Contraseña) */}
-                                                                    {item.label === 'Contraseña' && (
-                                                                        <div className="flex items-center space-x-3">
-                                                                            <button className="p-2 border bg-white rounded hover:bg-gray-200 w-12 h-12 flex items-center justify-center">
-                                                                                <PencilIcon className="h-5 w-5 text-gray-600" />
-                                                                            </button>
-                                                                            <span className="text-sm text-gray-600 dark:text-white truncate">Cambio</span>
-                                                                        </div>
                                                                     )}
                                                                 </div>
                                                             )}
