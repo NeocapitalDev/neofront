@@ -7,14 +7,15 @@ const Recaptcha = ({ onVerify }) => {
         if (isLoaded) return;  // Si ya está cargado, no hacemos nada más.
 
         const loadTurnstile = () => {
-            // Verificamos si el script ya está cargado
+            // Verificamos si Turnstile ya está disponible
             if (window.turnstile) {
-                // Si Turnstile ya está disponible, lo renderizamos
+                // Si Turnstile ya está disponible, lo renderizamos con el tema oscuro
                 window.turnstile.render('#turnstile-container', {
                     sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
                     callback: (token) => {
                         onVerify(token);
                     },
+                    theme: 'dark', // Establecemos el tema a "dark"
                 });
                 setIsLoaded(true); // Marcamos que ya se cargó el CAPTCHA
             }
