@@ -15,8 +15,8 @@ export default function ResetPassword() {
   const { code } = router.query;
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setpasswordConfirmation] = useState('');
-  const [loading, setLoading] = useState(false); 
-  const [showPassword, setShowPassword] = useState(false); 
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [captchaToken, setCaptchaToken] = useState('');  // Nuevo estado para el token del CAPTCHA
 
   const handleResetPassword = async (event) => {
@@ -35,9 +35,9 @@ export default function ResetPassword() {
     try {
       setLoading(true);
       // Enviar la solicitud de restablecimiento de contraseña junto con el token CAPTCHA
-      await axios.post(`${strapiUrl}/api/auth/reset-password`, { 
-        code, 
-        password, 
+      await axios.post(`${strapiUrl}/api/auth/reset-password`, {
+        code,
+        password,
         passwordConfirmation,
         captchaToken,  // Incluir el token CAPTCHA
       });
@@ -55,15 +55,15 @@ export default function ResetPassword() {
   };
 
   return (
-    <Layout className="bg-black min-h-screen">
-      <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-white">
+    <Layout className=" min-h-screen">
+      <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-black">
         Restablecer contraseña
       </h2>
 
-      <div className="mt-8">
+      <div className="mt-8 bg-zinc-200">
         <form className="space-y-6" onSubmit={handleResetPassword}>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-300">
+            <label htmlFor="password" className="block text-sm font-medium leading-6 text-black dark:text-gray-300">
               Contraseña
             </label>
             <div className="mt-2 relative">
@@ -76,11 +76,11 @@ export default function ResetPassword() {
                 onChange={(e) => setPassword(e.target.value)}
                 minLength={6}
                 required
-                className="block w-full rounded-md border-0 py-1.5 pr-10 bg-gray-800 text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 py-2 pr-10 shadow-sm text-gray-900 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 sm:text-sm sm:leading-6"
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-300 focus:outline-none"
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-black dark:text-gray-400 hover:text-gray-300 focus:outline-none"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -93,7 +93,7 @@ export default function ResetPassword() {
           </div>
 
           <div>
-            <label htmlFor="confirm-password" className="block text-sm font-medium leading-6 text-gray-300">
+            <label htmlFor="confirm-password" className="block text-sm text-black font-medium leading-6 dark:text-gray-300">
               Confirmar contraseña
             </label>
             <div className="mt-2 relative">
@@ -106,11 +106,11 @@ export default function ResetPassword() {
                 onChange={(e) => setpasswordConfirmation(e.target.value)}
                 minLength={6}
                 required
-                className="block w-full rounded-md border-0 py-1.5 pr-10 bg-gray-800 text-gray-300 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 py-2 pr-10 shadow-sm text-gray-900 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 sm:text-sm sm:leading-6"
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-300 focus:outline-none"
+                className="absolute inset-y-0 right-0 flex items-center px-3  text-black dark:text-gray-400 hover:text-gray-300 focus:outline-none"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -135,7 +135,7 @@ export default function ResetPassword() {
         </form>
 
         <p className="mt-10 text-sm text-center leading-6 text-gray-400">
-          <Link href="/login" className="font-semibold leading-6 text-amber-400 hover:text-amber-300">
+          <Link href="/login" className="font-semibold leading-6 text-amber-500 hover:text-amber-400">
             Volver al inicio de sesión
           </Link>
         </p>
