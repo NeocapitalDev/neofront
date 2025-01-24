@@ -3,6 +3,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 import CredencialesModal from './credentials';
+import Loader from '../../components/loaders/loader';
 
 // Función fetcher para usar con SWR
 const fetcher = async (url, token) => {
@@ -33,7 +34,7 @@ export default function Index() {
     );
 
     if (isLoading) {
-        return <p className="text-center">Cargando...</p>;
+        return <Loader />;
     }
 
     if (error) {
@@ -85,10 +86,10 @@ export default function Index() {
                         />
 
 
-                        <Link href={`/challenges/${challenge.login}`}>
+                        <Link href={`/metrix/${challenge.documentId}`}>
                             <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
                                 <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                                <span className="text-xs lg:text-sm dark:text-zinc-200">Ver Detalles</span>
+                                <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
                             </button>
                         </Link>
                     </div>
