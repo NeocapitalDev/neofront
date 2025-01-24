@@ -49,11 +49,32 @@ export default function Index() {
             {data.challenges.map((challenge, index) => (
                 <div
                     key={index}
-                    className="p-6 mb-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black"
+                    className="relative p-6 mb-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black"
                 >
-                    <h2 className="text-xl font-bold text-zinc-800 mb-2 dark:text-zinc-200">
-                        {challenge.title}
-                    </h2>
+                    <p className="text-sm font-bold text-zinc-800 mb-2 dark:text-zinc-200">
+                        Login: {challenge.login}
+                    </p>
+
+                    <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
+                        <p className="text-sm font-semibold text-gray-500 dark:text-gray-300">
+                            Balance:{' '}
+                            <span className="font-bold text-slate-800 dark:text-slate-200">
+                                {challenge.balance}
+                            </span>
+                        </p>
+                        <p className="text-sm font-semibold text-gray-500 dark:text-gray-300">
+                            Día de Recompensa:{' '}
+                            <span className="font-bold text-slate-800 dark:text-slate-200">
+                                {challenge.startDate}
+                            </span>
+                        </p>
+                        <p className="text-sm font-semibold text-gray-500 dark:text-gray-300">
+                            Resultado: {challenge.result}
+                        </p>
+                    </div>
+
+
+
                     <p className="text-sm text-gray-500 dark:text-gray-300">{challenge.description}</p>
                     <div className="mt-4 flex space-x-4">
                         <CredencialesModal />
