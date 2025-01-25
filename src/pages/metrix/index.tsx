@@ -66,8 +66,8 @@ export default function Component() {
             <LineChart
               data={chartData}
               margin={{
-                left: 12,
-                right: 12,
+                left: 0,
+                right: 0,
                 top: 20,
                 bottom: 20,
               }}
