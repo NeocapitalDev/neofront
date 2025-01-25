@@ -47,17 +47,12 @@ const Metrix = () => {
             </h1>
 
             <div className="flex justify-start gap-3 my-6">
-<<<<<<< HEAD
-                <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
-                    <UserIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                    <span className="text-xs lg:text-sm dark:text-zinc-200">Credenciales</span>
-                    
-                </button>
-=======
-                <CredencialesModal {...challengeData.data} />
+                {challengeData?.data ? (
+                    <CredencialesModal {...challengeData.data} />
+                ) : (
+                    <p>Cargando credenciales...</p> // Mensaje temporal mientras se cargan los datos
+                )}
 
-
->>>>>>> ddb49b43da4da0824d066988be61d553ff2039e6
                 <Link href="/support" className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
                     <PhoneIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
                     <span className="text-xs lg:text-sm dark:text-zinc-200">Contacte con nosotros</span>
@@ -68,15 +63,14 @@ const Metrix = () => {
                 </button>
             </div>
 
-
             <div className="mt-6">
-                <h2 className="text-lg font-semibold">Detalles del desafío</h2>
-                <pre className="bg-black p-4 rounded-lg overflow-auto text-sm">
-                    {JSON.stringify(challengeData, null, 2)}
-                </pre>
-            </div>
+                    <h2 className="text-lg font-semibold">Detalles del desafío</h2>
+                    <pre className="bg-black p-4 rounded-lg overflow-auto text-sm">
+                        {JSON.stringify(challengeData, null, 2)}
+                    </pre>
+                </div>
 
-            {/* <div>
+                {/* <div>
                 <div className="flex space-x-4">
                     <div className="w-3/4">
                         <h2 className="text-lg font-semibold">Resultados Actuales</h2>
