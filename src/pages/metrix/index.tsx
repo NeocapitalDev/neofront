@@ -19,7 +19,7 @@ import {
 
 // Importar los datos
 import openTradesByHour from "../metrix/data"
-
+import metrics from "../metrix/data.js"
 const chartConfig = {
   balance: {
     label: "Profit",
@@ -29,14 +29,18 @@ const chartConfig = {
 
 export default function Component() {
   const [chartData, setChartData] = useState([])
+  const [balance, setBalance] = useState(0)
 
   useEffect(() => {
+    // Extraer el balance desde "metrics"
+    setBalance(metrics.metrics.balance)
     // Extraer datos de "openTradesByHour"
     const extractedData = [
       { trade: 0, balance: 0 }, // Agregar trade 0 con profit 0
       ...openTradesByHour.metrics.openTradesByHour.map((item, index) => ({
         trade: index + 1, // Índice del trade
         balance: item.profit, // Profit
+
       })),
     ]
 
@@ -51,7 +55,7 @@ export default function Component() {
             Profit por Trade
           </CardTitle>
           <CardDescription className="text-4xl font-semibold text-black dark:text-white">
-            $99,921
+          Balance: ${balance.toLocaleString()} {/* Mostrar el balance */}
           </CardDescription>
         </CardHeader>
         <CardContent>
