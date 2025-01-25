@@ -4,10 +4,10 @@ import useSWR from 'swr';
 import { useRouter } from 'next/router';
 import Layout from '../../components/layout/dashboard';
 import { ArrowPathIcon, ChartBarIcon, PhoneIcon, UserIcon } from '@heroicons/react/24/outline';
-import MetrixDash from '../dashboard/metrixdash';
-import MetrixInfo from '../dashboard/metrixinfo';
-import Objetivos from '../dashboard/objetivos';
-import Diariotrading from '../dashboard/diariotrading';
+import MetrixDash from '../../pages/metrix/metrixdash';
+import MetrixInfo from '../../pages/metrix/metrixinfo';
+import Objetivos from '../../pages/metrix/objetivos';
+import Diariotrading from '../../pages/metrix/diariotrading';
 import Loader from '../../components/loaders/loader';
 
 const fetcher = (url) =>
