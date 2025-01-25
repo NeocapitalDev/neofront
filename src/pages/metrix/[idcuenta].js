@@ -6,7 +6,7 @@ import Layout from '../../components/layout/dashboard';
 import { ArrowPathIcon, ChartBarIcon, PhoneIcon } from '@heroicons/react/24/outline';
 import Loader from '../../components/loaders/loader';
 import CredencialesModal from '../../pages/dashboard/credentials';
-import Balance from "../../pages/prueba/index"
+import Balance from "./index"
 import Stats from "./stats"
 import MetrixDash from './metrixdash';
 

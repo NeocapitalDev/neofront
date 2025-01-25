@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Component from '../prueba';
+import Component from '.';
 
 export default function MetrixDash() {
     const data = [12, 19, 3, 5, 2]; // Datos de ejemplo
