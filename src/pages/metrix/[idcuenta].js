@@ -8,6 +8,7 @@ import Loader from '../../components/loaders/loader';
 import CredencialesModal from '../../pages/dashboard/credentials';
 import Balance from "../../pages/prueba/index"
 import Stats from "./stats"
+import MetrixDash from './metrixdash';
 
 const fetcher = (url) =>
     fetch(url, {
