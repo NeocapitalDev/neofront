@@ -64,15 +64,6 @@ const Metrix = () => {
             </h1>
 
             <div className="flex justify-start gap-3 my-6">
-<<<<<<< HEAD
-                {challengeData?.data ? (
-                    <CredencialesModal {...challengeData.data} />
-                ) : (
-                    <p>Cargando credenciales...</p> // Mensaje temporal mientras se cargan los datos
-                )}
-
-                <Link href="/support" className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
-=======
                 {/* Renderiza el modal solo si challengeData.data está disponible */}
                 {challengeData.data && <CredencialesModal {...challengeData.data} />}
 
@@ -80,7 +71,6 @@ const Metrix = () => {
                     href="/support"
                     className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500"
                 >
->>>>>>> 2ac5068ac5a5ec6130479857f831861733c1f392
                     <PhoneIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
                     <span className="text-xs lg:text-sm dark:text-zinc-200">Contacte con nosotros</span>
                 </Link>
@@ -94,33 +84,11 @@ const Metrix = () => {
             </div>
 
             <div className="mt-6">
-<<<<<<< HEAD
-                    <h2 className="text-lg font-semibold">Detalles del desafío</h2>
-                    <pre className="bg-black p-4 rounded-lg overflow-auto text-sm">
-                        {JSON.stringify(challengeData, null, 2)}
-                    </pre>
-                </div>
-
-                {/* <div>
-                <div className="flex space-x-4">
-                    <div className="w-3/4">
-                        <h2 className="text-lg font-semibold">Resultados Actuales</h2>
-                        <MetrixDash />
-                    </div>
-
-                    <div className="w-1/4">
-                        <h2 className="text-lg font-semibold">Free Trial {idcuenta}</h2>
-                        <MetrixInfo />
-                    </div>
-                </div>
-            </div> */}
-=======
                 <h2 className="text-lg font-semibold">Detalles del desafío</h2>
                 <pre className="bg-black p-4 rounded-lg overflow-auto text-sm">
                     {JSON.stringify(challengeData, null, 2)}
                 </pre>
             </div>
->>>>>>> 2ac5068ac5a5ec6130479857f831861733c1f392
         </Layout>
     );
 };

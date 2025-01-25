@@ -18,7 +18,7 @@ export default function Layout({ children }) {
                         </div>
                         <div className="flex-1">
                             {/* Columna 2 (Contenido) */}
-                            {/*<Breadcrumb />*/}
+                            <Breadcrumb />
                             {children}
                             <FooterInfo />
                         </div>
