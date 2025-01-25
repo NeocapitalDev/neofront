@@ -31,14 +31,19 @@ export default function Component() {
   const [chartData, setChartData] = useState([])
 
   useEffect(() => {
-    // Extraer datos de "openTradesByHour"
-    const extractedData = [
-      { trade: 0, balance: 0 }, // Agregar trade 0 con profit 0
-      ...openTradesByHour.metrics.openTradesByHour.map((item, index) => ({
-        trade: index + 1, // Índice del trade
-        balance: item.profit, // Profit
-      })),
-    ]
+    // Calcular el balance acumulado
+    const extractedData = openTradesByHour.metrics.openTradesByHour.reduce(
+      (acc, item, index) => {
+        const previousBalance = acc.length ? acc[acc.length - 1].balance : 0
+        const newBalance = previousBalance + item.profit
+        acc.push({
+          trade: index + 1,
+          balance: newBalance,
+        })
+        return acc
+      },
+      [{ trade: 0, balance: 0 }] // Inicializar con trade 0 y balance 0
+    )
 
     setChartData(extractedData)
   }, [])
