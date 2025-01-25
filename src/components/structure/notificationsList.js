@@ -1,4 +1,4 @@
-import { useStrapiData } from '../../lib/strapiService';
+import { useStrapiData } from '../../services/strapiService';
 import Image from 'next/image';
 import SkeletonLoader from '../loaders/skeleton';
 const NotificationsPage = () => {
