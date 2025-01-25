@@ -67,7 +67,7 @@ export default function Component() {
               data={chartData}
               margin={{
                 left: 0,
-                right: 0,
+                right: 12,
                 top: 20,
                 bottom: 20,
               }}
