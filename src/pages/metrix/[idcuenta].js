@@ -47,9 +47,9 @@ const Metrix = () => {
             </h1>
 
             <div className="flex justify-start gap-3 my-6">
-                                            <CredencialesModal {...challengeData} />
-                    
-               
+                <CredencialesModal {...challengeData.data} />
+
+
                 <Link href="/support" className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
                     <PhoneIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
                     <span className="text-xs lg:text-sm dark:text-zinc-200">Contacte con nosotros</span>
