@@ -56,7 +56,7 @@ export default function Component() {
               right: 12,
             }}
           >
-            <CartesianGrid vertical={false} />
+            <CartesianGrid horizontal={true}   strokeWidth={2} vertical={false} />
             <XAxis
               dataKey="month"
               tickLine={false}
