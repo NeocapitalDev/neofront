@@ -4,7 +4,6 @@ import useSWR from 'swr';
 import { useRouter } from 'next/router';
 import Layout from '../../components/layout/dashboard';
 import { ArrowPathIcon, ChartBarIcon, PhoneIcon, UserIcon } from '@heroicons/react/24/outline';
-<<<<<<< HEAD
 import MetrixDash from '../dashboard/metrixdash';
 import MetrixInfo from '../dashboard/metrixinfo';
 import Objetivos from '../dashboard/objetivos';
@@ -18,12 +17,6 @@ const fetcher = (url) =>
             'Content-Type': 'application/json',
         },
     }).then((res) => res.json());
-=======
-import MetrixDash from './metrixdash';
-import MetrixInfo from './metrixinfo';
-import Objetivos from './objetivos';
-import Diariotrading from './diariotrading';
->>>>>>> 561698c77725dca2dd59e5c5c43e1a3ed95675d4
 
 const Metrix = () => {
     const router = useRouter();
