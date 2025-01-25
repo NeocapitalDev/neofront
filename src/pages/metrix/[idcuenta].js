@@ -6,6 +6,7 @@ import Layout from '../../components/layout/dashboard';
 import { ArrowPathIcon, ChartBarIcon, PhoneIcon } from '@heroicons/react/24/outline';
 import Loader from '../../components/loaders/loader';
 import CredencialesModal from '../../pages/dashboard/credentials';
+import MetrixDash from './metrixdash';
 
 const fetcher = (url) =>
     fetch(url, {
@@ -88,6 +89,8 @@ const Metrix = () => {
                 <pre className="bg-black p-4 rounded-lg overflow-auto text-sm">
                     {JSON.stringify(challengeData, null, 2)}
                 </pre>
+
+                <MetrixDash />
             </div>
         </Layout>
     );
