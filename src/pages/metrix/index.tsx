@@ -18,9 +18,9 @@ import {
 
 const chartData = [
   { trade: "0", balance: 0 },
-  { trade: "1", balance: -123 },
-  { trade: "2", balance: -78 },
-  { trade: "3", balance: 40 },
+  { trade: "1", balance: -123},
+  { trade: "2", balance: -780 },
+  { trade: "3", balance: 400 },
 ]
 
 const chartConfig = {
@@ -44,14 +44,17 @@ export default function Component() {
         </CardHeader>
         <CardContent>
           <ChartContainer config={chartConfig}>
-            <LineChart
-              accessibilityLayer
-              data={chartData}
-              margin={{
-                left: 12,
-                right: 12,
-              }}
-            >
+          <LineChart
+  accessibilityLayer
+  data={chartData}
+  margin={{
+    left: 12,
+    right: 12,
+    top: 20,  // Padding superior
+    bottom: 20  // Padding inferior
+  }}
+>
+
               <CartesianGrid horizontal={true} strokeWidth={2} vertical={false} />
               <XAxis
                 dataKey="trade"
@@ -63,7 +66,7 @@ export default function Component() {
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                domain={[-150, 150]} // Ajusta manualmente para centrar el 0
+              //  domain={[-150, 150]} // Ajusta manualmente para centrar el 0
                 tickCount={7} // Número de divisiones en el eje
                 tickFormatter={(value) => `$${value}`}
               />
