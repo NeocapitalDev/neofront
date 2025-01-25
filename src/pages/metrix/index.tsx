@@ -55,10 +55,10 @@ export default function Component() {
       <Card>
         <CardHeader>
           <CardTitle className="font-normal text-black dark:text-white">
-            Profit por Trade
+          Balance
           </CardTitle>
           <CardDescription className="text-4xl font-semibold text-black dark:text-white">
-          Balance: ${balance.toLocaleString()} {/* Mostrar el balance */}
+          ${balance.toLocaleString()} {/* Mostrar el balance */}
           </CardDescription>
         </CardHeader>
         <CardContent>
