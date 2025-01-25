@@ -1,7 +1,7 @@
 // pages/socials.js
 import Layout from '../../components/layout/dashboard';
 import Loader from '../../components/loaders/loader';
-import { useStrapiData } from '../../lib/strapiService';
+import { useStrapiData } from '../../services/strapiService';
 import Image from 'next/image';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
 import { HeartIcon } from '@heroicons/react/24/outline';

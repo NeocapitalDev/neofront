@@ -6,6 +6,8 @@ import Layout from '../../components/layout/dashboard';
 import { ArrowPathIcon, ChartBarIcon, PhoneIcon } from '@heroicons/react/24/outline';
 import Loader from '../../components/loaders/loader';
 import CredencialesModal from '../../pages/dashboard/credentials';
+import Balance from "../../pages/prueba/index"
+import Stats from "./stats"
 
 const fetcher = (url) =>
     fetch(url, {
@@ -81,6 +83,18 @@ const Metrix = () => {
                     <ArrowPathIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
                     <span className="text-xs lg:text-sm dark:text-zinc-200">Actualizar</span>
                 </button>
+            </div>
+
+
+            <div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-2">
+                        <Balance />
+                    </div>
+                    <div className="md:col-span-1">
+                        <Stats />
+                    </div>
+                </div>
             </div>
 
             <div className="mt-6">

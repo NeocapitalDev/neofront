@@ -1,42 +1,28 @@
-import React from 'react';
+// pages/orders.js
 import Layout from '../../components/layout/dashboard';
-import { DocumentTextIcon } from '@heroicons/react/24/outline';
+import Loader from '../../components/loaders/loader';
+import { useStrapiData } from '../../services/strapiService';
 import Image from 'next/image';
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
+import { DocumentTextIcon } from '@heroicons/react/24/outline';
 
-const data = [
-    {
-        challenge: "FTMO Challenge 1",
-        dates: "01/01/2025 - 01/31/2025",
-        amount: "$200",
-        order: "#12345",
-        account: "Cuenta 1",
-        status: "Pagado",
-        documents: "Ver factura",
-    },
-    {
-        challenge: "FTMO Challenge 2",
-        dates: "02/01/2025 - 02/28/2025",
-        amount: "$150",
-        order: "#12346",
-        account: "Cuenta 2",
-        status: "Pendiente",
-        documents: "Descargar",
-    },
-    {
-        challenge: "FTMO Challenge 3",
-        dates: "03/01/2025 - 03/31/2025",
-        amount: "$300",
-        order: "#12347",
-        account: "Cuenta 3",
-        status: "Cancelado",
-        documents: "Sin documentos",
-    },
-];
+const ordersPage = () => {
+    // Usamos el hook que creamos para obtener los datos de 'orders'
+    const { data: orders, error, isLoading } = useStrapiData('orders');
+    //console.log(orders);
+    // Si está cargando, mostramos un mensaje de carga
+    if (isLoading) {
+        return <Layout><Loader /></Layout>;
+    }
 
+    // Si hay un error, mostramos el mensaje de error
+    if (error) {
+        return <Layout>Error al cargar los datos: {error.message}</Layout>;
+    }
 
-const Billing = () => {
+    // Si los datos se cargaron correctamente, los mostramos
     return (
-        <Layout title="Billing">
+        <Layout>
             <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                 <div className="flex justify-between items-center ">
                     <div className="flex items-center space-x-2">
@@ -46,74 +32,53 @@ const Billing = () => {
                 </div>
             </div>
 
+
             <div className="mt-6 overflow-x-auto dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                 <table className="w-full table-auto text-left border-collapse">
                     <thead className="text-zinc-800 dark:text-white text-sm font-semibold border-b border-gray-200 dark:border-zinc-600">
                         <tr>
                             <th className="p-4">Challenge</th>
-                            <th className="p-4">Fechas</th>
+                            <th className="p-4">Fecha</th>
                             <th className="p-4">Monto</th>
-                            <th className="p-4">Orden</th>
+                            <th className="p-4">Orden ID</th>
                             <th className="p-4">Cuenta</th>
                             <th className="p-4">Estado</th>
                             <th className="p-4">Factura</th>
                         </tr>
                     </thead>
 
-                    <tbody>
-                        {data.length === 0 ? (
-                            <tr>
-                                <td colSpan="7" className="px-4 py-6 text-center">
-                                    <div className="flex flex-col items-center justify-center h-[300px]">
-                                        <Image
-                                            src="/images/billing/descarga.svg"
-                                            width={300}
-                                            height={300}
-                                            className="w-[300px] h-[300px] relative -mt-20"
-                                            alt="No data icon"
-                                        />
-                                        <p className="-mt-20 text-gray-500 relative">No hay órdenes ni transacciones disponibles</p>
+                    {orders && orders.length > 0 ? (
+                        orders.map((plataforma, index) => (
+                            <div
+                                key={index}
+                                className="p-6 bg-white rounded-lg shadow-md dark:bg-zinc-800 dark:border-zinc-800 dark:text-white dark:shadow-black transition flex flex-col items-center"
+                            >
+                                {/* Contenedor Horizontal para el Icono y el Texto */}
+                                <div className="flex items-center mb-4 w-full">
+                                    {/* Icono */}
+                                    <div className="flex-shrink-0 dark:bg-zinc-700 bg-gray-100 p-3 rounded-full flex items-center justify-center">
+                                        {typeof plataforma.icono === 'string' ? (
+                                            <Image
+                                                src={`${plataforma.icono}`} // Asegúrate de que la imagen se encuentre en la ruta correcta
+                                                alt={plataforma.nombre}
+                                                width={60}
+                                                height={60}
+                                                className="w-[60px] h-[60px] rounded-full"
+                                            />
+                                        ) : (
+                                            plataforma.icono
+                                        )}
                                     </div>
-                                </td>
-                            </tr>
-                        ) : (
-                            data.map((row, index) => (
-                                <tr
-                                    key={index}
-                                    className={`${index === data.length - 1 ? '' : 'border-b dark:border-zinc-700'
-                                        } transition`}
-                                >
-                                    <td className="p-4 text-sm font-medium text-gray-800 dark:text-white">{row.challenge}</td>
-                                    <td className="p-4 text-sm text-gray-600 dark:text-white ">{row.dates}</td>
-                                    <td className="p-4 text-sm text-gray-600 dark:text-white">{row.amount}</td>
-                                    <td className="p-4 text-sm text-gray-600 dark:text-white">{row.order}</td>
-                                    <td className="p-4 text-sm text-gray-600 dark:text-white">{row.account}</td>
-                                    <td className="p-4 text-xs font-semibold text-white">
-                                        <span
-                                            className={`inline-block rounded-lg px-2 py-1 ${row.status === "Pagado"
-                                                ? "bg-green-600 "
-                                                : row.status === "Pendiente"
-                                                    ? "bg-yellow-600 "
-                                                    : "bg-red-600 "
-                                                }`}
-                                        >
-                                            {row.status}
-                                        </span>
-                                    </td>
-
-                                    <td className="p-4 text-xs font-semibold text-white">
-                                        <button
-                                            className="inline-block px-4 py-2 text-xs text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
-                                        >
-                                            {row.documents}
-                                        </button>
-                                    </td>
-
-
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
+                                    <div className="ml-4">
+                                        <span className="block dark:text-white text-gray-700 font-medium">Plataforma</span>
+                                        <p className="text-gray-900 dark:text-white font-bold text-lg">{plataforma.nombre}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div>No hay datos para mostrar.</div>
+                    )}
 
                 </table>
             </div>
@@ -123,4 +88,4 @@ const Billing = () => {
     );
 };
 
-export default Billing;
+export default ordersPage;

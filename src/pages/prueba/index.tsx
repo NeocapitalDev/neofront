@@ -39,12 +39,11 @@ const chartConfig = {
 
 export default function Component() {
   return (
-    <div className="w-1/2">
+    <div>
           <Card>
       <CardHeader>
-        <CardTitle>Balance</CardTitle>
-        <CardDescription className="text-4xl font-bold text-white">$15,231.89</CardDescription>
-        <CardDescription className=" text-white">+20.1% from last month</CardDescription>
+        <CardTitle className="font-normal text-black dark:text-white">Balance</CardTitle>
+        <CardDescription className="text-4xl font-semibold text-black dark:text-white">$15,231.89</CardDescription>
 
       </CardHeader>
       <CardContent>
