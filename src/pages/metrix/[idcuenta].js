@@ -9,6 +9,7 @@ import MetrixInfo from '../../pages/metrix/metrixinfo';
 import Objetivos from '../../pages/metrix/objetivos';
 import Diariotrading from '../../pages/metrix/diariotrading';
 import Loader from '../../components/loaders/loader';
+import CredencialesModal from '../../pages/dashboard/credentials';
 
 const fetcher = (url) =>
     fetch(url, {
@@ -46,10 +47,9 @@ const Metrix = () => {
             </h1>
 
             <div className="flex justify-start gap-3 my-6">
-                <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
-                    <UserIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                    <span className="text-xs lg:text-sm dark:text-zinc-200">Credenciales</span>
-                </button>
+                                            <CredencialesModal {...challengeData} />
+                    
+               
                 <Link href="/support" className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
                     <PhoneIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
                     <span className="text-xs lg:text-sm dark:text-zinc-200">Contacte con nosotros</span>
