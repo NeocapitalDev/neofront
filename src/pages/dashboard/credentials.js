@@ -2,17 +2,17 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, ClipboardDocumentIcon, PencilIcon, KeyIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
-export default function CredencialesModal() {
+export default function CredencialesModal({ login, password, server, platform }) {
     const [open, setOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar la contraseña
     const [copied, setCopied] = useState({}); // Estado para el mensaje de "Copiado" para cada item
 
     // Elimino la "Contraseña de solo lectura" del array de datos
     const data = [
-        { label: 'Login', value: '1420126402' },
-        { label: 'Contraseña', value: 'asAS*9@Pa9' },
-        { label: 'Servidor', value: 'FTMO-Demo2' },
-        { label: 'Plataforma', value: 'MT4' },
+        { label: 'Login', value: login },
+        { label: 'Contraseña', value: password },
+        { label: 'Servidor', value: server },
+        { label: 'Plataforma', value: platform },
     ];
 
     const handleCopy = (label, value) => {
