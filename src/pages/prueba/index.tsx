@@ -71,10 +71,10 @@ export default function Component() {
             <Line
               dataKey="desktop"
               type="natural"
-              stroke="var(--color-desktop)"
+              stroke="#FFC107"
               strokeWidth={2}
               dot={{
-                fill: "var(--color-desktop)",
+                fill: "#FFC107",
               }}
               activeDot={{
                 r: 6,
