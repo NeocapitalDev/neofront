@@ -32,10 +32,13 @@ export default function Component() {
 
   useEffect(() => {
     // Extraer datos de "openTradesByHour"
-    const extractedData = openTradesByHour.metrics.openTradesByHour.map((item, index) => ({
-      trade: index + 1, // Índice del trade
-      balance: item.profit, // Profit
-    }))
+    const extractedData = [
+      { trade: 0, balance: 0 }, // Agregar trade 0 con profit 0
+      ...openTradesByHour.metrics.openTradesByHour.map((item, index) => ({
+        trade: index + 1, // Índice del trade
+        balance: item.profit, // Profit
+      })),
+    ]
 
     setChartData(extractedData)
   }, [])
