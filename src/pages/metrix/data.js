@@ -1,4 +1,4 @@
-export default data = {
+export default {
     "metrics": {
         "equity": 99921.04,
         "margin": 0,

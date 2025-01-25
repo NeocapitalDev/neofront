@@ -1,13 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -18,68 +17,71 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-// Importando los datos desde la ruta correcta
+// Importar los datos
 import openTradesByHour from "../metrix/data"
 
+const chartConfig = {
+  balance: {
+    label: "Profit",
+    color: "hsl(var(--chart-1))",
+  },
+} satisfies ChartConfig
+
 export default function Component() {
-  // Estado para almacenar los datos del gráfico
   const [chartData, setChartData] = useState([])
 
-  // Simulación de la obtención de datos
   useEffect(() => {
-    // Contamos la cantidad de traders en el arreglo openTradesByHour
-    const totalTraders = openTradesByHour.length
-    const middlePoint = totalTraders / 2 // Establecer el punto medio de la gráfica
+    // Extraer datos de "openTradesByHour"
+    const extractedData = openTradesByHour.metrics.openTradesByHour.map((item, index) => ({
+      trade: index + 1, // Índice del trade
+      balance: item.profit, // Profit
+    }))
 
-    // Mapear los datos y asignar el número de trader junto con su desplazamiento en el eje Y
-    const processedData = openTradesByHour.map((item, index) => {
-      const yPosition = middlePoint - index // Colocar en la mitad y mover hacia abajo o hacia arriba
-      return {
-        traderNumber: index, // Asignar número secuencial a cada trader (0, 1, 2, ...)
-        profit: item.profit, // Beneficio
-        yPosition, // Determinamos la posición Y del trader
-      }
-    })
-
-    // Actualizamos el estado con los datos procesados
-    setChartData(processedData)
+    setChartData(extractedData)
   }, [])
 
   return (
     <div>
       <Card>
         <CardHeader>
-          <CardTitle className="font-normal text-black dark:text-white">Balance</CardTitle>
-          <CardDescription className="text-4xl font-semibold text-black dark:text-white">$15,231.89</CardDescription>
+          <CardTitle className="font-normal text-black dark:text-white">
+            Profit por Trade
+          </CardTitle>
+          <CardDescription className="text-4xl font-semibold text-black dark:text-white">
+            $99,921
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={{ /* Add your ChartConfig properties here */ }}>
+          <ChartContainer config={chartConfig}>
             <LineChart
               data={chartData}
               margin={{
                 left: 12,
                 right: 12,
+                top: 20,
+                bottom: 20,
               }}
             >
               <CartesianGrid horizontal={true} strokeWidth={2} vertical={false} />
-              
-              {/* Eje X con los números de trader */}
               <XAxis
-                dataKey="traderNumber"
+                dataKey="trade"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                tickFormatter={(value) => `Trader ${value}`} // Muestra "Trader 0", "Trader 1", etc.
+                label={{ value: "Trades", position: "insideBottom", offset: -10 }}
               />
-              
-              {/* Eje Y ajustado */}
-              <YAxis hide />
-              
-              <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-              
-              {/* Línea para 'profit' */}
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => `${value}`}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
               <Line
-                dataKey="profit"
+                dataKey="balance"
                 type="natural"
                 stroke="#FFC107"
                 strokeWidth={2}
