@@ -1,5 +1,5 @@
 
-import Diariotrading from '../dashboard/diariotrading';
+import Diariotrading from '../metrix/diariotrading';
 
 const Page = () => {
 

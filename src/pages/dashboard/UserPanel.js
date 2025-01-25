@@ -78,12 +78,8 @@ export default function Index() {
 
                     <p className="text-sm text-gray-500 dark:text-gray-300">{challenge.description}</p>
                     <div className="mt-4 flex space-x-4">
-                        <CredencialesModal
-                            login={challenge.login}
-                            password={challenge.password}
-                            server={challenge.server}
-                            platform={challenge.platform}
-                        />
+                        <CredencialesModal {...challenge} />
+
 
 
                         <Link href={`/metrix/${challenge.documentId}`}>
