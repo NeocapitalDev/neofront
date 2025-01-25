@@ -18,23 +18,21 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+  { trade: "0", balance: 0},
+  { trade: "1", balance: -123},
+  { trade: "2", balance: -78},
+  { trade: "2", balance: 40},
 ]
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  balance: {
+    label: "Balance",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
-  },
+  // mobile: {
+  //   label: "Mobile",
+  //   color: "hsl(var(--chart-2))",
+  // },
 } satisfies ChartConfig
 
 export default function Component() {
@@ -43,7 +41,7 @@ export default function Component() {
           <Card>
       <CardHeader>
         <CardTitle className="font-normal text-black dark:text-white">Balance</CardTitle>
-        <CardDescription className="text-4xl font-semibold text-black dark:text-white">$15,231.89</CardDescription>
+        <CardDescription className="text-4xl font-semibold text-black dark:text-white">$99,921</CardDescription>
 
       </CardHeader>
       <CardContent>
@@ -56,9 +54,9 @@ export default function Component() {
               right: 12,
             }}
           >
-            <CartesianGrid horizontal={true}   strokeWidth={2} vertical={false} />
+            <CartesianGrid horizontal={true} strokeWidth={2} vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey="trade"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
@@ -69,7 +67,7 @@ export default function Component() {
               content={<ChartTooltipContent hideLabel />}
             />
             <Line
-              dataKey="desktop"
+              dataKey="balance"
               type="natural"
               stroke="#FFC107"
               strokeWidth={2}
