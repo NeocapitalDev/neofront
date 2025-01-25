@@ -8,6 +8,7 @@ import Loader from '../../components/loaders/loader';
 import CredencialesModal from '../../pages/dashboard/credentials';
 import Balance from "../../pages/prueba/index"
 import Stats from "./stats"
+import MetrixDash from './metrixdash';
 
 const fetcher = (url) =>
     fetch(url, {
@@ -102,6 +103,8 @@ const Metrix = () => {
                 <pre className="bg-black p-4 rounded-lg overflow-auto text-sm">
                     {JSON.stringify(challengeData, null, 2)}
                 </pre>
+
+                <MetrixDash />
             </div>
         </Layout>
     );
