@@ -1,110 +1,173 @@
-import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react'; // Importamos el hook de sesión
 import Layout from '../../components/layout/dashboard';
-import User from '../../pages/profile/User';
-import Link from 'next/link';
+import Loader from '../../components/loaders/loader';
+import { useStrapiData } from '../../services/strapiServiceJWT';
 import { UserIcon } from '@heroicons/react/24/outline';
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import LogoGravatar from "../../components/LogoGravatar"
 
-const tabs = [
-  { name: 'Información Personal', href: '/profile', current: false },
-  { name: 'Información de Cuenta', href: '/profile/account', current: false },
-  { name: 'Seguridad', href: '/profile/security', current: false },
-  { name: 'FTMO Identity', href: '/profile/identity', current: false },
-];
+const ProfilePage = () => {
+  const { data: session } = useSession(); // Obtenemos la sesión
+  const token = session?.jwt; // Extraemos el token JWT de la sesión
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
-}
+  // Usamos el hook que creamos para obtener los datos de 'orders'
+  const { data, error, isLoading } = useStrapiData('users/me', token);
 
-
-function Index({ children }) {
-  const [currentTab, setCurrentTab] = useState(tabs[0]);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    const currentPath = window.location.pathname;
-    const selectedTab = tabs.find((tab) => tab.href === currentPath);
-    if (selectedTab) {
-      setCurrentTab(selectedTab);
-    }
-  }, []);
-
-  if (!isClient) {
-    return null;
+  //console.log('Full Data:', data); // Log de los datos completos obtenidos
+  if (isLoading) {
+    return <Layout><Loader /></Layout>;
   }
 
-   // Función para manejar el cambio de pestaña en el select
-   const handleTabClick = (tab) => {
-    setCurrentTab(tab); // Cambiar la pestaña activa
-  };
+  if (error) {
+    return <Layout>Error al cargar los datos: {error.message}</Layout>;
+  }
+
+  // Verificamos si los datos incluyen la propiedad `orders`
+  const users = data;
+  console.log('Users Data:', users); // Log de los datos de órdenes
 
   return (
-    <Layout title="Perfil">
-
-      {/* Tabs */}
-      <div className="dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-
-
-        <div className='p-4'>
-          <h2 className="p-2 text-xl font-semibold flex items-center">
-            <UserIcon className="h-6 w-6 mr-2" />
-            Perfil
-          </h2>
+    <Layout>
+      <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <UserIcon className="w-6 h-6 text-gray-600 dark:text-gray-200" />
+            <h1 className="text-xl font-semibold">Perfil</h1>
+          </div>
         </div>
-
-        {/* Mobile View */}
-        <div className="sm:hidden p-4">
-          <label htmlFor="tabs" className="sr-only">
-            Select a tab
-          </label>
-          <select
-            id="tabs"
-            name="tabs"
-            className="block dark:bg-zinc-800 w-full rounded-md border-gray-300 focus:border-amber-400 focus:ring-amber-400"
-            value={currentTab.name}
-            onChange={(e) => handleTabClick(tabs.find((tab) => tab.name === e.target.value))}
-          >
-            {tabs.map((tab) => (
-              <option key={tab.name} value={tab.name}>
-                {tab.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Desktop View */}
-        <div className="hidden sm:block">
-            <nav className="-mb-px flex justify-between" aria-label="Tabs">
-              {tabs.map((tab) => (
-                <Link key={tab.name} href={tab.href} passHref>
-                  <button
-                    onClick={() => setCurrentTab(tab)} // Cambiar la pestaña activa
-                    className={classNames(
-                      tab.href === currentTab.href
-                        ? 'text-amber-500 relative'
-                        : 'border-transparent text-gray-400',
-                      'w-full px-11 py-4 h-16 text-center text-sm font-medium'
-                    )}
-                  >
-                    {tab.name}
-                    {tab.href === currentTab.href && (
-                      <span className="absolute  bottom-0 left-0 w-full h-1 bg-amber-400"></span> // Custom bottom border
-                    )}
-                  </button>
-                </Link>
-              ))}
-            </nav>
-        </div>
-
       </div>
 
-      {/* Tab content */}
-      <div className="tab-content pt-5">
-        {window.location.pathname === '/profile' ? <User /> : children}
+      <div className='mt-6'>
+        <p className="text-lg font-semibold mb-4">Informacion de Cuenta</p>
       </div>
+
+      <div className="flex flex-col items-center p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+
+        <LogoGravatar
+          email={session.user.email || 'usuario@example.com'}
+          className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4"
+        />
+
+        <h1 className="text-3xl font-bold dark:text-white text-slate-700 mb-2">{data.name || 'Nombre no disponible'}</h1>
+        <p className="dark:text-white text-gray-400 text-sm mb-8">
+          Fecha de creación: {data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'No disponible'}
+        </p>
+
+        <div className="w-full space-y-6 bg-gray-100 p-6 rounded-lg dark:bg-zinc-800">
+          <div className="flex flex-col md:flex-row items-center">
+            <div className="w-full md:w-1/4 mb-2 md:mb-0">
+              <label className="text-base font-semibold dark:text-white  text-black">Username</label>
+            </div>
+            <div className="w-full md:w-3/4">
+              <p className="text-gray-700 dark:text-white">{data.username || 'Username no disponible'}</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center">
+            <div className="w-full md:w-1/4 mb-2 md:mb-0">
+              <label className="text-base font-semibold text-black dark:text-white">Email</label>
+            </div>
+            <div className="w-full md:w-3/4">
+              <p className="text-gray-700 dark:text-white">{data.email || 'Correo no disponible'}</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center">
+            <div className="w-full md:w-1/4 mb-2 md:mb-0">
+              <label className="text-base font-semibold text-black dark:text-white">Cuenta verificada</label>
+            </div>
+            <div className="w-full md:w-3/4">
+              <p className="text-gray-700 dark:text-white">Si</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <div className="mt-6">
+        <p className="text-lg font-semibold mb-4">Información Personal</p>
+      </div>
+
+      <div className="p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+
+        {/* Nombre y Apellido */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid w-full items-center gap-1.5">
+            <Label htmlFor="firstName">Nombre</Label>
+            <Input
+              type="text"
+              id="firstName"
+              placeholder={data.firstName || 'Nombre no disponible'}
+            />
+          </div>
+          <div className="grid w-full items-center gap-1.5">
+            <Label htmlFor="lastName">Apellido</Label>
+            <Input
+              type="text"
+              id="lastName"
+              placeholder={data.lastName || 'Apellido no disponible'}
+            />
+          </div>
+        </div>
+
+        {/* Teléfono */}
+        <div className="mt-4 grid w-full max-w-sm items-center gap-1.5">
+          <Label htmlFor="phone">Teléfono</Label>
+          <Input
+            type="tel"
+            id="phone"
+            placeholder={data.phone || 'Teléfono no disponible'}
+          />
+        </div>
+
+        {/* País y Ciudad */}
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid w-full items-center gap-1.5">
+            <Label htmlFor="country">País</Label>
+            <Input
+              type="text"
+              id="country"
+              placeholder={data.country || 'País no disponible'}
+            />
+          </div>
+          <div className="grid w-full items-center gap-1.5">
+            <Label htmlFor="city">Ciudad</Label>
+            <Input
+              type="text"
+              id="city"
+              placeholder={data.city || 'Ciudad no disponible'}
+            />
+          </div>
+        </div>
+
+        {/* Calle y Código Postal */}
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid w-full items-center gap-1.5">
+            <Label htmlFor="street">Calle</Label>
+            <Input
+              type="text"
+              id="street"
+              placeholder={data.street || 'Calle no disponible'}
+            />
+          </div>
+          <div className="grid w-full items-center gap-1.5">
+            <Label htmlFor="postalCode">Código Postal</Label>
+            <Input
+              type="text"
+              id="postalCode"
+              placeholder={data.postalCode || 'Código postal no disponible'}
+            />
+          </div>
+        </div>
+      </div>
+
+
+
+
     </Layout>
   );
-}
+};
 
-
-export default Index;
+export default ProfilePage;

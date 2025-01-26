@@ -86,7 +86,7 @@ const Metrix = () => {
     }
 
     return (
-        <Layout title="Metrix">
+        <Layout>
             <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                 <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
                 Account Metrix {challengeData.data.login || 'Sin nombre'}

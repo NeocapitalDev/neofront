@@ -100,13 +100,13 @@ export default function Navbar() {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                       >
-                        <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-zinc-800 py-1 shadow-lg ring-2 ring-zinc-700 focus:outline-none">
+                        <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md shadow-lg bg-white dark:bg-black p-1 ring-1 ring-zinc-200 dark:ring-zinc-800 focus:outline-none">
                           {userNavigation.map((item) => (
                             <Menu.Item key={item.name}>
                               {({ active }) => (
                                 <Link
                                   href={item.href}
-                                  className={`block px-4 py-2 text-sm ${item.signOut ? 'text-red-400' : 'text-white'} ${active ? 'bg-zinc-700' : ''
+                                  className={`block p-2 rounded-sm text-sm ${item.signOut ? 'text-red-600' : 'text-black dark:text-white'} ${active ? 'bg-zinc-100 dark:bg-zinc-800' : ''
                                     }`}
                                   onClick={item.signOut ? handleSignOut : undefined}
                                   target={item.external ? '_blank' : undefined}
