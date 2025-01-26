@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import useSWR from 'swr';
 import { useRouter } from 'next/router';
@@ -6,8 +6,8 @@ import Layout from '../../components/layout/dashboard';
 import { ArrowPathIcon, ChartBarIcon, PhoneIcon } from '@heroicons/react/24/outline';
 import Loader from '../../components/loaders/loader';
 import CredencialesModal from '../../pages/dashboard/credentials';
-import Balance from "./balance"
-import Stats from "./stats"
+import Balance from "./balance";
+import Stats from "./stats";
 
 const fetcher = (url) =>
     fetch(url, {
@@ -25,6 +25,37 @@ const Metrix = () => {
         idcuenta ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${idcuenta}` : null,
         fetcher
     );
+
+    const [metricsData, setMetricsData] = useState(null); // Estado para el segundo GET
+    const [metricsError, setMetricsError] = useState(null);
+
+    // Efecto para realizar el segundo GET cuando los datos del primer GET estén disponibles
+    useEffect(() => {
+        const fetchAdditionalMetrics = async (idMeta) => {
+            console.log('idMeta recibido para el segundo GET:', idMeta); // Depuración: imprimir idMeta
+            try {
+                const response = await fetch(
+                    `https://metastats-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${idMeta}/metrics`,
+                    {
+                        headers: {
+                            'auth-token': `${process.env.NEXT_PUBLIC_TOKEN_META_API}`,
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                );
+                const data = await response.json();
+                setMetricsData(data); // Guardar los datos en el estado
+                console.log('Additional Metrics:', data); // Depuración: Imprimir los datos obtenidos
+            } catch (err) {
+                console.error('Error fetching additional metrics:', err);
+                setMetricsError(err);
+            }
+        };
+
+        if (challengeData?.data?.idMeta) {
+            fetchAdditionalMetrics(challengeData.data.idMeta);
+        }
+    }, [challengeData?.data?.idMeta]);
 
     // Mostrar loader mientras se cargan los datos
     if (isLoading) {
@@ -62,7 +93,6 @@ const Metrix = () => {
             </h1>
 
             <div className="flex justify-start gap-3 my-6">
-                {/* Renderiza el modal solo si challengeData.data está disponible */}
                 {challengeData.data && <CredencialesModal {...challengeData.data} />}
 
                 <Link
@@ -81,7 +111,6 @@ const Metrix = () => {
                 </button>
             </div>
 
-
             <div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="md:col-span-2">
@@ -98,6 +127,19 @@ const Metrix = () => {
                 <pre className="bg-black p-4 rounded-lg overflow-auto text-sm">
                     {JSON.stringify(challengeData, null, 2)}
                 </pre>
+            </div>
+
+            <div className="mt-6">
+                <h2 className="text-lg font-semibold">Métricas adicionales</h2>
+                {metricsError ? (
+                    <p className="text-red-500">Error al cargar las métricas: {metricsError.message}</p>
+                ) : metricsData ? (
+                    <pre className="bg-black p-4 rounded-lg overflow-auto text-sm">
+                        {JSON.stringify(metricsData, null, 2)}
+                    </pre>
+                ) : (
+                    <p>Cargando métricas adicionales...</p>
+                )}
             </div>
         </Layout>
     );

@@ -52,7 +52,7 @@ export default function Component() {
 
   return (
     <div>
-      <p className="text-lg font-semibold mb-4">Resultados Actualess</p>
+      <p className="text-lg font-semibold mb-4">Resultados Actuales</p>
       <Card>
         <CardHeader>
           <CardTitle className="font-normal text-black dark:text-white">
