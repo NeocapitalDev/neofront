@@ -41,7 +41,7 @@ export default function Diariotrading() {
     return (
         <>
             <div className="my-4 flex items-center space-x-3 relative">
-                <h2 className="text-lg font-semibold">Diario de trading</h2>
+                <p className="text-lg font-semibold">Diario de trading</p>
 
                 {/* HoverCard para la información */}
                 <HoverCard>

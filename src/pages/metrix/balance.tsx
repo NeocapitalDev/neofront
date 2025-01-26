@@ -18,8 +18,8 @@ import {
 } from "@/components/ui/chart"
 
 // Importar los datos
-import openTradesByHour from "../metrix/data"
-import metrics from "../metrix/data.js"
+import openTradesByHour from "./data"
+import metrics from "./data.js"
 const chartConfig = {
   balance: {
     label: "Profit",
@@ -52,6 +52,7 @@ export default function Component() {
 
   return (
     <div>
+      <p className="text-lg font-semibold mb-4">Resultados Actualess</p>
       <Card>
         <CardHeader>
           <CardTitle className="font-normal text-black dark:text-white">
