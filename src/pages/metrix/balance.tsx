@@ -73,7 +73,7 @@ export default function Component({ data }) {
                 bottom: 20,
               }}
             >
-              <CartesianGrid horizontal strokeWidth={2} vertical={false} />
+              <CartesianGrid horizontal={true} strokeWidth={2} vertical={false} />
               <XAxis
                 dataKey="trade"
                 tickLine={false}
@@ -85,7 +85,7 @@ export default function Component({ data }) {
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                tickFormatter={(value) => `$${value.toLocaleString()}`}
+                tickFormatter={(value) => `$${value}`}
               />
               <ChartTooltip
                 cursor={false}
@@ -93,7 +93,7 @@ export default function Component({ data }) {
               />
               <Line
                 dataKey="balance"
-                type="monotone"
+                type="natural"
                 stroke="#FFC107"
                 strokeWidth={2}
                 dot={{
