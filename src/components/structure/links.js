@@ -1,5 +1,5 @@
 // links.js   parte general q contendra todos los arrays necesarios
-import { HomeIcon,UserCircleIcon, CreditCardIcon, ChatBubbleLeftEllipsisIcon, LifebuoyIcon } from '@heroicons/react/24/outline';
+import { HomeIcon,UserCircleIcon, CreditCardIcon, ChatBubbleLeftEllipsisIcon, LifebuoyIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 
 export const navigation = [
     { icon: HomeIcon, name: 'Dashboard', id: 'main', href: '/' }, // Mantengo el icono para Dashboard.
@@ -7,6 +7,7 @@ export const navigation = [
     { icon: CreditCardIcon, name: 'Facturación', id: 'billing', href: '/billing' }, // Representa pagos y facturación.
     { icon: ChatBubbleLeftEllipsisIcon, name: 'Sociales', id: 'social', href: '/social' }, // Representa interacciones sociales.
     { icon: LifebuoyIcon, name: 'Soporte', id: 'support', href: '/support' }, // Icono clásico de soporte.
+    { icon: ArrowRightOnRectangleIcon, name: 'Volver a la web', id: 'website', href: 'https://neocapitalfunding.com/' }, // Icono clásico de salir.
     
 ];
 

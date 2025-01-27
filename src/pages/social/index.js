@@ -10,6 +10,7 @@ const SocialsPage = () => {
     // Usamos el hook que creamos para obtener los datos de 'socials'
     const { data: socials, error, isLoading } = useStrapiData('socials');
     //console.log(socials);
+    
     // Si está cargando, mostramos un mensaje de carga
     if (isLoading) {
         return <Layout><Loader /></Layout>;

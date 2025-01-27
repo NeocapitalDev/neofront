@@ -13,10 +13,10 @@ const Breadcrumb = () => {
     const isHomePage = pathSegments.length === 0; // Detecta si estamos en la página principal
 
     return (
-        <nav className="flex items-center space-x-2 text-gray-500 mb-3 dark:text-white">
+        <nav className="text-sm flex items-center space-x-2 text-gray-500 mb-3 dark:text-white">
             {/* Icono de inicio con texto */}
             <a href="/dashboard" className="flex items-center text-gray-400 hover:text-gray-600 transition">
-                <HomeIcon className="w-5 h-5" />
+                <HomeIcon className="w-4 h-4" />
                 {isHomePage && <span className="ml-2 text-gray-700 dark:text-white font-medium">Inicio</span>}
             </a>
 
