@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
+import { useEffect, useState } from "react";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -9,46 +9,44 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 
-// Importar los datos
-import openTradesByHour from "./data"
-import metrics from "./data.js"
-const chartConfig = {
-  balance: {
-    label: "Profit",
-    color: "hsl(var(--chart-1))",
-  },
-} satisfies ChartConfig
-
-export default function Component() {
-  const [chartData, setChartData] = useState([])
-  const [balance, setBalance] = useState(0)
+export default function Component({ metricsData }) {
+  const [chartData, setChartData] = useState([]);
+  const [balance, setBalance] = useState(0);
 
   useEffect(() => {
-    setBalance(metrics.metrics.balance)
-    // Calcular el balance acumulado
-    const extractedData = openTradesByHour.metrics.openTradesByHour.reduce(
-      (acc, item, index) => {
-        const previousBalance = acc.length ? acc[acc.length - 1].balance : 0
-        const newBalance = previousBalance + item.profit
-        acc.push({
-          trade: index + 1,
-          balance: newBalance,
-        })
-        return acc
-      },
-      [{ trade: 0, balance: 0 }] // Inicializar con trade 0 y balance 0
-    )
+    if (metricsData && metricsData.metrics) {
+      const initialBalance = metricsData.metrics.balance || 0;
+      setBalance(initialBalance);
 
-    setChartData(extractedData)
-  }, [])
+      // Procesar datos para el gráfico
+      const extractedData = metricsData.metrics.openTradesByHour
+        ? metricsData.metrics.openTradesByHour.map((item, index) => ({
+            trade: index + 1, // Índice como identificador del trade
+            balance: item.profit || 0, // Asegurar que sea un número válido
+          }))
+        : [{ trade: 0, balance: initialBalance }];
+
+      setChartData(extractedData);
+    } else {
+      setBalance(0);
+      setChartData([{ trade: 0, balance: 0 }]);
+    }
+  }, [metricsData]);
+
+  const chartConfig = {
+    balance: {
+      label: "Profit",
+      color: "hsl(var(--chart-1))",
+    },
+  };
 
   return (
     <div>
@@ -56,10 +54,10 @@ export default function Component() {
       <Card>
         <CardHeader>
           <CardTitle className="font-normal text-black dark:text-white">
-          Balance
+            Balance
           </CardTitle>
           <CardDescription className="text-4xl font-semibold text-black dark:text-white">
-          ${balance.toLocaleString()} {/* Mostrar el balance */}
+            ${balance.toLocaleString()}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -73,7 +71,7 @@ export default function Component() {
                 bottom: 20,
               }}
             >
-              <CartesianGrid horizontal={true} strokeWidth={2} vertical={false} />
+              <CartesianGrid horizontal strokeWidth={2} vertical={false} />
               <XAxis
                 dataKey="trade"
                 tickLine={false}
@@ -85,7 +83,7 @@ export default function Component() {
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                tickFormatter={(value) => `${value}`}
+                tickFormatter={(value) => `$${value.toLocaleString()}`}
               />
               <ChartTooltip
                 cursor={false}
@@ -93,7 +91,7 @@ export default function Component() {
               />
               <Line
                 dataKey="balance"
-                type="natural"
+                type="monotone"
                 stroke="#FFC107"
                 strokeWidth={2}
                 dot={{
@@ -108,5 +106,5 @@ export default function Component() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
