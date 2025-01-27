@@ -3,7 +3,12 @@ import useSWR from "swr";
 import { useRouter } from "next/router";
 import Layout from "../../components/layout/dashboard";
 import Loader from "../../components/loaders/loader";
-import Component from "../metrix/balance"; // Importar el componente del gráfico
+import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import CredencialesModal from "./credentials"
+import Link from 'next/link'
+import Balance from "./balance"; // Importar el componente del gráfico
+import Stats from "./stats"; // Importar el componente del gráfico
+
 
 const fetcher = (url) =>
   fetch(url, {
@@ -53,12 +58,30 @@ const Metrix = () => {
 
   if (isLoading) {
     return (
-<<<<<<< HEAD
       <Layout>
         <Loader />
       </Layout>
-=======
-        <Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        Error al cargar los datos: {error.message}
+      </Layout>
+    );
+  }
+
+  if (!challengeData || !challengeData.data) {
+    return (
+      <Layout>
+        No se encontraron datos para esta cuenta.
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
             <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                 <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
                 Account Metrix {challengeData.data.login || 'Sin nombre'}
@@ -97,7 +120,7 @@ const Metrix = () => {
 
             <div className="mt-6">
                 <h2 className="text-lg font-semibold">Detalles del desafío</h2>
-                <pre className="bg-black p-4 rounded-lg overflow-auto text-sm">
+                <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
                     {JSON.stringify(challengeData, null, 2)}
                 </pre>
             </div>
@@ -107,7 +130,7 @@ const Metrix = () => {
                 {metricsError ? (
                     <p className="text-red-500">Error al cargar las métricas: {metricsError.message}</p>
                 ) : metricsData ? (
-                    <pre className="bg-black p-4 rounded-lg overflow-auto text-sm">
+                    <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
                         {JSON.stringify(metricsData, null, 2)}
                     </pre>
                 ) : (
@@ -115,45 +138,6 @@ const Metrix = () => {
                 )}
             </div>
         </Layout>
->>>>>>> e5b8e34eaca85cc09c8192e28a19f101a23bbf9a
-    );
-  }
-
-  if (error) {
-    return (
-      <Layout>
-        Error al cargar los datos: {error.message}
-      </Layout>
-    );
-  }
-
-  if (!challengeData || !challengeData.data) {
-    return (
-      <Layout>
-        No se encontraron datos para esta cuenta.
-      </Layout>
-    );
-  }
-
-  return (
-    <Layout title="Metrix">
-      <h1 className="flex p-6 bg-white shadow-md rounded-lg dark:bg-zinc-800 dark:text-white">
-        Account Metrix {challengeData.data.login || "Sin nombre"}
-      </h1>
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold">Métricas adicionales</h2>
-        {metricsError ? (
-          <p className="text-red-500">
-            Error al cargar las métricas: {metricsError.message}
-          </p>
-        ) : metricsData ? (
-          // Pasar metricsData al componente gráfico
-          <Component metricsData={metricsData} />
-        ) : (
-          <p>Cargando métricas adicionales...</p>
-        )}
-      </div>
-    </Layout>
   );
 };
 
