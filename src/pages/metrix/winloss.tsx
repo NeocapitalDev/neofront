@@ -48,7 +48,7 @@ export default function Component({ data }) {
   };
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col mt-4">
       <CardHeader className="items-center pb-0">
         <CardTitle>Radial Chart - Dynamic Data</CardTitle>
         <CardDescription>Resumen basado en métricas recibidas</CardDescription>
