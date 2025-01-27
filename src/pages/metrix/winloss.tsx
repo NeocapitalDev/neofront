@@ -131,7 +131,7 @@ export default function Component({ data }) {
           Cambios recientes en las métricas <TrendingUp className="h-4 w-4" />
         </div>
         <div className="flex justify-between">
-          <span className="text-green-600">
+          <span className="text-amber-400">
             Ganancia: {chartData[0].wonTradesPercent.toFixed(1)}%
           </span>
           <span className="text-red-600">
