@@ -49,7 +49,7 @@ export default function Component({ data }) {
     <Card className="flex flex-col mt-4 ">
       <CardHeader className="items-center pb-0">
 
-        <CardTitle>Progreso de Win/Lose</CardTitle>
+        <CardTitle>Progreso de Win/Loss</CardTitle>
         <CardDescription>Resumen basado en métricas recibidas</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-1 items-center ">
@@ -60,8 +60,8 @@ export default function Component({ data }) {
           <RadialBarChart
             data={chartData}
             endAngle={180}
-            innerRadius={80}
-            outerRadius={130}
+            innerRadius={90}
+            outerRadius={140}
           >
             <ChartTooltip
               cursor={false}
@@ -76,7 +76,7 @@ export default function Component({ data }) {
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) - 16}
-                          className="fill-foreground text-2xl font-bold"
+                          className="fill-foreground text-3xl font-bold"
                         >
 
 
