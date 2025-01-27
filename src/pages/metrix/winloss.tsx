@@ -77,7 +77,10 @@ export default function Component({ data }) {
                           y={(viewBox.cy || 0) - 16}
                           className="fill-foreground text-2xl font-bold"
                         >
-                          Win / Loss 
+                          
+                          
+                          % Rates
+
 
                         </tspan>
                         <tspan
@@ -85,7 +88,8 @@ export default function Component({ data }) {
                           y={(viewBox.cy || 0) + 4}
                           className="fill-muted-foreground"
                         >
-                          Rates
+                                                    Win / Loss 
+
                         </tspan>
                       </text>
                     );
@@ -101,7 +105,7 @@ export default function Component({ data }) {
               className="stroke-transparent stroke-2"
               label={{
                 position: "insideStart",
-                formatter: (value) => `${chartData[0].lostTradesPercent.toFixed(0)}%`, // Muestra valores reales
+                formatter: (value) => `${chartData[0].lostTradesPercent.toFixed(1)}`, // Muestra valores reales
                 fill: "#fff",
               }}
             />
@@ -113,7 +117,7 @@ export default function Component({ data }) {
               className="stroke-transparent stroke-2"
               label={{
                 position: "insideEnd",
-                formatter: (value) => `${chartData[0].wonTradesPercent.toFixed(0)}%`, // Muestra valores reales
+                formatter: (value) => `${chartData[0].wonTradesPercent.toFixed(1)}`, // Muestra valores reales
                 fill: "#fff",
               }}
             />
