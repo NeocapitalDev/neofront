@@ -17,6 +17,9 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
+<<<<<<< HEAD
+export default function Component({ metricsData }) {
+=======
 const chartConfig = {
   balance: {
     label: "Profit",
@@ -25,10 +28,38 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function Component({ data }) {
+>>>>>>> e5b8e34eaca85cc09c8192e28a19f101a23bbf9a
   const [chartData, setChartData] = useState([]);
   const [balance, setBalance] = useState(0);
 
   useEffect(() => {
+<<<<<<< HEAD
+    if (metricsData && metricsData.metrics) {
+      const initialBalance = metricsData.metrics.balance || 0;
+      setBalance(initialBalance);
+
+      // Procesar datos para el gráfico
+      const extractedData = metricsData.metrics.openTradesByHour
+        ? metricsData.metrics.openTradesByHour.map((item, index) => ({
+            trade: index + 1, // Índice como identificador del trade
+            balance: item.profit || 0, // Asegurar que sea un número válido
+          }))
+        : [{ trade: 0, balance: initialBalance }];
+
+      setChartData(extractedData);
+    } else {
+      setBalance(0);
+      setChartData([{ trade: 0, balance: 0 }]);
+    }
+  }, [metricsData]);
+
+  const chartConfig = {
+    balance: {
+      label: "Profit",
+      color: "hsl(var(--chart-1))",
+    },
+  };
+=======
     if (data?.metrics) {
       setBalance(data.metrics.balance);
 
@@ -49,6 +80,7 @@ export default function Component({ data }) {
       setChartData(extractedData);
     }
   }, [data]);
+>>>>>>> e5b8e34eaca85cc09c8192e28a19f101a23bbf9a
 
   return (
     <div>
@@ -59,7 +91,11 @@ export default function Component({ data }) {
             Balance
           </CardTitle>
           <CardDescription className="text-4xl font-semibold text-black dark:text-white">
+<<<<<<< HEAD
+            ${balance.toLocaleString()}
+=======
             ${balance.toLocaleString()} {/* Mostrar el balance */}
+>>>>>>> e5b8e34eaca85cc09c8192e28a19f101a23bbf9a
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -73,7 +109,7 @@ export default function Component({ data }) {
                 bottom: 20,
               }}
             >
-              <CartesianGrid horizontal={true} strokeWidth={2} vertical={false} />
+              <CartesianGrid horizontal strokeWidth={2} vertical={false} />
               <XAxis
                 dataKey="trade"
                 tickLine={false}
@@ -85,7 +121,7 @@ export default function Component({ data }) {
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                tickFormatter={(value) => `${value}`}
+                tickFormatter={(value) => `$${value.toLocaleString()}`}
               />
               <ChartTooltip
                 cursor={false}
@@ -93,7 +129,7 @@ export default function Component({ data }) {
               />
               <Line
                 dataKey="balance"
-                type="natural"
+                type="monotone"
                 stroke="#FFC107"
                 strokeWidth={2}
                 dot={{
@@ -109,4 +145,8 @@ export default function Component({ data }) {
       </Card>
     </div>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e5b8e34eaca85cc09c8192e28a19f101a23bbf9a

@@ -1,91 +1,63 @@
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import useSWR from 'swr';
-import { useRouter } from 'next/router';
-import Layout from '../../components/layout/dashboard';
-import { ArrowPathIcon, ChartBarIcon, PhoneIcon } from '@heroicons/react/24/outline';
-import Loader from '../../components/loaders/loader';
-import CredencialesModal from '../../pages/dashboard/credentials';
-import Balance from "./balance";
-import Stats from "./stats";
+import React, { useEffect, useState } from "react";
+import useSWR from "swr";
+import { useRouter } from "next/router";
+import Layout from "../../components/layout/dashboard";
+import Loader from "../../components/loaders/loader";
+import Component from "../metrix/balance"; // Importar el componente del gráfico
 
 const fetcher = (url) =>
-    fetch(url, {
-        headers: {
-            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-            'Content-Type': 'application/json',
-        },
-    }).then((res) => res.json());
+  fetch(url, {
+    headers: {
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+  }).then((res) => res.json());
 
 const Metrix = () => {
-    const router = useRouter();
-    const { idcuenta } = router.query; // Obtiene el idcuenta de la URL
+  const router = useRouter();
+  const { idcuenta } = router.query;
 
-    const { data: challengeData, error, isLoading } = useSWR(
-        idcuenta ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${idcuenta}` : null,
-        fetcher
-    );
+  const { data: challengeData, error, isLoading } = useSWR(
+    idcuenta
+      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${idcuenta}`
+      : null,
+    fetcher
+  );
 
-    const [metricsData, setMetricsData] = useState(null); // Estado para el segundo GET
-    const [metricsError, setMetricsError] = useState(null);
+  const [metricsData, setMetricsData] = useState(null);
+  const [metricsError, setMetricsError] = useState(null);
 
-    // Efecto para realizar el segundo GET cuando los datos del primer GET estén disponibles
-    useEffect(() => {
-        const fetchAdditionalMetrics = async (idMeta) => {
-            console.log('idMeta recibido para el segundo GET:', idMeta); // Depuración: imprimir idMeta
-            try {
-                const response = await fetch(
-                    `https://metastats-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${idMeta}/metrics`,
-                    {
-                        headers: {
-                            'auth-token': `${process.env.NEXT_PUBLIC_TOKEN_META_API}`,
-                            'Content-Type': 'application/json',
-                        },
-                    }
-                );
-                const data = await response.json();
-                setMetricsData(data); // Guardar los datos en el estado
-                console.log('Additional Metrics:', data); // Depuración: Imprimir los datos obtenidos
-            } catch (err) {
-                console.error('Error fetching additional metrics:', err);
-                setMetricsError(err);
-            }
-        };
-
-        if (challengeData?.data?.idMeta) {
-            fetchAdditionalMetrics(challengeData.data.idMeta);
-        }
-    }, [challengeData?.data?.idMeta]);
-
-    // Mostrar loader mientras se cargan los datos
-    if (isLoading) {
-        return (
-            <Layout>
-                <Loader />
-            </Layout>
+  useEffect(() => {
+    const fetchAdditionalMetrics = async (idMeta) => {
+      try {
+        const response = await fetch(
+          `https://metastats-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${idMeta}/metrics`,
+          {
+            headers: {
+              "auth-token": `${process.env.NEXT_PUBLIC_TOKEN_META_API}`,
+              "Content-Type": "application/json",
+            },
+          }
         );
-    }
+        const data = await response.json();
+        setMetricsData(data);
+      } catch (err) {
+        setMetricsError(err);
+      }
+    };
 
-    // Mostrar mensaje de error si ocurre un problema al cargar los datos
-    if (error) {
-        console.error('Error fetching challenge data:', error);
-        return (
-            <Layout>
-                Error al cargar los datos: {error.message}
-            </Layout>
-        );
+    if (challengeData?.data?.idMeta) {
+      fetchAdditionalMetrics(challengeData.data.idMeta);
     }
+  }, [challengeData?.data?.idMeta]);
 
-    // Si no hay datos o la estructura no es válida, mostrar un fallback
-    if (!challengeData || !challengeData.data) {
-        return (
-            <Layout>
-                No se encontraron datos para esta cuenta.
-            </Layout>
-        );
-    }
-
+  if (isLoading) {
     return (
+<<<<<<< HEAD
+      <Layout>
+        <Loader />
+      </Layout>
+=======
         <Layout>
             <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                 <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
@@ -143,7 +115,46 @@ const Metrix = () => {
                 )}
             </div>
         </Layout>
+>>>>>>> e5b8e34eaca85cc09c8192e28a19f101a23bbf9a
     );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        Error al cargar los datos: {error.message}
+      </Layout>
+    );
+  }
+
+  if (!challengeData || !challengeData.data) {
+    return (
+      <Layout>
+        No se encontraron datos para esta cuenta.
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout title="Metrix">
+      <h1 className="flex p-6 bg-white shadow-md rounded-lg dark:bg-zinc-800 dark:text-white">
+        Account Metrix {challengeData.data.login || "Sin nombre"}
+      </h1>
+      <div className="mt-6">
+        <h2 className="text-lg font-semibold">Métricas adicionales</h2>
+        {metricsError ? (
+          <p className="text-red-500">
+            Error al cargar las métricas: {metricsError.message}
+          </p>
+        ) : metricsData ? (
+          // Pasar metricsData al componente gráfico
+          <Component metricsData={metricsData} />
+        ) : (
+          <p>Cargando métricas adicionales...</p>
+        )}
+      </div>
+    </Layout>
+  );
 };
 
 export default Metrix;
