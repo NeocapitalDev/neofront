@@ -6,8 +6,10 @@ import Loader from "../../components/loaders/loader";
 import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import CredencialesModal from "./credentials"
 import Link from 'next/link'
+
 import Balance from "./balance"; // Importar el componente del gráfico
 import Stats from "./stats"; // Importar el componente del gráfico
+import WinLoss from "./winloss"; // Importar el componente del gráfico
 
 
 const fetcher = (url) =>
@@ -114,7 +116,17 @@ const Metrix = () => {
                     </div>
                     <div className="md:col-span-1">
                         <Stats />
+
                     </div>
+                </div>
+            </div>
+
+
+            <div>
+                <div >
+                    {console.log("Datos enviados a WinLoss:", metricsData)}
+                    <WinLoss data={metricsData || {}} />
+                  
                 </div>
             </div>
 
@@ -124,6 +136,8 @@ const Metrix = () => {
                     {JSON.stringify(challengeData, null, 2)}
                 </pre>
             </div>
+
+
 
             <div className="mt-6">
                 <h2 className="text-lg font-semibold">Métricas adicionales</h2>
