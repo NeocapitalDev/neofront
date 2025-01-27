@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
-import BarraWinLose from "../metrix/barra_win_lose";
 
 import {
   Card,
@@ -127,12 +126,7 @@ export default function Component({ data }) {
         </CardContent>
       </Card>
       {/* Componente BarraWinLose */}
-      <BarraWinLose
-        winPercentage={winPercentage}
-        losePercentage={losePercentage}
-        totalWins={totalWins}
-        totalLosses={totalLosses}
-      />
+
     </>
   );
 }
