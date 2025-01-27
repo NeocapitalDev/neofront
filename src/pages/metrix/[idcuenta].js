@@ -123,12 +123,15 @@ const Metrix = () => {
             </div>
 
 
-            <div>
-                <div  >
-                    <WinLoss data={metricsData || {}} />
-                    <BarraWinLose  data={metricsData || {}} />
+         
+            <div className="mt-6">
+            <WinLoss data={metricsData || {}} />
 
-                </div>
+            </div>
+
+            <div className="mt-6">
+            <BarraWinLose data={metricsData || {}} />
+
             </div>
 
             <div className="mt-6">

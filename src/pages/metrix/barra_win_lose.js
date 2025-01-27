@@ -27,8 +27,7 @@ export default function BarraWinLose({ data }) {
   }
 
   return (
-    <div className="pt-5">
-      <p className="text-lg font-semibold mb-4">Progreso de Win/Lose</p>
+<div className=" p-5 border rounded-xl bg-slate-50" style={{ backgroundColor: "#0A0A0A" }} >      
       <div className="w-full bg-gray-200 rounded-full dark:bg-gray-700 h-6 relative">
         {/* Porcentaje y cantidad de Wins */}
         <div
