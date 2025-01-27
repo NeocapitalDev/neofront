@@ -18,14 +18,17 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "src/components/Recaptcha.js"  ],
+    "**/*.tsx",
+    "src/components/Recaptcha.js"
+  ],
   "exclude": [
     "node_modules"
   ]
