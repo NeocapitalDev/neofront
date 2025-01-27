@@ -77,7 +77,7 @@ export default function Component({ data }) {
                           y={(viewBox.cy || 0) - 16}
                           className="fill-foreground text-2xl font-bold"
                         >
-                          Win / Lose 
+                          Win / Loss 
 
                         </tspan>
                         <tspan
