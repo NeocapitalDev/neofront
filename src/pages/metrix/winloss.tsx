@@ -21,27 +21,25 @@ import {
 
 export default function Component({ data }) {
   const [chartData, setChartData] = useState([
-    { month: "january", desktop: 1260, mobile: 570 },
+    { month: "january", wonTradesPercent: 0, lostTradesPercent: 0 },
   ]);
-  const [totalVisitors, setTotalVisitors] = useState(0);
 
   useEffect(() => {
     if (data?.metrics) {
-      const desktop = data.metrics.wonTradesPercent || 0; // Reemplaza desktop por métricas reales
-      const mobile = data.metrics.lostTradesPercent || 0; // Reemplaza mobile por métricas reales
+      const wonTradesPercent = data.metrics.wonTradesPercent || 0; // Usa valores reales
+      const lostTradesPercent = data.metrics.lostTradesPercent || 0; // Usa valores reales
 
-      const updatedData = [{ month: "dynamic", desktop, mobile }];
+      const updatedData = [{ month: "dynamic", wonTradesPercent, lostTradesPercent }];
       setChartData(updatedData);
-      setTotalVisitors(desktop + mobile);
     }
   }, [data]);
 
   const chartConfig = {
-    desktop: {
+    wonTradesPercent: {
       label: "Won Trades",
       color: "hsl(var(--chart-1))",
     },
-    mobile: {
+    lostTradesPercent: {
       label: "Lost Trades",
       color: "hsl(var(--chart-2))",
     },
@@ -79,14 +77,15 @@ export default function Component({ data }) {
                           y={(viewBox.cy || 0) - 16}
                           className="fill-foreground text-2xl font-bold"
                         >
-                          {totalVisitors.toLocaleString()}%
+                          Win / Lose 
+
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 4}
                           className="fill-muted-foreground"
                         >
-                          Total Metrics
+                          Rates
                         </tspan>
                       </text>
                     );
@@ -95,18 +94,28 @@ export default function Component({ data }) {
               />
             </PolarRadiusAxis>
             <RadialBar
-              dataKey="desktop"
+              dataKey="wonTradesPercent"
               stackId="a"
               cornerRadius={5}
-              fill="var(--color-desktop)"
+              fill="hsl(var(--chart-1))"
               className="stroke-transparent stroke-2"
+              label={{
+                position: "insideStart",
+                formatter: (value) => `${chartData[0].wonTradesPercent.toFixed(2)}%`, // Muestra valores reales
+                fill: "#fff",
+              }}
             />
             <RadialBar
-              dataKey="mobile"
-              fill="var(--color-mobile)"
+              dataKey="lostTradesPercent"
+              fill="hsl(var(--chart-2))"
               stackId="a"
               cornerRadius={5}
               className="stroke-transparent stroke-2"
+              label={{
+                position: "insideEnd",
+                formatter: (value) => `${chartData[0].lostTradesPercent.toFixed(2)}%`, // Muestra valores reales
+                fill: "#fff",
+              }}
             />
           </RadialBarChart>
         </ChartContainer>
