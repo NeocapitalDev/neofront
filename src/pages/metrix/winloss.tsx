@@ -51,7 +51,7 @@ export default function Component({ data }) {
         <CardTitle>Radial Chart - Dynamic Data</CardTitle>
         <CardDescription>Resumen basado en métricas recibidas</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-1 items-center pb-0">
+      <CardContent className="flex flex-1 items-center ">
         <ChartContainer
           config={chartConfig}
           className="mx-auto aspect-square w-full max-w-[250px]"
@@ -77,8 +77,8 @@ export default function Component({ data }) {
                           y={(viewBox.cy || 0) - 16}
                           className="fill-foreground text-2xl font-bold"
                         >
-                          
-                          
+
+
                           % Rates
 
 
@@ -88,7 +88,7 @@ export default function Component({ data }) {
                           y={(viewBox.cy || 0) + 4}
                           className="fill-muted-foreground"
                         >
-                                                    Win / Loss 
+                          Win / Loss
 
                         </tspan>
                       </text>
@@ -103,11 +103,11 @@ export default function Component({ data }) {
               cornerRadius={5}
               fill="hsl(0, 70%, 50%)" // Rojo
               className="stroke-transparent stroke-2"
-              label={{
-                position: "insideStart",
-                formatter: (value) => `${chartData[0].lostTradesPercent.toFixed(1)}`, // Muestra valores reales
-                fill: "#fff",
-              }}
+            ///   label={{
+            ///    position: "insideStart",
+            ///     formatter: (value) => `${chartData[0].lostTradesPercent.toFixed(1)}`, // Muestra valores reales
+            //    fill: "#fff",
+            //   }}
             />
             <RadialBar
               dataKey="wonTradesPercent"
@@ -115,23 +115,30 @@ export default function Component({ data }) {
               stackId="a"
               cornerRadius={5}
               className="stroke-transparent stroke-2"
-              label={{
-                position: "insideEnd",
-                formatter: (value) => `${chartData[0].wonTradesPercent.toFixed(1)}`, // Muestra valores reales
-                fill: "#fff",
-              }}
+            //     label={{
+            //      position: "insideEnd",
+            //      formatter: (value) => `${chartData[0].wonTradesPercent.toFixed(1)}`, // Muestra valores reales
+            //      fill: "#fff",
+            //     }}
             />
           </RadialBarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
+
+      <CardFooter className="flex-col gap-2 text-sm -mt-24">
         <div className="flex items-center gap-2 font-medium leading-none">
           Cambios recientes en las métricas <TrendingUp className="h-4 w-4" />
         </div>
-        <div className="leading-none text-muted-foreground">
-          Datos basados en operaciones realizadas.
+        <div className="flex justify-between">
+          <span className="text-green-600">
+            Ganancia: {chartData[0].wonTradesPercent.toFixed(1)}%
+          </span>
+          <span className="text-red-600">
+            Pérdida: {chartData[0].lostTradesPercent.toFixed(1)}%
+          </span>
         </div>
       </CardFooter>
+
     </Card>
   );
 }
