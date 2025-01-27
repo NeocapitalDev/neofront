@@ -27,8 +27,8 @@ export default function BarraWinLose({ data }) {
   }
 
   return (
-<div className=" p-5 border rounded-xl bg-slate-50" style={{ backgroundColor: "#0A0A0A" }} >      
-      <div className="w-full bg-gray-200 rounded-full dark:bg-gray-700 h-6 relative">
+<div className="p-5 border rounded-xl bg-white shadow-md dark:bg-[#0A0A0A]">
+<div className="w-full bg-gray-200 rounded-full dark:bg-gray-700 h-6 relative">
         {/* Porcentaje y cantidad de Wins */}
         <div
           className="absolute top-0 left-0 h-full bg-amber-500 rounded-l-xl text-xs font-medium text-center text-blue-100 flex items-center justify-center"
