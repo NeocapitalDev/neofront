@@ -94,26 +94,26 @@ export default function Component({ data }) {
               />
             </PolarRadiusAxis>
             <RadialBar
-              dataKey="wonTradesPercent"
+              dataKey="lostTradesPercent"
               stackId="a"
               cornerRadius={5}
-              fill="hsl(var(--chart-1))"
+              fill="hsl(0, 70%, 50%)" // Rojo
               className="stroke-transparent stroke-2"
               label={{
                 position: "insideStart",
-                formatter: (value) => `${chartData[0].wonTradesPercent.toFixed(2)}%`, // Muestra valores reales
+                formatter: (value) => `${chartData[0].lostTradesPercent.toFixed(2)}%`, // Muestra valores reales
                 fill: "#fff",
               }}
             />
             <RadialBar
-              dataKey="lostTradesPercent"
-              fill="hsl(var(--chart-2))"
+              dataKey="wonTradesPercent"
+              fill="hsl(30, 90%, 50%)" // Naranja
               stackId="a"
               cornerRadius={5}
               className="stroke-transparent stroke-2"
               label={{
                 position: "insideEnd",
-                formatter: (value) => `${chartData[0].lostTradesPercent.toFixed(2)}%`, // Muestra valores reales
+                formatter: (value) => `${chartData[0].wonTradesPercent.toFixed(2)}%`, // Muestra valores reales
                 fill: "#fff",
               }}
             />
