@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import BarraWinLose from "../metrix/barra_win_lose";
 
 import {
   Card,
@@ -27,6 +28,8 @@ const chartConfig = {
 export default function Component({ data }) {
   const [chartData, setChartData] = useState([]);
   const [balance, setBalance] = useState(0);
+  const [winPercentage, setWinPercentage] = useState(0);
+  const [losePercentage, setLosePercentage] = useState(0);
 
   useEffect(() => {
     if (data?.metrics) {
@@ -47,6 +50,14 @@ export default function Component({ data }) {
       );
 
       setChartData(extractedData);
+
+      // Calcular porcentaje de win y lose
+      const totalTrades = data.metrics.openTradesByHour.length;
+      const wins = data.metrics.openTradesByHour.filter((trade) => trade.profit > 0).length;
+      const losses = totalTrades - wins;
+
+      setWinPercentage(parseFloat(((wins / totalTrades) * 100).toFixed(2)));
+      setLosePercentage(parseFloat(((losses / totalTrades) * 100).toFixed(2)));
     }
   }, [data]);
 
@@ -107,6 +118,9 @@ export default function Component({ data }) {
           </ChartContainer>
         </CardContent>
       </Card>
+      <BarraWinLose 
+        winPercentage={winPercentage}
+        losePercentage={losePercentage} />
     </div>
   );
 }
