@@ -10,6 +10,7 @@ import Link from 'next/link'
 import Balance from "./balance"; // Importar el componente del gráfico
 import Stats from "./stats"; // Importar el componente del gráfico
 import WinLoss from "./winloss"; // Importar el componente del gráfico
+import BarraWinLose from "./barra_win_lose";
 
 
 const fetcher = (url) =>
@@ -123,10 +124,10 @@ const Metrix = () => {
 
 
             <div>
-                <div >
-                    {console.log("Datos enviados a WinLoss:", metricsData)}
+                <div  >
                     <WinLoss data={metricsData || {}} />
-                  
+                    <BarraWinLose  data={metricsData || {}} />
+
                 </div>
             </div>
 
