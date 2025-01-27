@@ -30,6 +30,8 @@ export default function Component({ data }) {
   const [balance, setBalance] = useState(0);
   const [winPercentage, setWinPercentage] = useState(0);
   const [losePercentage, setLosePercentage] = useState(0);
+  const [totalWins, setTotalWins] = useState(0);
+  const [totalLosses, setTotalLosses] = useState(0);
 
   useEffect(() => {
     if (data?.metrics) {
@@ -51,18 +53,24 @@ export default function Component({ data }) {
 
       setChartData(extractedData);
 
-      // Calcular porcentaje de win y lose
+      // Calcular estadísticas de ganancias y pérdidas
       const totalTrades = data.metrics.openTradesByHour.length;
-      const wins = data.metrics.openTradesByHour.filter((trade) => trade.profit > 0).length;
-      const losses = totalTrades - wins;
+      const wins = data.metrics.openTradesByHour.filter((trade) => trade.profit > 0);
+      const losses = data.metrics.openTradesByHour.filter((trade) => trade.profit <= 0);
 
-      setWinPercentage(parseFloat(((wins / totalTrades) * 100).toFixed(2)));
-      setLosePercentage(parseFloat(((losses / totalTrades) * 100).toFixed(2)));
+      const totalWinAmount = wins.reduce((sum, trade) => sum + trade.profit, 0);
+      const totalLossAmount = losses.reduce((sum, trade) => sum + Math.abs(trade.profit), 0);
+
+      setTotalWins(totalWinAmount);
+      setTotalLosses(totalLossAmount);
+
+      setWinPercentage(parseFloat(((wins.length / totalTrades) * 100).toFixed(2)));
+      setLosePercentage(parseFloat(((losses.length / totalTrades) * 100).toFixed(2)));
     }
   }, [data]);
 
   return (
-    <div>
+    <>
       <p className="text-lg font-semibold mb-4">Resultados Actuales</p>
       <Card>
         <CardHeader>
@@ -118,9 +126,13 @@ export default function Component({ data }) {
           </ChartContainer>
         </CardContent>
       </Card>
-      <BarraWinLose 
+      {/* Componente BarraWinLose */}
+      <BarraWinLose
         winPercentage={winPercentage}
-        losePercentage={losePercentage} />
-    </div>
+        losePercentage={losePercentage}
+        totalWins={totalWins}
+        totalLosses={totalLosses}
+      />
+    </>
   );
 }
