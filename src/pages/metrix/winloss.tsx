@@ -101,7 +101,7 @@ export default function Component({ data }) {
               className="stroke-transparent stroke-2"
               label={{
                 position: "insideStart",
-                formatter: (value) => `${chartData[0].lostTradesPercent.toFixed(2)}%`, // Muestra valores reales
+                formatter: (value) => `${chartData[0].lostTradesPercent.toFixed(0)}%`, // Muestra valores reales
                 fill: "#fff",
               }}
             />
@@ -113,7 +113,7 @@ export default function Component({ data }) {
               className="stroke-transparent stroke-2"
               label={{
                 position: "insideEnd",
-                formatter: (value) => `${chartData[0].wonTradesPercent.toFixed(2)}%`, // Muestra valores reales
+                formatter: (value) => `${chartData[0].wonTradesPercent.toFixed(0)}%`, // Muestra valores reales
                 fill: "#fff",
               }}
             />
