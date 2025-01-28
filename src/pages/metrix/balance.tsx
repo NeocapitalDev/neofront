@@ -125,7 +125,6 @@ export default function Component({ data }) {
           </ChartContainer>
         </CardContent>
       </Card>
-      {/* Componente BarraWinLose */}
 
     </>
   );
