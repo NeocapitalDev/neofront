@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 
 export default function BarraWinLose({ data }) {
-  console.log(data)
-
   const [metrics, setMetrics] = useState({
     averageWin: 0,
     averageLoss: 0,
@@ -27,14 +25,14 @@ export default function BarraWinLose({ data }) {
   }
 
   return (
-<div className="p-5 border rounded-xl bg-white shadow-md dark:bg-[#0A0A0A]">
-<div className="w-full bg-gray-200 rounded-full dark:bg-gray-700 h-6 relative">
+    <div className="p-2 bg-white shadow-md dark:bg-[#0A0A0A]">
+      <div className="w-full mx-auto bg-gray-200 rounded-full dark:bg-gray-700 h-6 relative">
         {/* Porcentaje y cantidad de Wins */}
         <div
-          className="absolute top-0 left-0 h-full bg-amber-500 rounded-l-xl text-xs font-medium text-center text-blue-100 flex items-center justify-center"
+          className="absolute top-0 left-0 h-full bg-amber-600 rounded-l-xl text-xs font-medium text-center text-blue-100 flex items-center justify-center"
           style={{ width: `${metrics.wonTradesPercent}%` }}
         >
-          ${metrics.averageWin.toLocaleString()} Wins
+          ${metrics.averageWin.toLocaleString()} 
         </div>
         {/* Porcentaje y cantidad de Losses */}
         <div
@@ -44,7 +42,7 @@ export default function BarraWinLose({ data }) {
             width: `${metrics.lostTradesPercent}%`,
           }}
         >
-          ${metrics.averageLoss.toLocaleString()} Losses
+          ${metrics.averageLoss.toLocaleString()} 
         </div>
       </div>
     </div>

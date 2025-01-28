@@ -86,79 +86,75 @@ const Metrix = () => {
 
   return (
     <Layout>
-            <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-                <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
-                Account Metrix {challengeData.data.login || 'Sin nombre'}
-            </h1>
+      <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+        <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
+        Account Metrix {challengeData.data.login || 'Sin nombre'}
+      </h1>
 
-            <div className="flex justify-start gap-3 my-6">
-                {challengeData.data && <CredencialesModal {...challengeData.data} />}
+      <div className="flex justify-start gap-3 my-6">
+        {challengeData.data && <CredencialesModal {...challengeData.data} />}
 
-                <Link
-                    href="/support"
-                    className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500"
-                >
-                    <PhoneIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                    <span className="text-xs lg:text-sm dark:text-zinc-200">Contacte con nosotros</span>
-                </Link>
-                <button
-                    onClick={() => router.reload()}
-                    className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500"
-                >
-                    <ArrowPathIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                    <span className="text-xs lg:text-sm dark:text-zinc-200">Actualizar</span>
-                </button>
-            </div>
+        <Link
+          href="/support"
+          className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500"
+        >
+          <PhoneIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+          <span className="text-xs lg:text-sm dark:text-zinc-200">Contacte con nosotros</span>
+        </Link>
+        <button
+          onClick={() => router.reload()}
+          className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500"
+        >
+          <ArrowPathIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+          <span className="text-xs lg:text-sm dark:text-zinc-200">Actualizar</span>
+        </button>
+      </div>
 
-            <div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="md:col-span-2">
-                    {console.log("Datos enviados a Balance:", metricsData)}
-                    <Balance data={metricsData || {}} />
-                    </div>
-                    <div className="md:col-span-1">
-                        <Stats />
+      <div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2">
+            {console.log("Datos enviados a Balance:", metricsData)}
+            <Balance data={metricsData || {}} />
+          </div>
+          <div className="md:col-span-1">
+            <Stats />
 
-                    </div>
-                </div>
-            </div>
+          </div>
+        </div>
+      </div>
 
 
-         
-            <div className="mt-6">
-            <WinLoss data={metricsData || {}} />
-
-            </div>
-
-            <div className="mt-6">
-            <BarraWinLose data={metricsData || {}} />
-
-            </div>
-
-            <div className="mt-6">
-                <h2 className="text-lg font-semibold">Detalles del desafío</h2>
-                <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
-                    {JSON.stringify(challengeData, null, 2)}
-                </pre>
-            </div>
+      {/* Barras win lose */}
+      <div className="mt-6 w-full max-w-[100%] md:max-w-[65%] lg:max-w-[66%]  justify-start items-start">
+        <WinLoss data={metricsData || {}} />
+      </div>
 
             <Objetivos/>
 
 
 
-            <div className="mt-6">
-                <h2 className="text-lg font-semibold">Métricas adicionales</h2>
-                {metricsError ? (
-                    <p className="text-red-500">Error al cargar las métricas: {metricsError.message}</p>
-                ) : metricsData ? (
-                    <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
-                        {JSON.stringify(metricsData, null, 2)}
-                    </pre>
-                ) : (
-                    <p>Cargando métricas adicionales...</p>
-                )}
-            </div>
-        </Layout>
+      <div className="mt-6">
+        <h2 className="text-lg font-semibold">Detalles del desafío</h2>
+        <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
+          {JSON.stringify(challengeData, null, 2)}
+        </pre>
+      </div>
+
+
+
+      <div className="mt-6">
+        <h2 className="text-lg font-semibold">Métricas adicionales</h2>
+        {metricsError ? (
+          <p className="text-red-500">Error al cargar las métricas: {metricsError.message}</p>
+        ) : metricsData ? (
+          <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
+            {JSON.stringify(metricsData, null, 2)}
+          </pre>
+        ) : (
+          <p>Cargando métricas adicionales...</p>
+        )}
+      </div>
+    </Layout>
   );
 };
 

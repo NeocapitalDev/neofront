@@ -6,7 +6,7 @@ import { UserIcon } from '@heroicons/react/24/outline';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LogoGravatar from "../../components/LogoGravatar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CountryDropdown } from '@/components/ui/country-dropdown';
 
 const ProfilePage = () => {
@@ -17,7 +17,7 @@ const ProfilePage = () => {
     country: "", // Valor por defecto para el dropdown de país
     city: "",
     street: "",
-    postalCode: "",
+    zipCode: "",
   });
 
   const handleChange = (e) => {
@@ -39,10 +39,28 @@ const ProfilePage = () => {
 
   const { data, error, isLoading } = useStrapiData('users/me', token);
 
-  console.log(data)
+
+  // Sincronizar datos iniciales con el formulario
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        firstName: data.firstName || "",
+        lastName: data.lastName || "",
+        phone: data.phone || "",
+        country: data.country || "",
+        city: data.city || "",
+        street: data.street || "",
+        zipCode: data.zipCode || "",
+      });
+    }
+  }, [data]);
 
   if (isLoading) {
-    return <Layout><Loader /></Layout>;
+    return (
+      <Layout>
+        <Loader />
+      </Layout>
+    );
   }
 
   if (error) {
@@ -66,14 +84,17 @@ const ProfilePage = () => {
 
       <div className="flex flex-col items-center p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <LogoGravatar
-          email={session.user.email || 'usuario@example.com'}
+          email={session.user.email || "usuario@example.com"}
           className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4"
         />
         <h1 className="text-3xl font-bold dark:text-white text-slate-700 mb-2">
           {data.name || 'Nombre no disponible'}
         </h1>
         <p className="dark:text-white text-gray-400 text-sm mb-8">
-          Fecha de creación: {data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'No disponible'}
+          Fecha de creación:{" "}
+          {data.createdAt
+            ? new Date(data.createdAt).toLocaleDateString()
+            : "No disponible"}
         </p>
 
         <div className="w-full space-y-6 bg-gray-100 p-6 rounded-lg dark:bg-zinc-800">
@@ -82,22 +103,30 @@ const ProfilePage = () => {
               <label className="text-base font-semibold dark:text-white text-black">Username</label>
             </div>
             <div className="w-full md:w-3/4">
-              <p className="text-gray-700 dark:text-white">{data.username || 'Username no disponible'}</p>
+              <p className="text-gray-700 dark:text-white">
+                {data.username || "Username no disponible"}
+              </p>
             </div>
           </div>
 
           <div className="flex flex-col md:flex-row items-center">
             <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <label className="text-base font-semibold text-black dark:text-white">Email</label>
+              <label className="text-base font-semibold text-black dark:text-white">
+                Email
+              </label>
             </div>
             <div className="w-full md:w-3/4">
-              <p className="text-gray-700 dark:text-white">{data.email || 'Correo no disponible'}</p>
+              <p className="text-gray-700 dark:text-white">
+                {data.email || "Correo no disponible"}
+              </p>
             </div>
           </div>
 
           <div className="flex flex-col md:flex-row items-center">
             <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <label className="text-base font-semibold text-black dark:text-white">Cuenta verificada</label>
+              <label className="text-base font-semibold text-black dark:text-white">
+                Cuenta verificada
+              </label>
             </div>
             <div className="w-full md:w-3/4">
               <p className="text-gray-700 dark:text-white">Sí</p>
@@ -120,7 +149,7 @@ const ProfilePage = () => {
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
-              placeholder={data.firstName || "Nombre no disponible"}
+              placeholder="Ingrese su nombre"
             />
           </div>
           <div className="grid w-full items-center gap-1.5">
@@ -131,7 +160,7 @@ const ProfilePage = () => {
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
-              placeholder={data.lastName || "Apellido no disponible"}
+              placeholder="Ingrese su apellido"
             />
           </div>
         </div>
@@ -144,8 +173,7 @@ const ProfilePage = () => {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            placeholder={data.phone || "Teléfono no disponible"}
-          />
+            placeholder="Ingrese su teléfono"/>
         </div>
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -153,7 +181,7 @@ const ProfilePage = () => {
             <Label htmlFor="country">País</Label>
             <CountryDropdown
               placeholder="Elige un país"
-              defaultValue={formData.country}
+              defaultValue={data.country}
               onChange={handleCountryChange}
             />
           </div>
@@ -165,7 +193,7 @@ const ProfilePage = () => {
               name="city"
               value={formData.city}
               onChange={handleChange}
-              placeholder={data.city || "Ciudad no disponible"}
+              placeholder="Ingrese su ciudad"
             />
           </div>
         </div>
@@ -179,18 +207,18 @@ const ProfilePage = () => {
               name="street"
               value={formData.street}
               onChange={handleChange}
-              placeholder={data.street || "Calle no disponible"}
+              placeholder="Ingrese su calle"
             />
           </div>
           <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="postalCode">Código Postal</Label>
+            <Label htmlFor="zipCode">Código Postal</Label>
             <Input
               type="text"
-              id="postalCode"
-              name="postalCode"
+              id="zipCode"
+              name="zipCode"
               value={formData.zipCode}
               onChange={handleChange}
-              placeholder={data.zipCode || "Código postal no disponible"}
+              placeholder="Ingrese su código postal"
             />
           </div>
         </div>
