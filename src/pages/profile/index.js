@@ -14,7 +14,7 @@ const ProfilePage = () => {
     firstName: "",
     lastName: "",
     phone: "",
-    country: "USA", // Valor por defecto para el dropdown de país
+    country: "PER", // Valor por defecto para el dropdown de país
     city: "",
     street: "",
     postalCode: "",
