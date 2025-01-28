@@ -20,10 +20,41 @@ const ProfilePage = () => {
     zipCode: "",
   });
 
+  const [error, setError] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    country: "",
+    city: "",
+    street: "",
+    zipCode: "",
+  });
+
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Validar que el teléfono no contenga letras
+    if (name === "phone" && !/^\d*$/.test(value)) {
+      setError((prev) => ({ ...prev, [name]: "El teléfono solo debe contener números." }));
+      setTimeout(() => setError((prev) => ({ ...prev, [name]: "" })), 2000);
+      return;
+    }
+
+    // Validar que los textos no sean demasiado largos
+    if (value.length > 50 && (name === "firstName" || name === "lastName" || name === "city" || name === "street")) {
+      setError((prev) => ({ ...prev, [name]: "El campo no debe exceder los 50 caracteres." }));
+      setTimeout(() => setError((prev) => ({ ...prev, [name]: "" })), 2000);
+      return;
+    }
+
+    if (value.length > 10 && name === "zipCode") {
+      setError((prev) => ({ ...prev, [name]: "El código postal no debe exceder 10 caracteres." }));
+      setTimeout(() => setError((prev) => ({ ...prev, [name]: "" })), 2000);
+      return;
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
@@ -32,32 +63,35 @@ const ProfilePage = () => {
     setFormData((prev) => ({ ...prev, country: value.alpha3 }));
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.firstName) newErrors.firstName = "El nombre es requerido";
-    if (!formData.lastName) newErrors.lastName = "El apellido es requerido";
-    if (!formData.phone) newErrors.phone = "El teléfono es requerido";
-    if (!formData.country) newErrors.country = "El país es requerido";
-    if (!formData.city) newErrors.city = "La ciudad es requerida";
-    if (!formData.street) newErrors.street = "La calle es requerida";
-    if (!formData.zipCode) newErrors.zipCode = "El código postal es requerido";
-    return newErrors;
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-    } else {
-      console.log("Formulario enviado:", formData);
+    const { firstName, lastName, phone, country, city, street, zipCode } = formData;
+
+    if (!firstName || !lastName || !phone || !country || !city || !street || !zipCode) {
+      setError((prev) => ({ ...prev, form: "Todos los campos son obligatorios." }));
+      setTimeout(() => setError((prev) => ({ ...prev, form: "" })), 2000);
+      return;
     }
+
+    if (!/^\d+$/.test(phone)) {
+      setError((prev) => ({ ...prev, phone: "El teléfono solo debe contener números." }));
+      setTimeout(() => setError((prev) => ({ ...prev, phone: "" })), 2000);
+      return;
+    }
+
+    if (firstName.length > 50 || lastName.length > 50 || city.length > 50 || street.length > 50 || zipCode.length > 10) {
+      setError((prev) => ({ ...prev, form: "Los campos no deben exceder el límite de caracteres." }));
+      setTimeout(() => setError((prev) => ({ ...prev, form: "" })), 2000);
+      return;
+    }
+
+    console.log("Formulario enviado:", formData);
   };
 
   const { data: session } = useSession();
   const token = session?.jwt;
 
-  const { data, error, isLoading } = useStrapiData('users/me', token);
+  const { data, error: fetchError, isLoading } = useStrapiData('users/me', token);
 
   useEffect(() => {
     if (data) {
@@ -90,8 +124,8 @@ const ProfilePage = () => {
     );
   }
 
-  if (error) {
-    return <Layout>Error al cargar los datos: {error.message}</Layout>;
+  if (fetchError) {
+    return <Layout>Error al cargar los datos: {fetchError.message}</Layout>;
   }
 
   return (
@@ -161,14 +195,14 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-
       <form onSubmit={handleSubmit} className="mt-5 space-y-6 p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <div className="mt-6">
           <p className="text-lg font-semibold mb-4">Información Personal</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="grid w-full items-center gap-1.5">
+          {/* Campo Nombre */}
+          <div className="grid w-full items-start gap-1.5">
             <Label htmlFor="firstName">Nombre</Label>
             <Input
               type="text"
@@ -178,9 +212,16 @@ const ProfilePage = () => {
               onChange={handleChange}
               placeholder="Ingrese su nombre"
             />
-            {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
+            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+              {error.firstName && <div className="text-red-500">{error.firstName}</div>}
+              {!formData.firstName && error.form && (
+                <div className="text-red-500">Campo obligatorio</div>
+              )}
+            </div>
           </div>
-          <div className="grid w-full items-center gap-1.5">
+
+          {/* Campo Apellido */}
+          <div className="grid w-full items-start gap-1.5">
             <Label htmlFor="lastName">Apellido</Label>
             <Input
               type="text"
@@ -190,9 +231,15 @@ const ProfilePage = () => {
               onChange={handleChange}
               placeholder="Ingrese su apellido"
             />
-            {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
+            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+              {error.lastName && <div className="text-red-500">{error.lastName}</div>}
+              {!formData.lastName && error.form && (
+                <div className="text-red-500">Campo obligatorio</div>
+              )}
+            </div>
           </div>
         </div>
+
 
         <div className="mt-4 grid w-full items-center gap-1.5">
           <Label htmlFor="phone">Teléfono</Label>
@@ -201,16 +248,15 @@ const ProfilePage = () => {
             id="phone"
             name="phone"
             value={formData.phone}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (/^\d*$/.test(value)) {
-                handleChange(e);
-              } else {
-                setErrors((prev) => ({ ...prev, phone: "Ingrese solo números" }));
-              }
-            }}
-            placeholder="Ingrese su teléfono"/>
-          {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
+            onChange={handleChange}
+            placeholder="Ingrese su teléfono"
+          />
+          <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+            {error.phone && <div className="text-red-500">{error.phone}</div>}
+            {!formData.phone && error.form && (
+              <div className="text-red-500">Campo obligatorio</div>
+            )}
+          </div>
         </div>
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -221,7 +267,12 @@ const ProfilePage = () => {
               defaultValue={formData.country}
               onChange={handleCountryChange}
             />
-            {errors.country && <p className="text-red-500 text-sm">{errors.country}</p>}
+            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+              {error.country && <div className="text-red-500">{error.country}</div>}
+              {!formData.country && error.form && (
+                <div className="text-red-500">Campo obligatorio</div>
+              )}
+            </div>
           </div>
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="city">Ciudad</Label>
@@ -233,7 +284,12 @@ const ProfilePage = () => {
               onChange={handleChange}
               placeholder="Ingrese su ciudad"
             />
-            {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
+            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+              {error.city && <div className="text-red-500">{error.city}</div>}
+              {!formData.city && error.form && (
+                <div className="text-red-500">Campo obligatorio</div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -248,7 +304,12 @@ const ProfilePage = () => {
               onChange={handleChange}
               placeholder="Ingrese su calle"
             />
-            {errors.street && <p className="text-red-500 text-sm">{errors.street}</p>}
+            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+              {error.street && <div className="text-red-500">{error.street}</div>}
+              {!formData.street && error.form && (
+                <div className="text-red-500">Campo obligatorio</div>
+              )}
+            </div>
           </div>
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="zipCode">Código Postal</Label>
@@ -260,7 +321,12 @@ const ProfilePage = () => {
               onChange={handleChange}
               placeholder="Ingrese su código postal"
             />
-            {errors.zipCode && <p className="text-red-500 text-sm">{errors.zipCode}</p>}
+            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+              {error.zipCode && <div className="text-red-500">{error.zipCode}</div>}
+              {!formData.zipCode && error.form && (
+                <div className="text-red-500">Campo obligatorio</div>
+              )}
+            </div>
           </div>
         </div>
 
