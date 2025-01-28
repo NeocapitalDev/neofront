@@ -12,18 +12,51 @@ const OrdersPage = () => {
     // Usamos el hook que creamos para obtener los datos de 'orders'
     const { data, error, isLoading } = useStrapiData('users/me?populate=orders', token);
 
-    //console.log('Full Data:', data); // Log de los datos completos obtenidos
     if (isLoading) {
-        return <Layout><Loader /></Layout>;
+        return (
+            <Layout>
+                <Loader />
+            </Layout>
+        );
     }
 
     if (error) {
-        return <Layout>Error al cargar los datos: {error.message}</Layout>;
+        return (
+            <Layout>
+                <div className="p-6 text-red-600 dark:text-red-400">
+                    Error al cargar los datos: {error.message}
+                </div>
+            </Layout>
+        );
     }
 
     // Verificamos si los datos incluyen la propiedad `orders`
+
+    // const orders = [
+    //     {
+    //         products: "Curso de React Avanzado",
+    //         dateCreated: "2025-01-15T10:30:00Z",
+    //         total: 99.99,
+    //         idWoo: "123456",
+    //         statusOrder: "Completado",
+    //     },
+    //     {
+    //         products: "Membresía Premium",
+    //         dateCreated: "2025-01-20T14:45:00Z",
+    //         total: 49.99,
+    //         idWoo: "789012",
+    //         statusOrder: "Pendiente",
+    //     },
+    //     {
+    //         products: "E-book de Programación",
+    //         dateCreated: "2025-01-22T08:15:00Z",
+    //         total: 19.99,
+    //         idWoo: "345678",
+    //         statusOrder: "Cancelado",
+    //     },
+    // ];
+    
     const orders = data?.orders || [];
-    //console.log('Orders Data:', orders); // Log de los datos de órdenes
 
     return (
         <Layout>
@@ -65,7 +98,11 @@ const OrdersPage = () => {
                                 </TableRow>
                             ))
                         ) : (
-                            <div>No hay datos para mostrar.</div>
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center">
+                                    No hay datos para mostrar.
+                                </TableCell>
+                            </TableRow>
                         )}
                     </TableBody>
                 </Table>
