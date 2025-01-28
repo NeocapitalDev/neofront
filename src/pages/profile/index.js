@@ -26,7 +26,7 @@ const ProfilePage = () => {
   };
 
   const handleCountryChange = (value) => {
-    setFormData((prev) => ({ ...prev, country: value.name }));
+    setFormData((prev) => ({ ...prev, country: value.alpha3 }));
   };
 
   const handleSubmit = (e) => {
@@ -134,7 +134,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        <div className="mt-4 grid w-full max-w-sm items-center gap-1.5">
+        <div className="mt-4 grid w-full  items-center gap-1.5">
           <Label htmlFor="phone">Teléfono</Label>
           <Input
             type="tel"
@@ -193,7 +193,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        <button type="submit" className="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-600">
+        <button type="submit" className="px-4 py-2 bg-amber-500 text-black font-semibold rounded hover:bg-amber-600">
           Enviar
         </button>
       </form>
