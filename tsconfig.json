@@ -28,7 +28,7 @@
     "**/*.ts",
     "**/*.tsx",
     "src/components/Recaptcha.js"
-  ],
+, "src/pages/profile/index.js"  ],
   "exclude": [
     "node_modules"
   ]
