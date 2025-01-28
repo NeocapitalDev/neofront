@@ -181,7 +181,7 @@ const ProfilePage = () => {
             <Label htmlFor="country">País</Label>
             <CountryDropdown
               placeholder="Elige un país"
-              defaultValue={data.country}
+              defaultValue={formData.country}
               onChange={handleCountryChange}
             />
           </div>
