@@ -14,33 +14,51 @@ const ProfilePage = () => {
     firstName: "",
     lastName: "",
     phone: "",
-    country: "", // Valor por defecto para el dropdown de país
+    country: "",
     city: "",
     street: "",
     zipCode: "",
   });
 
+  const [errors, setErrors] = useState({});
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleCountryChange = (value) => {
     setFormData((prev) => ({ ...prev, country: value.alpha3 }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Formulario enviado:", formData);
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.firstName) newErrors.firstName = "El nombre es requerido";
+    if (!formData.lastName) newErrors.lastName = "El apellido es requerido";
+    if (!formData.phone) newErrors.phone = "El teléfono es requerido";
+    if (!formData.country) newErrors.country = "El país es requerido";
+    if (!formData.city) newErrors.city = "La ciudad es requerida";
+    if (!formData.street) newErrors.street = "La calle es requerida";
+    if (!formData.zipCode) newErrors.zipCode = "El código postal es requerido";
+    return newErrors;
   };
 
-  const { data: session } = useSession(); // Obtenemos la sesión
-  const token = session?.jwt; // Extraemos el token JWT de la sesión
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+    } else {
+      console.log("Formulario enviado:", formData);
+    }
+  };
+
+  const { data: session } = useSession();
+  const token = session?.jwt;
 
   const { data, error, isLoading } = useStrapiData('users/me', token);
 
-
-  // Sincronizar datos iniciales con el formulario
   useEffect(() => {
     if (data) {
       setFormData({
@@ -54,6 +72,15 @@ const ProfilePage = () => {
       });
     }
   }, [data]);
+
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      const timer = setTimeout(() => {
+        setErrors({});
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [errors]);
 
   if (isLoading) {
     return (
@@ -151,6 +178,7 @@ const ProfilePage = () => {
               onChange={handleChange}
               placeholder="Ingrese su nombre"
             />
+            {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
           </div>
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="lastName">Apellido</Label>
@@ -162,18 +190,27 @@ const ProfilePage = () => {
               onChange={handleChange}
               placeholder="Ingrese su apellido"
             />
+            {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
           </div>
         </div>
 
-        <div className="mt-4 grid w-full  items-center gap-1.5">
+        <div className="mt-4 grid w-full items-center gap-1.5">
           <Label htmlFor="phone">Teléfono</Label>
           <Input
             type="tel"
             id="phone"
             name="phone"
             value={formData.phone}
-            onChange={handleChange}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                handleChange(e);
+              } else {
+                setErrors((prev) => ({ ...prev, phone: "Ingrese solo números" }));
+              }
+            }}
             placeholder="Ingrese su teléfono"/>
+          {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
         </div>
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -184,6 +221,7 @@ const ProfilePage = () => {
               defaultValue={formData.country}
               onChange={handleCountryChange}
             />
+            {errors.country && <p className="text-red-500 text-sm">{errors.country}</p>}
           </div>
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="city">Ciudad</Label>
@@ -195,6 +233,7 @@ const ProfilePage = () => {
               onChange={handleChange}
               placeholder="Ingrese su ciudad"
             />
+            {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
           </div>
         </div>
 
@@ -209,6 +248,7 @@ const ProfilePage = () => {
               onChange={handleChange}
               placeholder="Ingrese su calle"
             />
+            {errors.street && <p className="text-red-500 text-sm">{errors.street}</p>}
           </div>
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="zipCode">Código Postal</Label>
@@ -220,6 +260,7 @@ const ProfilePage = () => {
               onChange={handleChange}
               placeholder="Ingrese su código postal"
             />
+            {errors.zipCode && <p className="text-red-500 text-sm">{errors.zipCode}</p>}
           </div>
         </div>
 
@@ -227,9 +268,6 @@ const ProfilePage = () => {
           Enviar
         </button>
       </form>
-
-
-
     </Layout>
   );
 };
