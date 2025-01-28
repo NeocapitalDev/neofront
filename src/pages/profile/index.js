@@ -14,7 +14,7 @@ const ProfilePage = () => {
     firstName: "",
     lastName: "",
     phone: "",
-    country: "PER", // Valor por defecto para el dropdown de país
+    country: "", // Valor por defecto para el dropdown de país
     city: "",
     street: "",
     postalCode: "",
@@ -38,6 +38,8 @@ const ProfilePage = () => {
   const token = session?.jwt; // Extraemos el token JWT de la sesión
 
   const { data, error, isLoading } = useStrapiData('users/me', token);
+
+  console.log(data)
 
   if (isLoading) {
     return (
@@ -165,7 +167,7 @@ const ProfilePage = () => {
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="country">País</Label>
             <CountryDropdown
-              placeholder="Select country"
+              placeholder="Elige un país"
               defaultValue={formData.country}
               onChange={handleCountryChange}
             />
@@ -201,9 +203,9 @@ const ProfilePage = () => {
               type="text"
               id="postalCode"
               name="postalCode"
-              value={formData.postalCode}
+              value={formData.zipCode}
               onChange={handleChange}
-              placeholder={data.postalCode || "Código postal no disponible"}
+              placeholder={data.zipCode || "Código postal no disponible"}
             />
           </div>
         </div>
