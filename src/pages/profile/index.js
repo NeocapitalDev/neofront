@@ -261,7 +261,8 @@ const ProfilePage = () => {
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="country">País</Label>
+            {/* Campo País */}
+            <Label htmlFor="country">País</Label> 
             <CountryDropdown
               placeholder="Elige un país"
               defaultValue={formData.country}
@@ -275,6 +276,7 @@ const ProfilePage = () => {
             </div>
           </div>
           <div className="grid w-full items-center gap-1.5">
+            {/* Campo Ciudad */}
             <Label htmlFor="city">Ciudad</Label>
             <Input
               type="text"
