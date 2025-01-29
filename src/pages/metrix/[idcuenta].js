@@ -10,7 +10,7 @@ import Link from 'next/link'
 import Balance from "./balance"; // Importar el componente del gráfico
 import Stats from "./stats"; // Importar el componente del gráfico
 import WinLoss from "./winloss"; // Importar el componente del gráfico
-import BarraWinLose from "./barra_win_lose";
+// import BarraWinLose from "./barra_win_lose";
 import Objetivos from "./objetivos";
 
 
@@ -125,7 +125,7 @@ const Metrix = () => {
 
 
       {/* Barras win lose */}
-      <div className="mt-6 w-full max-w-[100%] md:max-w-[65%] lg:max-w-[66%]  justify-start items-start">
+      <div className="mt-6 w-full max-w-full md:max-w-2/3 lg:max-w-2/3 justify-start items-start">
         <WinLoss data={metricsData || {}} />
       </div>
 
