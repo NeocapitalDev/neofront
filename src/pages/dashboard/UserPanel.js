@@ -59,88 +59,96 @@ export default function Index() {
         }));
     };
 
-    // Agrupar desafíos por "step"
-    const challengesByStep = data.challenges.reduce((acc, challenge) => {
-        const step = challenge.step || "Sin categoría"; // Si no tiene step, agrupar en "Sin categoría"
-        if (!acc[step]) acc[step] = [];
-        acc[step].push(challenge);
-        return acc;
-    }, {});
+    // Definir los steps en orden fijo
+    const steps = [
+        { key: "one", label: "Estudiante" },
+        { key: "two", label: "Practicante" },
+        { key: "three", label: "Neotrader" },
+    ];
 
     return (
         <div>
-            {Object.entries(challengesByStep).map(([step, challenges]) => (
-                <div key={step}>
-                    {/* Título del Step */}
-                    <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">{step}</h2>
+            {steps.map(({ key, label }) => {
+                // Filtrar los desafíos que coincidan con el step actual
+                const challenges = data.challenges.filter(challenge => challenge.step === key);
 
-                    {/* Renderizar los desafíos de este step */}
-                    {challenges.map((challenge, index) => {
-                        const isVisible = visibility[challenge.id] ?? true;
+                if (challenges.length === 0) return null; // Si no hay desafíos en este step, no renderizar nada
 
-                        return (
-                            <div
-                                key={index}
-                                className="relative p-6 mb-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black"
-                            >
-                                <p className="text-sm font-bold text-zinc-800 mb-2 dark:text-zinc-200">
-                                    Login: {challenge.login}
-                                </p>
+                return (
+                    <div key={key}>
+                        {/* Título del Step */}
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">{label}</h2>
 
-                                {isVisible && (
-                                    <>
-                                        <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
-                                            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                Balance:{' '}
-                                                <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                    {challenge.balance}
-                                                </span>
-                                            </p>
-                                            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                Fin:{' '}
-                                                <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                    {challenge.endDate
-                                                        ? new Date(challenge.endDate).toLocaleDateString()
-                                                        : "No disponible"}
-                                                </span>
-                                            </p>
-                                            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                Resultado:{' '}
-                                                <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                    {challenge.result}
-                                                </span>
-                                            </p>
+                        {/* Renderizar los desafíos de este step */}
+                        {challenges.map((challenge, index) => {
+                            const isVisible = visibility[challenge.id] ?? true;
+
+                            return (
+                                <div
+                                    key={index}
+                                    className="relative p-6 mb-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black"
+                                >
+                                    <p className="text-sm font-bold text-zinc-800 mb-2 dark:text-zinc-200">
+                                        Login: {challenge.login}
+                                    </p>
+
+                                    {isVisible && (
+                                        <>
+                                            <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
+                                                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                    Balance:{' '}
+                                                    <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                        {challenge.balance}
+                                                    </span>
+                                                </p>
+                                                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                    Fin:{' '}
+                                                    <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                        {challenge.endDate
+                                                            ? new Date(challenge.endDate).toLocaleDateString()
+                                                            : "No disponible"}
+                                                    </span>
+                                                </p>
+                                                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                    Resultado:{' '}
+                                                    <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                        {challenge.result}
+                                                    </span>
+                                                </p>
+                                            </div>
+
+                                            <div className="mt-4 flex space-x-4">
+                                                <CredencialesModal {...challenge} />
+
+                                                <Link href={`/metrix/${challenge.documentId}`}>
+                                                    <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
+                                                        <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+                                                        <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
+                                                    </button>
+                                                </Link>
+                                            </div>
+                                        </>
+                                    )}
+
+                                    <div className="absolute bottom-6 right-6 flex items-center">
+                                        <div className="flex items-center space-x-2">
+                                            <Switch
+                                                id={`visible-mode-${index}`}
+                                                checked={isVisible}
+                                                onCheckedChange={() => toggleVisibility(challenge.id)}
+                                            />
+                                            <Label htmlFor={`visible-mode-${index}`}>Visible</Label>
                                         </div>
-
-                                        <div className="mt-4 flex space-x-4">
-                                            <CredencialesModal {...challenge} />
-
-                                            <Link href={`/metrix/${challenge.documentId}`}>
-                                                <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
-                                                    <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                                                    <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
-                                                </button>
-                                            </Link>
-                                        </div>
-                                    </>
-                                )}
-
-                                <div className="absolute bottom-6 right-6 flex items-center">
-                                    <div className="flex items-center space-x-2">
-                                        <Switch
-                                            id={`visible-mode-${index}`}
-                                            checked={isVisible}
-                                            onCheckedChange={() => toggleVisibility(challenge.id)}
-                                        />
-                                        <Label htmlFor={`visible-mode-${index}`}>Visible</Label>
                                     </div>
                                 </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            ))}
+                            );
+                        })}
+                    </div>
+                );
+            })}
         </div>
     );
 }
+
+
 
