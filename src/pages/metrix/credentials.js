@@ -25,7 +25,7 @@ export default function CredencialesModal({ login, password, server, platform })
         <div>
             {/* Botón para abrir el modal */}
             <button
-                className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 w-auto dark:bg-zinc-700 dark:hover:bg-zinc-600 dark:border-zinc-500"
+                className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md  bg-gray-200 hover:bg-gray-300 w-auto dark:bg-zinc-700 dark:hover:bg-zinc-600 dark:border-zinc-500"
                 onClick={() => setOpen(true)}
             >
                 <KeyIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
@@ -119,10 +119,10 @@ export default function CredencialesModal({ login, password, server, platform })
                                                                     {/* Botón de copiar */}
                                                                     <div className="flex items-center space-x-3">
                                                                         <button
-                                                                            className="p-2 bg-white rounded border hover:bg-gray-200 w-12 h-12 flex items-center justify-center"
+                                                                            className="p-2 bg-white dark:bg-zinc-700 rounded border dark:hover:bg-gray-500 hover:bg-gray-200 w-12 h-12 flex items-center justify-center"
                                                                             onClick={() => handleCopy(item.label, item.value)}
                                                                         >
-                                                                            <ClipboardDocumentIcon className="h-5 w-5 text-gray-600" />
+                                                                            <ClipboardDocumentIcon className="h-5 w-5 dark:text-gray-300 text-gray-600" />
                                                                         </button>
                                                                         <span className="text-sm text-gray-600 dark:text-white truncate">Copiar</span>
                                                                     </div>
@@ -135,8 +135,8 @@ export default function CredencialesModal({ login, password, server, platform })
                                                                     {/* Botón de cambio (solo para Contraseña) */}
                                                                     {item.label === 'Contraseña' && (
                                                                         <div className="flex items-center space-x-3">
-                                                                            <button className="p-2 border bg-white rounded hover:bg-gray-200 w-12 h-12 flex items-center justify-center">
-                                                                                <PencilIcon className="h-5 w-5 text-gray-600" />
+                                                                            <button className="p-2 border bg-white rounded dark:bg-zinc-700 dark:hover:bg-gray-500 hover:bg-gray-200 w-12 h-12 flex items-center justify-center">
+                                                                                <PencilIcon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
                                                                             </button>
                                                                             <span className="text-sm text-gray-600 dark:text-white truncate">Cambio</span>
                                                                         </div>
