@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import LogoGravatar from "../../components/LogoGravatar";
 import React, { useState, useEffect } from "react";
 import { CountryDropdown } from '@/components/ui/country-dropdown';
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
 const ProfilePage = () => {
   const [formData, setFormData] = useState({
@@ -149,7 +150,7 @@ const ProfilePage = () => {
           className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4"
         />
         <h1 className="text-3xl font-bold dark:text-white text-slate-700 mb-2">
-          {data.name || 'Nombre no disponible'}
+         @{data.username || "Username no disponible"}
         </h1>
         <p className="dark:text-white text-gray-400 text-sm mb-8">
           Fecha de creación:{" "}
@@ -159,16 +160,6 @@ const ProfilePage = () => {
         </p>
 
         <div className="w-full space-y-6 bg-gray-100 p-6 rounded-lg dark:bg-zinc-800">
-          <div className="flex flex-col md:flex-row items-center">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <label className="text-base font-semibold dark:text-white text-black">Username</label>
-            </div>
-            <div className="w-full md:w-3/4">
-              <p className="text-gray-700 dark:text-white">
-                {data.username || "Username no disponible"}
-              </p>
-            </div>
-          </div>
 
           <div className="flex flex-col md:flex-row items-center">
             <div className="w-full md:w-1/4 mb-2 md:mb-0">
@@ -189,9 +180,18 @@ const ProfilePage = () => {
                 Cuenta verificada
               </label>
             </div>
-            <div className="w-full md:w-3/4">
-              <p className="text-gray-700 dark:text-white">Sí</p>
+
+            <div className="w-full md:w-3/4 flex items-center space-x-2">
+              {data.isVerified ? (
+                <CheckCircleIcon className="w-6 h-6 text-green-500" />
+              ) : (
+                <XCircleIcon className="w-6 h-6 text-red-500" />
+              )}
+              <p className="text-gray-700 dark:text-white">
+                {data.isVerified ? "Verificado" : "No verificado"}
+              </p>
             </div>
+
           </div>
         </div>
       </div>

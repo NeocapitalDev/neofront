@@ -86,21 +86,28 @@ export default function Index() {
                         {isVisible && (
                             <>
                                 <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
-                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-300">
+
+                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                         Balance:{' '}
                                         <span className="font-bold text-slate-800 dark:text-slate-200">
                                             {challenge.balance}
                                         </span>
                                     </p>
-                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-300">
-                                        Día de Recompensa:{' '}
+                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                        Fin:{' '}
                                         <span className="font-bold text-slate-800 dark:text-slate-200">
-                                            {challenge.startDate}
+                                            {challenge.endDate
+                                                ? new Date(data.createdAt).toLocaleDateString()
+                                                : "No disponible"}
                                         </span>
                                     </p>
-                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-300">
-                                        Resultado: {challenge.result}
+                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                        Resultado:{' '}
+                                        <span className="font-bold text-slate-800 dark:text-slate-200">
+                                            {challenge.result}
+                                        </span>
                                     </p>
+
                                 </div>
 
                                 <div className="mt-4 flex space-x-4">
