@@ -29,32 +29,6 @@ const OrdersPage = () => {
             </Layout>
         );
     }
-
-    // Verificamos si los datos incluyen la propiedad `orders`
-
-    // const orders = [
-    //     {
-    //         products: "Curso de React Avanzado",
-    //         dateCreated: "2025-01-15T10:30:00Z",
-    //         total: 99.99,
-    //         idWoo: "123456",
-    //         statusOrder: "Completado",
-    //     },
-    //     {
-    //         products: "Membresía Premium",
-    //         dateCreated: "2025-01-20T14:45:00Z",
-    //         total: 49.99,
-    //         idWoo: "789012",
-    //         statusOrder: "Pendiente",
-    //     },
-    //     {
-    //         products: "E-book de Programación",
-    //         dateCreated: "2025-01-22T08:15:00Z",
-    //         total: 19.99,
-    //         idWoo: "345678",
-    //         statusOrder: "Cancelado",
-    //     },
-    // ];
     
     const orders = data?.orders || [];
 
