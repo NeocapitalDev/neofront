@@ -33,8 +33,22 @@ export default function Index() {
         ([url, token]) => fetcher(url, token)
     );
 
-    const [visibility, setVisibility] = useState({});
-
+    const [visibility, setVisibility] = useState(() => {
+        // Obtener valores del localStorage en la primera renderización
+        if (typeof window !== "undefined") {
+            const storedVisibility = localStorage.getItem("visibility");
+            return storedVisibility ? JSON.parse(storedVisibility) : {};
+        }
+        return {};
+    });
+    
+    useEffect(() => {
+        // Guardar los cambios en localStorage cada vez que visibility cambie
+        if (typeof window !== "undefined") {
+            localStorage.setItem("visibility", JSON.stringify(visibility));
+        }
+    }, [visibility]);
+    
     useEffect(() => {
         const storedVisibility = localStorage.getItem("visibility");
         if (storedVisibility) {
@@ -42,9 +56,6 @@ export default function Index() {
         }
     }, []);
 
-    useEffect(() => {
-        localStorage.setItem("visibility", JSON.stringify(visibility));
-    }, [visibility]);
 
     if (isLoading) return <Loader />;
     if (error) return <p className="text-center text-red-500">Error al cargar los datos: {error.message}</p>;
