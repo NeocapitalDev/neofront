@@ -1,41 +1,38 @@
 import React, { useEffect, useState } from 'react';
 
 const Recaptcha = ({ onVerify }) => {
-    const [isLoaded, setIsLoaded] = useState(false);  // Estado para controlar si el CAPTCHA ha sido cargado.
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        if (isLoaded) return;  // Si ya está cargado, no hacemos nada más.
+        if (isLoaded) return;
 
         const loadTurnstile = () => {
-            // Verificamos si Turnstile ya está disponible
             if (window.turnstile) {
-                // Si Turnstile ya está disponible, lo renderizamos con el tema oscuro
                 window.turnstile.render('#turnstile-container', {
                     sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
                     callback: (token) => {
                         onVerify(token);
                     },
-                    theme: 'dark', // Establecemos el tema a "dark"
+                    theme: 'dark',
                 });
-                setIsLoaded(true); // Marcamos que ya se cargó el CAPTCHA
+                setIsLoaded(true);
             }
         };
 
-        // Verificamos si el script está cargado en el navegador
         const scriptExists = document.querySelector('script[src="https://challenges.cloudflare.com/turnstile/v0/api.js"]');
         if (!scriptExists) {
             const script = document.createElement('script');
             script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
             script.async = true;
             script.defer = true;
-            script.onload = loadTurnstile;  // Cuando cargue el script, ejecutamos loadTurnstile.
+            script.onload = loadTurnstile;
             document.head.appendChild(script);
         } else {
-            loadTurnstile();  // Si el script ya está presente, lo cargamos directamente
+            loadTurnstile();
         }
-    }, [isLoaded, onVerify]);  // El efecto solo se ejecuta si isLoaded cambia.
+    }, [isLoaded, onVerify]);
 
-    return <div id="turnstile-container"></div>;
+    return <div id="turnstile-container" className="my-4"></div>;
 };
 
 export default Recaptcha;

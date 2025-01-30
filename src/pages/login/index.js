@@ -1,21 +1,22 @@
-import { useState } from "react";
-import { toast } from "sonner";
-import { useRouter } from "next/router";
-import { signIn } from "next-auth/react";
-import Layout from "../../components/layout/auth";
-import Recaptcha from "../../components/Recaptcha";
-import Link from "next/link";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { useRouter } from 'next/router';
+import { signIn } from 'next-auth/react';
+import Layout from '../../components/layout/auth';
+import Recaptcha from '../../components/Recaptcha';
+import Link from 'next/link';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 export default function SignIn() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [captchaToken, setCaptchaToken] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleCaptcha = (token) => {
+    console.log('CAPTCHA Token recibido:', token);
     setCaptchaToken(token);
   };
 
@@ -23,28 +24,34 @@ export default function SignIn() {
     e.preventDefault();
 
     if (!captchaToken) {
-      toast.error("Por favor, completa el CAPTCHA.");
+      toast.error('Por favor, completa el CAPTCHA.');
       return;
     }
 
     setIsSubmitting(true);
 
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-      captchaToken,
-    });
+    try {
+      const result = await signIn('credentials', {
+        redirect: false,
+        email,
+        password,
+        captchaToken,
+      });
 
-    if (result?.ok) {
-      toast.success("Sesión iniciada correctamente.");
-      setTimeout(() => {
-        const callbackUrl =
-          new URLSearchParams(window.location.search).get("callbackUrl") || "/";
-        router.replace(callbackUrl);
-      }, 1000); // Redirección con un retraso de 1 segundo
-    } else {
-      toast.error("Credenciales incorrectas o CAPTCHA no válido.");
+      if (result?.ok) {
+        toast.success('Sesión iniciada correctamente.');
+        setTimeout(() => {
+          const callbackUrl =
+            new URLSearchParams(window.location.search).get('callbackUrl') || '/';
+          router.replace(callbackUrl);
+        }, 500);
+      } else {
+        toast.error('Credenciales incorrectas o CAPTCHA no válido.');
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      toast.error('Ocurrió un error inesperado. Inténtalo de nuevo.');
       setIsSubmitting(false);
     }
   };
@@ -74,7 +81,7 @@ export default function SignIn() {
                 autoComplete="email"
                 placeholder="tu@ejemplo.com"
                 required
-                className="block w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:focus:ring-amber-500 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
               />
             </div>
           </div>
@@ -100,13 +107,13 @@ export default function SignIn() {
               <input
                 id="password"
                 name="password"
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 minLength={6}
                 required
-                className="block w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:focus:ring-amber-500 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
               />
               <button
                 type="button"
@@ -128,13 +135,13 @@ export default function SignIn() {
             <button
               type="submit"
               disabled={isSubmitting || !captchaToken}
-              className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 ${
+              className={`dark:text-black text-zinc-900 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 ${
                 isSubmitting || !captchaToken
-                  ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed"
-                  : "bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400"
+                  ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'
+                  : 'bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400'
               }`}
             >
-              {isSubmitting ? "Ingresando..." : "Ingresar"}
+              {isSubmitting ? 'Ingresando...' : 'Ingresar'}
             </button>
           </div>
         </form>
