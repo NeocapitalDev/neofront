@@ -4,7 +4,7 @@ import Loader from '../../components/loaders/loader';
 import { useStrapiData } from '../../services/strapiServiceJWT';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { DocumentTextIcon } from '@heroicons/react/24/outline';
-import { WithdrawalsTable } from '../admin/withdrawals/withdrawls';
+import { WithdrawalsTable } from '../admin/withdrawals/index';
 
 const OrdersPage = () => {
     const { data: session } = useSession(); // Obtenemos la sesión
