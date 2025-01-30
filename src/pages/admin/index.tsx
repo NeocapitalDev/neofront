@@ -1,4 +1,8 @@
-import { AppSidebar } from "@/components/dash/app-sidebar"
+"use client";
+
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,15 +10,19 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcumb"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/breadcumb";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebard"
+} from "@/components/ui/sidebard";
+import { AppSidebar } from "@/components/dash/app-sidebar";
 
 export default function Page() {
+  const pathname = usePathname(); // Obtiene la URL actual
+  const segments = pathname.split("/").filter(Boolean); // Divide en segmentos
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -25,15 +33,27 @@ export default function Page() {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
+                {segments.map((segment, index) => {
+                  const href = `/${segments.slice(0, index + 1).join("/")}`;
+                  const isLast = index === segments.length - 1;
+                  const formattedSegment =
+                    segment.charAt(0).toUpperCase() + segment.slice(1); // Capitaliza
+
+                  return (
+                    <BreadcrumbItem key={href}>
+                      {isLast ? (
+                        <BreadcrumbPage>{formattedSegment}</BreadcrumbPage>
+                      ) : (
+                        <>
+                          <BreadcrumbLink asChild>
+                            <Link href={href}>{formattedSegment}</Link>
+                          </BreadcrumbLink>
+                          <BreadcrumbSeparator />
+                        </>
+                      )}
+                    </BreadcrumbItem>
+                  );
+                })}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
@@ -48,5 +68,5 @@ export default function Page() {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }
