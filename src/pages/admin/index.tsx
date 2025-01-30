@@ -16,7 +16,7 @@ import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebard";
+} from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dash/app-sidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

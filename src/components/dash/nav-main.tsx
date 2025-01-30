@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation"; // Importar usePathname
 import { ChevronRight, type LucideIcon } from "lucide-react";
 
 import {
@@ -17,7 +18,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebard";
+} from "@/components/ui/sidebar";
 
 export function NavMain({
   items,
@@ -33,6 +34,8 @@ export function NavMain({
     }[];
   }[];
 }) {
+  const pathname = usePathname(); // Obtener la URL actual
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -46,13 +49,20 @@ export function NavMain({
           >
             <SidebarMenuItem>
               <div className="flex w-full">
-                {/* 🔹 Enlace principal con Link */}
-                <Link href={item.url} className="flex-grow">
+                {/* 🔹 Enlace principal con validación */}
+                {pathname !== item.url ? (
+                  <Link href={item.url} className="flex-grow">
+                    <SidebarMenuButton tooltip={item.title}>
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  </Link>
+                ) : (
                   <SidebarMenuButton tooltip={item.title}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                   </SidebarMenuButton>
-                </Link>
+                )}
 
                 {/* 🔹 Botón para desplegar el submenú (si hay items) */}
                 {item.items && item.items.length > 0 && (
@@ -70,11 +80,17 @@ export function NavMain({
                   <SidebarMenuSub>
                     {item.items.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
-                          <Link href={subItem.url}>
+                        {pathname !== subItem.url ? (
+                          <SidebarMenuSubButton asChild>
+                            <Link href={subItem.url}>
+                              <span>{subItem.title}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        ) : (
+                          <SidebarMenuSubButton>
                             <span>{subItem.title}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
+                          </SidebarMenuSubButton>
+                        )}
                       </SidebarMenuSubItem>
                     ))}
                   </SidebarMenuSub>
