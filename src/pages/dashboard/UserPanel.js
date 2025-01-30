@@ -26,6 +26,7 @@ const fetcher = async (url, token) => {
 
 export default function Index() {
     const { data: session } = useSession();
+    console.log(useSession());
     const { data, error, isLoading } = useSWR(
         session?.jwt
             ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate=challenges`, session.jwt]
