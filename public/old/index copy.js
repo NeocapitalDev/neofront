@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import Layout from '../../components/layout/dashboard';
-import User from '../../pages/profile/User';
+import Layout from '../../src/components/layout/dashboard';
+import User from '../../src/pages/profile/User';
 import Link from 'next/link';
 import { UserIcon } from '@heroicons/react/24/outline';
 

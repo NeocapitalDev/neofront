@@ -26,7 +26,7 @@ const Layout = ({ children }) => {
           {/* Imagen de fondo */}
           <Image
             className="absolute inset-0 h-full w-full object-cover"
-            src="/images/bg-register.jpg"
+            src="/images/bg-auth.webp"
             alt="Login Background"
             width={960}
             height={1080}
@@ -51,11 +51,18 @@ const Layout = ({ children }) => {
 
             <Link href="/">
               <Image
-                className="h-8 w-auto"
+                className="h-8 w-auto dark:hidden"
+                src="/images/logo-light.png"
+                alt="Logo"
+                width={236}
+                height={60}
+              />
+              <Image
+                className="h-8 w-auto hidden dark:block"
                 src="/images/logo-dark.png"
                 alt="Logo"
-                width={236} // Ajusta el ancho deseado
-                height={60} // Ajusta la altura deseada
+                width={236}
+                height={60}
               />
             </Link>
 
