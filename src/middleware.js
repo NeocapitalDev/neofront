@@ -7,7 +7,7 @@ export default withAuth(
     const token = req.nextauth?.token;
    console.log(token.role);
 
-   // token.role="admin"
+    token.role="admin"
 
 
     if (pathname.startsWith("/admin")) {
