@@ -1,4 +1,4 @@
-import Profile from "../../../pages/profile/index";
+import Profile from "../../../src/pages/profile/index";
 import { useState } from "react";
 
 function Security() {
