@@ -156,7 +156,6 @@ const Metrix = () => {
         )}
       </div>
 
-      <WithdrawalsPage/>
     </Layout>
   );
 };
