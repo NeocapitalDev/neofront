@@ -1,101 +1,111 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import { Table, TableHead, TableRow, TableCell, TableBody } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import DashboardLayout from "..";
 
-const Input = ({ value, onChange, placeholder }) => (
-  <input
-    type="text"
-    value={value}
-    onChange={onChange}
-    placeholder={placeholder}
-    className="px-4 py-2 border rounded-md w-full dark:bg-zinc-700 dark:text-white"
-  />
-);
+const withdrawalsData = [
+  { id: "1", user: "John Doe", amount: 100, status: "Completed", date: "2025-01-28" },
+  { id: "2", user: "Jane Smith", amount: 200, status: "Pending", date: "2025-01-29" },
+  { id: "3", user: "Mike Ross", amount: 150, status: "Rejected", date: "2025-01-27" },
+];
 
-const Button = ({ children, onClick, className = "" }) => (
-  <button
-    onClick={onClick}
-    className={`px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition ${className}`}
-  >
-    {children}
-  </button>
-);
+export default function WithdrawalsTable() {
+  const [search, setSearch] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [filteredData, setFilteredData] = useState(withdrawalsData);
 
-export default function WithdrawalsTable({ data = [] }) {
-  const [filter, setFilter] = useState({ status: "", amount: "" });
-  const [filteredData, setFilteredData] = useState(data);
+  const statuses = ["All", "Completed", "Pending", "Rejected"];
 
-  // Sincronizar el estado inicial
   useEffect(() => {
-    setFilteredData(data);
-  }, [data]);
-
-  const applyFilters = (status) => {
-    const newFilteredData = data.filter(
+    const filtered = withdrawalsData.filter(
       (item) =>
-        (status === "" || item.status === status) &&
-        (filter.amount === "" || item.amount.toString().includes(filter.amount))
+        (search === "" || item.user.toLowerCase().includes(search.toLowerCase())) &&
+        (selectedStatus === "All" || item.status === selectedStatus)
     );
-    setFilteredData(newFilteredData);
-    setFilter({ ...filter, status });
-  };
+    setFilteredData(filtered);
+  }, [search, selectedStatus]);
 
   return (
     <DashboardLayout>
-      <div className="p-8 mt-5 bg-white dark:bg-zinc-800 rounded-lg shadow-lg">
-        <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
-          <div className="flex space-x-4">
-            {["Pending", "Completed", "Rejected"].map((status) => (
-              <Button
-                key={status}
-                onClick={() => applyFilters(status)}
-                className={filter.status === status ? "bg-gray-800 text-white" : "bg-gray-200 dark:bg-gray-700"}
-              >
-                {status}
-              </Button>
-            ))}
-          </div>
+      <div className="p-8 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
+        <div className="flex items-center gap-4 mb-6">
+          {/* Search Bar */}
           <Input
-            placeholder="Filtrar por monto"
-            value={filter.amount}
-            onChange={(e) => setFilter({ ...filter, amount: e.target.value })}
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-1/3 bg-zinc-800 text-zinc-200 border-zinc-700"
           />
-          <Button onClick={() => applyFilters("")} className="bg-red-500 text-white">
-            Reset
-          </Button>
+
+          {/* Dropdown for Status */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="bg-zinc-800 hover:bg-zinc-600 text-zinc-200 border-zinc-700">
+                {selectedStatus} ▼
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-zinc-800 text-zinc-200">
+              {statuses.map((status) => (
+                <DropdownMenuItem
+                  key={status}
+                  onClick={() => setSelectedStatus(status)}
+                  className={`${
+                    selectedStatus === status ? "bg-zinc-700" : ""
+                  } hover:bg-zinc-700`}
+                >
+                  {status}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse table-fixed rounded-lg overflow-hidden">
-            <thead className="bg-gray-200 dark:bg-gray-700">
-              <tr>
-                <th className="py-4 px-6 font-semibold text-center w-1/3">Usuario</th>
-                <th className="py-4 px-6 font-semibold text-center w-1/3">Estado</th>
-                <th className="py-4 px-6 font-semibold text-center w-1/3">Monto</th>
-              </tr>
-            </thead>
-            <tbody>
+
+        {/* Table */}
+        <div className="rounded-md border border-zinc-700 overflow-hidden">
+          <Table>
+            <TableHeader className="bg-zinc-800">
+              <TableRow>
+                <TableHead className="text-zinc-200 border-b border-zinc-700">User</TableHead>
+                <TableHead className="text-zinc-200 border-b border-zinc-700">Amount</TableHead>
+                <TableHead className="text-zinc-200 border-b border-zinc-700">Status</TableHead>
+                <TableHead className="text-zinc-200 border-b border-zinc-700">Date</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {filteredData.length > 0 ? (
-                filteredData.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="hover:bg-gray-100 dark:hover:bg-gray-600 transition divide-x divide-gray-200 dark:divide-gray-700"
-                  >
-                    <td className="py-4 px-6 text-center w-1/3 truncate">{item.user}</td>
-                    <td className="py-4 px-6 font-medium capitalize text-center w-1/3 truncate">{item.status}</td>
-                    <td className="py-4 px-6 font-bold text-green-500 dark:text-green-400 text-center w-1/3 truncate">
-                      ${item.amount}
-                    </td>
-                  </tr>
+                filteredData.map((item) => (
+                  <TableRow key={item.id} className="border-b border-zinc-700">
+                    <TableCell className="text-zinc-200">{item.user}</TableCell>
+                    <TableCell className="text-zinc-200">${item.amount}</TableCell>
+                    <TableCell className="text-zinc-200">{item.status}</TableCell>
+                    <TableCell className="text-zinc-200">{item.date}</TableCell>
+                  </TableRow>
                 ))
               ) : (
-                <tr>
-                  <td colSpan={3} className="py-4 px-6 text-center">
-                    No hay datos disponibles
-                  </td>
-                </tr>
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-zinc-500 py-6">
+                    No results found. Try searching or filtering for a different term.
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </DashboardLayout>
