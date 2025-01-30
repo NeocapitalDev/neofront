@@ -1,8 +1,8 @@
 // pages/withdrawals.js
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Layout from '../../components/layout/dashboard';
-import Loader from '../../components/loaders/loader';
+import Layout from '../../../components/layout/dashboard';
+import Loader from '../../../components/loaders/loader';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
 
 export default function WithdrawalsPage() {

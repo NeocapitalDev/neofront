@@ -12,7 +12,7 @@ import Stats from "./stats"; // Importar el componente del gráfico
 import WinLoss from "./winloss"; // Importar el componente del gráfico
 // import BarraWinLose from "./barra_win_lose";
 import Objetivos from "./objetivos";
-import WithdrawalsPage from "../withdrawals/withdrawls";
+import WithdrawalsPage from "../admin/withdrawals/withdrawls";
 
 
 const fetcher = (url) =>
