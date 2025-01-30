@@ -66,8 +66,8 @@ const data = {
 
     },
     {
-      title: "Retiros",
-      url: "/admin/retiros", // URL para la página de Retiros
+      title: "Withdrawals",
+      url: "/admin/withdrawals", // URL para la página de Retiros
       icon: UserCheck, // Icono que representa a "Retiros"
       isActive: false,
 
