@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/router';
 import { signIn } from 'next-auth/react';
 import Layout from '../../components/layout/auth';
-import Recaptcha from '../../components/Recaptcha';  // Importar el componente de Recaptcha
+import Recaptcha from '../../components/Recaptcha';  
 import Link from 'next/link';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 

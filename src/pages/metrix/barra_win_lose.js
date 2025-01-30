@@ -26,24 +26,38 @@ export default function BarraWinLose({ data }) {
 
   return (
     <div className="p-2 bg-white shadow-md dark:bg-[#0A0A0A]">
-      <div className="w-full mx-auto bg-gray-200 rounded-full dark:bg-gray-700 h-6 relative">
+      <div className="w-full mx-auto bg-gray-200 rounded-full dark:bg-gray-700 h-6 relative overflow-hidden">
         {/* Porcentaje y cantidad de Wins */}
-        <div
-          className="absolute top-0 left-0 h-full bg-amber-600 rounded-l-xl text-xs font-medium text-center text-blue-100 flex items-center justify-center"
-          style={{ width: `${metrics.wonTradesPercent}%` }}
-        >
-          ${metrics.averageWin.toLocaleString()} 
-        </div>
+        {metrics.wonTradesPercent > 0 && (
+          <div
+            className="absolute top-0 left-0 h-full bg-amber-600 text-xs font-medium text-center text-blue-100 flex items-center justify-center"
+            style={{
+              width: `${metrics.wonTradesPercent}%`,
+              borderTopRightRadius:
+                metrics.wonTradesPercent === 100 ? "0" : "9999px",
+              borderBottomRightRadius:
+                metrics.wonTradesPercent === 100 ? "0" : "9999px",
+            }}
+          >
+            {`$${metrics.averageWin.toLocaleString()}`}
+          </div>
+        )}
         {/* Porcentaje y cantidad de Losses */}
-        <div
-          className="absolute top-0 h-full bg-red-600 rounded-r-full text-xs font-medium text-center text-red-100 flex items-center justify-center"
-          style={{
-            left: `${metrics.wonTradesPercent}%`,
-            width: `${metrics.lostTradesPercent}%`,
-          }}
-        >
-          ${metrics.averageLoss.toLocaleString()} 
-        </div>
+        {metrics.lostTradesPercent > 0 && (
+          <div
+            className="absolute top-0 h-full bg-red-600 text-xs font-medium text-center text-red-100 flex items-center justify-center"
+            style={{
+              left: `${metrics.wonTradesPercent}%`,
+              width: `${metrics.lostTradesPercent}%`,
+              borderTopLeftRadius:
+                metrics.lostTradesPercent === 100 ? "0" : "9999px",
+              borderBottomLeftRadius:
+                metrics.lostTradesPercent === 100 ? "0" : "9999px",
+            }}
+          >
+            {`$${metrics.averageLoss.toLocaleString()}`}
+          </div>
+        )}
       </div>
     </div>
   );
