@@ -49,22 +49,37 @@ export function NavMain({
           >
             <SidebarMenuItem>
               <div className="flex w-full">
-                {/* 🔹 Enlace principal con validación */}
-                {pathname !== item.url ? (
+
+
+
+                {pathname == item.url ? (
+
+                  <div className="flex-grow">
+
+                    <SidebarMenuButton tooltip={item.title}>
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+
+
+                  </div>
+
+
+                ) : (
+
+
                   <Link href={item.url} className="flex-grow">
                     <SidebarMenuButton tooltip={item.title}>
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
                     </SidebarMenuButton>
                   </Link>
-                ) : (
-                  <SidebarMenuButton tooltip={item.title}>
-                    {item.icon && <item.icon />}
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
+
                 )}
 
-                {/* 🔹 Botón para desplegar el submenú (si hay items) */}
+
+
+
                 {item.items && item.items.length > 0 && (
                   <CollapsibleTrigger asChild>
                     <button className="p-2">
@@ -72,6 +87,9 @@ export function NavMain({
                     </button>
                   </CollapsibleTrigger>
                 )}
+
+
+
               </div>
 
               {/* 🔹 Submenú */}
