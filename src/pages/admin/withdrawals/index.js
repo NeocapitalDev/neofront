@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, TableHead, TableRow, TableCell, TableBody } from "@/components/ui/table";
+import DashboardLayout from "..";
 
 const Input = ({ value, onChange, placeholder }) => (
   <input
@@ -20,60 +21,83 @@ const Button = ({ children, onClick, className = "" }) => (
   </button>
 );
 
-export function WithdrawalsTable({ data }) {
+export default function WithdrawalsTable({ data = [] }) {
   const [filter, setFilter] = useState({ status: "", amount: "" });
   const [filteredData, setFilteredData] = useState(data);
 
+  // Sincronizar el estado inicial
+  useEffect(() => {
+    setFilteredData(data);
+  }, [data]);
+
   const applyFilters = (status) => {
-    const newFilteredData = data.filter((item) =>
-      (status === "" || item.status === status) &&
-      (filter.amount === "" || item.amount.toString().includes(filter.amount))
+    const newFilteredData = data.filter(
+      (item) =>
+        (status === "" || item.status === status) &&
+        (filter.amount === "" || item.amount.toString().includes(filter.amount))
     );
     setFilteredData(newFilteredData);
     setFilter({ ...filter, status });
   };
 
   return (
-    <div className="p-8 mt-5 bg-white dark:bg-zinc-800 rounded-lg shadow-lg space-y-8">
-      <div className="flex flex-col md:flex-row items-center gap-6">
-        <div className="flex space-x-4">
-          {["Pending", "Completed", "Rejected"].map((status) => (
-            <Button 
-              key={status} 
-              onClick={() => applyFilters(status)} 
-              className={filter.status === status ? "bg-gray-800 text-white" : "bg-gray-200 dark:bg-gray-700"}
-            >
-              {status}
-            </Button>
-          ))}
-        </div>
-        <Input
-          placeholder="Filtrar por monto"
-          value={filter.amount}
-          onChange={(e) => setFilter({ ...filter, amount: e.target.value })}
-        />
-        <Button onClick={() => applyFilters("")} className="bg-red-500 text-white">Reset</Button>
-      </div>
-      <div className="overflow-x-auto">
-        <Table className="w-full border-collapse rounded-lg overflow-hidden">
-          <TableHead className="bg-gray-200 dark:bg-gray-700 text-left">
-            <TableRow>
-              <TableCell className="py-3 px-28 font-semibold text-center">Usuario</TableCell>
-              <TableCell className="py-3 px-28 font-semibold text-center">Estado</TableCell>
-              <TableCell className="py-3 px-28 font-semibold text-center">Monto</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredData.map((item, index) => (
-              <TableRow key={index} className="hover:bg-gray-100 dark:hover:bg-gray-600 transition">
-                <TableCell className="py-6 px-28 text-center">{item.user}</TableCell>
-                <TableCell className="py-6 px-28 font-medium capitalize text-center">{item.status}</TableCell>
-                <TableCell className="py-6 px-28 font-bold text-green-500 dark:text-green-400 text-center">${item.amount}</TableCell>
-              </TableRow>
+    <DashboardLayout>
+      <div className="p-8 mt-5 bg-white dark:bg-zinc-800 rounded-lg shadow-lg">
+        <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
+          <div className="flex space-x-4">
+            {["Pending", "Completed", "Rejected"].map((status) => (
+              <Button
+                key={status}
+                onClick={() => applyFilters(status)}
+                className={filter.status === status ? "bg-gray-800 text-white" : "bg-gray-200 dark:bg-gray-700"}
+              >
+                {status}
+              </Button>
             ))}
-          </TableBody>
-        </Table>
+          </div>
+          <Input
+            placeholder="Filtrar por monto"
+            value={filter.amount}
+            onChange={(e) => setFilter({ ...filter, amount: e.target.value })}
+          />
+          <Button onClick={() => applyFilters("")} className="bg-red-500 text-white">
+            Reset
+          </Button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse table-fixed rounded-lg overflow-hidden">
+            <thead className="bg-gray-200 dark:bg-gray-700">
+              <tr>
+                <th className="py-4 px-6 font-semibold text-center w-1/3">Usuario</th>
+                <th className="py-4 px-6 font-semibold text-center w-1/3">Estado</th>
+                <th className="py-4 px-6 font-semibold text-center w-1/3">Monto</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData.length > 0 ? (
+                filteredData.map((item, index) => (
+                  <tr
+                    key={index}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-600 transition divide-x divide-gray-200 dark:divide-gray-700"
+                  >
+                    <td className="py-4 px-6 text-center w-1/3 truncate">{item.user}</td>
+                    <td className="py-4 px-6 font-medium capitalize text-center w-1/3 truncate">{item.status}</td>
+                    <td className="py-4 px-6 font-bold text-green-500 dark:text-green-400 text-center w-1/3 truncate">
+                      ${item.amount}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} className="py-4 px-6 text-center">
+                    No hay datos disponibles
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

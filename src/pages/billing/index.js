@@ -81,7 +81,6 @@ const OrdersPage = () => {
                         )}
                     </TableBody>
                 </Table>
-                <WithdrawalsTable data={orders} />
             </div>
             
         </Layout>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -19,8 +20,14 @@ import {
 import { AppSidebar } from "@/components/dash/app-sidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname(); // Obtiene la URL actual
-  const segments = pathname.split("/").filter(Boolean); // Divide en segmentos
+  const pathname = usePathname();
+  const [segments, setSegments] = useState<string[]>([]);
+
+  // Generar los segmentos solo en el cliente
+  useEffect(() => {
+    const pathSegments = pathname.split("/").filter(Boolean);
+    setSegments(pathSegments);
+  }, [pathname]);
 
   return (
     <SidebarProvider>
@@ -58,10 +65,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        {/* 🔹 Aquí renderiza el contenido de las páginas hijas */}
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          {children}
-        </div>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
