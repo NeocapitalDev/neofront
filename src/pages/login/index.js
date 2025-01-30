@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/router';
 import { signIn } from 'next-auth/react';
 import Layout from '../../components/layout/auth';
-import Recaptcha from '../../components/Recaptcha';
+import Recaptcha from '../../components/Recaptcha';  // Importar el componente de Recaptcha
 import Link from 'next/link';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
@@ -16,7 +16,7 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleCaptcha = (token) => {
-    console.log('CAPTCHA Token recibido:', token);
+    console.log("Token del CAPTCHA:", token);
     setCaptchaToken(token);
   };
 
@@ -30,28 +30,21 @@ export default function SignIn() {
 
     setIsSubmitting(true);
 
-    try {
-      const result = await signIn('credentials', {
-        redirect: false,
-        email,
-        password,
-        captchaToken,
-      });
+    const result = await signIn('credentials', {
+      redirect: false,
+      email,
+      password,
+      captchaToken,
+    });
 
-      if (result?.ok) {
-        toast.success('Sesión iniciada correctamente.');
-        setTimeout(() => {
-          const callbackUrl =
-            new URLSearchParams(window.location.search).get('callbackUrl') || '/';
-          router.replace(callbackUrl);
-        }, 500);
-      } else {
-        toast.error('Credenciales incorrectas o CAPTCHA no válido.');
-        setIsSubmitting(false);
-      }
-    } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-      toast.error('Ocurrió un error inesperado. Inténtalo de nuevo.');
+    if (result?.ok) {
+      toast.success('Sesión iniciada correctamente.');
+      setTimeout(() => {
+        const callbackUrl = new URLSearchParams(window.location.search).get('callbackUrl') || '/';
+        router.replace(callbackUrl);
+      }, 500);
+    } else {
+      toast.error('Credenciales incorrectas o CAPTCHA no válido.');
       setIsSubmitting(false);
     }
   };
@@ -65,10 +58,7 @@ export default function SignIn() {
       <div className="mt-8">
         <form className="space-y-6" onSubmit={onSubmit}>
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300"
-            >
+            <label htmlFor="email" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">
               Correo electrónico
             </label>
             <div className="mt-2">
@@ -88,17 +78,11 @@ export default function SignIn() {
 
           <div>
             <div className="flex items-center justify-between">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300"
-              >
+              <label htmlFor="password" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">
                 Contraseña
               </label>
               <div className="text-sm">
-                <Link
-                  href="/forgot-password"
-                  className="leading-6 text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300"
-                >
+                <Link href="/forgot-password" className="leading-6 text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300">
                   ¿Has olvidado tu contraseña?
                 </Link>
               </div>
@@ -135,16 +119,21 @@ export default function SignIn() {
             <button
               type="submit"
               disabled={isSubmitting || !captchaToken}
-              className={`dark:text-black text-zinc-900 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 ${
-                isSubmitting || !captchaToken
-                  ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'
-                  : 'bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400'
-              }`}
+              className={`dark:text-black text-zinc-900 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400  ${isSubmitting || !captchaToken ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed" : "bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400"}`}
             >
               {isSubmitting ? 'Ingresando...' : 'Ingresar'}
             </button>
           </div>
         </form>
+
+{/* 
+        <p className="mt-10 text-sm text-center leading-6 text-zinc-900 font-medium dark:text-gray-400">
+      ¿No tienes una cuenta?{" "}
+      <Link href="/register" className="font-semibold leading-6 text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300">
+        Regístrate ahora
+      </Link>
+    </p> */}
+
       </div>
     </Layout>
   );
