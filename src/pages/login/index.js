@@ -16,7 +16,6 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleCaptcha = (token) => {
-    console.log("Token del CAPTCHA:", token);
     setCaptchaToken(token);
   };
 
