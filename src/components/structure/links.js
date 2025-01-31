@@ -11,7 +11,6 @@ export const navigation = [
     
 ];
 
-
 export const userNavigation = [
     { name: 'Tu perfil', href: '/profile' },
     { name: 'Facturación', href: '/billing'},
@@ -19,7 +18,11 @@ export const userNavigation = [
 ];
 
 // Puedes colocar esta constante en un archivo de configuración o en el mismo componente
-
 export const principalButton = [
     { name: 'Nuevo desafío NEO', href: 'https://neocapitalfunding.com/desafio-neo/' }
+];
+
+export const FooterNav = [
+    { name: 'Política de Privacidad', href: 'https://neocapitalfunding.com/privacy-policy/' },
+    { name: 'Términos y Condiciones', href: 'https://neocapitalfunding.com/terms-of-service/' }
 ];

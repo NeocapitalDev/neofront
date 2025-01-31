@@ -8,8 +8,11 @@ import LogoGravatar from "../../components/LogoGravatar";
 import React, { useState, useEffect } from "react";
 
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import useSWR, { mutate } from "swr";
 
 const ProfilePage = () => {
+
+  
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -31,6 +34,16 @@ const ProfilePage = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+
+  const { data: session } = useSession();
+  const token = session?.jwt;
+
+  const { data, error: fetchError, isLoading } = useStrapiData('users/me', token);
+
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,35 +76,62 @@ const ProfilePage = () => {
     setFormData((prev) => ({ ...prev, country: value.alpha3 }));
   };
 
-  const handleSubmit = (e) => {
+
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { firstName, lastName, phone, country, city, street, zipCode } = formData;
-
-    if (!firstName || !lastName || !phone || !country || !city || !street || !zipCode) {
-      setError((prev) => ({ ...prev, form: "Todos los campos son obligatorios." }));
-      setTimeout(() => setError((prev) => ({ ...prev, form: "" })), 2000);
-      return;
+  
+    console.log("Datos enviados a Strapi:", JSON.stringify(formData, null, 2));
+  
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/101`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          data: {  // Strapi espera los datos dentro de un objeto `data`
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            phone: formData.phone,
+            country: formData.country,
+            city: formData.city,
+            street: formData.street,
+            zipCode: formData.zipCode,
+          }
+        }),
+        
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error en la respuesta de Strapi:", errorData);
+  
+        throw new Error(`Error ${response.status} - ${errorData?.error?.message || "Error desconocido"}`);
+      }
+  
+      const updatedData = await response.json();
+      console.log("Respuesta de Strapi:", updatedData);
+  
+      setSuccess("Datos actualizados correctamente.");
+      setTimeout(() => setSuccess(""), 3000);
+  
+   
+ 
+  
+    } catch (error) {
+      console.error("Error en handleSubmit:", error);
+      setErrors({ form: error.message });
+      setTimeout(() => setErrors({ form: "" }), 3000);
+    } finally {
+      setLoading(false);
     }
-
-    if (!/^\d+$/.test(phone)) {
-      setError((prev) => ({ ...prev, phone: "El teléfono solo debe contener números." }));
-      setTimeout(() => setError((prev) => ({ ...prev, phone: "" })), 2000);
-      return;
-    }
-
-    if (firstName.length > 50 || lastName.length > 50 || city.length > 50 || street.length > 50 || zipCode.length > 10) {
-      setError((prev) => ({ ...prev, form: "Los campos no deben exceder el límite de caracteres." }));
-      setTimeout(() => setError((prev) => ({ ...prev, form: "" })), 2000);
-      return;
-    }
-
-    console.log("Formulario enviado:", formData);
   };
+  
 
-  const { data: session } = useSession();
-  const token = session?.jwt;
 
-  const { data, error: fetchError, isLoading } = useStrapiData('users/me', token);
 
   useEffect(() => {
     if (data) {

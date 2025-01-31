@@ -1,49 +1,54 @@
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { useRouter } from 'next/router';
-import { signIn } from 'next-auth/react';
-import Layout from '../../components/layout/auth';
-import Recaptcha from '../../components/Recaptcha';  
-import Link from 'next/link';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { useState } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/router";
+import { signIn } from "next-auth/react";
+import Layout from "../../components/layout/auth";
+import Link from "next/link";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import Recaptcha from "../../components/Recaptcha"; // 🔹 Importa el nuevo componente Recaptcha
 
 export default function SignIn() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [captchaToken, setCaptchaToken] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-
-  const handleCaptcha = (token) => {
-    setCaptchaToken(token);
-  };
+  const [captchaToken, setCaptchaToken] = useState("");
 
   const onSubmit = async (e) => {
     e.preventDefault();
 
     if (!captchaToken) {
-      toast.error('Por favor, completa el CAPTCHA.');
+      toast.error("Por favor, completa el CAPTCHA.");
       return;
     }
 
+    console.log("🔹 CAPTCHA enviado:", captchaToken); // 🔹 Verifica el token antes de enviarlo
+
     setIsSubmitting(true);
 
-    const result = await signIn('credentials', {
-      redirect: false,
-      email,
-      password,
-      captchaToken,
-    });
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+        captcha: captchaToken, // 🔹 Se envía el token a NextAuth.js
+      });
 
-    if (result?.ok) {
-      toast.success('Sesión iniciada correctamente.');
-      setTimeout(() => {
-        const callbackUrl = new URLSearchParams(window.location.search).get('callbackUrl') || '/';
-        router.replace(callbackUrl);
-      }, 500);
-    } else {
-      toast.error('Credenciales incorrectas o CAPTCHA no válido.');
+      if (result?.ok) {
+        toast.success("Sesión iniciada correctamente.");
+        setTimeout(() => {
+          const callbackUrl =
+            new URLSearchParams(window.location.search).get("callbackUrl") || "/";
+          router.replace(callbackUrl);
+        }, 500);
+      } else {
+        toast.error("Credenciales incorrectas.");
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+      toast.error("Ocurrió un error inesperado. Inténtalo de nuevo.");
       setIsSubmitting(false);
     }
   };
@@ -90,7 +95,7 @@ export default function SignIn() {
               <input
                 id="password"
                 name="password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -112,15 +117,20 @@ export default function SignIn() {
             </div>
           </div>
 
-          <Recaptcha onVerify={handleCaptcha} />
+          {/* 🔹 Cloudflare Turnstile Captcha usando el nuevo componente */}
+          <Recaptcha onVerify={setCaptchaToken} />
 
           <div>
             <button
               type="submit"
-              disabled={isSubmitting || !captchaToken}
-              className={`dark:text-black text-zinc-900 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400  ${isSubmitting || !captchaToken ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed" : "bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400"}`}
+              disabled={isSubmitting}
+              className={`dark:text-black text-zinc-900 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 ${
+                isSubmitting
+                  ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed"
+                  : "bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400"
+              }`}
             >
-              {isSubmitting ? 'Ingresando...' : 'Ingresar'}
+              {isSubmitting ? "Ingresando..." : "Ingresar"}
             </button>
           </div>
         </form>
