@@ -12,8 +12,7 @@ const Recaptcha = ({ onVerify }) => {
                     sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
                     callback: (token) => {
                         onVerify(token);
-                    },
-                    theme: 'dark',
+                    }
                 });
                 setIsLoaded(true);
             }
