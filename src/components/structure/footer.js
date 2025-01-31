@@ -1,10 +1,19 @@
+import { FooterNav } from '../structure/links';
+
+
 const FooterInfo = () => {
     return (
         <div className="mt-10 text-sm text-zinc-500">
             <div className="flex flex-col">
                 <div className="font-bold text-md mb-4 border-b pb-1 border-gray-300 dark:border-zinc-600">
-                    <a href="#" className="text-zinc-600 hover:underline dark:text-white">Política de Privacidad</a> &nbsp; | &nbsp;
-                    <a href="#" className="text-zinc-600 hover:underline dark:text-white">Términos y Condiciones</a>
+                    {FooterNav.map((item, index) => (
+                        <span key={index}>
+                            <a href={item.href} className="text-zinc-600 hover:underline dark:text-white">
+                                {item.name}
+                            </a>
+                            {index < FooterNav.length - 1 && <span> &nbsp; | &nbsp; </span>}
+                        </span>
+                    ))}
                 </div>
                 <p className="mb-4 max-w-full text-xs text-justify">
                     Toda la información proporcionada en este sitio está destinada exclusivamente a fines educativos relacionados con el trading en mercados financieros y no sirve en
@@ -15,7 +24,7 @@ const FooterInfo = () => {
                     técnica ofrecida para las plataformas y la alimentación de datos de {process.env.NEXT_PUBLIC_NAME_APP} está gestionada por proveedores de liquidez.
                 </p>
                 <p className="text-xs">
-                    2025 © Copyright - {process.env.NEXT_PUBLIC_NAME_APP}.com.pe Hecho con ❤ por el trading.<br />
+                    2025 © Copyright - {process.env.NEXT_PUBLIC_NAME_APP} Hecho con ❤ por el trading.<br />
                     Versión: 1.1.0
                 </p>
             </div>

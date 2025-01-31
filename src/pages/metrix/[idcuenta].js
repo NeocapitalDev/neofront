@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Layout from "../../components/layout/dashboard";
 import Loader from "../../components/loaders/loader";
 import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
-import CredencialesModal from "./credentials"
+import CredencialesModal from "../dashboard/credentials"
 import Link from 'next/link'
 
 import Balance from "./balance"; // Importar el componente del gráfico

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/router";
@@ -7,16 +6,6 @@ import Layout from "../../components/layout/auth";
 import Link from "next/link";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import Recaptcha from "../../components/Recaptcha"; // 🔹 Importa el nuevo componente Recaptcha
-=======
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { useRouter } from 'next/router';
-import { signIn } from 'next-auth/react';
-import Layout from '../../components/layout/auth';
-import Recaptcha from '../../components/Recaptcha';  
-import Link from 'next/link';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
->>>>>>> 9f2e442714d708f4f4f26dd1cd574189a8793ff6
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -24,14 +13,7 @@ export default function SignIn() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-<<<<<<< HEAD
   const [captchaToken, setCaptchaToken] = useState("");
-=======
-
-  const handleCaptcha = (token) => {
-    setCaptchaToken(token);
-  };
->>>>>>> 9f2e442714d708f4f4f26dd1cd574189a8793ff6
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -45,7 +27,6 @@ export default function SignIn() {
 
     setIsSubmitting(true);
 
-<<<<<<< HEAD
     try {
       const result = await signIn("credentials", {
         redirect: false,
@@ -68,23 +49,6 @@ export default function SignIn() {
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       toast.error("Ocurrió un error inesperado. Inténtalo de nuevo.");
-=======
-    const result = await signIn('credentials', {
-      redirect: false,
-      email,
-      password,
-      captchaToken,
-    });
-
-    if (result?.ok) {
-      toast.success('Sesión iniciada correctamente.');
-      setTimeout(() => {
-        const callbackUrl = new URLSearchParams(window.location.search).get('callbackUrl') || '/';
-        router.replace(callbackUrl);
-      }, 500);
-    } else {
-      toast.error('Credenciales incorrectas o CAPTCHA no válido.');
->>>>>>> 9f2e442714d708f4f4f26dd1cd574189a8793ff6
       setIsSubmitting(false);
     }
   };
@@ -159,17 +123,12 @@ export default function SignIn() {
           <div>
             <button
               type="submit"
-<<<<<<< HEAD
               disabled={isSubmitting}
               className={`dark:text-black text-zinc-900 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 ${
                 isSubmitting
                   ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed"
                   : "bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400"
               }`}
-=======
-              disabled={isSubmitting || !captchaToken}
-              className={`dark:text-black text-zinc-900 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400  ${isSubmitting || !captchaToken ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed" : "bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400"}`}
->>>>>>> 9f2e442714d708f4f4f26dd1cd574189a8793ff6
             >
               {isSubmitting ? "Ingresando..." : "Ingresar"}
             </button>
