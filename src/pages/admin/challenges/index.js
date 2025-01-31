@@ -84,8 +84,6 @@ export default function ChallengesTable() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  if (isLoading) return <div>Cargando...</div>;
-  if (error) return <div>Error al cargar los datos</div>;
 
   return (
     <DashboardLayout>

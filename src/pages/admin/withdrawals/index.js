@@ -22,10 +22,8 @@ import DashboardLayout from "..";
 const challengeColumns = [
   { accessorKey: "id", header: "ID" },
   { accessorKey: "login", header: "Login" },
-  { accessorKey: "result", header: "Resultado" },
   { accessorKey: "startDate", header: "Fecha de Inicio" },
   { accessorKey: "endDate", header: "Fecha de Fin" },
-  { accessorKey: "phase", header: "Etapa" },
 ];
 
 const fetcher = (url, token) =>
@@ -84,8 +82,6 @@ export default function ChallengesTable() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  if (isLoading) return <div>Cargando...</div>;
-  if (error) return <div>Error al cargar los datos</div>;
 
   return (
     <DashboardLayout>
@@ -99,29 +95,6 @@ export default function ChallengesTable() {
             onChange={(e) => setSearch(e.target.value)}
             className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
           />
-
-          {/* Filtro por resultado */}
-          <select
-            value={resultFilter}
-            onChange={(e) => setResultFilter(e.target.value)}
-            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
-          >
-            <option value="">Resultado</option>
-            <option value="aprobado">Aprobado</option>
-            <option value="no aprobado">No Aprobado</option>
-          </select>
-
-          {/* Filtro por etapa */}
-          <select
-            value={phaseFilter}
-            onChange={(e) => setPhaseFilter(e.target.value)}
-            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
-          >
-            <option value="">Etapa</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
 
           {/* Filtro por fecha de inicio */}
           <Input
@@ -158,10 +131,8 @@ export default function ChallengesTable() {
                   <TableRow key={index} className="border-b border-zinc-700">
                     <TableCell>{challenge.id}</TableCell>
                     <TableCell>{challenge.login}</TableCell>
-                    <TableCell>{challenge.result ?? "N/A"}</TableCell>
                     <TableCell>{formatDate(challenge.startDate) ?? "N/A"}</TableCell>
                     <TableCell>{formatDate(challenge.endDate) ?? "N/A"}</TableCell>
-                    <TableCell>{challenge.phase}</TableCell>
                   </TableRow>
                 ))
               ) : (
