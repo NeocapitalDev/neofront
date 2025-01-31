@@ -3,10 +3,11 @@ import Layout from '../../components/layout/dashboard';
 import Loader from '../../components/loaders/loader';
 import { useStrapiData } from '../../services/strapiServiceJWT';
 import { UserIcon } from '@heroicons/react/24/outline';
-import ProfileForm from '../profile/profileForm';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import LogoGravatar from "../../components/LogoGravatar";
 import React, { useState, useEffect } from "react";
-
+import { CountryDropdown } from '@/components/ui/country-dropdown';
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import useSWR, { mutate } from "swr";
 
@@ -234,8 +235,147 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-      <ProfileForm formData={formData} setFormData={setFormData} token={token} />
+      <form onSubmit={handleSubmit} className="mt-5 space-y-6 p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+        <div className="mt-6">
+          <p className="text-lg font-semibold mb-4">Información Personal</p>
+        </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Campo Nombre */}
+          <div className="grid w-full items-start gap-1.5">
+            <Label htmlFor="firstName">Nombre</Label>
+            <Input
+              type="text"
+              id="firstName"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              placeholder="Ingrese su nombre"
+            />
+            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+              {error.firstName && <div className="text-red-500">{error.firstName}</div>}
+              {!formData.firstName && error.form && (
+                <div className="text-red-500">Campo obligatorio</div>
+              )}
+            </div>
+          </div>
+
+          {/* Campo Apellido */}
+          <div className="grid w-full items-start gap-1.5">
+            <Label htmlFor="lastName">Apellido</Label>
+            <Input
+              type="text"
+              id="lastName"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              placeholder="Ingrese su apellido"
+            />
+            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+              {error.lastName && <div className="text-red-500">{error.lastName}</div>}
+              {!formData.lastName && error.form && (
+                <div className="text-red-500">Campo obligatorio</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+
+        <div className="mt-4 grid w-full items-center gap-1.5">
+          <Label htmlFor="phone">Teléfono</Label>
+          <Input
+            type="tel"
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="Ingrese su teléfono"
+          />
+          <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+            {error.phone && <div className="text-red-500">{error.phone}</div>}
+            {!formData.phone && error.form && (
+              <div className="text-red-500">Campo obligatorio</div>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid w-full items-center gap-1.5">
+            {/* Campo País */}
+            <Label htmlFor="country">País</Label> 
+            <CountryDropdown
+              placeholder="Elige un país"
+              defaultValue={formData.country}
+              onChange={handleCountryChange}
+            />
+            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+              {error.country && <div className="text-red-500">{error.country}</div>}
+              {!formData.country && error.form && (
+                <div className="text-red-500">Campo obligatorio</div>
+              )}
+            </div>
+          </div>
+          <div className="grid w-full items-center gap-1.5">
+            {/* Campo Ciudad */}
+            <Label htmlFor="city">Ciudad</Label>
+            <Input
+              type="text"
+              id="city"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              placeholder="Ingrese su ciudad"
+            />
+            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+              {error.city && <div className="text-red-500">{error.city}</div>}
+              {!formData.city && error.form && (
+                <div className="text-red-500">Campo obligatorio</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid w-full items-center gap-1.5">
+            <Label htmlFor="street">Calle</Label>
+            <Input
+              type="text"
+              id="street"
+              name="street"
+              value={formData.street}
+              onChange={handleChange}
+              placeholder="Ingrese su calle"
+            />
+            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+              {error.street && <div className="text-red-500">{error.street}</div>}
+              {!formData.street && error.form && (
+                <div className="text-red-500">Campo obligatorio</div>
+              )}
+            </div>
+          </div>
+          <div className="grid w-full items-center gap-1.5">
+            <Label htmlFor="zipCode">Código Postal</Label>
+            <Input
+              type="text"
+              id="zipCode"
+              name="zipCode"
+              value={formData.zipCode}
+              onChange={handleChange}
+              placeholder="Ingrese su código postal"
+            />
+            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+              {error.zipCode && <div className="text-red-500">{error.zipCode}</div>}
+              {!formData.zipCode && error.form && (
+                <div className="text-red-500">Campo obligatorio</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" className="px-4 py-2 bg-amber-500 text-black font-semibold rounded hover:bg-amber-600">
+          Enviar
+        </button>
+      </form>
     </Layout>
   );
 };
