@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { useSession } from "next-auth/react";
+import useSWR from "swr";
 import {
   useReactTable,
   getCoreRowModel,
@@ -17,35 +19,43 @@ import {
 import { Input } from "@/components/ui/input";
 import DashboardLayout from "..";
 
-const usersData = [
-  { id: "1", username: "JohnDoe", email: "john@example.com", blocked: false, verified: true },
-  { id: "2", username: "JaneSmith", email: "jane@example.com", blocked: true, verified: false },
-  { id: "3", username: "Alice", email: "alice@example.com", blocked: false, verified: true },
-];
-
 const userColumns = [
   { accessorKey: "username", header: "Nombre de Usuario" },
   { accessorKey: "email", header: "Email" },
   {
-    accessorKey: "blocked",
-    header: "Bloqueado",
-    cell: ({ row }) => (row.getValue("blocked") ? "Sí" : "No"),
-  },
-  {
-    accessorKey: "verified",
+    accessorKey: "isVerified",
     header: "Verificado",
-    cell: ({ row }) => (row.getValue("verified") ? "Sí" : "No"),
+    cell: ({ row }) => (row.getValue("isVerified") ? "TRUE" : "FALSE"),
   },
 ];
 
+const fetcher = (url, token) =>
+  fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((res) => res.json());
+
 export default function UsersTable() {
+  const { data: session } = useSession();
+  const { data, error, isLoading } = useSWR(
+    session?.jwt
+      ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users`, session.jwt]
+      : null,
+    ([url, token]) => fetcher(url, token)
+  );
+
   const [search, setSearch] = useState("");
 
   const filteredData = useMemo(() => {
-    return usersData.filter((user) =>
+    if (!data) return [];
+    return data.filter((user) =>
       user.username.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [search]);
+    ).map(user => ({
+      ...user,
+      isVerified: user.isVerified ? "TRUE" : "FALSE",
+    }));
+  }, [data, search]);
 
   const table = useReactTable({
     data: filteredData,
@@ -54,8 +64,11 @@ export default function UsersTable() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
+  if (isLoading) return <div>Cargando...</div>;
+  if (error) return <div>Error al cargar los datos</div>;
+
   return (
-    <DashboardLayout>
+    // <DashboardLayout>
       <div className="p-8 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
         {/* Barra de búsqueda */}
         <div className="flex items-center py-4">
@@ -71,36 +84,26 @@ export default function UsersTable() {
         <div className="border border-zinc-700 rounded-md overflow-hidden">
           <Table>
             <TableHeader className="bg-zinc-800">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      className="text-zinc-200 border-b border-zinc-700"
-                    >
-                      {header.column.columnDef.header}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
+              <TableRow>
+                {userColumns.map((column) => (
+                  <TableHead key={column.accessorKey} className="text-zinc-200 border-b border-zinc-700">
+                    {column.header}
+                  </TableHead>
+                ))}
+              </TableRow>
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.length > 0 ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} className="border-b border-zinc-700">
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="text-zinc-200">
-                        {cell.renderValue()}
-                      </TableCell>
-                    ))}
+              {filteredData.length > 0 ? (
+                filteredData.map((user, index) => (
+                  <TableRow key={index} className="border-b border-zinc-700">
+                    <TableCell>{user.username}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.isVerified}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell
-                    colSpan={userColumns.length}
-                    className="text-center text-zinc-500 py-6"
-                  >
+                  <TableCell colSpan={userColumns.length} className="text-center text-zinc-500 py-6">
                     No se encontraron resultados.
                   </TableCell>
                 </TableRow>
@@ -109,6 +112,6 @@ export default function UsersTable() {
           </Table>
         </div>
       </div>
-    </DashboardLayout>
+    // </DashboardLayout>
   );
 }
