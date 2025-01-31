@@ -25,7 +25,7 @@ const challengeColumns = [
   { accessorKey: "result", header: "Resultado" },
   { accessorKey: "startDate", header: "Fecha de Inicio" },
   { accessorKey: "endDate", header: "Fecha de Fin" },
-  { accessorKey: "phase", header: "Paso" },
+  { accessorKey: "phase", header: "Etapa" },
 ];
 
 const fetcher = (url, token) =>
@@ -39,19 +39,43 @@ export default function ChallengesTable() {
   const { data: session } = useSession();
   const { data, error, isLoading } = useSWR(
     session?.jwt
-      ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges?filters[phase][$eq]=3&filters[passed][$eq]=true`, session.jwt]
-      : null,
+    ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges?filters[phase][$eq]=3&filters[passed][$eq]=true`, session.jwt]
+    : null,
     ([url, token]) => fetcher(url, token)
   );
 
   const [search, setSearch] = useState("");
+  const [resultFilter, setResultFilter] = useState(""); // "Aprobado" o "No Aprobado"
+  const [phaseFilter, setPhaseFilter] = useState(""); // "1", "2", "3"
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDateFilter, setEndDateFilter] = useState("");
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
 
   const filteredData = useMemo(() => {
     if (!data || !data.data) return [];
-    return data.data.filter((challenge) =>
-      challenge.login.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [data, search]);
+
+    return data.data.filter((challenge) => {
+      const matchesSearch = challenge.login.toLowerCase().includes(search.toLowerCase());
+      const matchesResult =
+        resultFilter && challenge.result
+          ? challenge.result.toLowerCase() === resultFilter.toLowerCase()
+          : true;
+      const matchesPhase = phaseFilter ? String(challenge.phase) === phaseFilter : true;
+      const matchesDateRange =
+        (!startDateFilter || new Date(challenge.startDate) >= new Date(startDateFilter)) &&
+        (!endDateFilter || new Date(challenge.endDate) <= new Date(endDateFilter));
+
+      return matchesSearch && matchesResult && matchesPhase && matchesDateRange;
+    });
+  }, [data, search, resultFilter, phaseFilter, startDateFilter, endDateFilter]);
 
   const table = useReactTable({
     data: filteredData,
@@ -65,19 +89,59 @@ export default function ChallengesTable() {
 
   return (
     <DashboardLayout>
-      <div className="p-8 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
-        {/* Barra de búsqueda */}
-        <div className="flex items-center py-4">
+      <div className="p-6 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
+        {/* Barra de búsqueda y filtros */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-2">
+          {/* Filtro por login */}
           <Input
-            placeholder="Filtrar por login..."
+            placeholder="Login..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
+            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
+          />
+
+          {/* Filtro por resultado */}
+          <select
+            value={resultFilter}
+            onChange={(e) => setResultFilter(e.target.value)}
+            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
+          >
+            <option value="">Resultado</option>
+            <option value="aprobado">Aprobado</option>
+            <option value="no aprobado">No Aprobado</option>
+          </select>
+
+          {/* Filtro por etapa */}
+          <select
+            value={phaseFilter}
+            onChange={(e) => setPhaseFilter(e.target.value)}
+            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
+          >
+            <option value="">Etapa</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+
+          {/* Filtro por fecha de inicio */}
+          <Input
+            type="date"
+            value={startDateFilter}
+            onChange={(e) => setStartDateFilter(e.target.value)}
+            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
+          />
+
+          {/* Filtro por fecha de fin */}
+          <Input
+            type="date"
+            value={endDateFilter}
+            onChange={(e) => setEndDateFilter(e.target.value)}
+            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
           />
         </div>
 
         {/* Tabla */}
-        <div className="border border-zinc-700 rounded-md overflow-hidden">
+        <div className="border border-zinc-700 rounded-md overflow-hidden mt-4">
           <Table>
             <TableHeader className="bg-zinc-800">
               <TableRow>
@@ -95,8 +159,8 @@ export default function ChallengesTable() {
                     <TableCell>{challenge.id}</TableCell>
                     <TableCell>{challenge.login}</TableCell>
                     <TableCell>{challenge.result ?? "N/A"}</TableCell>
-                    <TableCell>{challenge.startDate ?? "N/A"}</TableCell>
-                    <TableCell>{challenge.endDate ?? "N/A"}</TableCell>
+                    <TableCell>{formatDate(challenge.startDate) ?? "N/A"}</TableCell>
+                    <TableCell>{formatDate(challenge.endDate) ?? "N/A"}</TableCell>
                     <TableCell>{challenge.phase}</TableCell>
                   </TableRow>
                 ))
@@ -114,3 +178,7 @@ export default function ChallengesTable() {
     </DashboardLayout>
   );
 }
+
+
+
+
