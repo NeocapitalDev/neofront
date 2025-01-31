@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -38,29 +38,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
-              <BreadcrumbList>
-                {segments.map((segment, index) => {
-                  const href = `/${segments.slice(0, index + 1).join("/")}`;
-                  const isLast = index === segments.length - 1;
-                  const formattedSegment =
-                    segment.charAt(0).toUpperCase() + segment.slice(1); // Capitaliza
 
-                  return (
-                    <BreadcrumbItem key={href}>
-                      {isLast ? (
-                        <BreadcrumbPage>{formattedSegment}</BreadcrumbPage>
-                      ) : (
-                        <>
-                          <BreadcrumbLink asChild>
-                            <Link href={href}>{formattedSegment}</Link>
-                          </BreadcrumbLink>
-                          <BreadcrumbSeparator />
-                        </>
-                      )}
-                    </BreadcrumbItem>
-                  );
-                })}
-              </BreadcrumbList>
+
+            <BreadcrumbList>
+  {segments.map((segment, index) => {
+    const href = `/${segments.slice(0, index + 1).join("/")}`;
+    const isLast = index === segments.length - 1;
+    const formattedSegment =
+      segment.charAt(0).toUpperCase() + segment.slice(1); // Capitaliza
+
+    return (
+      <React.Fragment key={href}>
+        <BreadcrumbItem>
+          {isLast ? (
+            <BreadcrumbPage>{formattedSegment}</BreadcrumbPage>
+          ) : (
+            <BreadcrumbLink asChild>
+              <Link href={href}>{formattedSegment}</Link>
+            </BreadcrumbLink>
+          )}
+        </BreadcrumbItem>
+        {!isLast && <BreadcrumbSeparator />}
+      </React.Fragment>
+    );
+  })}
+</BreadcrumbList>
+
+
+
             </Breadcrumb>
           </div>
         </header>
