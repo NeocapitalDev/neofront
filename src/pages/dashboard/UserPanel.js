@@ -73,9 +73,9 @@ export default function Index() {
 
     // Definir los steps en orden fijo
     const steps = [
-        { key: "three", label: "Neotrader" },
-        { key: "two", label: "Practicante" },
-        { key: "one", label: "Estudiante" },
+        { key: "three", label: "Fase Neotrader" },
+        { key: "two", label: "FasePracticante" },
+        { key: "one", label: "Fase Estudiante" },
     ];
 
     return (
