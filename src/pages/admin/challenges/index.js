@@ -16,12 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-<<<<<<< HEAD
-import { fetcher } from "@/services/strapiService";
-import Loader from "@/components/loaders/loader";
-=======
 import { Input } from "@/components/ui/input";
->>>>>>> e5d2b66867a4a7cbe8ae1b2180c5027757ac8870
 import DashboardLayout from "..";
 
 const challengeColumns = [
@@ -30,7 +25,7 @@ const challengeColumns = [
   { accessorKey: "result", header: "Resultado" },
   { accessorKey: "startDate", header: "Fecha de Inicio" },
   { accessorKey: "endDate", header: "Fecha de Fin" },
-  { accessorKey: "step", header: "Paso" },
+  { accessorKey: "phase", header: "Etapa" },
 ];
 
 const fetcher = (url, token) =>
@@ -50,13 +45,37 @@ export default function ChallengesTable() {
   );
 
   const [search, setSearch] = useState("");
+  const [resultFilter, setResultFilter] = useState(""); // "Aprobado" o "No Aprobado"
+  const [phaseFilter, setPhaseFilter] = useState(""); // "1", "2", "3"
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDateFilter, setEndDateFilter] = useState("");
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
 
   const filteredData = useMemo(() => {
     if (!data || !data.data) return [];
-    return data.data.filter((challenge) =>
-      challenge.login.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [data, search]);
+
+    return data.data.filter((challenge) => {
+      const matchesSearch = challenge.login.toLowerCase().includes(search.toLowerCase());
+      const matchesResult =
+        resultFilter && challenge.result
+          ? challenge.result.toLowerCase() === resultFilter.toLowerCase()
+          : true;
+      const matchesPhase = phaseFilter ? String(challenge.phase) === phaseFilter : true;
+      const matchesDateRange =
+        (!startDateFilter || new Date(challenge.startDate) >= new Date(startDateFilter)) &&
+        (!endDateFilter || new Date(challenge.endDate) <= new Date(endDateFilter));
+
+      return matchesSearch && matchesResult && matchesPhase && matchesDateRange;
+    });
+  }, [data, search, resultFilter, phaseFilter, startDateFilter, endDateFilter]);
 
   const table = useReactTable({
     data: filteredData,
@@ -65,99 +84,64 @@ export default function ChallengesTable() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-<<<<<<< HEAD
-  return (
-    <DashboardLayout>
-      <div className="p-8 mt-5 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
-        <div className="flex items-center gap-4 mb-6">
-          <Input
-            placeholder="Buscar por login..."
-=======
   if (isLoading) return <div>Cargando...</div>;
   if (error) return <div>Error al cargar los datos</div>;
 
   return (
     <DashboardLayout>
-      <div className="p-8 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
-        {/* Barra de búsqueda */}
-        <div className="flex items-center py-4">
+      <div className="p-6 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
+        {/* Barra de búsqueda y filtros */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-2">
+          {/* Filtro por login */}
           <Input
-            placeholder="Filtrar por login..."
->>>>>>> e5d2b66867a4a7cbe8ae1b2180c5027757ac8870
+            placeholder="Login..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
+            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
           />
-<<<<<<< HEAD
-          <DropdownMenu>
-            <DropdownMenuTrigger className="bg-zinc-800 text-zinc-200 px-4 py-2 rounded-md">
-              Estado
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-zinc-800 text-zinc-200">
-              {["", "Aprobado", "No aprobado"].map((status) => (
-                <DropdownMenuItem
-                  key={status}
-                  onClick={() => setStatusFilter(status)}
-                  className={`${statusFilter === status ? "bg-zinc-700" : ""} hover:bg-zinc-700`}
-                >
-                  {status || "Todos"}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
 
-        {isLoading ? (
-          <Loader />
-        ) : error ? (
-          <div className="text-red-500 text-center py-4">Error al cargar los datos.</div>
-        ) : (
-          <div className="border border-zinc-700 rounded-md overflow-hidden">
-            <Table>
-              <TableHeader className="bg-zinc-800">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead
-                        key={header.id}
-                        className="text-zinc-200 border-b border-zinc-700"
-                      >
-                        {header.column.columnDef.header}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows.length > 0 ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id} className="border-b border-zinc-700">
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="text-zinc-200">
-                          {cell.renderValue()}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={challengeColumns.length}
-                      className="text-center text-zinc-500 py-6"
-                    >
-                      No se encontraron resultados.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-=======
+          {/* Filtro por resultado */}
+          <select
+            value={resultFilter}
+            onChange={(e) => setResultFilter(e.target.value)}
+            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
+          >
+            <option value="">Resultado</option>
+            <option value="aprobado">Aprobado</option>
+            <option value="no aprobado">No Aprobado</option>
+          </select>
+
+          {/* Filtro por etapa */}
+          <select
+            value={phaseFilter}
+            onChange={(e) => setPhaseFilter(e.target.value)}
+            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
+          >
+            <option value="">Etapa</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+
+          {/* Filtro por fecha de inicio */}
+          <Input
+            type="date"
+            value={startDateFilter}
+            onChange={(e) => setStartDateFilter(e.target.value)}
+            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
+          />
+
+          {/* Filtro por fecha de fin */}
+          <Input
+            type="date"
+            value={endDateFilter}
+            onChange={(e) => setEndDateFilter(e.target.value)}
+            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
+          />
         </div>
 
         {/* Tabla */}
-        <div className="border border-zinc-700 rounded-md overflow-hidden">
+        <div className="border border-zinc-700 rounded-md overflow-hidden mt-4">
           <Table>
             <TableHeader className="bg-zinc-800">
               <TableRow>
@@ -175,9 +159,9 @@ export default function ChallengesTable() {
                     <TableCell>{challenge.id}</TableCell>
                     <TableCell>{challenge.login}</TableCell>
                     <TableCell>{challenge.result ?? "N/A"}</TableCell>
-                    <TableCell>{challenge.startDate ?? "N/A"}</TableCell>
-                    <TableCell>{challenge.endDate ?? "N/A"}</TableCell>
-                    <TableCell>{challenge.step}</TableCell>
+                    <TableCell>{formatDate(challenge.startDate) ?? "N/A"}</TableCell>
+                    <TableCell>{formatDate(challenge.endDate) ?? "N/A"}</TableCell>
+                    <TableCell>{challenge.phase}</TableCell>
                   </TableRow>
                 ))
               ) : (
@@ -190,7 +174,6 @@ export default function ChallengesTable() {
             </TableBody>
           </Table>
         </div>
->>>>>>> e5d2b66867a4a7cbe8ae1b2180c5027757ac8870
       </div>
     </DashboardLayout>
   );
