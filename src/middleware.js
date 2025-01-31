@@ -4,23 +4,23 @@ import { NextResponse } from "next/server";
 export default withAuth(
   function middleware(req) {
     const { pathname } = req.nextUrl;
-    const token = req.nextauth?.token;
-   console.log(token.role);
+    const token = req.nextauth?.token; 
 
-    token.role="admin"
+    // Obtiene el rol del usuario desde el token
+    const userRole = token?.rol; 
 
+    console.log("Token Role:", userRole);
 
-    if (pathname.startsWith("/admin")) {
-      if (!token || token.role !== "admin") {
-        return NextResponse.redirect(new URL("/403", req.url)); 
-      }
+    // Si la ruta es /admin y el usuario no es admin, redirigir a /403
+    if (pathname.startsWith("/admin") && userRole !== "admin") {
+      return NextResponse.redirect(new URL("/403", req.url));
     }
 
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token, 
+      authorized: ({ token }) => !!token, // Solo permite acceso si hay un token
     },
   }
 );
