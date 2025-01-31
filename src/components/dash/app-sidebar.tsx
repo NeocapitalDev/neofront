@@ -1,47 +1,39 @@
 "use client";
 
 import * as React from "react";
+import { useSession } from "next-auth/react";
 
-import { Users, Award, Frame, PieChart, UserCheck, GalleryVerticalEnd, AudioWaveform, Command } from "lucide-react"; // Importar iconos
+import { Users, Award, UserCheck } from "lucide-react";
 
 import { NavMain } from "@/components/dash/nav-main";
-import { NavProjects } from "@/components/dash/nav-projects";
 import { NavUser } from "@/components/dash/nav-user";
-import { TeamSwitcher } from "@/components/dash/team-switcher";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  // Aquí filtramos las opciones para solo tener Users, Challenges y Retiros
-  navMain: [
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: session, status } = useSession();
+  const [userData, setUserData] = React.useState(null);
+
+  // Efecto para actualizar el estado cuando session esté disponible
+  React.useEffect(() => {
+    console.log("Sesión actual:", session);
+
+    if (session) {
+      setUserData({
+        email: session.user.email || "correo@ejemplo.com",
+        avatar: "/avatars/default.jpg", // Avatar por defecto
+        name: session.user.email.split("@")[0] || "Usuario", // Si no hay nombre, usar parte del email
+      });
+    }
+  }, [session]);
+
+  const isLoading = status === "loading" || !userData;
+
+  const navMain = [
     {
       title: "Users",
       url: "/admin/users",
@@ -60,50 +52,33 @@ const data = {
     },
     {
       title: "Challenges",
-      url: "/admin/challenges", // URL para la página de Challenges
-      icon: Award, // Icono que representa a "Challenges"
+      url: "/admin/challenges",
+      icon: Award,
       isActive: false,
-
     },
     {
       title: "Withdrawals",
-      url: "/admin/withdrawals", // URL para la página de Retiros
-      icon: UserCheck, // Icono que representa a "Retiros"
+      url: "/admin/withdrawals",
+      icon: UserCheck,
       isActive: false,
-
     },
-  ],
-};
+  ];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        {/* <NavProjects projects={data.projects} /> */}
+        <NavMain items={navMain} />
       </SidebarContent>
+
       <SidebarFooter>
-        <NavUser user={data.user} />
+        {isLoading ? (
+          <p className="text-center text-gray-500">Cargando sesión...</p>
+        ) : (
+          <NavUser user={userData} />
+        )}
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );
 }
-
-
-
-
-  // projects: [
-  //   {
-  //     name: "Design Engineering",
-  //     url: "/admin/retiros",
-  //     icon: Frame,
-  //   },
-  //   {
-  //     name: "Sales & Marketing",
-  //     url: "/admin/challenges",
-  //     icon: PieChart,
-  //   }
- 
-  // ],
