@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
+import { useSession } from "next-auth/react";
+import useSWR from "swr";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+} from "@tanstack/react-table";
 import {
   Table,
   TableBody,
@@ -10,97 +17,93 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import DashboardLayout from "..";
 
-const withdrawalsData = [
-  { id: "1", user: "John Doe", amount: 100, status: "Completed", date: "2025-01-28" },
-  { id: "2", user: "Jane Smith", amount: 200, status: "Pending", date: "2025-01-29" },
-  { id: "3", user: "Mike Ross", amount: 150, status: "Rejected", date: "2025-01-27" },
+const challengeColumns = [
+  { accessorKey: "id", header: "ID" },
+  { accessorKey: "login", header: "Login" },
+  { accessorKey: "result", header: "Resultado" },
+  { accessorKey: "startDate", header: "Fecha de Inicio" },
+  { accessorKey: "endDate", header: "Fecha de Fin" },
+  { accessorKey: "step", header: "Paso" },
 ];
 
-export default function WithdrawalsTable() {
+const fetcher = (url, token) =>
+  fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((res) => res.json());
+
+export default function ChallengesTable() {
+  const { data: session } = useSession();
+  const { data, error, isLoading } = useSWR(
+    session?.jwt
+      ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges?filters[phase][$eq]=three&filters[passed][$eq]=true`, session.jwt]
+      : null,
+    ([url, token]) => fetcher(url, token)
+  );
+
   const [search, setSearch] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("All");
-  const [filteredData, setFilteredData] = useState(withdrawalsData);
 
-  const statuses = ["All", "Completed", "Pending", "Rejected"];
-
-  useEffect(() => {
-    const filtered = withdrawalsData.filter(
-      (item) =>
-        (search === "" || item.user.toLowerCase().includes(search.toLowerCase())) &&
-        (selectedStatus === "All" || item.status === selectedStatus)
+  const filteredData = useMemo(() => {
+    if (!data || !data.data) return [];
+    return data.data.filter((challenge) =>
+      challenge.login.toLowerCase().includes(search.toLowerCase())
     );
-    setFilteredData(filtered);
-  }, [search, selectedStatus]);
+  }, [data, search]);
+
+  const table = useReactTable({
+    data: filteredData,
+    columns: challengeColumns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
+  if (isLoading) return <div>Cargando...</div>;
+  if (error) return <div>Error al cargar los datos</div>;
 
   return (
     <DashboardLayout>
       <div className="p-8 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
-        <div className="flex items-center gap-4 mb-6">
-          {/* Search Bar */}
+        {/* Barra de búsqueda */}
+        <div className="flex items-center py-4">
           <Input
-            placeholder="Search..."
+            placeholder="Filtrar por login..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-1/3 bg-zinc-800 text-zinc-200 border-zinc-700"
+            className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
           />
-
-          {/* Dropdown for Status */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="bg-zinc-800 hover:bg-zinc-600 text-zinc-200 border-zinc-700">
-                {selectedStatus} ▼
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-zinc-800 text-zinc-200">
-              {statuses.map((status) => (
-                <DropdownMenuItem
-                  key={status}
-                  onClick={() => setSelectedStatus(status)}
-                  className={`${
-                    selectedStatus === status ? "bg-zinc-700" : ""
-                  } hover:bg-zinc-700`}
-                >
-                  {status}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
-        {/* Table */}
-        <div className="rounded-md border border-zinc-700 overflow-hidden">
+        {/* Tabla */}
+        <div className="border border-zinc-700 rounded-md overflow-hidden">
           <Table>
             <TableHeader className="bg-zinc-800">
               <TableRow>
-                <TableHead className="text-zinc-200 border-b border-zinc-700">User</TableHead>
-                <TableHead className="text-zinc-200 border-b border-zinc-700">Amount</TableHead>
-                <TableHead className="text-zinc-200 border-b border-zinc-700">Status</TableHead>
-                <TableHead className="text-zinc-200 border-b border-zinc-700">Date</TableHead>
+                {challengeColumns.map((column) => (
+                  <TableHead key={column.accessorKey} className="text-zinc-200 border-b border-zinc-700">
+                    {column.header}
+                  </TableHead>
+                ))}
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredData.length > 0 ? (
-                filteredData.map((item) => (
-                  <TableRow key={item.id} className="border-b border-zinc-700">
-                    <TableCell className="text-zinc-200">{item.user}</TableCell>
-                    <TableCell className="text-zinc-200">${item.amount}</TableCell>
-                    <TableCell className="text-zinc-200">{item.status}</TableCell>
-                    <TableCell className="text-zinc-200">{item.date}</TableCell>
+                filteredData.map((challenge, index) => (
+                  <TableRow key={index} className="border-b border-zinc-700">
+                    <TableCell>{challenge.id}</TableCell>
+                    <TableCell>{challenge.login}</TableCell>
+                    <TableCell>{challenge.result ?? "N/A"}</TableCell>
+                    <TableCell>{challenge.startDate ?? "N/A"}</TableCell>
+                    <TableCell>{challenge.endDate ?? "N/A"}</TableCell>
+                    <TableCell>{challenge.step}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-zinc-500 py-6">
-                    No results found. Try searching or filtering for a different term.
+                  <TableCell colSpan={challengeColumns.length} className="text-center text-zinc-500 py-6">
+                    No se encontraron resultados.
                   </TableCell>
                 </TableRow>
               )}
