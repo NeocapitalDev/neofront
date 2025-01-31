@@ -25,7 +25,7 @@ const challengeColumns = [
   { accessorKey: "result", header: "Resultado" },
   { accessorKey: "startDate", header: "Fecha de Inicio" },
   { accessorKey: "endDate", header: "Fecha de Fin" },
-  { accessorKey: "step", header: "Paso" },
+  { accessorKey: "phase", header: "Paso" },
 ];
 
 const fetcher = (url, token) =>
@@ -39,7 +39,7 @@ export default function ChallengesTable() {
   const { data: session } = useSession();
   const { data, error, isLoading } = useSWR(
     session?.jwt
-      ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges?filters[phase][$eq]=three&filters[passed][$eq]=true`, session.jwt]
+      ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges?filters[phase][$eq]=3&filters[passed][$eq]=true`, session.jwt]
       : null,
     ([url, token]) => fetcher(url, token)
   );
@@ -97,7 +97,7 @@ export default function ChallengesTable() {
                     <TableCell>{challenge.result ?? "N/A"}</TableCell>
                     <TableCell>{challenge.startDate ?? "N/A"}</TableCell>
                     <TableCell>{challenge.endDate ?? "N/A"}</TableCell>
-                    <TableCell>{challenge.step}</TableCell>
+                    <TableCell>{challenge.phase}</TableCell>
                   </TableRow>
                 ))
               ) : (
