@@ -16,7 +16,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+<<<<<<< HEAD
+import { fetcher } from "@/services/strapiService";
+import Loader from "@/components/loaders/loader";
+=======
 import { Input } from "@/components/ui/input";
+>>>>>>> e5d2b66867a4a7cbe8ae1b2180c5027757ac8870
 import DashboardLayout from "..";
 
 const challengeColumns = [
@@ -60,6 +65,14 @@ export default function ChallengesTable() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
+<<<<<<< HEAD
+  return (
+    <DashboardLayout>
+      <div className="p-8 mt-5 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
+        <div className="flex items-center gap-4 mb-6">
+          <Input
+            placeholder="Buscar por login..."
+=======
   if (isLoading) return <div>Cargando...</div>;
   if (error) return <div>Error al cargar los datos</div>;
 
@@ -70,10 +83,77 @@ export default function ChallengesTable() {
         <div className="flex items-center py-4">
           <Input
             placeholder="Filtrar por login..."
+>>>>>>> e5d2b66867a4a7cbe8ae1b2180c5027757ac8870
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
           />
+<<<<<<< HEAD
+          <DropdownMenu>
+            <DropdownMenuTrigger className="bg-zinc-800 text-zinc-200 px-4 py-2 rounded-md">
+              Estado
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-zinc-800 text-zinc-200">
+              {["", "Aprobado", "No aprobado"].map((status) => (
+                <DropdownMenuItem
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  className={`${statusFilter === status ? "bg-zinc-700" : ""} hover:bg-zinc-700`}
+                >
+                  {status || "Todos"}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {isLoading ? (
+          <Loader />
+        ) : error ? (
+          <div className="text-red-500 text-center py-4">Error al cargar los datos.</div>
+        ) : (
+          <div className="border border-zinc-700 rounded-md overflow-hidden">
+            <Table>
+              <TableHeader className="bg-zinc-800">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead
+                        key={header.id}
+                        className="text-zinc-200 border-b border-zinc-700"
+                      >
+                        {header.column.columnDef.header}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.length > 0 ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id} className="border-b border-zinc-700">
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="text-zinc-200">
+                          {cell.renderValue()}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={challengeColumns.length}
+                      className="text-center text-zinc-500 py-6"
+                    >
+                      No se encontraron resultados.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+=======
         </div>
 
         {/* Tabla */}
@@ -110,6 +190,7 @@ export default function ChallengesTable() {
             </TableBody>
           </Table>
         </div>
+>>>>>>> e5d2b66867a4a7cbe8ae1b2180c5027757ac8870
       </div>
     </DashboardLayout>
   );

@@ -45,7 +45,8 @@ export default function UsersTable() {
     ([url, token]) => fetcher(url, token)
   );
 
-  const [search, setSearch] = useState("");
+  const [usernameSearch, setUsernameSearch] = useState("");
+  const [emailSearch, setEmailSearch] = useState("");
   const [verificationFilter, setVerificationFilter] = useState("Todos");
 
   const filteredData = useMemo(() => {
@@ -54,8 +55,8 @@ export default function UsersTable() {
     return data
       .filter(
         (user) =>
-          user.username.toLowerCase().includes(search.toLowerCase()) ||
-          user.email.toLowerCase().includes(search.toLowerCase())
+          user.username.toLowerCase().includes(usernameSearch.toLowerCase()) &&
+          user.email.toLowerCase().includes(emailSearch.toLowerCase())
       )
       .filter((user) => {
         if (verificationFilter === "Todos") return true;
@@ -67,7 +68,7 @@ export default function UsersTable() {
         ...user,
         isVerified: user.isVerified ? "TRUE" : "FALSE",
       }));
-  }, [data, search, verificationFilter]);
+  }, [data, usernameSearch, emailSearch, verificationFilter]);
 
   const table = useReactTable({
     data: filteredData,
@@ -80,62 +81,71 @@ export default function UsersTable() {
   if (error) return <div>Error al cargar los datos</div>;
 
   return (
-    <div className="p-8 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
-      {/* Filtros */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4">
-        {/* Input de búsqueda */}
-        <Input
-          placeholder="Buscar por nombre o email..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
-        />
+    <DashboardLayout>
+      <div className="p-8 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
+        {/* Filtros */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4">
+          {/* Input de búsqueda por nombre */}
+          <Input
+            placeholder="Buscar por nombre..."
+            value={usernameSearch}
+            onChange={(e) => setUsernameSearch(e.target.value)}
+            className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
+          />
+          {/* Input de búsqueda por email */}
+          <Input
+            placeholder="Buscar por email..."
+            value={emailSearch}
+            onChange={(e) => setEmailSearch(e.target.value)}
+            className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
+          />
 
-        {/* Select para Verificación */}
-        <Select
-          value={verificationFilter}
-          onChange={(e) => setVerificationFilter(e.target.value)}
-        />
-      </div>
+          {/* Select para Verificación */}
+          <Select
+            value={verificationFilter}
+            onChange={(e) => setVerificationFilter(e.target.value)}
+          />
+        </div>
 
-      {/* Tabla */}
-      <div className="border border-zinc-700 rounded-md overflow-hidden">
-        <Table>
-          <TableHeader className="bg-zinc-800">
-            <TableRow>
-              {userColumns.map((column) => (
-                <TableHead
-                  key={column.accessorKey}
-                  className="text-zinc-200 border-b border-zinc-700"
-                >
-                  {column.header}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredData.length > 0 ? (
-              filteredData.map((user, index) => (
-                <TableRow key={index} className="border-b border-zinc-700">
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.isVerified}</TableCell>
-                </TableRow>
-              ))
-            ) : (
+        {/* Tabla */}
+        <div className="border border-zinc-700 rounded-md overflow-hidden">
+          <Table>
+            <TableHeader className="bg-zinc-800">
               <TableRow>
-                <TableCell
-                  colSpan={userColumns.length}
-                  className="text-center text-zinc-500 py-6"
-                >
-                  No se encontraron resultados.
-                </TableCell>
+                {userColumns.map((column) => (
+                  <TableHead
+                    key={column.accessorKey}
+                    className="text-zinc-200 border-b border-zinc-700"
+                  >
+                    {column.header}
+                  </TableHead>
+                ))}
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredData.length > 0 ? (
+                filteredData.map((user, index) => (
+                  <TableRow key={index} className="border-b border-zinc-700">
+                    <TableCell>{user.username}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.isVerified}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={userColumns.length}
+                    className="text-center text-zinc-500 py-6"
+                  >
+                    No se encontraron resultados.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 
