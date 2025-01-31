@@ -39,7 +39,7 @@ export default function ChallengesTable() {
   const { data: session } = useSession();
   const { data, error, isLoading } = useSWR(
     session?.jwt
-    ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges?filters[phase][$eq]=3&filters[passed][$eq]=true`, session.jwt]
+    ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges?filters[phase][$eq]=3&filters[passed][$eq]=true&filters[result][$eq]=Aprobado`, session.jwt]
     : null,
     ([url, token]) => fetcher(url, token)
   );
