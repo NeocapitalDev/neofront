@@ -20,31 +20,13 @@ const fetcher = async (url, token) => {
         throw new Error(`Error: ${response.status}`);
     }
 
-    return response.json();
-};
-
-// Función fetcher para la API de Metastats
-const fetchMetaStats = async (idMeta) => {
-    const response = await fetch(
-        `https://metastats-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${idMeta}/metrics`,
-        {
-            headers: {
-                "auth-token": `${process.env.NEXT_PUBLIC_TOKEN_META_API}`,
-                "Content-Type": "application/json",
-            },
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error(`Error en Metastats API: ${response.status}`);
-    }
-
-    return response.json();
+    const data = await response.json();
+    return data;
 };
 
 export default function Index() {
     const { data: session } = useSession();
-
+    console.log(useSession());
     const { data, error, isLoading } = useSWR(
         session?.jwt
             ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate=challenges`, session.jwt]
@@ -53,47 +35,34 @@ export default function Index() {
     );
 
     const [visibility, setVisibility] = useState(() => {
+        // Obtener valores del localStorage en la primera renderización
         if (typeof window !== "undefined") {
             const storedVisibility = localStorage.getItem("visibility");
             return storedVisibility ? JSON.parse(storedVisibility) : {};
         }
         return {};
     });
-
-    const [metaStats, setMetaStats] = useState({}); // Estado para almacenar los balances de Metastats
-
+    
     useEffect(() => {
-        if (data?.challenges?.length) {
-            const fetchAllMetaStats = async () => {
-                const metaStatsData = {};
-
-                for (const challenge of data.challenges) {
-                    if (challenge.idMeta) {
-                        try {
-                            const metaData = await fetchMetaStats(challenge.idMeta);
-                            metaStatsData[challenge.idMeta] = metaData.metrics?.balance; // Solo guardar el balance
-                        } catch (error) {
-                            console.error(`Error al obtener Metastats para idMeta ${challenge.idMeta}:`, error);
-                        }
-                    }
-                }
-
-                setMetaStats(metaStatsData); // Actualizar el estado con los balances
-            };
-
-            fetchAllMetaStats();
-        }
-    }, [data?.challenges]);
-
-    useEffect(() => {
+        // Guardar los cambios en localStorage cada vez que visibility cambie
         if (typeof window !== "undefined") {
             localStorage.setItem("visibility", JSON.stringify(visibility));
         }
     }, [visibility]);
+    
+    useEffect(() => {
+        const storedVisibility = localStorage.getItem("visibility");
+        if (storedVisibility) {
+            setVisibility(JSON.parse(storedVisibility));
+        }
+    }, []);
+
 
     if (isLoading) return <Loader />;
     if (error) return <p className="text-center text-red-500">Error al cargar los datos: {error.message}</p>;
     if (!data?.challenges?.length) return <p className="text-center">No hay desafíos disponibles.</p>;
+
+    // console.log(data.challenges);
 
     const toggleVisibility = (id) => {
         setVisibility((prev) => ({
@@ -102,6 +71,7 @@ export default function Index() {
         }));
     };
 
+    // Definir los phase en orden fijo
     const phase = [
         { key: "3", label: "Fase Neotrader" },
         { key: "2", label: "Fase Practicante" },
@@ -111,17 +81,19 @@ export default function Index() {
     return (
         <div>
             {phase.map(({ key, label }) => {
+                // Filtrar los desafíos que coincidan con el phase actual
                 const challenges = data.challenges.filter(challenge => challenge.phase == key);
 
-                if (challenges.length === 0) return null;
+                if (challenges.length === 0) return null; // Si no hay desafíos en este phase, no renderizar nada
 
                 return (
                     <div key={key}>
+                        {/* Título del phase */}
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">{label}</h2>
 
+                        {/* Renderizar los desafíos de este phase */}
                         {challenges.map((challenge, index) => {
                             const isVisible = visibility[challenge.id] ?? true;
-                            const balance = metaStats[challenge.idMeta]; // Obtener el balance del estado
 
                             return (
                                 <div
@@ -138,7 +110,7 @@ export default function Index() {
                                                 <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                                     Balance:{' '}
                                                     <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                        {balance !== undefined ? balance : "Cargando..."}
+                                                        {challenge.balance}
                                                     </span>
                                                 </p>
                                                 <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">

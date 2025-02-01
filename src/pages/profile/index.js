@@ -175,7 +175,7 @@ const ProfilePage = () => {
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <UserIcon className="w-6 h-6 text-gray-600 dark:text-gray-200" />
-            <h1 className="text-xl font-semibold">Perfil {session.user.role || "usuario@example.com"}</h1>
+            <h1 className="text-xl font-semibold">Perfil</h1>
           </div>
         </div>
       </div>
