@@ -62,7 +62,7 @@ export default function Index() {
     if (error) return <p className="text-center text-red-500">Error al cargar los datos: {error.message}</p>;
     if (!data?.challenges?.length) return <p className="text-center">No hay desafíos disponibles.</p>;
 
-    console.log(data.challenges);
+    // console.log(data.challenges);
 
     const toggleVisibility = (id) => {
         setVisibility((prev) => ({
