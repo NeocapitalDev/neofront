@@ -71,27 +71,27 @@ export default function Index() {
         }));
     };
 
-    // Definir los steps en orden fijo
-    const steps = [
-        { key: "three", label: "Fase Neotrader" },
-        { key: "two", label: "FasePracticante" },
-        { key: "one", label: "Fase Estudiante" },
+    // Definir los phase en orden fijo
+    const phase = [
+        { key: "3", label: "Fase Neotrader" },
+        { key: "2", label: "FasePracticante" },
+        { key: "1", label: "Fase Estudiante" },
     ];
 
     return (
         <div>
-            {steps.map(({ key, label }) => {
-                // Filtrar los desafíos que coincidan con el step actual
-                const challenges = data.challenges.filter(challenge => challenge.step === key);
+            {phase.map(({ key, label }) => {
+                // Filtrar los desafíos que coincidan con el phase actual
+                const challenges = data.challenges.filter(challenge => challenge.phase == key);
 
-                if (challenges.length === 0) return null; // Si no hay desafíos en este step, no renderizar nada
+                if (challenges.length === 0) return null; // Si no hay desafíos en este phase, no renderizar nada
 
                 return (
                     <div key={key}>
-                        {/* Título del Step */}
+                        {/* Título del phase */}
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">{label}</h2>
 
-                        {/* Renderizar los desafíos de este step */}
+                        {/* Renderizar los desafíos de este phase */}
                         {challenges.map((challenge, index) => {
                             const isVisible = visibility[challenge.id] ?? true;
 
