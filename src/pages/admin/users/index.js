@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { CheckCircle, XCircle } from "lucide-react"; // Importa íconos de Lucide
 import DashboardLayout from "..";
 
 const userColumns = [
@@ -25,7 +26,21 @@ const userColumns = [
   {
     accessorKey: "isVerified",
     header: "Verificado",
-    cell: ({ row }) => (row.getValue("isVerified") ? "TRUE" : "FALSE"),
+    cell: ({ row }) => (
+      <div className="flex items-center space-x-2">
+        {row.getValue("isVerified") ? (
+          <div className="flex items-center space-x-2">
+            <CheckCircle className="text-green-500 w-5 h-5" />
+            <span className="text-green-500 font-medium">Verificado</span>
+          </div>
+        ) : (
+          <div className="flex items-center space-x-2">
+            <XCircle className="text-red-500 w-5 h-5" />
+            <span className="text-red-500 font-medium">No Verificado</span>
+          </div>
+        )}
+      </div>
+    ),
   },
 ];
 
@@ -50,24 +65,25 @@ export default function UsersTable() {
   const [verificationFilter, setVerificationFilter] = useState("Todos");
 
   const filteredData = useMemo(() => {
-    if (!data) return [];
+    if (!Array.isArray(data)) {
+      console.error("Error: 'data' no es un arreglo:", data);
+      return [];
+    }
 
     return data
       .filter(
         (user) =>
-          user.username.toLowerCase().includes(usernameSearch.toLowerCase()) &&
-          user.email.toLowerCase().includes(emailSearch.toLowerCase())
+          user?.username
+            ?.toLowerCase()
+            .includes(usernameSearch.toLowerCase()) &&
+          user?.email?.toLowerCase().includes(emailSearch.toLowerCase())
       )
       .filter((user) => {
         if (verificationFilter === "Todos") return true;
         return verificationFilter === "Verificado"
           ? user.isVerified
           : !user.isVerified;
-      })
-      .map((user) => ({
-        ...user,
-        isVerified: user.isVerified ? "TRUE" : "FALSE",
-      }));
+      });
   }, [data, usernameSearch, emailSearch, verificationFilter]);
 
   const table = useReactTable({
@@ -77,28 +93,49 @@ export default function UsersTable() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <p className="text-center text-zinc-500">Cargando datos...</p>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <p className="text-center text-red-500">Error al cargar los datos.</p>
+      </DashboardLayout>
+    );
+  }
+
+  if (!Array.isArray(data)) {
+    return (
+      <DashboardLayout>
+        <p className="text-center text-zinc-500">
+          No hay datos disponibles o la estructura es incorrecta.
+        </p>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
       <div className="p-8 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
         {/* Filtros */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4">
-          {/* Input de búsqueda por nombre */}
           <Input
             placeholder="Buscar por nombre..."
             value={usernameSearch}
             onChange={(e) => setUsernameSearch(e.target.value)}
             className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
           />
-          {/* Input de búsqueda por email */}
           <Input
             placeholder="Buscar por email..."
             value={emailSearch}
             onChange={(e) => setEmailSearch(e.target.value)}
             className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
           />
-
-          {/* Select para Verificación */}
           <Select
             value={verificationFilter}
             onChange={(e) => setVerificationFilter(e.target.value)}
@@ -126,7 +163,23 @@ export default function UsersTable() {
                   <TableRow key={index} className="border-b border-zinc-700">
                     <TableCell>{user.username}</TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.isVerified}</TableCell>
+                    <TableCell>
+                      {user.isVerified ? (
+                        <div className="flex items-center space-x-2">
+                          <CheckCircle className="text-green-500 w-5 h-5" />
+                          <span className="text-green-500 font-medium">
+                            Verificado
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <XCircle className="text-red-500 w-5 h-5" />
+                          <span className="text-red-500 font-medium">
+                            No Verificado
+                          </span>
+                        </div>
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
@@ -154,7 +207,7 @@ const Select = ({ value, onChange }) => {
       <select
         value={value}
         onChange={onChange}
-        className="block w-full px-3 py-2 bg-zinc-800 text-zinc-200 border border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-600"
+        className="block w-full px-3 py-1 bg-zinc-800 text-zinc-200 border border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-600"
       >
         <option value="Todos">Todos</option>
         <option value="Verificado">Verificado</option>
