@@ -25,7 +25,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     if (session) {
       setUserData({
         email: session.user.email || "correo@ejemplo.com",
-        avatar: "/avatars/default.jpg", // Avatar por defecto
+        avatar: "/images/icon-dark.png", // Avatar por defecto
         name: session.user.email.split("@")[0] || "Usuario", // Si no hay nombre, usar parte del email
       });
     }
