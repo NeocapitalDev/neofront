@@ -48,7 +48,7 @@ export default NextAuth({
     session: async ({ session, token }) => {
       session.id = token.id;
       session.jwt = token.jwt;
-      session.rol = token.rol;
+      session.role = token.role;
 
       return Promise.resolve(session);
     },
@@ -57,7 +57,7 @@ export default NextAuth({
       if (isSignIn) {
         token.id = user.id;
         token.jwt = user.jwt;
-        token.rol = user.rol;
+        token.role = user.role;
 
       }
       return Promise.resolve(token);

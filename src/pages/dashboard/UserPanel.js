@@ -58,8 +58,7 @@ export default function Index() {
     }
   }, []);
 
-  if (isLoading) return <Loader />;
-  if (error) return <p className="text-center text-red-500">Error al cargar los datos: {error.message}</p>;
+    // console.log(data.challenges);
 
   const isVerified = data?.isVerified;
 
