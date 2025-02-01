@@ -73,16 +73,16 @@ export default function Index() {
 
     // Definir los steps en orden fijo
     const steps = [
-        { key: 3, label: "Fase Neotrader" },
-        { key: 2, label: "FasePracticante" },
-        { key: 1, label: "Fase Estudiante" },
+        { key: "three", label: "Fase Neotrader" },
+        { key: "two", label: "FasePracticante" },
+        { key: "one", label: "Fase Estudiante" },
     ];
 
     return (
         <div>
             {steps.map(({ key, label }) => {
                 // Filtrar los desafíos que coincidan con el step actual
-                const challenges = data.challenges.filter(challenge => challenge.phase == key);
+                const challenges = data.challenges.filter(challenge => challenge.step === key);
 
                 if (challenges.length === 0) return null; // Si no hay desafíos en este step, no renderizar nada
 
@@ -161,6 +161,3 @@ export default function Index() {
         </div>
     );
 }
-
-
-
