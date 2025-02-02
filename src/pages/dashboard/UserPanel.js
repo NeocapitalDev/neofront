@@ -1,8 +1,9 @@
-import useSWR from "swr";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { ChartBarIcon, BellIcon } from "@heroicons/react/24/outline";
-import CredencialesModal from "./credentials";
+import useSWR from 'swr';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import { ChartBarIcon, BellIcon } from '@heroicons/react/24/outline';
+import CredencialesModal from './credentials';
+import Loader from '../../components/loaders/loader';
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
@@ -43,8 +44,8 @@ const fetchMetaStats = async (idMeta) => {
 };
 
 export default function Index() {
-  const { data: session } = useSession();
-  const router = useRouter();
+    const { data: session } = useSession();
+    const router = useRouter();
 
   const { data, error, isLoading } = useSWR(
     session?.jwt
@@ -95,10 +96,58 @@ export default function Index() {
     }
   }, [visibility]);
 
-  // Si los datos aún están cargando
-  if (isLoading) {
-    return <p className="text-center">Cargando...</p>;
-  }
+                setMetaStats(metaStatsData); // Actualizar el estado con los balances
+            };
+
+            fetchAllMetaStats();
+        }
+    }, [data?.challenges]);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            localStorage.setItem("visibility", JSON.stringify(visibility));
+        }
+    }, [visibility]);
+
+    if (isLoading) return <Loader />;
+    if (error) return <p className="text-center text-red-500">Error al cargar los datos: {error.message}</p>;
+
+    const isVerified = data?.isVerified;
+
+    // Mostrar mensaje si el usuario no está verificado
+    if (isVerified === false) {
+        return (
+            <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg shadow-md">
+                <div className="flex items-center space-x-2">
+                    <BellIcon className="h-6 w-6 text-yellow-500 dark:text-yellow-300" />
+                    <span className="text-sm text-yellow-800 dark:text-yellow-300 font-medium">
+                        Por favor verifica tu cuenta para acceder a los desafíos.
+                    </span>
+                </div>
+                <button
+                    onClick={() => router.push("/profile")}
+                    className="mt-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg shadow-md text-sm"
+                >
+                    Verificar ahora
+                </button>
+            </div>
+        );
+    }
+
+    if (!data?.challenges?.length) return <p className="text-center">No hay desafíos disponibles.</p>;
+
+    const toggleVisibility = (id) => {
+        setVisibility((prev) => ({
+            ...prev,
+            [id]: !prev[id],
+        }));
+    };
+
+    const phase = [
+        { key: "3", label: "Fase Neotrader" },
+        { key: "2", label: "Fase Practicante" },
+        { key: "1", label: "Fase Estudiante" },
+    ];
 
   // Si hay un error en la carga de datos
   if (error) {
