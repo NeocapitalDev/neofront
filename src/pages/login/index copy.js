@@ -1,57 +1,54 @@
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { useRouter } from 'next/router';
-import { signIn } from 'next-auth/react';
-import Layout from '../../components/layout/auth';
-import Recaptcha from '../../components/Recaptcha';
-import Link from 'next/link';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { useState } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/router";
+import { signIn } from "next-auth/react";
+import Layout from "../../components/layout/auth";
+import Link from "next/link";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+
 
 export default function SignIn() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [captchaToken, setCaptchaToken] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-
-  const handleCaptcha = (token) => {
-    console.log('CAPTCHA Token recibido:', token);
-    setCaptchaToken(token);
-  };
+  // const [captchaToken, setCaptchaToken] = useState("");
 
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    if (!captchaToken) {
-      toast.error('Por favor, completa el CAPTCHA.');
-      return;
-    }
+    // if (!captchaToken) {
+    //   toast.error("Por favor, completa el CAPTCHA.");
+    //   return;
+    // }
+
+    // console.log("🔹 CAPTCHA enviado:", captchaToken); // 🔹 Verifica el token antes de enviarlo
 
     setIsSubmitting(true);
 
     try {
-      const result = await signIn('credentials', {
+      const result = await signIn("credentials", {
         redirect: false,
         email,
         password,
-        captchaToken,
+        // captcha: captchaToken, // 🔹 Se envía el token a NextAuth.js
       });
 
       if (result?.ok) {
-        toast.success('Sesión iniciada correctamente.');
+        toast.success("Sesión iniciada correctamente.");
         setTimeout(() => {
           const callbackUrl =
-            new URLSearchParams(window.location.search).get('callbackUrl') || '/';
+            new URLSearchParams(window.location.search).get("callbackUrl") || "/";
           router.replace(callbackUrl);
         }, 500);
       } else {
-        toast.error('Credenciales incorrectas o CAPTCHA no válido.');
+        toast.error("Credenciales incorrectas.");
         setIsSubmitting(false);
       }
     } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-      toast.error('Ocurrió un error inesperado. Inténtalo de nuevo.');
+      console.error("Error al iniciar sesión:", error);
+      toast.error("Ocurrió un error inesperado. Inténtalo de nuevo.");
       setIsSubmitting(false);
     }
   };
@@ -65,10 +62,7 @@ export default function SignIn() {
       <div className="mt-8">
         <form className="space-y-6" onSubmit={onSubmit}>
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300"
-            >
+            <label htmlFor="email" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">
               Correo electrónico
             </label>
             <div className="mt-2">
@@ -88,17 +82,11 @@ export default function SignIn() {
 
           <div>
             <div className="flex items-center justify-between">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300"
-              >
+              <label htmlFor="password" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">
                 Contraseña
               </label>
               <div className="text-sm">
-                <Link
-                  href="/forgot-password"
-                  className="leading-6 text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300"
-                >
+                <Link href="/forgot-password" className="leading-6 text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300">
                   ¿Has olvidado tu contraseña?
                 </Link>
               </div>
@@ -107,7 +95,7 @@ export default function SignIn() {
               <input
                 id="password"
                 name="password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -129,22 +117,32 @@ export default function SignIn() {
             </div>
           </div>
 
-          <Recaptcha onVerify={handleCaptcha} />
+          {/* 🔹 Cloudflare Turnstile Captcha usando el nuevo componente 
+          <Recaptcha onVerify={setCaptchaToken} />*/}
 
           <div>
             <button
               type="submit"
-              disabled={isSubmitting || !captchaToken}
+              disabled={isSubmitting}
               className={`dark:text-black text-zinc-900 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 ${
-                isSubmitting || !captchaToken
-                  ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'
-                  : 'bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400'
+                isSubmitting
+                  ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed"
+                  : "bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400"
               }`}
             >
-              {isSubmitting ? 'Ingresando...' : 'Ingresar'}
+              {isSubmitting ? "Ingresando..." : "Ingresar"}
             </button>
           </div>
         </form>
+
+{/* 
+        <p className="mt-10 text-sm text-center leading-6 text-zinc-900 font-medium dark:text-gray-400">
+      ¿No tienes una cuenta?{" "}
+      <Link href="/register" className="font-semibold leading-6 text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300">
+        Regístrate ahora
+      </Link>
+    </p> */}
+
       </div>
     </Layout>
   );
