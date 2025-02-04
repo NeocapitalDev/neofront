@@ -106,9 +106,9 @@ export default function Index() {
     };
 
     const phase = [
-        { key: "1", label: "Fase Estudiante" },
-        { key: "2", label: "Fase Practicante" },
         { key: "3", label: "Fase Neotrader" },
+        { key: "2", label: "Fase Practicante" },
+        { key: "1", label: "Fase Estudiante" },
     ];
 
     return (
@@ -120,16 +120,16 @@ export default function Index() {
                     return (
                         <div key={key}>
                             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">{label}</h2>
-                            <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg shadow-md">
+                            <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg shadow-md mb-6">
                                 <div className="flex items-center space-x-2">
-                                    <BellIcon className="h-6 w-6 text-yellow-500 dark:text-yellow-300" />
-                                    <span className="text-sm text-yellow-800 dark:text-yellow-300 font-medium">
+                                    <BellIcon className="h-6 w-6 text-amber-500 dark:text-amber-300" />
+                                    <span className="text-sm text-amber-800 dark:text-yellow-300 font-medium">
                                         Por favor verifica tu cuenta para acceder a la fase Neotrader.
                                     </span>
                                 </div>
                                 <button
                                     onClick={() => router.push("/profile")}
-                                    className="mt-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg shadow-md text-sm"
+                                    className="mt-4 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-md text-sm"
                                 >
                                     Verificar ahora
                                 </button>
