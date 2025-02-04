@@ -82,9 +82,7 @@ export default function Objetivos() {
                                         <div className="d-flex flex-column align-items-center">
                                             <p>{obj.descripcion}</p>
                                             <div className="mt-2 d-flex justify-content-center">
-
                                                 <center>
-
                                                     <iframe
                                                         width="200"
                                                         src={obj.videoUrl.replace("watch?v=", "embed/")}
@@ -93,10 +91,7 @@ export default function Objetivos() {
                                                         referrerPolicy="strict-origin-when-cross-origin"
                                                         allowFullScreen>
                                                     </iframe>
-
                                                 </center>
-
-
                                             </div>
                                         </div>
                                     </td>
