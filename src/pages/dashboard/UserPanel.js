@@ -24,7 +24,6 @@ const fetcher = async (url, token) => {
     return response.json();
 };
 
-
 // Función fetcher para la API de Metastats
 const fetchMetaStats = async (idMeta) => {
     const response = await fetch(
@@ -63,7 +62,7 @@ export default function Index() {
         return {};
     });
 
-    const [metaStats, setMetaStats] = useState({}); // Estado para almacenar los balances de Metastats
+    const [metaStats, setMetaStats] = useState({});
 
     useEffect(() => {
         if (data?.challenges?.length) {
@@ -74,14 +73,14 @@ export default function Index() {
                     if (challenge.idMeta) {
                         try {
                             const metaData = await fetchMetaStats(challenge.idMeta);
-                            metaStatsData[challenge.idMeta] = metaData.metrics?.balance; // Solo guardar el balance
+                            metaStatsData[challenge.idMeta] = metaData.metrics?.balance;
                         } catch (error) {
                             console.error(`Error al obtener Metastats para idMeta ${challenge.idMeta}:`, error);
                         }
                     }
                 }
 
-                setMetaStats(metaStatsData); // Actualizar el estado con los balances
+                setMetaStats(metaStatsData);
             };
 
             fetchAllMetaStats();
@@ -99,28 +98,6 @@ export default function Index() {
 
     const isVerified = data?.isVerified;
 
-    // Mostrar mensaje si el usuario no está verificado
-    if (isVerified === false) {
-        return (
-            <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg shadow-md">
-                <div className="flex items-center space-x-2">
-                    <BellIcon className="h-6 w-6 text-yellow-500 dark:text-yellow-300" />
-                    <span className="text-sm text-yellow-800 dark:text-yellow-300 font-medium">
-                        Por favor verifica tu cuenta para acceder a los desafíos.
-                    </span>
-                </div>
-                <button
-                    onClick={() => router.push("/profile")}
-                    className="mt-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg shadow-md text-sm"
-                >
-                    Verificar ahora
-                </button>
-            </div>
-        );
-    }
-
-    if (!data?.challenges?.length) return <p className="text-center">No hay desafíos disponibles.</p>;
-
     const toggleVisibility = (id) => {
         setVisibility((prev) => ({
             ...prev,
@@ -129,25 +106,46 @@ export default function Index() {
     };
 
     const phase = [
-        { key: "3", label: "Fase Neotrader" },
-        { key: "2", label: "Fase Practicante" },
         { key: "1", label: "Fase Estudiante" },
+        { key: "2", label: "Fase Practicante" },
+        { key: "3", label: "Fase Neotrader" },
     ];
 
     return (
         <div>
             {phase.map(({ key, label }) => {
-                const challenges = data.challenges.filter(challenge => challenge.phase == key);
+                const challenges = data?.challenges?.filter(challenge => challenge.phase == key) || [];
+
+                if (key === "3" && !isVerified) {
+                    return (
+                        <div key={key}>
+                            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">{label}</h2>
+                            <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg shadow-md">
+                                <div className="flex items-center space-x-2">
+                                    <BellIcon className="h-6 w-6 text-yellow-500 dark:text-yellow-300" />
+                                    <span className="text-sm text-yellow-800 dark:text-yellow-300 font-medium">
+                                        Por favor verifica tu cuenta para acceder a la fase Neotrader.
+                                    </span>
+                                </div>
+                                <button
+                                    onClick={() => router.push("/profile")}
+                                    className="mt-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg shadow-md text-sm"
+                                >
+                                    Verificar ahora
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }
 
                 if (challenges.length === 0) return null;
 
                 return (
                     <div key={key}>
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">{label}</h2>
-
                         {challenges.map((challenge, index) => {
                             const isVisible = visibility[challenge.id] ?? true;
-                            const balance = metaStats[challenge.idMeta]; // Obtener el balance del estado
+                            const balance = metaStats[challenge.idMeta];
 
                             return (
                                 <div
@@ -157,7 +155,6 @@ export default function Index() {
                                     <p className="text-sm font-bold text-zinc-800 mb-2 dark:text-zinc-200">
                                         Login: {challenge.login}
                                     </p>
-
                                     {isVisible && (
                                         <>
                                             <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
