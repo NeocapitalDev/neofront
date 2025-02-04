@@ -72,37 +72,18 @@ const Metrix = () => {
   if (error || metricsError) {
     return (
       <Layout>
-        <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-          <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
-          Account Metrix {challengeData?.data?.login || "Sin nombre"}
-        </h1>
-
-        <div className="flex justify-start gap-3 my-6">
-          {challengeData?.data && <CredencialesModal {...challengeData.data} />}
-
+        <div className="flex flex-col items-center justify-center min-h-screen text-center">
+          <h1 className="text-2xl font-bold text-red-500">🚧 En mantenimiento 🚧</h1>
+          <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
+            Estamos realizando mejoras en nuestro sistema. Por favor, intenta nuevamente más tarde.
+          </p>
           <Link
             href="/support"
-            className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500"
+            className="mt-4 flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500"
           >
             <PhoneIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-            <span className="text-xs lg:text-sm dark:text-zinc-200">Contacte con nosotros</span>
+            <span className="text-xs lg:text-sm dark:text-zinc-200">Contacte con soporte</span>
           </Link>
-          <button
-            onClick={() => router.reload()}
-            className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500"
-          >
-            <ArrowPathIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-            <span className="text-xs lg:text-sm dark:text-zinc-200">Actualizar</span>
-          </button>
-        </div>
-
-        <div className="flex flex-col items-center justify-center py-20 text-center text-white">
-          <div className="p-8 bg-white dark:bg-zinc-800 rounded-lg shadow-lg w-full">
-            <h1 className="text-3xl font-extrabold text-red-600">🚧 En mantenimiento 🚧</h1>
-            <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">
-              Estamos trabajando en mejoras para nuestro sistema. Por favor, vuelve a intentarlo más tarde.
-            </p>
-          </div>
         </div>
       </Layout>
     );
