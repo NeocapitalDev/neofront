@@ -10,7 +10,6 @@ export default withAuth(
     // Obtiene el rol del usuario desde el token
     const userRole = token?.role;
 
-    console.log("Token Role:", userRole);
 
     // Si el usuario intenta acceder a /admin y es admin, redirigir a /admin/users
     if (pathname === "/admin" && userRole === "Admin") {
