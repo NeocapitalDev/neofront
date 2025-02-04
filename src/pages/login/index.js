@@ -5,7 +5,6 @@ import { signIn } from "next-auth/react";
 import Layout from "../../components/layout/auth";
 import Link from "next/link";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import Recaptcha from "@/components/Recaptcha";
 
 
 export default function SignIn() {
@@ -14,7 +13,7 @@ export default function SignIn() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState("");
+  // const [captchaToken, setCaptchaToken] = useState("");
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -108,7 +107,8 @@ export default function SignIn() {
             </div>
           </div>
 
-          <Recaptcha onVerify={setCaptchaToken} />
+          {/* 🔹 Cloudflare Turnstile Captcha usando el nuevo componente 
+          <Recaptcha onVerify={setCaptchaToken} />*/}
 
           <div>
             <button
