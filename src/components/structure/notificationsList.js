@@ -3,7 +3,7 @@ import Image from 'next/image';
 import SkeletonLoader from '../loaders/skeleton';
 const NotificationsPage = () => {
     // Usamos el hook que creamos para obtener los datos de 'notifications'
-    const { data: notifications, error, isLoading } = useStrapiData('news');
+    const { data: notifications, error, isLoading } = useStrapiData('news?sort=createdAt:desc&pagination[limit]=3');
 
     // Si está cargando, mostramos un mensaje de carga
     if (isLoading) {
