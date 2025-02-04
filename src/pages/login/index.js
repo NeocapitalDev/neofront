@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import Layout from "../../components/layout/auth";
 import Link from "next/link";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import Recaptcha from "../../components/Recaptcha"; // 🔹 Importa el nuevo componente Recaptcha
+
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -13,17 +13,17 @@ export default function SignIn() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState("");
+  // const [captchaToken, setCaptchaToken] = useState("");
 
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    if (!captchaToken) {
-      toast.error("Por favor, completa el CAPTCHA.");
-      return;
-    }
+    // if (!captchaToken) {
+    //   toast.error("Por favor, completa el CAPTCHA.");
+    //   return;
+    // }
 
-    console.log("🔹 CAPTCHA enviado:", captchaToken); // 🔹 Verifica el token antes de enviarlo
+    // console.log("🔹 CAPTCHA enviado:", captchaToken); // 🔹 Verifica el token antes de enviarlo
 
     setIsSubmitting(true);
 
@@ -32,7 +32,7 @@ export default function SignIn() {
         redirect: false,
         email,
         password,
-        captcha: captchaToken, // 🔹 Se envía el token a NextAuth.js
+        // captcha: captchaToken, // 🔹 Se envía el token a NextAuth.js
       });
 
       if (result?.ok) {
@@ -117,8 +117,8 @@ export default function SignIn() {
             </div>
           </div>
 
-          {/* 🔹 Cloudflare Turnstile Captcha usando el nuevo componente */}
-          <Recaptcha onVerify={setCaptchaToken} />
+          {/* 🔹 Cloudflare Turnstile Captcha usando el nuevo componente 
+          <Recaptcha onVerify={setCaptchaToken} />*/}
 
           <div>
             <button

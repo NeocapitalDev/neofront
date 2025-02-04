@@ -9,8 +9,8 @@ import LogoGravatar from "../../components/LogoGravatar";
 import React, { useState, useEffect } from "react";
 import { CountryDropdown } from '@/components/ui/country-dropdown';
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import VerificationButton from "@/components/sumsub";
 import useSWR, { mutate } from "swr";
-
 const ProfilePage = () => {
 
   
@@ -372,9 +372,12 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        <button type="submit" className="px-4 py-2 bg-amber-500 text-black font-semibold rounded hover:bg-amber-600">
-          Enviar
-        </button>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+          <button type="submit" className="px-4 py-2 bg-amber-500 text-black font-semibold rounded hover:bg-amber-600">
+            Enviar
+          </button>
+          <VerificationButton />
+        </div>
       </form>
     </Layout>
   );
