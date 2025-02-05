@@ -4,11 +4,6 @@ import React, { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 import {
-  useReactTable,
-  getCoreRowModel,
-  getPaginationRowModel,
-} from "@tanstack/react-table";
-import {
   Table,
   TableBody,
   TableCell,
@@ -17,10 +12,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { CheckCircle, XCircle } from "lucide-react"; // Importa íconos de Lucide
+import { CheckCircle, XCircle } from "lucide-react";
 import DashboardLayout from "..";
+import { useRouter } from "next/navigation"; // Importación del router
 
-const userColumns = [
+const userColumns = (router) => [
   { accessorKey: "username", header: "Nombre de Usuario" },
   { accessorKey: "email", header: "Email" },
   {
@@ -42,6 +38,26 @@ const userColumns = [
       </div>
     ),
   },
+  {
+    accessorKey: "id",
+    header: "Challenges",
+    cell: ({ row }) => {
+      const handleViewChallenges = () => {
+        const id = row.getValue("id");
+        const documentId = row.original.documentId;
+        router.push(`/admin/users?id=${id}&documentId=${documentId}`); // Redirige con los parámetros
+      };
+
+      return (
+        <button
+          onClick={handleViewChallenges}
+          className="text-blue-500 hover:underline"
+        >
+          Ver
+        </button>
+      );
+    },
+  },
 ];
 
 const fetcher = (url, token) =>
@@ -53,6 +69,7 @@ const fetcher = (url, token) =>
 
 export default function UsersTable() {
   const { data: session } = useSession();
+  const router = useRouter();
   const { data, error, isLoading } = useSWR(
     session?.jwt
       ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users`, session.jwt]
@@ -65,17 +82,11 @@ export default function UsersTable() {
   const [verificationFilter, setVerificationFilter] = useState("Todos");
 
   const filteredData = useMemo(() => {
-    if (!Array.isArray(data)) {
-      console.error("Error: 'data' no es un arreglo:", data);
-      return [];
-    }
-
+    if (!Array.isArray(data)) return [];
     return data
       .filter(
         (user) =>
-          user?.username
-            ?.toLowerCase()
-            .includes(usernameSearch.toLowerCase()) &&
+          user?.username?.toLowerCase().includes(usernameSearch.toLowerCase()) &&
           user?.email?.toLowerCase().includes(emailSearch.toLowerCase())
       )
       .filter((user) => {
@@ -85,13 +96,6 @@ export default function UsersTable() {
           : !user.isVerified;
       });
   }, [data, usernameSearch, emailSearch, verificationFilter]);
-
-  const table = useReactTable({
-    data: filteredData,
-    columns: userColumns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-  });
 
   if (isLoading) {
     return (
@@ -105,16 +109,6 @@ export default function UsersTable() {
     return (
       <DashboardLayout>
         <p className="text-center text-red-500">Error al cargar los datos.</p>
-      </DashboardLayout>
-    );
-  }
-
-  if (!Array.isArray(data)) {
-    return (
-      <DashboardLayout>
-        <p className="text-center text-zinc-500">
-          No hay datos disponibles o la estructura es incorrecta.
-        </p>
       </DashboardLayout>
     );
   }
@@ -136,10 +130,6 @@ export default function UsersTable() {
             onChange={(e) => setEmailSearch(e.target.value)}
             className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
           />
-          <Select
-            value={verificationFilter}
-            onChange={(e) => setVerificationFilter(e.target.value)}
-          />
         </div>
 
         {/* Tabla */}
@@ -147,7 +137,7 @@ export default function UsersTable() {
           <Table>
             <TableHeader className="bg-zinc-800">
               <TableRow>
-                {userColumns.map((column) => (
+                {userColumns(router).map((column) => (
                   <TableHead
                     key={column.accessorKey}
                     className="text-zinc-200 border-b border-zinc-700"
@@ -165,29 +155,26 @@ export default function UsersTable() {
                     <TableCell>{user.email}</TableCell>
                     <TableCell>
                       {user.isVerified ? (
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle className="text-green-500 w-5 h-5" />
-                          <span className="text-green-500 font-medium">
-                            Verificado
-                          </span>
-                        </div>
+                        <CheckCircle className="text-green-500 w-5 h-5" />
                       ) : (
-                        <div className="flex items-center space-x-2">
-                          <XCircle className="text-red-500 w-5 h-5" />
-                          <span className="text-red-500 font-medium">
-                            No Verificado
-                          </span>
-                        </div>
+                        <XCircle className="text-red-500 w-5 h-5" />
                       )}
+                    </TableCell>
+                    <TableCell>
+                      <button
+                        onClick={() =>
+                          router.push(`/admin/users?id=${user.id}&documentId=${user.documentId}`)
+                        }
+                        className="text-blue-500 hover:underline"
+                      >
+                        Ver
+                      </button>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell
-                    colSpan={userColumns.length}
-                    className="text-center text-zinc-500 py-6"
-                  >
+                  <TableCell colSpan={userColumns(router).length} className="text-center">
                     No se encontraron resultados.
                   </TableCell>
                 </TableRow>
@@ -199,20 +186,3 @@ export default function UsersTable() {
     </DashboardLayout>
   );
 }
-
-/* Componente Select */
-const Select = ({ value, onChange }) => {
-  return (
-    <div className="relative w-full md:w-48">
-      <select
-        value={value}
-        onChange={onChange}
-        className="block w-full px-3 py-1 bg-zinc-800 text-zinc-200 border border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-600"
-      >
-        <option value="Todos">Todos</option>
-        <option value="Verificado">Verificado</option>
-        <option value="No Verificado">No Verificado</option>
-      </select>
-    </div>
-  );
-};
