@@ -36,38 +36,35 @@ export default function Component({ data }) {
     if (data?.metrics) {
       const { balance, openTradesByHour } = data.metrics;
 
-      // Validar si `balance` y `openTradesByHour` existen y son válidos
       if (typeof balance === "number") {
         setBalance(balance);
       } else {
         console.error("El balance no es válido:", balance);
       }
 
-      if (Array.isArray(openTradesByHour)) {
-        // Calcular el balance acumulado
+      if (Array.isArray(openTradesByHour) && openTradesByHour.length > 0) {
         const extractedData = openTradesByHour.reduce(
           (acc, item, index) => {
             const previousBalance = acc.length ? acc[acc.length - 1].balance : 0;
-            const newBalance = previousBalance + (item.profit || 0); // Validar `item.profit`
+            const newBalance = previousBalance + (item.profit || 0);
             acc.push({
               trade: index + 1,
               balance: newBalance,
             });
             return acc;
           },
-          [{ trade: 0, balance: 0 }] // Inicializar con trade 0 y balance 0
+          [{ trade: 0, balance: 0 }]
         );
 
         setChartData(extractedData);
 
-        // Calcular estadísticas de ganancias y pérdidas
         const totalTrades = openTradesByHour.length;
         const wins = openTradesByHour.filter((trade) => trade.profit > 0);
         const losses = openTradesByHour.filter((trade) => trade.profit <= 0);
 
         const totalWinAmount = wins.reduce((sum, trade) => sum + trade.profit, 0);
         const totalLossAmount = losses.reduce(
-          (sum, trade) => sum + Math.abs(trade.profit || 0), // Validar `trade.profit`
+          (sum, trade) => sum + Math.abs(trade.profit || 0),
           0
         );
 
@@ -81,7 +78,7 @@ export default function Component({ data }) {
           totalTrades > 0 ? parseFloat(((losses.length / totalTrades) * 100).toFixed(2)) : 0
         );
       } else {
-        console.error("Los datos de `openTradesByHour` no son válidos:", openTradesByHour);
+        setChartData([]);
       }
     } else {
       console.warn("Los datos de `metrics` no están disponibles.");
@@ -97,10 +94,17 @@ export default function Component({ data }) {
             Balance
           </CardTitle>
           <CardDescription className="text-4xl font-semibold text-black dark:text-white">
-            ${balance.toLocaleString()} {/* Mostrar el balance */}
+            ${balance.toLocaleString()}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative">
+          {chartData.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center bg-opacity-75 dark:bg-opacity-75">
+              <p className="text-xl font-semibold text-gray-700 dark:text-gray-300">
+                No hay trades disponibles
+              </p>
+            </div>
+          )}
           <ChartContainer config={chartConfig}>
             <LineChart
               data={chartData}
@@ -125,10 +129,7 @@ export default function Component({ data }) {
                 tickMargin={8}
                 tickFormatter={(value) => `$${value}`}
               />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-              />
+              <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
               <Line
                 dataKey="balance"
                 type="natural"
