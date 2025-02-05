@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { CheckCircle, XCircle } from "lucide-react"; // Importa íconos de Lucide
 import DashboardLayout from "..";
+import { useRouter } from 'next/router';
 
 const userColumns = [
   { accessorKey: "username", header: "Nombre de Usuario" },
@@ -41,6 +42,11 @@ const userColumns = [
         )}
       </div>
     ),
+  },
+  {
+    accessorKey: "id",
+    header: "Acciones",
+    cell: ({ row }) => <RedirectButton userId={row.original.id} />,
   },
 ];
 
@@ -86,12 +92,6 @@ export default function UsersTable() {
       });
   }, [data, usernameSearch, emailSearch, verificationFilter]);
 
-  const table = useReactTable({
-    data: filteredData,
-    columns: userColumns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-  });
 
   if (isLoading) {
     return (
@@ -180,6 +180,9 @@ export default function UsersTable() {
                         </div>
                       )}
                     </TableCell>
+                    <TableCell>
+                      <RedirectButton userdocumentId={user.documentId} />
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
@@ -214,5 +217,22 @@ const Select = ({ value, onChange }) => {
         <option value="No Verificado">No Verificado</option>
       </select>
     </div>
+  );
+};
+
+const RedirectButton = ({ userdocumentId }) => {
+  const router = useRouter();
+
+  const handleRedirect = () => {
+    router.push(`/admin/users/${userdocumentId}`);
+  };
+
+  return (
+    <button
+      onClick={handleRedirect}
+      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+    >
+      Ver Detalles
+    </button>
   );
 };

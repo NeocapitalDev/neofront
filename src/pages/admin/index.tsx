@@ -25,8 +25,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   // Generar los segmentos solo en el cliente
   useEffect(() => {
-    const pathSegments = pathname.split("/").filter(Boolean);
-    setSegments(pathSegments);
+    if (pathname) { // Verifica que pathname no sea null
+      const pathSegments = pathname.split("/").filter(Boolean);
+      setSegments(pathSegments);
+    }
   }, [pathname]);
 
   return (
