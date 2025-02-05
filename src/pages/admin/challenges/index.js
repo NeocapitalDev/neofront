@@ -45,8 +45,8 @@ export default function ChallengesTable() {
   );
 
   const [search, setSearch] = useState("");
-  const [resultFilter, setResultFilter] = useState(""); // "Aprobado" o "No Aprobado"
-  const [phaseFilter, setPhaseFilter] = useState(""); // "1", "2", "3"
+  const [resultFilter, setResultFilter] = useState("");
+  const [phaseFilter, setPhaseFilter] = useState("");
   const [startDateFilter, setStartDateFilter] = useState("");
   const [endDateFilter, setEndDateFilter] = useState("");
 
@@ -59,11 +59,24 @@ export default function ChallengesTable() {
     });
   };
 
+  const translateResult = (result) => {
+    switch (result) {
+      case "approved":
+        return "Aprobado";
+      case "disapproved":
+        return "Desaprobado";
+      case "progress":
+        return "En Curso";
+      default:
+        return "N/A";
+    }
+  };
+
   const filteredData = useMemo(() => {
     if (!data || !data.data) return [];
 
     return data.data.filter((challenge) => {
-      const matchesSearch = challenge.login.toLowerCase().includes(search.toLowerCase());
+      const matchesSearch = challenge.login?.toLowerCase().includes(search.toLowerCase());
       const matchesResult =
         resultFilter && challenge.result
           ? challenge.result.toLowerCase() === resultFilter.toLowerCase()
@@ -83,7 +96,6 @@ export default function ChallengesTable() {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
-
 
   return (
     <DashboardLayout>
@@ -105,8 +117,9 @@ export default function ChallengesTable() {
             className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
           >
             <option value="">Resultado</option>
-            <option value="aprobado">Aprobado</option>
-            <option value="no aprobado">No Aprobado</option>
+            <option value="approved">Aprobado</option>
+            <option value="disapproved">Desaprobado</option>
+            <option value="progress">En Curso</option>
           </select>
 
           {/* Filtro por etapa */}
@@ -156,7 +169,7 @@ export default function ChallengesTable() {
                   <TableRow key={index} className="border-b border-zinc-700">
                     <TableCell>{challenge.id}</TableCell>
                     <TableCell>{challenge.login}</TableCell>
-                    <TableCell>{challenge.result ?? "N/A"}</TableCell>
+                    <TableCell>{translateResult(challenge.result)}</TableCell>
                     <TableCell>{formatDate(challenge.startDate) ?? "N/A"}</TableCell>
                     <TableCell>{formatDate(challenge.endDate) ?? "N/A"}</TableCell>
                     <TableCell>{challenge.phase}</TableCell>
