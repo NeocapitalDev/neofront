@@ -34,57 +34,37 @@ export default function Component({ data }) {
 
   useEffect(() => {
     if (data?.metrics) {
-      const { balance, openTradesByHour } = data.metrics;
+      setBalance(data.metrics.balance);
 
-      // Validar si `balance` y `openTradesByHour` existen y son válidos
-      if (typeof balance === "number") {
-        setBalance(balance);
-      } else {
-        console.error("El balance no es válido:", balance);
-      }
+      // Calcular el balance acumulado
+      const extractedData = data.metrics.openTradesByHour.reduce(
+        (acc, item, index) => {
+          const previousBalance = acc.length ? acc[acc.length - 1].balance : 0;
+          const newBalance = previousBalance + item.profit;
+          acc.push({
+            trade: index + 1,
+            balance: newBalance,
+          });
+          return acc;
+        },
+        [{ trade: 0, balance: 0 }] // Inicializar con trade 0 y balance 0
+      );
 
-      if (Array.isArray(openTradesByHour)) {
-        // Calcular el balance acumulado
-        const extractedData = openTradesByHour.reduce(
-          (acc, item, index) => {
-            const previousBalance = acc.length ? acc[acc.length - 1].balance : 0;
-            const newBalance = previousBalance + (item.profit || 0); // Validar `item.profit`
-            acc.push({
-              trade: index + 1,
-              balance: newBalance,
-            });
-            return acc;
-          },
-          [{ trade: 0, balance: 0 }] // Inicializar con trade 0 y balance 0
-        );
+      setChartData(extractedData);
 
-        setChartData(extractedData);
+      // Calcular estadísticas de ganancias y pérdidas
+      const totalTrades = data.metrics.openTradesByHour.length;
+      const wins = data.metrics.openTradesByHour.filter((trade) => trade.profit > 0);
+      const losses = data.metrics.openTradesByHour.filter((trade) => trade.profit <= 0);
 
-        // Calcular estadísticas de ganancias y pérdidas
-        const totalTrades = openTradesByHour.length;
-        const wins = openTradesByHour.filter((trade) => trade.profit > 0);
-        const losses = openTradesByHour.filter((trade) => trade.profit <= 0);
+      const totalWinAmount = wins.reduce((sum, trade) => sum + trade.profit, 0);
+      const totalLossAmount = losses.reduce((sum, trade) => sum + Math.abs(trade.profit), 0);
 
-        const totalWinAmount = wins.reduce((sum, trade) => sum + trade.profit, 0);
-        const totalLossAmount = losses.reduce(
-          (sum, trade) => sum + Math.abs(trade.profit || 0), // Validar `trade.profit`
-          0
-        );
+      setTotalWins(totalWinAmount);
+      setTotalLosses(totalLossAmount);
 
-        setTotalWins(totalWinAmount);
-        setTotalLosses(totalLossAmount);
-
-        setWinPercentage(
-          totalTrades > 0 ? parseFloat(((wins.length / totalTrades) * 100).toFixed(2)) : 0
-        );
-        setLosePercentage(
-          totalTrades > 0 ? parseFloat(((losses.length / totalTrades) * 100).toFixed(2)) : 0
-        );
-      } else {
-        console.error("Los datos de `openTradesByHour` no son válidos:", openTradesByHour);
-      }
-    } else {
-      console.warn("Los datos de `metrics` no están disponibles.");
+      setWinPercentage(parseFloat(((wins.length / totalTrades) * 100).toFixed(2)));
+      setLosePercentage(parseFloat(((losses.length / totalTrades) * 100).toFixed(2)));
     }
   }, [data]);
 
@@ -145,6 +125,7 @@ export default function Component({ data }) {
           </ChartContainer>
         </CardContent>
       </Card>
+
     </>
   );
 }
