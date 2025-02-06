@@ -236,6 +236,8 @@ const ProfilePage = () => {
         </div>
       </div>
 
+
+      {/*Formulario del perfil */}
       <form onSubmit={handleSubmit} className="mt-5 space-y-6 p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <div className="mt-6">
           <p className="text-lg font-semibold mb-4">Información Personal</p>
@@ -386,7 +388,7 @@ const ProfilePage = () => {
         </div>
       </form>
 
-
+      {/*Visualizacion de varificacion cuando no esta verificado y tiene challenges en fase 3*/}
       {!isVerified && hasPhase3Challenge && (
         <div className="mt-6">
           <p className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">
@@ -397,7 +399,6 @@ const ProfilePage = () => {
             <div className="flex-shrink-0">
               <ChatBubbleBottomCenterTextIcon className="h-12 w-12 text-zinc-400 dark:text-zinc-400" />
             </div>
-
             {/* Contenido de texto */}
             <div>
               <p className="text-sm leading-6 text-gray-700 dark:text-gray-300">
@@ -406,6 +407,7 @@ const ProfilePage = () => {
                 una vez que alcance un objetivo de ganancias en una verificación que no haya
                 violado la pérdida diaria máxima o la pérdida máxima.
               </p>
+
               {/* Botón de verificación */}
               <div className="mt-4">
                 <VerificationButton />

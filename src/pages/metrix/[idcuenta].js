@@ -147,6 +147,7 @@ const Metrix = () => {
       </div>
 
       <div className="mt-6 w-full max-w-full md:max-w-2/3 lg:max-w-2/3 justify-start items-start">
+        <h2 className="text-lg font-semibold">Progreso Win/Loss</h2>
         <WinLoss data={metricsData || {}} />
       </div>
 
