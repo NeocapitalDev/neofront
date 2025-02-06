@@ -395,7 +395,7 @@ const ProfilePage = () => {
           <div className="flex flex-col md:flex-row items-start p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black space-y-4 md:space-y-0 md:space-x-6">
             {/* Icono */}
             <div className="flex-shrink-0">
-              <ChatBubbleBottomCenterTextIcon className="h-12 w-12 text-blue-500 dark:text-blue-400" />
+              <ChatBubbleBottomCenterTextIcon className="h-12 w-12 text-zinc-400 dark:text-zinc-400" />
             </div>
 
             {/* Contenido de texto */}
