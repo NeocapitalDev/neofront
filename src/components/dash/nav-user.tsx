@@ -24,6 +24,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { PresentationChartBarIcon } from '@heroicons/react/24/outline'
 
 export function NavUser({
   user,
@@ -58,7 +59,7 @@ export function NavUser({
                 <AvatarFallback className="rounded-lg">N</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">Neo Capital</span>
+                <span className="truncate font-semibold">{user.name} </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -69,10 +70,20 @@ export function NavUser({
             align="end"
             sideOffset={4}
           >
+            <DropdownMenuItem 
+              className="cursor-pointer"
+              onClick={() => router.push('/')}
+            >
+              <PresentationChartBarIcon className="mr-2 size-4" />
+              <span>Volver al Sistema</span>
+            </DropdownMenuItem>
+
+
             <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
               <LogOut className="mr-2 size-4" />
               <span>Cerrar sesión</span>
             </DropdownMenuItem>
+
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
