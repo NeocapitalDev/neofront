@@ -23,7 +23,7 @@ const VerificationButton = () => {
     };
 
     return (
-        <div className="flex flex-col items-end">
+        <div className="flex flex-col items-end mt-6">
             {/* Botón de verificación */}
             <button
                 onClick={startVerification}

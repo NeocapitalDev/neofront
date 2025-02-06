@@ -367,15 +367,24 @@ const ProfilePage = () => {
         </div>
       </form>
 
-      <div className="mt-6">
-        <p className="text-lg font-semibold mb-4">Verificación de cuenta</p>
-      </div>
+      {/* Mostrar solo si la cuenta está verificada */}
+      {!isVerified && (
+        <div className="mt-6">
+          <p className="text-lg font-semibold mb-4">Verificación de cuenta</p>
+          <div className="flex flex-col items-start p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+            <p className="text-xs">
+              La sección de identidad de FTMO se desbloqueará para usted una vez que
+              esté a punto de firmar o cambiar un contrato con nosotros. Se
+              desbloqueará automáticamente una vez que alcance un objetivo de
+              ganancias en una verificación que no haya violado la pérdida diaria
+              máxima o la pérdida máxima
+            </p>
 
-      <div className="flex flex-col items-center p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-        <p className="text-xs">La sección de identidad de FTMO se desbloqueará para usted una vez que esté a punto de firmar o cambiar un contrato con nosotros. Se desbloqueará automáticamente una vez que alcance un objetivo de ganancias en una verificación que no haya violado la pérdida diaria máxima o la pérdida máxima</p>
+            <VerificationButton />
+          </div>
+        </div>
+      )}
 
-        <VerificationButton />
-      </div>
     </Layout>
   );
 };
