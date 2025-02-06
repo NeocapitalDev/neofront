@@ -13,7 +13,7 @@ import VerificationButton from "@/components/sumsub";
 import useSWR, { mutate } from "swr";
 const ProfilePage = () => {
 
-  
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -82,46 +82,44 @@ const ProfilePage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     console.log("Datos enviados a Strapi:", JSON.stringify(formData, null, 2));
-  
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/101`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${data.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
         },
         body: JSON.stringify({
-          data: {  // Strapi espera los datos dentro de un objeto `data`
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            phone: formData.phone,
-            country: formData.country,
-            city: formData.city,
-            street: formData.street,
-            zipCode: formData.zipCode,
-          }
+          firstName: formData.firstName,  // No es necesario envolver en `data`
+          lastName: formData.lastName,
+          phone: formData.phone,
+          country: formData.country,
+          city: formData.city,
+          street: formData.street,
+          zipCode: formData.zipCode,
         }),
-        
+
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error en la respuesta de Strapi:", errorData);
-  
+
         throw new Error(`Error ${response.status} - ${errorData?.error?.message || "Error desconocido"}`);
       }
-  
+
       const updatedData = await response.json();
       console.log("Respuesta de Strapi:", updatedData);
-  
+
       setSuccess("Datos actualizados correctamente.");
       setTimeout(() => setSuccess(""), 3000);
-  
-   
- 
-  
+
+
+
+
     } catch (error) {
       console.error("Error en handleSubmit:", error);
       setErrors({ form: error.message });
@@ -130,7 +128,7 @@ const ProfilePage = () => {
       setLoading(false);
     }
   };
-  
+
 
 
 
@@ -190,7 +188,7 @@ const ProfilePage = () => {
           className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4"
         />
         <h1 className="text-3xl font-bold dark:text-white text-slate-700 mb-2">
-         @{data.username || "Username no disponible"}
+          @{data.username || "Username no disponible"}
         </h1>
         <p className="dark:text-white text-gray-400 text-sm mb-8">
           Fecha de creación:{" "}
@@ -302,7 +300,7 @@ const ProfilePage = () => {
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="grid w-full items-center gap-1.5">
             {/* Campo País */}
-            <Label htmlFor="country">País</Label> 
+            <Label htmlFor="country">País</Label>
             <CountryDropdown
               placeholder="Elige un país"
               defaultValue={formData.country}
@@ -374,11 +372,24 @@ const ProfilePage = () => {
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
           <button type="submit" className="px-4 py-2 bg-amber-500 text-black font-semibold rounded hover:bg-amber-600">
-            Enviar
+            Guardar
           </button>
-          <VerificationButton />
         </div>
       </form>
+
+
+
+      <div className="mt-6">
+        <p className="text-lg font-semibold mb-4">Verificación de cuenta</p>
+      </div>
+
+      <div className="flex flex-col items-center p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+        <p className="text-xs">La sección de identidad de FTMO se desbloqueará para usted una vez que esté a punto de firmar o cambiar un contrato con nosotros. Se desbloqueará automáticamente una vez que alcance un objetivo de ganancias en una verificación que no haya violado la pérdida diaria máxima o la pérdida máxima</p>
+
+        <VerificationButton />
+      </div>
+
+
     </Layout>
   );
 };

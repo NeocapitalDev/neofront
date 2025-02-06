@@ -10,6 +10,10 @@ import { navigation, userNavigation } from './links';
 import Notifications from './notifications';
 import ThemeToggle from './ThemeToggle';
 
+import { PresentationChartBarIcon } from '@heroicons/react/24/outline';
+
+
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
@@ -18,7 +22,7 @@ export default function Navbar() {
   const router = useRouter()
   const [currentPath, setCurrentPath] = useState(router.pathname)
   const { data: session } = useSession()
-
+  //console.log(session);
   useEffect(() => {
     const handleRouteChange = (url) => {
       setCurrentPath(url)
@@ -82,7 +86,7 @@ export default function Navbar() {
                   <div className="flex items-center gap-x-4">
                     {/* Correo electrónico (visible solo en escritorio) */}
                     <p className="hidden lg:block text-white text-sm font-medium">
-                      {session.user.email}
+                      {session.firstName}
                     </p>
 
                     {/* Foto de perfil y menú */}
@@ -130,6 +134,16 @@ export default function Navbar() {
 
                     {/* Notificaciones */}
                     <Notifications />
+
+
+                    {/* Mostrar el ícono solo si el rol es 'admin' */}
+                    {session.rol === 'Admin' && (
+                      <Link href="/admin">
+                        <PresentationChartBarIcon className="h-6 w-6 text-red-500 cursor-pointer" />
+                      </Link>
+                    )}
+
+
                   </div>
                 )}
               </div>
@@ -145,8 +159,8 @@ export default function Navbar() {
                       as={Link}
                       href={item.href}
                       className={`block border-l-4 py-2 pl-3 pr-4 text-base font-medium ${currentPath === item.href
-                          ? 'border-gray-500 bg-zinc-900 text-white'
-                          : 'border-transparent text-gray-300 hover:border-gray-500 hover:bg-zinc-900 hover:text-white'
+                        ? 'border-gray-500 bg-zinc-900 text-white'
+                        : 'border-transparent text-gray-300 hover:border-gray-500 hover:bg-zinc-900 hover:text-white'
                         }`}
                       aria-current={currentPath === item.href ? 'page' : undefined}
                     >

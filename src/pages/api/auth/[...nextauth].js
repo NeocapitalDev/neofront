@@ -49,6 +49,7 @@ export default NextAuth({
       session.id = token.id;
       session.jwt = token.jwt;
       session.rol = token.rol;
+      session.firstName = token.firstName; // Agregando firstName a la sesión
 
       return Promise.resolve(session);
     },
@@ -58,6 +59,7 @@ export default NextAuth({
         token.id = user.id;
         token.jwt = user.jwt;
         token.rol = user.rol;
+        token.firstName = user.firstName; // Agregando firstName al token
 
       }
       return Promise.resolve(token);
