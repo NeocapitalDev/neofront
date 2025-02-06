@@ -115,6 +115,10 @@ export default function UsersTable() {
             onChange={(e) => setEmailSearch(e.target.value)}
             className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
           />
+          <Select
+            value={verificationFilter}
+            onChange={(e) => setVerificationFilter(e.target.value)}
+          />
         </div>
 
         {/* Tabla */}
@@ -174,7 +178,7 @@ const Select = ({ value, onChange }) => {
         onChange={onChange}
         className="block w-full px-3 py-1 bg-zinc-800 text-zinc-200 border border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-600"
       >
-        <option value="Todos">Todos</option>
+        <option value="Todos">Estado de cuenta</option>
         <option value="Verificado">Verificado</option>
         <option value="No Verificado">No Verificado</option>
       </select>

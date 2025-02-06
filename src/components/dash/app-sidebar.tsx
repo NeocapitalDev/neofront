@@ -13,20 +13,37 @@ import {
   SidebarFooter,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import md5 from 'md5';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session, status } = useSession();
   const [userData, setUserData] = React.useState(null);
+
+
+  const Gravatar = ({ email, size = 200, className = "h-8 w-8 rounded-full" }) => {
+    const getGravatarUrl = (email, size) => {
+      const hash = md5(email.trim().toLowerCase());
+      return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=retro`;
+    };
+
+    const avatarUrl = getGravatarUrl(email || 'nulled', size);
+
+    return <img className={className} src={avatarUrl} alt="User Avatar" />;
+  };
+
+
 
   // Efecto para actualizar el estado cuando session esté disponible
   React.useEffect(() => {
     console.log("Sesión actual:", session);
 
     if (session) {
+      const avatarUrl = `https://www.gravatar.com/avatar/${md5(session.user.email.trim().toLowerCase())}?s=40&d=retro`;
+
       setUserData({
         email: session.user.email || "correo@ejemplo.com",
-        avatar: "/images/icon-dark.png", // Avatar por defecto
-        name: session.user.email.split("@")[0] || "Usuario", // Si no hay nombre, usar parte del email
+        avatar: avatarUrl, // Avatar de Gravatar
+        name: session.firstName || session.user.email.split("@")[0], // Si no hay nombre, usar parte del email
       });
     }
   }, [session]);
