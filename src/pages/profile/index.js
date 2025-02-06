@@ -11,9 +11,8 @@ import { CountryDropdown } from '@/components/ui/country-dropdown';
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import VerificationButton from "@/components/sumsub";
 import useSWR, { mutate } from "swr";
+
 const ProfilePage = () => {
-
-
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -43,20 +42,15 @@ const ProfilePage = () => {
 
   const { data, error: fetchError, isLoading } = useStrapiData('users/me', token);
 
-
-
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Validar que el teléfono no contenga letras
     if (name === "phone" && !/^\d*$/.test(value)) {
       setError((prev) => ({ ...prev, [name]: "El teléfono solo debe contener números." }));
       setTimeout(() => setError((prev) => ({ ...prev, [name]: "" })), 2000);
       return;
     }
 
-    // Validar que los textos no sean demasiado largos
     if (value.length > 50 && (name === "firstName" || name === "lastName" || name === "city" || name === "street")) {
       setError((prev) => ({ ...prev, [name]: "El campo no debe exceder los 50 caracteres." }));
       setTimeout(() => setError((prev) => ({ ...prev, [name]: "" })), 2000);
@@ -77,9 +71,6 @@ const ProfilePage = () => {
     setFormData((prev) => ({ ...prev, country: value.alpha3 }));
   };
 
-
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -93,7 +84,7 @@ const ProfilePage = () => {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
         },
         body: JSON.stringify({
-          firstName: formData.firstName,  // No es necesario envolver en `data`
+          firstName: formData.firstName,
           lastName: formData.lastName,
           phone: formData.phone,
           country: formData.country,
@@ -101,7 +92,6 @@ const ProfilePage = () => {
           street: formData.street,
           zipCode: formData.zipCode,
         }),
-
       });
 
       if (!response.ok) {
@@ -116,10 +106,6 @@ const ProfilePage = () => {
 
       setSuccess("Datos actualizados correctamente.");
       setTimeout(() => setSuccess(""), 3000);
-
-
-
-
     } catch (error) {
       console.error("Error en handleSubmit:", error);
       setErrors({ form: error.message });
@@ -128,9 +114,6 @@ const ProfilePage = () => {
       setLoading(false);
     }
   };
-
-
-
 
   useEffect(() => {
     if (data) {
@@ -167,6 +150,8 @@ const ProfilePage = () => {
     return <Layout>Error al cargar los datos: {fetchError.message}</Layout>;
   }
 
+  const isVerified = data?.isVerified;
+
   return (
     <Layout>
       <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
@@ -198,7 +183,6 @@ const ProfilePage = () => {
         </p>
 
         <div className="w-full space-y-6 bg-gray-100 p-6 rounded-lg dark:bg-zinc-800">
-
           <div className="flex flex-col md:flex-row items-center">
             <div className="w-full md:w-1/4 mb-2 md:mb-0">
               <label className="text-base font-semibold text-black dark:text-white">
@@ -220,26 +204,25 @@ const ProfilePage = () => {
             </div>
 
             <div className="w-full md:w-3/4 flex items-center space-x-2">
-              {data.isVerified ? (
+              {isVerified ? (
                 <CheckCircleIcon className="w-6 h-6 text-green-500" />
               ) : (
                 <XCircleIcon className="w-6 h-6 text-red-500" />
               )}
               <p className="text-gray-700 dark:text-white">
-                {data.isVerified ? "Verificado" : "No verificado"}
+                {isVerified ? "Verificado" : "No verificado"}
               </p>
             </div>
-
           </div>
         </div>
       </div>
+
       <form onSubmit={handleSubmit} className="mt-5 space-y-6 p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <div className="mt-6">
           <p className="text-lg font-semibold mb-4">Información Personal</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Campo Nombre */}
           <div className="grid w-full items-start gap-1.5">
             <Label htmlFor="firstName">Nombre</Label>
             <Input
@@ -249,8 +232,9 @@ const ProfilePage = () => {
               value={formData.firstName}
               onChange={handleChange}
               placeholder="Ingrese su nombre"
+              disabled={isVerified}
             />
-            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+            <div className="h-1">
               {error.firstName && <div className="text-red-500">{error.firstName}</div>}
               {!formData.firstName && error.form && (
                 <div className="text-red-500">Campo obligatorio</div>
@@ -258,7 +242,6 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* Campo Apellido */}
           <div className="grid w-full items-start gap-1.5">
             <Label htmlFor="lastName">Apellido</Label>
             <Input
@@ -268,8 +251,9 @@ const ProfilePage = () => {
               value={formData.lastName}
               onChange={handleChange}
               placeholder="Ingrese su apellido"
+              disabled={isVerified}
             />
-            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+            <div className="h-1">
               {error.lastName && <div className="text-red-500">{error.lastName}</div>}
               {!formData.lastName && error.form && (
                 <div className="text-red-500">Campo obligatorio</div>
@@ -277,7 +261,6 @@ const ProfilePage = () => {
             </div>
           </div>
         </div>
-
 
         <div className="mt-4 grid w-full items-center gap-1.5">
           <Label htmlFor="phone">Teléfono</Label>
@@ -288,8 +271,9 @@ const ProfilePage = () => {
             value={formData.phone}
             onChange={handleChange}
             placeholder="Ingrese su teléfono"
+            disabled={isVerified}
           />
-          <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+          <div className="h-1">
             {error.phone && <div className="text-red-500">{error.phone}</div>}
             {!formData.phone && error.form && (
               <div className="text-red-500">Campo obligatorio</div>
@@ -299,14 +283,14 @@ const ProfilePage = () => {
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="grid w-full items-center gap-1.5">
-            {/* Campo País */}
             <Label htmlFor="country">País</Label>
             <CountryDropdown
               placeholder="Elige un país"
               defaultValue={formData.country}
               onChange={handleCountryChange}
+              disabled={isVerified}
             />
-            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+            <div className="h-1">
               {error.country && <div className="text-red-500">{error.country}</div>}
               {!formData.country && error.form && (
                 <div className="text-red-500">Campo obligatorio</div>
@@ -314,7 +298,6 @@ const ProfilePage = () => {
             </div>
           </div>
           <div className="grid w-full items-center gap-1.5">
-            {/* Campo Ciudad */}
             <Label htmlFor="city">Ciudad</Label>
             <Input
               type="text"
@@ -323,8 +306,9 @@ const ProfilePage = () => {
               value={formData.city}
               onChange={handleChange}
               placeholder="Ingrese su ciudad"
+              disabled={isVerified}
             />
-            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+            <div className="h-1">
               {error.city && <div className="text-red-500">{error.city}</div>}
               {!formData.city && error.form && (
                 <div className="text-red-500">Campo obligatorio</div>
@@ -343,8 +327,9 @@ const ProfilePage = () => {
               value={formData.street}
               onChange={handleChange}
               placeholder="Ingrese su calle"
+              disabled={isVerified}
             />
-            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+            <div className="h-1">
               {error.street && <div className="text-red-500">{error.street}</div>}
               {!formData.street && error.form && (
                 <div className="text-red-500">Campo obligatorio</div>
@@ -360,8 +345,9 @@ const ProfilePage = () => {
               value={formData.zipCode}
               onChange={handleChange}
               placeholder="Ingrese su código postal"
+              disabled={isVerified}
             />
-            <div className="h-1"> {/* Contenedor fijo para el mensaje de error */}
+            <div className="h-1">
               {error.zipCode && <div className="text-red-500">{error.zipCode}</div>}
               {!formData.zipCode && error.form && (
                 <div className="text-red-500">Campo obligatorio</div>
@@ -371,13 +357,15 @@ const ProfilePage = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
-          <button type="submit" className="px-4 py-2 bg-amber-500 text-black font-semibold rounded hover:bg-amber-600">
+          <button
+            type="submit"
+            className="px-4 py-2 bg-amber-500 text-black font-semibold rounded hover:bg-amber-600"
+            disabled={isVerified}
+          >
             Guardar
           </button>
         </div>
       </form>
-
-
 
       <div className="mt-6">
         <p className="text-lg font-semibold mb-4">Verificación de cuenta</p>
@@ -388,8 +376,6 @@ const ProfilePage = () => {
 
         <VerificationButton />
       </div>
-
-
     </Layout>
   );
 };
