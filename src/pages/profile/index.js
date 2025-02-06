@@ -401,7 +401,7 @@ const ProfilePage = () => {
             {/* Contenido de texto */}
             <div>
               <p className="text-sm leading-6 text-gray-700 dark:text-gray-300">
-                La sección de identidad de FTMO se desbloqueará para usted una vez que esté
+                La sección de identidad de Neo Capital se desbloqueará para usted una vez que esté
                 a punto de firmar o cambiar un contrato con nosotros. Se desbloqueará automáticamente
                 una vez que alcance un objetivo de ganancias en una verificación que no haya
                 violado la pérdida diaria máxima o la pérdida máxima.
