@@ -100,20 +100,20 @@ export default function UsersTable() {
 
   return (
     <DashboardLayout>
-      <div className="p-8 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
+      <div className="p-8 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 rounded-lg shadow-lg">
         {/* Filtros */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4">
           <Input
             placeholder="Buscar por nombre..."
             value={usernameSearch}
             onChange={(e) => setUsernameSearch(e.target.value)}
-            className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
+            className="max-w-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
           />
           <Input
             placeholder="Buscar por email..."
             value={emailSearch}
             onChange={(e) => setEmailSearch(e.target.value)}
-            className="max-w-sm bg-zinc-800 text-zinc-200 border-zinc-700"
+            className="max-w-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
           />
           <Select
             value={verificationFilter}
@@ -122,14 +122,14 @@ export default function UsersTable() {
         </div>
 
         {/* Tabla */}
-        <div className="border border-zinc-700 rounded-md overflow-hidden">
+        <div className="border border-zinc-300 dark:border-zinc-700 rounded-md overflow-hidden">
           <Table>
-            <TableHeader className="bg-zinc-800">
+            <TableHeader className="bg-zinc-200 dark:bg-zinc-800">
               <TableRow>
                 {userColumns(router).map((column) => (
                   <TableHead
                     key={column.accessorKey}
-                    className="text-zinc-200 border-b border-zinc-700"
+                    className="text-zinc-900 dark:text-zinc-200 border-b border-zinc-300 dark:border-zinc-700"
                   >
                     {column.header}
                   </TableHead>
@@ -139,7 +139,7 @@ export default function UsersTable() {
             <TableBody>
               {filteredData.length > 0 ? (
                 filteredData.map((user, index) => (
-                  <TableRow key={index} className="border-b border-zinc-700">
+                  <TableRow key={index} className="border-b border-zinc-300 dark:border-zinc-700">
                     <TableCell>{user.username}</TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>
@@ -176,9 +176,9 @@ const Select = ({ value, onChange }) => {
       <select
         value={value}
         onChange={onChange}
-        className="block w-full px-3 py-1 bg-zinc-800 text-zinc-200 border border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-600"
+        className=" max-w-sm bg-white dark:bg-zinc-800 text-zinc-700 rounded-md dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
       >
-        <option value="Todos">Estado de cuenta</option>
+        <option className="" value="Todos">Estado de cuenta</option>
         <option value="Verificado">Verificado</option>
         <option value="No Verificado">No Verificado</option>
       </select>

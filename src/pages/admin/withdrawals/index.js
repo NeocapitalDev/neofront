@@ -85,7 +85,7 @@ export default function ChallengesTable() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
+      <div className="p-6 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 rounded-lg shadow-lg">
         {/* Barra de búsqueda y filtros */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-2">
           {/* Filtro por login */}
@@ -93,7 +93,7 @@ export default function ChallengesTable() {
             placeholder="Login..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
+            className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
           />
 
           {/* Filtro por fecha de inicio */}
@@ -101,7 +101,7 @@ export default function ChallengesTable() {
             type="date"
             value={startDateFilter}
             onChange={(e) => setStartDateFilter(e.target.value)}
-            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
+            className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
           />
 
           {/* Filtro por fecha de fin */}
@@ -109,17 +109,17 @@ export default function ChallengesTable() {
             type="date"
             value={endDateFilter}
             onChange={(e) => setEndDateFilter(e.target.value)}
-            className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
+            className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
           />
         </div>
 
         {/* Tabla */}
-        <div className="border border-zinc-700 rounded-md overflow-hidden mt-4">
+        <div className="border border-zinc-300 dark:border-zinc-700 rounded-md overflow-hidden mt-4">
           <Table>
-            <TableHeader className="bg-zinc-800">
+            <TableHeader className="bg-zinc-200 dark:bg-zinc-800">
               <TableRow>
                 {challengeColumns.map((column) => (
-                  <TableHead key={column.accessorKey} className="text-zinc-200 border-b border-zinc-700">
+                  <TableHead key={column.accessorKey} className="text-zinc-900 dark:text-zinc-200 border-b border-zinc-300 dark:border-zinc-700">
                     {column.header}
                   </TableHead>
                 ))}
@@ -128,7 +128,7 @@ export default function ChallengesTable() {
             <TableBody>
               {filteredData.length > 0 ? (
                 filteredData.map((challenge, index) => (
-                  <TableRow key={index} className="border-b border-zinc-700">
+                  <TableRow key={index} className="border-b border-zinc-300 dark:border-zinc-700">
                     <TableCell>{challenge.id}</TableCell>
                     <TableCell>{challenge.login}</TableCell>
                     <TableCell>{formatDate(challenge.startDate) ?? "N/A"}</TableCell>
