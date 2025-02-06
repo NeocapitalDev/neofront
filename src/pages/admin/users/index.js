@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { CheckCircle, XCircle } from "lucide-react";
 import DashboardLayout from "..";
-import { useRouter } from "next/navigation"; // Importación del router
+import { useRouter } from 'next/router';
 
 const userColumns = (router) => [
   { accessorKey: "username", header: "Nombre de Usuario" },
@@ -40,23 +40,8 @@ const userColumns = (router) => [
   },
   {
     accessorKey: "id",
-    header: "Challenges",
-    cell: ({ row }) => {
-      const handleViewChallenges = () => {
-        const id = row.getValue("id");
-        const documentId = row.original.documentId;
-        router.push(`/admin/users?id=${id}&documentId=${documentId}`); // Redirige con los parámetros
-      };
-
-      return (
-        <button
-          onClick={handleViewChallenges}
-          className="text-blue-500 hover:underline"
-        >
-          Ver
-        </button>
-      );
-    },
+    header: "Acciones",
+    cell: ({ row }) => <RedirectButton userId={row.original.id} />,
   },
 ];
 
@@ -161,14 +146,7 @@ export default function UsersTable() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <button
-                        onClick={() =>
-                          router.push(`/admin/users?id=${user.id}&documentId=${user.documentId}`)
-                        }
-                        className="text-blue-500 hover:underline"
-                      >
-                        Ver
-                      </button>
+                      <RedirectButton userdocumentId={user.documentId} />
                     </TableCell>
                   </TableRow>
                 ))
@@ -186,3 +164,37 @@ export default function UsersTable() {
     </DashboardLayout>
   );
 }
+
+/* Componente Select */
+const Select = ({ value, onChange }) => {
+  return (
+    <div className="relative w-full md:w-48">
+      <select
+        value={value}
+        onChange={onChange}
+        className="block w-full px-3 py-1 bg-zinc-800 text-zinc-200 border border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-600"
+      >
+        <option value="Todos">Todos</option>
+        <option value="Verificado">Verificado</option>
+        <option value="No Verificado">No Verificado</option>
+      </select>
+    </div>
+  );
+};
+
+const RedirectButton = ({ userdocumentId }) => {
+  const router = useRouter();
+
+  const handleRedirect = () => {
+    router.push(`/admin/users/${userdocumentId}`);
+  };
+
+  return (
+    <button
+      onClick={handleRedirect}
+      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+    >
+      Ver Detalles
+    </button>
+  );
+};
