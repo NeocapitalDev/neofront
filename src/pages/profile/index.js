@@ -10,7 +10,7 @@ import React, { useState, useEffect } from "react";
 import { CountryDropdown } from '@/components/ui/country-dropdown';
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import VerificationButton from "@/components/sumsub";
-import useSWR, { mutate } from "swr";
+import { ChatBubbleBottomCenterTextIcon } from "@heroicons/react/24/outline";
 
 const ProfilePage = () => {
   const [formData, setFormData] = useState({
@@ -40,7 +40,7 @@ const ProfilePage = () => {
   const { data: session } = useSession();
   const token = session?.jwt;
 
-  const { data, error: fetchError, isLoading } = useStrapiData('users/me', token);
+  const { data, error: fetchError, isLoading } = useStrapiData('users/me?populate=challenges', token);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -129,6 +129,7 @@ const ProfilePage = () => {
     }
   }, [data]);
 
+
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
       const timer = setTimeout(() => {
@@ -150,7 +151,25 @@ const ProfilePage = () => {
     return <Layout>Error al cargar los datos: {fetchError.message}</Layout>;
   }
 
-  const isVerified = data?.isVerified;
+  // Convertir isVerified a booleano para evitar errores
+  const isVerified = !!data?.isVerified;
+
+  // Asegurar que challenges sea un array antes de aplicar .some()
+  const hasPhase3Challenge = Array.isArray(data?.challenges) &&
+    data.challenges.some(challenge => challenge.phase === 3);
+
+
+  // Debugging: Verificar valores en consola
+  //console.log("isVerified:", isVerified);
+  //console.log("hasPhase3Challenge:", hasPhase3Challenge);
+  //console.log("data?.challenges:", data?.challenges);
+
+  //console.log("Challenges details:", data.challenges.map(challenge => ({
+  //  id: challenge.id,
+  //  documentId: challenge.documentId,
+  // phase: challenge.phase, // Verificar si existe la propiedad phase
+  //  fullChallenge: challenge // Inspeccionar el objeto completo
+  //})));
 
   return (
     <Layout>
@@ -367,20 +386,31 @@ const ProfilePage = () => {
         </div>
       </form>
 
-      {/* Mostrar solo si la cuenta está verificada */}
-      {!isVerified && (
-        <div className="mt-6">
-          <p className="text-lg font-semibold mb-4">Verificación de cuenta</p>
-          <div className="flex flex-col items-start p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-            <p className="text-xs">
-              La sección de identidad de FTMO se desbloqueará para usted una vez que
-              esté a punto de firmar o cambiar un contrato con nosotros. Se
-              desbloqueará automáticamente una vez que alcance un objetivo de
-              ganancias en una verificación que no haya violado la pérdida diaria
-              máxima o la pérdida máxima
-            </p>
 
-            <VerificationButton />
+      {!isVerified && hasPhase3Challenge && (
+        <div className="mt-6">
+          <p className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">
+            Verificación de cuenta
+          </p>
+          <div className="flex flex-col md:flex-row items-start p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black space-y-4 md:space-y-0 md:space-x-6">
+            {/* Icono */}
+            <div className="flex-shrink-0">
+              <ChatBubbleBottomCenterTextIcon className="h-12 w-12 text-blue-500 dark:text-blue-400" />
+            </div>
+
+            {/* Contenido de texto */}
+            <div>
+              <p className="text-sm leading-6 text-gray-700 dark:text-gray-300">
+                La sección de identidad de FTMO se desbloqueará para usted una vez que esté
+                a punto de firmar o cambiar un contrato con nosotros. Se desbloqueará automáticamente
+                una vez que alcance un objetivo de ganancias en una verificación que no haya
+                violado la pérdida diaria máxima o la pérdida máxima.
+              </p>
+              {/* Botón de verificación */}
+              <div className="mt-4">
+                <VerificationButton />
+              </div>
+            </div>
           </div>
         </div>
       )}
