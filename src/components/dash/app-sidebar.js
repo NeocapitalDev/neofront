@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useSession } from "next-auth/react";
 
-import { Users, Award, UserCheck } from "lucide-react";
+import { Users, Award, UserCheck,Activity } from "lucide-react";
 
 import { NavMain } from "@/components/dash/nav-main";
 import { NavUser } from "@/components/dash/nav-user";
@@ -79,6 +79,13 @@ export function AppSidebar({ ...props }) {
       icon: UserCheck,
       isActive: false,
     },
+    {
+      title: "brokerAccount",
+      url: "/admin/brokerAccount",
+      icon: Activity,
+      isActive: false,
+    },
+    
   ];
 
   return (
