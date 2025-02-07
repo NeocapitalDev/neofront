@@ -144,9 +144,15 @@ export default function UsersTable() {
                     <TableCell>{user.email}</TableCell>
                     <TableCell>
                       {user.isVerified ? (
-                        <CheckCircle className="text-green-500 w-5 h-5" />
+                        <div className="flex items-center space-x-2">
+                          <CheckCircle className="text-green-500 w-5 h-5" />
+                          <span className="text-green-500 font-medium">Verificado</span>
+                        </div>
                       ) : (
-                        <XCircle className="text-red-500 w-5 h-5" />
+                        <div className="flex items-center space-x-2">
+                          <XCircle className="text-red-500 w-5 h-5" />
+                          <span className="text-red-500 font-medium">No Verificado</span>
+                        </div>
                       )}
                     </TableCell>
                     <TableCell>
