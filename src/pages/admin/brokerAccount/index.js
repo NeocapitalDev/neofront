@@ -25,6 +25,7 @@ const brokerAccountColumns = [
     { accessorKey: "balance", header: "Balance" },
     { accessorKey: "server", header: "Server" },
     { accessorKey: "platform", header: "Platform" },
+    { accessorkey: "inversorPass", header: "Inversor"},
     { accessorKey: "used", header: "Used" },
 ];
 
@@ -145,6 +146,7 @@ export default function BrokerAccountsTable() {
                                         <TableCell>{account.balance}</TableCell>
                                         <TableCell>{account.server}</TableCell>
                                         <TableCell>{account.platform}</TableCell>
+                                        <TableCell>{account.inversorPass}</TableCell>
                                         <TableCell>{account.used ? "Si" : "No"}</TableCell>
                                     </TableRow>
                                 ))
