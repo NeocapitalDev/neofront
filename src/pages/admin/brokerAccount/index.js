@@ -43,21 +43,34 @@ export default function BrokerAccountsTable() {
             : null,
         ([url, token]) => fetcher(url, token)
     );
-    console.log(data)
+
     const [search, setSearch] = useState("");
-    const [resultFilter, setResultFilter] = useState("");
-    const [phaseFilter, setPhaseFilter] = useState("");
-    const [startDateFilter, setStartDateFilter] = useState("");
-    const [endDateFilter, setEndDateFilter] = useState("");
+    const [usedFilter, setUsedFilter] = useState("");
 
     const filteredData = useMemo(() => {
         if (!data || !data.data) return [];
 
         return data.data.filter((account) => {
             const matchesSearch = account.login?.toLowerCase().includes(search.toLowerCase());
-            return matchesSearch;
+            const matchesUsed =
+                usedFilter === "" ? true : account.used === (usedFilter === "Yes");
+
+            return matchesSearch && matchesUsed;
         });
-    }, [data, search]);
+    }, [data, search, usedFilter]);
+
+    // Contador de cuentas por balance
+    const balanceCounts = useMemo(() => {
+        if (!data || !data.data) return {};
+
+        const balances = ["5000", "10000", "25000", "50000", "100000"];
+        const counts = balances.reduce((acc, balance) => {
+            acc[balance] = data.data.filter((account) => account.balance == balance).length;
+            return acc;
+        }, {});
+
+        return counts;
+    }, [data]);
 
     const table = useReactTable({
         data: filteredData,
@@ -69,8 +82,28 @@ export default function BrokerAccountsTable() {
     return (
         <DashboardLayout>
             <div className="p-6 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 rounded-lg shadow-lg">
+
+                {/* Resumen de Cuentas por Balance */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 ">
+                    {[
+                        { amount: "5000", label: "$5,000", color: "bg-blue-500" },
+                        { amount: "10000", label: "$10,000", color: "bg-green-500" },
+                        { amount: "25000", label: "$25,000", color: "bg-yellow-500" },
+                        { amount: "50000", label: "$50,000", color: "bg-red-500" },
+                        { amount: "100000", label: "$100,000", color: "bg-purple-500" },
+                    ].map(({ amount, label, color }) => (
+                        <div
+                            key={amount}
+                            className={`${color} text-white p-4 rounded-lg shadow-md flex flex-col items-center`}
+                        >
+                            <span className="text-xl font-bold">{balanceCounts[amount] || 0}</span>
+                            <span className="text-sm">{label}</span>
+                        </div>
+                    ))}
+                </div>
+
                 {/* Barra de búsqueda y filtros */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-2 mt-4">
                     {/* Filtro por login */}
                     <Input
                         placeholder="Login..."
@@ -78,10 +111,21 @@ export default function BrokerAccountsTable() {
                         onChange={(e) => setSearch(e.target.value)}
                         className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
                     />
+
+                    {/* Filtro por "Used" */}
+                    <select
+                        value={usedFilter}
+                        onChange={(e) => setUsedFilter(e.target.value)}
+                        className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
+                    >
+                        <option value="">Todos</option>
+                        <option value="Yes">Sí</option>
+                        <option value="No">No</option>
+                    </select>
                 </div>
 
                 {/* Tabla */}
-                <div className="border border-zinc-300 dark:border-zinc-700 rounded-md overflow-hidden mt-4">
+                <div className="border border-zinc-300 dark:border-zinc-700 rounded-md overflow-hidden mt-6">
                     <Table>
                         <TableHeader className="bg-zinc-200 dark:bg-zinc-800">
                             <TableRow>
@@ -101,7 +145,7 @@ export default function BrokerAccountsTable() {
                                         <TableCell>{account.balance}</TableCell>
                                         <TableCell>{account.server}</TableCell>
                                         <TableCell>{account.platform}</TableCell>
-                                        <TableCell>{account.used ? "Yes" : "No"}</TableCell>
+                                        <TableCell>{account.used ? "Si" : "No"}</TableCell>
                                     </TableRow>
                                 ))
                             ) : (
