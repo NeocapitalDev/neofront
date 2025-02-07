@@ -41,6 +41,8 @@ export default function Component({ data }) {
   const noTrades = chartData.wonTradesPercent === 0 && chartData.lostTradesPercent === 0;
 
   return (
+    <div className="mt-6 w-full max-w-full md:max-w-2/3 lg:max-w-2/3 justify-start items-start">
+        <h2 className="text-lg font-semibold">Win/Loss Rates</h2>
     <Card className="flex flex-col mt-4 pt-4">
 
       <CardContent className="flex flex-col items-center">
@@ -49,8 +51,8 @@ export default function Component({ data }) {
             Sin resultados aun, no se han realizado trades.
           </div>
         ) : (
-          <div className="w-full max-w-[800px] mt-4">
-            <div className="relative w-full h-8 mt-2 bg-gray-200 dark:bg-gray-700 rounded-md">
+          <div className="w-full mt-6">
+            <div className="relative w-full h-8 bg-gray-200 dark:bg-gray-700 rounded-md">
               {/* Porcentaje de Wins */}
               {chartData.wonTradesPercent > 0 && (
                 <div
@@ -77,10 +79,10 @@ export default function Component({ data }) {
             </div>
             {/* Valores promedio */}
             <div className="flex justify-between mt-1">
-              <span className="text-green-400">
+              <span className="text-gray-600">
                 Ganancia: ${chartData.averageWin.toLocaleString()}
               </span>
-              <span className="text-red-600">
+              <span className="text-gray-600">
                 Perdida: ${chartData.averageLoss.toLocaleString()}
               </span>
             </div>
@@ -88,5 +90,6 @@ export default function Component({ data }) {
         )}
       </CardContent>
     </Card>
+    </div>
   );
 }
