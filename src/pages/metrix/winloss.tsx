@@ -2,9 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { TrendingUp } from "lucide-react";
-import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
-import BarraWinLose from "../metrix/barra_win_lose";
-
 import {
   Card,
   CardContent,
@@ -13,142 +10,83 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
 
 export default function Component({ data }) {
-  const [chartData, setChartData] = useState([
-    { month: "january", wonTradesPercent: 0, lostTradesPercent: 0 },
-  ]);
+  const [chartData, setChartData] = useState({
+    wonTradesPercent: 0,
+    lostTradesPercent: 0,
+    wonTrades: 0,
+    lostTrades: 0,
+    wonBalance: 0,
+    lostBalance: 0,
+    averageWin: 0,
+    averageLoss: 0,
+  });
 
   useEffect(() => {
     if (data?.metrics) {
-      const wonTradesPercent = data.metrics.wonTradesPercent || 0; // Usa valores reales
-      const lostTradesPercent = data.metrics.lostTradesPercent || 0; // Usa valores reales
-
-      const updatedData = [
-        { month: "dynamic", wonTradesPercent, lostTradesPercent },
-      ];
-      setChartData(updatedData);
+      setChartData({
+        wonTradesPercent: data.metrics.wonTradesPercent || 0,
+        lostTradesPercent: data.metrics.lostTradesPercent || 0,
+        wonTrades: data.metrics.wonTrades || 0,
+        lostTrades: data.metrics.lostTrades || 0,
+        wonBalance: data.metrics.wonBalance || 0,
+        lostBalance: data.metrics.lostBalance || 0,
+        averageWin: data.metrics.averageWin || 0,
+        averageLoss: data.metrics.averageLoss || 0,
+      });
     }
   }, [data]);
 
-  const chartConfig = {
-    wonTradesPercent: {
-      label: "Won Trades",
-      color: "hsl(var(--chart-1))",
-    },
-    lostTradesPercent: {
-      label: "Lost Trades",
-      color: "hsl(var(--chart-2))",
-    },
-  };
-
-  const noTrades = chartData[0].wonTradesPercent === 0 && chartData[0].lostTradesPercent === 0;
+  const noTrades = chartData.wonTradesPercent === 0 && chartData.lostTradesPercent === 0;
 
   return (
-    <Card className="flex flex-col mt-4">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Progreso de Win/Loss</CardTitle>
-        <CardDescription>Resumen basado en métricas recibidas</CardDescription>
-      </CardHeader>
+    <Card className="flex flex-col mt-4 pt-4">
 
-      <CardContent className="flex flex-col items-center ">
+      <CardContent className="flex flex-col items-center">
         {noTrades ? (
           <div className="text-center text-muted-foreground">
             Sin resultados aun, no se han realizado trades.
           </div>
         ) : (
-          <>
-            {/* Gráfico Radial */}
-            <ChartContainer
-              config={chartConfig}
-              className="mx-auto aspect-square w-full max-w-[250px]"
-            >
-              <RadialBarChart
-                data={chartData}
-                endAngle={180}
-                innerRadius={90}
-                outerRadius={140}
-              >
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                  <Label
-                    content={({ viewBox }) => {
-                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                          >
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) - 16}
-                              className="fill-foreground text-3xl font-bold"
-                            >
-                              % Rates
-                            </tspan>
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) + 4}
-                              className="fill-muted-foreground"
-                            >
-                              Win / Loss
-                            </tspan>
-                          </text>
-                        );
-                      }
-                    }}
-                  />
-                </PolarRadiusAxis>
-                <RadialBar
-                  dataKey="lostTradesPercent"
-                  stackId="a"
-                  cornerRadius={5}
-                  fill="hsl(0, 70%, 50%)" // Rojo
-                  className="stroke-transparent stroke-2"
-                />
-                <RadialBar
-                  dataKey="wonTradesPercent"
-                  fill="hsl(30, 90%, 50%)" // Naranja
-                  stackId="a"
-                  cornerRadius={5}
-                  className="stroke-transparent stroke-2"
-                />
-              </RadialBarChart>
-            </ChartContainer>
-
-            {/* Barra Horizontal Win/Lose */}
-            <div className="w-full max-w-[500px] -mt-24">
-              <BarraWinLose data={data} />
+          <div className="w-full max-w-[800px] mt-4">
+            <div className="relative w-full h-8 mt-2 bg-gray-200 dark:bg-gray-700 rounded-md">
+              {/* Porcentaje de Wins */}
+              {chartData.wonTradesPercent > 0 && (
+                <div
+                  className="absolute top-0 left-0 h-full bg-green-600 text-xs font-medium text-center text-blue-100 flex items-center justify-center rounded-md"
+                  style={{
+                    width: `${chartData.wonTradesPercent}%`,
+                  }}
+                >
+                  {`${chartData.wonTradesPercent.toFixed(1)}%`}
+                </div>
+              )}
+              {/* Porcentaje de Losses */}
+              {chartData.lostTradesPercent > 0 && (
+                <div
+                  className="absolute top-0 h-full bg-red-600 text-xs font-medium text-center text-red-100 flex items-center justify-center rounded-md"
+                  style={{
+                    left: `${chartData.wonTradesPercent}%`,
+                    width: `${chartData.lostTradesPercent}%`,
+                  }}
+                >
+                  {`${chartData.lostTradesPercent.toFixed(1)}%`}
+                </div>
+              )}
             </div>
-          </>
-        )}
-      </CardContent>
-
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Cambios recientes en las métricas <TrendingUp className="h-4 w-4" />
-        </div>
-        {!noTrades && (
-          <div className="flex justify-between">
-            <span className="text-amber-400">
-              Ganancia: {chartData[0].wonTradesPercent.toFixed(1)}%
-            </span>
-            <span className="text-red-600">
-              Pérdida: {chartData[0].lostTradesPercent.toFixed(1)}%
-            </span>
+            {/* Valores promedio */}
+            <div className="flex justify-between mt-1">
+              <span className="text-green-400">
+                Ganancia: ${chartData.averageWin.toLocaleString()}
+              </span>
+              <span className="text-red-600">
+                Perdida: ${chartData.averageLoss.toLocaleString()}
+              </span>
+            </div>
           </div>
         )}
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 }
