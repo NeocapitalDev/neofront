@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import md5 from 'md5';
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }) {
   const { data: session, status } = useSession();
   const [userData, setUserData] = React.useState(null);
 
