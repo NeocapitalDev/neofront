@@ -2,7 +2,8 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, ClipboardDocumentIcon, PencilIcon, KeyIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
-export default function CredencialesModal({ login, password, server, platform }) {
+export default function CredencialesModal({ login, password, server, platform, inversorPass
+}) {
     const [open, setOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar la contraseña
     const [copied, setCopied] = useState({}); // Estado para el mensaje de "Copiado" para cada item
@@ -11,8 +12,11 @@ export default function CredencialesModal({ login, password, server, platform })
     const data = [
         { label: 'Login', value: login },
         { label: 'Contraseña', value: password },
+        { label: 'InversorPass', value: inversorPass },
+
         { label: 'Servidor', value: server },
         { label: 'Plataforma', value: platform },
+
     ];
 
     const handleCopy = (label, value) => {

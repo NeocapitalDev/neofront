@@ -192,7 +192,7 @@ const ProfilePage = () => {
           className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4"
         />
         <h1 className="text-3xl font-bold dark:text-white text-slate-700 mb-2">
-          @{data.username || "Username no disponible"}
+          {session.firstName || "Username no disponible"}
         </h1>
         <p className="dark:text-white text-gray-400 text-sm mb-8">
           Fecha de creación:{" "}

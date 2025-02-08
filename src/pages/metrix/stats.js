@@ -6,17 +6,17 @@ export default function Stats(props) {
   }, [props]);
 
   const {
-    createdAt, documentId, endDate, id, idMeta, initBalance, 
-    login, password, phase, platform, publishedAt, result, 
-    server, startDate, updatedAt 
+     endDate,  
+     broker_account, result 
+    , startDate,  
   } = props;
 
   const data = [
     { label: "Resultado", value: result },
     { label: "Inicio", value: startDate || "-" },
     { label: "Fin", value: endDate || "-" },
-    { label: "Tamaño de cuenta", value: initBalance ? `$${initBalance}` : "-" },
-    { label: "Plataforma", value: platform },
+    { label: "Tamaño de cuenta", value: broker_account.balance ? `$${broker_account.balance}` : "-" },
+    { label: "Plataforma", value: broker_account.platform },
   ];
 
   return (
