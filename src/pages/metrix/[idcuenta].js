@@ -26,7 +26,7 @@ const Metrix = () => {
 
   const { data: challengeData, error, isLoading } = useSWR(
     idcuenta
-      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${idcuenta}`
+      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${idcuenta}?populate=broker_account`
       : null,
     fetcher
   );
@@ -61,8 +61,8 @@ const Metrix = () => {
       }
     };
 
-    if (challengeData?.data?.idMeta) {
-      fetchAdditionalMetrics(challengeData.data.idMeta);
+    if (challengeData?.data?.broker_account.idMeta) {
+      fetchAdditionalMetrics(challengeData.data.broker_account.idMeta);
     }
   }, [challengeData?.data?.idMeta]);
 
@@ -78,11 +78,11 @@ const Metrix = () => {
     <Layout>
       <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
-        Account Metrix {challengeData?.data?.login || "Sin nombre"}
+        Account Metrix {challengeData?.data?.broker_account.login || "Sin nombre"}
       </h1>
 
       <div className="flex justify-start gap-3 my-6">
-        {challengeData?.data && <CredencialesModal {...challengeData.data} />}
+        {challengeData?.data && <CredencialesModal {...challengeData.data.broker_account} />}
 
         <Link
           href="/support"
