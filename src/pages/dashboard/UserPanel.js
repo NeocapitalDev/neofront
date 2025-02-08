@@ -37,7 +37,7 @@ export default function Index() {
 
     const { data, error, isLoading } = useSWR(
         session?.jwt
-            ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate=challenges`, session.jwt]
+            ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate]=broker_account`, session.jwt]
             : null,
         ([url, token]) => fetcher(url, token)
     );
