@@ -33,11 +33,14 @@ const Metrix = () => {
 
   const [metricsData, setMetricsData] = useState(null);
   const [metricsError, setMetricsError] = useState(null);
-  const [isMetricsLoading, setIsMetricsLoading] = useState(false);
+
+  // useEffect(() => {
+  //   console.log("challengeData recibido:", challengeData);
+  // }, [challengeData]);
+
 
   useEffect(() => {
     const fetchAdditionalMetrics = async (idMeta) => {
-      setIsMetricsLoading(true);
       try {
         const response = await fetch(
           `https://metastats-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${idMeta}/metrics`,
@@ -52,21 +55,19 @@ const Metrix = () => {
           throw new Error("Error al obtener datos de MetaAPI");
         }
         const data = await response.json();
-        console.log("Datos obtenidos de MetaAPI:", data);
         setMetricsData(data);
+
       } catch (err) {
         setMetricsError(err);
-      } finally {
-        setIsMetricsLoading(false);
       }
     };
 
     if (challengeData?.data?.broker_account?.idMeta) {
       fetchAdditionalMetrics(challengeData.data.broker_account.idMeta);
     }
-  }, [challengeData?.data?.broker_account?.idMeta]);
+  }, [challengeData?.data?.idMeta]);
 
-  if (isLoading || isMetricsLoading) {
+  if (isLoading) {
     return (
       <Layout>
         <Loader />
@@ -100,6 +101,7 @@ const Metrix = () => {
         </button>
       </div>
 
+
       {error || metricsError ? (
         <div className="flex flex-col items-center justify-center py-20 text-center text-white">
           <div className="p-8 bg-white dark:bg-zinc-800 rounded-lg shadow-lg w-full">
@@ -125,6 +127,7 @@ const Metrix = () => {
 
           <WinLoss data={metricsData || {}} />
 
+
           <Objetivos />
 
           <div className="mt-6">
@@ -148,6 +151,7 @@ const Metrix = () => {
           </div>
         </>
       )}
+
     </Layout>
   );
 };
