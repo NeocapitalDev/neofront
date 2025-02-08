@@ -2,17 +2,17 @@ import { useSession } from 'next-auth/react';
 import Layout from '../../components/layout/dashboard';
 import Loader from '../../components/loaders/loader';
 import { useStrapiData } from '../../services/strapiServiceJWT';
-import { IdentificationIcon, UserIcon } from '@heroicons/react/24/outline';
+import { UserIcon } from '@heroicons/react/24/outline';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LogoGravatar from "../../components/LogoGravatar";
 import React, { useState, useEffect } from "react";
 import { CountryDropdown } from '@/components/ui/country-dropdown';
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
-import VerificationButton from "@/components/sumsub";
-import { ChatBubbleBottomCenterTextIcon } from "@heroicons/react/24/outline";
 import { toast } from 'sonner';
-import { Veriff } from '@veriff/js-sdk';
+import dynamic from "next/dynamic";
+
+const Verification = dynamic(() => import("./verification"), { ssr: false }); // 👈 Evita SSR
 
 const ProfilePage = () => {
   const [formData, setFormData] = useState({
@@ -76,7 +76,7 @@ const ProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); // Deshabilita el botón mientras se procesa la solicitud
-  
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${data.id}`, {
         method: "PUT",
@@ -86,14 +86,14 @@ const ProfilePage = () => {
         },
         body: JSON.stringify(formData),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error en la respuesta de Strapi:", errorData);
         toast.error('Error en la respuesta');
         throw new Error(`Error ${response.status} - ${errorData?.error?.message || "Error desconocido"}`);
       }
-  
+
       setSuccess("Datos actualizados correctamente.");
       toast.success('Datos actualizados correctamente.');
       setTimeout(() => setSuccess(""), 3000);
@@ -104,7 +104,7 @@ const ProfilePage = () => {
     } finally {
       setLoading(false); // Habilita el botón nuevamente después de completar la solicitud
     }
-  };  
+  };
 
   useEffect(() => {
     if (data) {
@@ -381,31 +381,10 @@ const ProfilePage = () => {
 
       {/*Visualizacion de varificacion cuando no esta verificado y tiene challenges en fase 3*/}
       {!isVerified && hasPhase3Challenge && (
-        <div className="mt-6">
-          <p className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">
-            Verificación de cuenta
-          </p>
-          <div className="flex flex-col md:flex-row items-start p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black space-y-4 md:space-y-0 md:space-x-6">
-            {/* Icono */}
-            <div className="flex-shrink-0">
-              <IdentificationIcon className="h-12 w-12 text-zinc-400 dark:text-zinc-400" />
-            </div>
-
-            {/* Contenido de texto */}
-            <div>
-              <p className="text-sm leading-6 text-gray-700 dark:text-gray-300">
-                Confirme su identidad. Para continuar, necesitará una identificación con foto válida y un dispositivo con cámara. Al proceder, acepta que Veriff procese sus datos personales, incluidos los datos biométricos.
-              </p>
-
-
-              {/* Botón de verificación */}
-              <div className="mt-4">
-                <VerificationButton />
-                <div id='veriff-root' style="width:400px"></div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <>
+        h
+        <Verification apiKey="dd8f7e39-0ef2-4c05-a872-b40235b2d24f"/>
+        </>
       )}
 
     </Layout>
