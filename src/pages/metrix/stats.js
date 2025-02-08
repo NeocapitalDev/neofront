@@ -5,12 +5,14 @@ export default function Stats(props) {
     console.log("Datos recibidos en Stats:", props);
   }, [props]);
 
+  // Validar props antes de acceder a sus valores
   const {
-     endDate,  
-     broker_account, result 
-    , startDate,  
+    endDate = "-",
+    broker_account = {}, // Si es undefined, asigna un objeto vacío para evitar errores
+    result = "-",
+    startDate = "-",
   } = props;
-
+  
   const data = [
     { label: "Resultado", value: result },
     { label: "Inicio", value: startDate || "-" },
