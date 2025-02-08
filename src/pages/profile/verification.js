@@ -4,9 +4,19 @@ import { useEffect, useState } from "react";
 import { Veriff } from "@veriff/js-sdk";
 import { createVeriffFrame } from "@veriff/incontext-sdk";
 import { IdentificationIcon } from "@heroicons/react/24/outline";
+import { useStrapiData } from "@/services/strapiServiceJWT";
+import { useSession } from "next-auth/react";
 
 const VeriffComponent = () => {
   const [veriffInstance, setVeriffInstance] = useState(null);
+
+
+  const { data: session } = useSession();
+  const token = session?.jwt;
+
+  const { data, error: fetchError, isLoading } = useStrapiData('users/me?populate=challenges', token);
+
+
 
   useEffect(() => {
     const veriff = Veriff({
@@ -26,10 +36,10 @@ const VeriffComponent = () => {
     // Configura los parámetros del usuario
     veriff.setParams({
       person: {
-        givenName: "Foo",
-        lastName: "Bar",
+        givenName: data.firstName,
+        lastName: data.lastName,
       },
-      vendorData: "7eb19312-79d6-11ec-90d6-0242ac120003",
+      vendorData: data.documentId,
     });
 
     setVeriffInstance(veriff);
