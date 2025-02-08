@@ -14,9 +14,9 @@ const VeriffComponent = () => {
   const { data: session } = useSession();
   const token = session?.jwt;
 
-  const { data, error: fetchError, isLoading } = useStrapiData('users/me?populate=challenges', token);
+  const { data, error: fetchError, isLoading } = useStrapiData('users/me', token);
 
-
+  console.log(data)
 
   useEffect(() => {
     const veriff = Veriff({
