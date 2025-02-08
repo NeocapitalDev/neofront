@@ -152,7 +152,7 @@ export default function Index() {
                                                             approved: 'text-green-500'
                                                         }[challenge.result] || 'text-slate-800 dark:text-slate-200'}`}>
                                                             {{
-                                                                init: 'Inicial',
+                                                                init: 'Iniciado',
                                                                 progress: 'En curso',
                                                                 disapproved: 'Desaprobado',
                                                                 approved: 'Aprobado'
