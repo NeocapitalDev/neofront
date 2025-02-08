@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, ClipboardDocumentIcon, PencilIcon, KeyIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import ButtonInit from '@/components/button_init';
 
 export default function CredencialesModal({ login, password, server, platform }) {
     const [open, setOpen] = useState(false);
@@ -22,15 +23,16 @@ export default function CredencialesModal({ login, password, server, platform })
     };
 
     return (
-        <div>
-            {/* Botón para abrir el modal */}
-            <button
-                className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 w-auto dark:bg-zinc-700 dark:hover:bg-zinc-600 dark:border-zinc-500"
-                onClick={() => setOpen(true)}
-            >
-                <KeyIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                <span className="text-xs lg:text-sm dark:text-zinc-200">Credenciales</span>
-            </button>
+        <div className='flex items-center space-x-4'>
+
+                {/* Botón para abrir el modal */}
+                <button
+                    className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 w-auto dark:bg-zinc-700 dark:hover:bg-zinc-600 dark:border-zinc-500"
+                    onClick={() => setOpen(true)}
+                >
+                    <KeyIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+                    <span className="text-xs lg:text-sm dark:text-zinc-200">Credenciales</span>
+                </button>
 
             {/* Modal */}
             <Transition.Root show={open} as={Fragment}>
@@ -156,6 +158,9 @@ export default function CredencialesModal({ login, password, server, platform })
                     </div>
                 </Dialog>
             </Transition.Root>
+
+            {/* Botón adicional */}
+            <ButtonInit />
         </div>
     );
 }
