@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import ButtonInit from '@/components/button_init';
 
 const fetcher = async (url, token) => {
     const response = await fetch(url, {
@@ -41,7 +42,7 @@ export default function Index() {
             : null,
         ([url, token]) => fetcher(url, token)
     );
-   console.log(data)
+    console.log(data)
     const [visibility, setVisibility] = useState(() => {
         if (typeof window !== "undefined") {
             const storedVisibility = localStorage.getItem("visibility");
@@ -179,6 +180,9 @@ export default function Index() {
                                                 <Label htmlFor={`visible-mode-${index}`}>Visible</Label>
                                             </div>
                                         </div>
+                                        {/* Botón para iniciar el challenge con espaciado superior */}
+                                        <ButtonInit />
+
                                     </div>
                                 );
                             })

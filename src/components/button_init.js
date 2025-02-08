@@ -43,12 +43,19 @@ const ButtonInit = () => {
     };
 
     return (
-        <button
-            onClick={handleClick}
-            className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 w-auto dark:bg-zinc-700 dark:hover:bg-zinc-600 dark:border-zinc-500"
-        >
-            Challenge Data
-        </button>
+        <div className="flex flex-col-1 items-start py-4 gap-2 mt-4 dark:border-zinc-600 bg-gray-100 dark:bg-zinc-800 ">
+    <p className="text-sm text-gray-600 dark:text-gray-300 py-2">
+        Haz clic para iniciar el challenge
+    </p> 
+
+    <button
+        onClick={handleClick}
+        className="flex items-center justify-center space-x-2 px-3 py-1 h-8 border rounded-md shadow-sm bg-gray-200 hover:bg-gray-300 text-xs dark:bg-zinc-700 dark:hover:bg-zinc-600 dark:border-zinc-500"
+    >
+        Iniciar challenge
+    </button>
+</div>
+
     );
 };
 
