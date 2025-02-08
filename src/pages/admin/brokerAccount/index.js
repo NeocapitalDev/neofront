@@ -40,7 +40,7 @@ export default function BrokerAccountsTable() {
     const { data: session } = useSession();
     const { data, error, isLoading } = useSWR(
         session?.jwt
-            ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/broker-accounts`, session.jwt]
+            ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/broker-accounts?filters[used][$eq]=false`, session.jwt]
             : null,
         ([url, token]) => fetcher(url, token)
     );
