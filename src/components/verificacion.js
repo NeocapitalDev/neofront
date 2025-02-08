@@ -37,7 +37,7 @@ const VerificationButton = () => {
                     ? "Verificación Completa"
                     : loading
                         ? "Cargando..."
-                        : "Verificar Identidad"}
+                        : "Iniciar Verificacion"}
             </button>
         </div>
     );
