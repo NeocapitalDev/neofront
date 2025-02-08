@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Veriff } from "@veriff/js-sdk";
 import { createVeriffFrame } from "@veriff/incontext-sdk";
-import { IdentificationIcon, UserIcon } from '@heroicons/react/24/outline';
+import { IdentificationIcon } from "@heroicons/react/24/outline";
 
 const VeriffComponent = () => {
   const [veriffInstance, setVeriffInstance] = useState(null);
@@ -23,20 +23,26 @@ const VeriffComponent = () => {
       },
     });
 
+    // Configura los parámetros del usuario
+    veriff.setParams({
+      person: {
+        givenName: "Foo",
+        lastName: "Bar",
+      },
+      vendorData: "7eb19312-79d6-11ec-90d6-0242ac120003",
+    });
+
     setVeriffInstance(veriff);
   }, []);
 
-  const startVerification = () => {
+  useEffect(() => {
     if (veriffInstance) {
       veriffInstance.mount({
-        formLabel: {
-          vendorData: "Order number",
-        },
+        submitBtnText: 'Obtener verificación',
+        loadingText: 'Porfavor espera...'
       });
-    } else {
-      console.error("Veriff aún no está listo.");
     }
-  };
+  }, [veriffInstance]); // Inicia automáticamente cuando Veriff esté listo
 
   return (
     <>
@@ -52,24 +58,18 @@ const VeriffComponent = () => {
 
           {/* Contenido de texto */}
           <div>
-            <p className="text-sm leading-6 text-gray-700 dark:text-gray-300">
-              Confirme su identidad. Para continuar, necesitará una identificación con foto válida y un dispositivo con cámara. Al proceder, acepta que Veriff procese sus datos personales, incluidos los datos biométricos.
+            <p className="text-sm leading-6 text-gray-700 dark:text-gray-300 mb-6">
+              Confirme su identidad. Para continuar, necesitará una
+              identificación con foto válida y un dispositivo con cámara. Al
+              proceder, acepta que Veriff procese sus datos personales,
+              incluidos los datos biométricos.
             </p>
 
+            <div id="veriff-root"></div>
 
-            {/* Botón de verificación */}
-            <div className="flex flex-col items-start mt-6">
-              <button
-                onClick={startVerification}
-                className="px-4 py-2 text-black font-semibold rounded-md shadow-lg transition bg-amber-500 hover:bg-amber-600"
-              >
-                Verificar Identidad
-              </button>
-            </div>
           </div>
         </div>
       </div>
-      <div id="veriff-root"></div>
     </>
   );
 };

@@ -382,7 +382,6 @@ const ProfilePage = () => {
       {/*Visualizacion de varificacion cuando no esta verificado y tiene challenges en fase 3*/}
       {!isVerified && hasPhase3Challenge && (
         <>
-        h
         <Verification apiKey="dd8f7e39-0ef2-4c05-a872-b40235b2d24f"/>
         </>
       )}
