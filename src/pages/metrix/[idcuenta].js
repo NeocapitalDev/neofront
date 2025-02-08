@@ -126,14 +126,17 @@ const Metrix = () => {
 
           <WinLoss data={metricsData || {}} />
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="w-full md:w-1/2  rounded-lg ">
-              <h2 className="text-lg font-bold mb-4 pt-5">Resumen Diario</h2>
-              <Daily_summary />
-            </div>
 
-            <div className="w-full md:w-1/2  rounded-lg ">
+
+            <div className="w-full md:w-1/3  rounded-lg ">
               <h2 className="text-lg font-bold mb-4 pt-5">Estadísticas</h2>
               <Statistics />
+            </div>
+
+
+            <div className="w-full md:w-2/3  rounded-lg ">
+              <h2 className="text-lg font-bold mb-4 pt-5">Resumen Diario</h2>
+              <Daily_summary />
             </div>
           </div>
 
