@@ -125,7 +125,11 @@ export default function Index() {
                                         className="relative p-6 mb-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black"
                                     >
                                         <p className="text-sm font-bold text-zinc-800 mb-2 dark:text-zinc-200">
+<<<<<<< HEAD
                                             Login: {challenge.broker_account?.login || "-"}
+=======
+                                        Login: {challenge.broker_account?.login ? challenge.broker_account.login : "Sin cuenta"}
+>>>>>>> 7f8925d6ffc027283833bb619705a7ebf1e7b57b
                                         </p>
                                         {isVisible && (
                                             <>
@@ -133,7 +137,13 @@ export default function Index() {
                                                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                                         Balance:{" "}
                                                         <span className="font-bold text-slate-800 dark:text-slate-200">
+<<<<<<< HEAD
                                                             ${balance !== undefined ? balance : challenge.broker_account?.balance || "-"}
+=======
+                                                        ${balance !== undefined 
+        ? balance 
+        : challenge.broker_account?.balance ?? "-"}                                                            
+>>>>>>> 7f8925d6ffc027283833bb619705a7ebf1e7b57b
                                                         </span>
                                                     </p>
                                                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
