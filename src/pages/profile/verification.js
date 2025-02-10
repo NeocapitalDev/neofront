@@ -39,7 +39,7 @@ const VeriffComponent = () => {
         givenName: data.firstName,
         lastName: data.lastName,
       },
-      vendorData: String(data.id),
+      vendorData: data.documentId,
     });
 
     setVeriffInstance(veriff);
