@@ -45,19 +45,6 @@ const VeriffComponent = () => {
         setVeriffInstance(veriff);
       });
     });
-<<<<<<< HEAD
-
-    veriff.setParams({
-      person: {
-        givenName: data.firstName,
-        lastName: data.lastName,
-      },
-      vendorData: data.documentId,
-    });
-
-    setVeriffInstance(veriff);
-=======
->>>>>>> 213e213b64f88a7ee66c3f29c05a45e77ff2dffc
   }, [isLoading, data]);
 
   useEffect(() => {
