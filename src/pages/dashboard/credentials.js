@@ -162,7 +162,6 @@ export default function CredencialesModal({ login, password, server, platform, i
                     </div>
                 </Dialog>
             </Transition.Root>
-                                    
         </div>
     );
 }
