@@ -120,13 +120,13 @@ const Metrix = () => {
 
             <div className="w-full md:w-1/3  rounded-lg ">
               <h2 className="text-lg font-bold mb-4 pt-5">Estadísticas</h2>
-              <Statistics />
+              <Statistics data={metricsData || {}}/>
             </div>
 
 
             <div className="w-full md:w-2/3  rounded-lg ">
               <h2 className="text-lg font-bold mb-4 pt-5">Resumen Diario</h2>
-              <Daily_summary />
+              <Daily_summary data={metricsData || {}} />
             </div>
           </div>
 
