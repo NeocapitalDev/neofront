@@ -12,13 +12,24 @@ export default function Stats(props) {
     result = "-",
     startDate = "-",
   } = props;
-  
+
+  // Traducción de valores del result
+  const resultTranslations = {
+    init: "Iniciado",
+    progress: "En progreso",
+    disapproved: "Desaprobado",
+    approved: "Aprobado",
+    withdrawals: "Retiros",
+  };
+
+  const translatedResult = resultTranslations[result] || result;
+
   const data = [
-    { label: "Resultado", value: result },
+    { label: "Resultado", value: translatedResult },
     { label: "Inicio", value: startDate || "-" },
     { label: "Fin", value: endDate || "-" },
     { label: "Tamaño de cuenta", value: broker_account.balance ? `$${broker_account.balance}` : "-" },
-    { label: "Plataforma", value: broker_account.platform },
+    { label: "Plataforma", value: broker_account.platform || "-" },
   ];
 
   return (
