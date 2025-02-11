@@ -133,9 +133,12 @@ export default function Index() {
                                                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                                         Balance:{" "}
                                                         <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                            ${balance !== undefined ? balance : challenge.broker_account?.balance || "-"}
+                                                            ${metaStats[challenge.idMeta] !== undefined
+                                                                ? metaStats[challenge.idMeta]  // Muestra el balance actualizado si hay datos
+                                                                : challenge.broker_account?.balance || "-"}  {/*Si no hay actividad, muestra el balance inicial*/}
                                                         </span>
                                                     </p>
+
                                                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                                         Fin:{" "}
                                                         <span className="font-bold text-slate-800 dark:text-slate-200">
