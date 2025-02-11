@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import {
     Table,
     TableBody,
@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import DashboardLayout from "..";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const brokerAccountColumns = [
     { accessorKey: "login", header: "Login" },
@@ -43,6 +44,15 @@ export default function BrokerAccountsTable() {
 
     const [search, setSearch] = useState("");
     const [selectedAccountType, setSelectedAccountType] = useState(null);
+    const [formData, setFormData] = useState({
+        login: "",
+        password: "",
+        server: "",
+        balance: null,
+        platform: "mt4",
+        used: false,
+        inversorPass: "",
+    });
 
     const accountTypes = [
         { amount: "5000", label: "$5,000", color: "bg-blue-500" },
@@ -60,6 +70,77 @@ export default function BrokerAccountsTable() {
             return acc;
         }, {});
     }, [data]);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+
+        if (name === "login" && !/^[a-zA-Z0-9]*$/.test(value)) return;
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const saveBrokerAccount = async () => {
+        if (!session?.jwt) {
+            toast.error("No hay sesión activa.");
+            return;
+        }
+
+        if (!formData.login || !formData.password || !formData.server || !formData.balance) {
+            toast.warning("Todos los campos son obligatorios.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/broker-accounts`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${session.jwt}`,
+                },
+                body: JSON.stringify({ data: formData }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                console.error("❌ Error Strapi Response:", result);
+                throw new Error(result?.error?.message || "Error desconocido en Strapi");
+            }
+
+            toast.success("Cuenta guardada exitosamente!");
+
+            // 🔄 ACTUALIZA LA TABLA EN TIEMPO REAL
+            mutate(
+                [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/broker-accounts?filters[used][$eq]=false`, session.jwt],
+                async (currentData) => {
+                    const newData = result.data;
+                    return {
+                        ...currentData,
+                        data: [...(currentData?.data || []), newData],
+                    };
+                },
+                false
+            );
+
+            // Reinicia el formulario
+            setFormData({
+                login: "",
+                password: "",
+                server: "",
+                balance: null,
+                platform: "mt4",
+                used: false,
+                inversorPass: "",
+            });
+            setSelectedAccountType(null);
+        } catch (error) {
+            console.error("🚨 Error al guardar en Strapi:", error);
+            toast.error("Error al guardar la cuenta.");
+        }
+    };
 
     return (
         <DashboardLayout>
@@ -84,6 +165,7 @@ export default function BrokerAccountsTable() {
                                     key={amount}
                                     onClick={() => {
                                         setSelectedAccountType(label);
+                                        setFormData({ ...formData, balance: amount });
                                     }}
                                     className={`${color} text-white p-4 rounded-lg shadow-md flex flex-col items-center hover:opacity-90 transition`}
                                 >
@@ -91,44 +173,42 @@ export default function BrokerAccountsTable() {
                                 </button>
                             ))}
                         </div>
-                        {/* Formulario debajo del botón */}
-                            <div className="mt-6   rounded-md shadow-md">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">Agregar cuenta - {selectedAccountType}</h2>
-                                <Input placeholder="Ingrese el login..." className="mt-4 border bg-zinc-700" />
-                                <Input placeholder="Ingrese la contraseña..." className="mt-2 border bg-zinc-700" />
-                                <Input placeholder="Ingrese el servidor..." className="mt-2 border bg-zinc-700" />
-                                <Button className="mt-4 w-full">Guardar Cuenta</Button>
-                            </div>
-                        
+
+                        {/* Formulario */}
+                        <div className="mt-6 rounded-md shadow-md">
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">Agregar cuenta - {selectedAccountType}</h2>
+                            <Input name="login" placeholder="Ingrese el login..." value={formData.login} onChange={handleInputChange} className="mt-4 border bg-zinc-700" />
+                            <Input name="password" placeholder="Ingrese la contraseña..." type="password" value={formData.password} onChange={handleInputChange} className="mt-2 border bg-zinc-700" />
+                            <Input name="server" placeholder="Ingrese el servidor..." value={formData.server} onChange={handleInputChange} className="mt-2 border bg-zinc-700" />
+                            <Button className="mt-4 w-full" onClick={saveBrokerAccount}>Guardar Cuenta</Button>
+                        </div>
                     </div>
 
                     {/* Tabla de cuentas */}
                     <div className="md:col-span-3 border-zinc-300 border-2 dark:border-zinc-700 rounded-md overflow-hidden h-[70vh] overflow-y-auto">
-                        <div className="p-4">
-                            <Input
-                                placeholder="Buscar login..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="w-full mb-4"
-                            />
-                        </div>
                         <Table>
                             <TableHeader className="bg-zinc-200 dark:bg-zinc-800">
                                 <TableRow>
                                     {brokerAccountColumns.map((column) => (
-                                        <TableHead key={column.accessorKey} className="text-zinc-900 dark:text-zinc-200 border-b border-zinc-300 dark:border-zinc-700">
-                                            {column.header}
-                                        </TableHead>
+                                        <TableHead key={column.accessorKey}>{column.header}</TableHead>
                                     ))}
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow>
-                                    <TableCell colSpan={brokerAccountColumns.length} className="text-center text-zinc-500 py-6">
-                                        No se encontraron resultados.
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
+    {data?.data?.map((account) => (
+        <TableRow key={account.id}>
+            {brokerAccountColumns.map((col) => (
+                <TableCell key={col.accessorKey}>
+                    {col.accessorKey === "used"
+                        ? account[col.accessorKey] === false ? "No" : "Sí"
+                        : account[col.accessorKey] ?? account.attributes?.[col.accessorKey] ?? "N/A"}
+                </TableCell>
+            ))}
+        </TableRow>
+    ))}
+</TableBody>
+
+
                         </Table>
                     </div>
                 </div>

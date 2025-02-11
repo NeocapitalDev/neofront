@@ -4,8 +4,6 @@ import Link from 'next/link';
 import { ChartBarIcon, BellIcon } from '@heroicons/react/24/outline';
 import CredencialesModal from './credentials';
 import Loader from '../../components/loaders/loader';
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import ButtonInit from '@/components/button_init';
@@ -49,7 +47,6 @@ export default function Index() {
                         }
                     }
                 }
-
                 setBalances(newBalances);
             };
 
