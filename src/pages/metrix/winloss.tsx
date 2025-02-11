@@ -24,16 +24,16 @@ export default function Component({ data }) {
   });
 
   useEffect(() => {
-    if (data?.metrics) {
+    if (data) {
       setChartData({
-        wonTradesPercent: data.metrics.wonTradesPercent || 0,
-        lostTradesPercent: data.metrics.lostTradesPercent || 0,
-        wonTrades: data.metrics.wonTrades || 0,
-        lostTrades: data.metrics.lostTrades || 0,
-        wonBalance: data.metrics.wonBalance || 0,
-        lostBalance: data.metrics.lostBalance || 0,
-        averageWin: data.metrics.averageWin || 0,
-        averageLoss: data.metrics.averageLoss || 0,
+        wonTradesPercent: data.wonTradesPercent || 0,
+        lostTradesPercent: data.lostTradesPercent || 0,
+        wonTrades: data.wonTrades || 0,
+        lostTrades: data.lostTrades || 0,
+        wonBalance: data.wonBalance || 0,
+        lostBalance: data.lostBalance || 0,
+        averageWin: data.averageWin || 0,
+        averageLoss: data.averageLoss || 0,
       });
     }
   }, [data]);

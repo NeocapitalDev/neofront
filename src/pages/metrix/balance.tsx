@@ -31,10 +31,10 @@ export default function Component({ data }) {
   const [losePercentage, setLosePercentage] = useState(0);
   const [totalWins, setTotalWins] = useState(0);
   const [totalLosses, setTotalLosses] = useState(0);
-
+  console.log(data);
   useEffect(() => {
-    if (data?.metrics) {
-      const { balance, openTradesByHour } = data.metrics;
+    if (data) {
+      const { balance, openTradesByHour } = data;
 
       if (typeof balance === "number") {
         setBalance(balance);

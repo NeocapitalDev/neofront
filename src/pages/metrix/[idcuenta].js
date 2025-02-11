@@ -8,6 +8,7 @@ import CredencialesModal from "../dashboard/credentials";
 import Link from "next/link";
 import Daily_summary from '../../pages/metrix/daily_summary';
 import Statistics from '../../pages/metrix/statistics';
+import MetaApi, { MetaStats } from 'metaapi.cloud-sdk';
 
 import Balance from "./balance";
 import Stats from "./stats";
@@ -38,29 +39,18 @@ const Metrix = () => {
 
   useEffect(() => {
     const fetchAdditionalMetrics = async (idMeta) => {
-      setIsMetricsLoading(true);
+      const metaStats = new MetaStats(process.env.NEXT_PUBLIC_TOKEN_META_API);
       try {
-        const response = await fetch(
-          `https://metastats-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${idMeta}/metrics`,
-          {
-            headers: {
-              "auth-token": `${process.env.NEXT_PUBLIC_TOKEN_META_API}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Error al obtener datos de MetaAPI");
-        }
-        const data = await response.json();
-        console.log("Datos obtenidos de MetaAPI:", data);
-        setMetricsData(data);
+        const metrics = await metaStats.getMetrics(idMeta);
+        setMetricsData(metrics);
+        console.log(metricsData);
       } catch (err) {
         setMetricsError(err);
       } finally {
         setIsMetricsLoading(false);
       }
     };
+    
 
     if (challengeData?.data?.broker_account?.idMeta) {
       fetchAdditionalMetrics(challengeData.data.broker_account.idMeta);
