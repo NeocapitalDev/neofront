@@ -2,39 +2,36 @@
 
 import { useEffect, useState } from "react";
 import { TrendingUp } from "lucide-react";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function Component({ data }) {
   const [chartData, setChartData] = useState({
     wonTradesPercent: 0,
     lostTradesPercent: 0,
-    wonTrades: 0,
-    lostTrades: 0,
     wonBalance: 0,
     lostBalance: 0,
-    averageLoss: 0,
-    totalProfit: 0,
   });
 
   useEffect(() => {
     if (data) {
+      const wonBalance =
+        data.currencySummary?.[0]?.total?.profit > 0
+          ? data.currencySummary[0].total.profit
+          : 0;
+
       setChartData({
         wonTradesPercent: data.wonTradesPercent || 0,
         lostTradesPercent: data.lostTradesPercent || 0,
-        wonTrades: data.wonTrades || 0,
-        lostTrades: data.lostTrades || 0,
-        wonBalance: data.wonBalance || 0, // Se usa la ganancia total
-        lostBalance: data.lostBalance || 0,
-        averageLoss: data.averageLoss || 0,
-        totalProfit: data.profit || 0,
+        wonBalance: wonBalance, // Ganancia total obtenida
+        lostBalance: data.currencySummary?.[0]?.total?.profit < 0
+          ? Math.abs(data.currencySummary[0].total.profit)
+          : 0, // Perdida total en positivo
       });
     }
   }, [data]);
 
-  const noTrades = chartData.wonTradesPercent === 0 && chartData.lostTradesPercent === 0;
+  const noTrades =
+    chartData.wonTradesPercent === 0 && chartData.lostTradesPercent === 0;
 
   return (
     <div className="mt-6 w-full max-w-full md:max-w-2/3 lg:max-w-2/3 justify-start items-start">
@@ -78,7 +75,7 @@ export default function Component({ data }) {
                   Ganancia total: ${chartData.wonBalance.toLocaleString()}
                 </span>
                 <span className="text-red-600 font-medium">
-                  Pérdida total: ${chartData.totalProfit.toLocaleString()}
+                  Pérdida total: ${chartData.lostBalance.toLocaleString()}
                 </span>
               </div>
             </div>
