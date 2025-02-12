@@ -6,7 +6,7 @@ import CredencialesModal from './credentials';
 import Loader from '../../components/loaders/loader';
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import ButtonInit from '@/components/button_init';
+import ButtonInit from 'src/pages/dashboard/button_init';
 import MetaApi, { MetaStats } from 'metaapi.cloud-sdk';
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -139,10 +139,11 @@ export default function Index() {
                                                                 approved: 'text-green-500'
                                                             }[challenge.result] || 'text-slate-800 dark:text-slate-200'}`}>
                                                             {{
-                                                                init: 'Iniciado',
+                                                                init: 'Por iniciar',
                                                                 progress: 'En curso',
                                                                 disapproved: 'Desaprobado',
-                                                                approved: 'Aprobado'
+                                                                approved: 'Aprobado',
+                                                                retry: 'Repetir'
                                                             }[challenge.result] || challenge.result}
                                                         </span>
                                                     </p>
@@ -160,7 +161,7 @@ export default function Index() {
                                             </>
                                         )}
 
-                                        <ButtonInit />
+                                        <ButtonInit documentId={challenge.documentId} result={challenge.result} />
 
                                         {/* Botón de visibilidad abajo */}
                                         <div className="mt-4 flex items-center justify-end">

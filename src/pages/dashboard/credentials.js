@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, ClipboardDocumentIcon, PencilIcon, KeyIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-import ButtonInit from '@/components/button_init';
+import ButtonInit from 'src/pages/dashboard/button_init';
 
 export default function CredencialesModal({ login, password, server, platform, inversorPass
 }) {
