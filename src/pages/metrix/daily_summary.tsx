@@ -7,27 +7,26 @@ export default function Component({ data }) {
     
         let date;
         
-        // Si dateString es un número (timestamp), conviértelo a fecha
         if (typeof dateString === "number") {
             date = new Date(dateString);
         } else if (typeof dateString === "string") {
-            date = new Date(dateString);
+            date = new Date(dateString + "T00:00:00Z"); // Ajuste de zona horaria
         } else {
-            return "-"; // Si no es válido, devuelve "-"
+            return "-";
         }
     
-        if (isNaN(date.getTime())) return "-"; // Verifica si es una fecha válida
+        if (isNaN(date.getTime())) return "-";
     
         return date.toLocaleDateString("es-ES", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric"
-        });
+        })+ " (UTC)";
     };
+    
     
     return (
         <div className="border-gray-200 border-2 dark:border-zinc-800 dark:shadow-black p-3 bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
-            <p className="text-lg font-semibold mb-4">Resumen Diario</p>
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="border-b border-gray-300 dark:border-zinc-700">
