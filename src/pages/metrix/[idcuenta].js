@@ -44,7 +44,7 @@ const Metrix = () => {
       try {
         const metrics = await metaStats.getMetrics(idMeta);
         setMetricsData(metrics);
-        console.log(metricsData);
+  //      console.log(metricsData);
       } catch (err) {
         setMetricsError(err);
       } finally {
@@ -57,6 +57,37 @@ const Metrix = () => {
       fetchAdditionalMetrics(challengeData.data.broker_account.idMeta);
     }
   }, [challengeData?.data?.broker_account?.idMeta]);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = process.env.NEXT_PUBLIC_TOKEN_META_API;
+      try {
+        const response = await fetch(
+          `https://risk-management-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${challengeData?.data?.broker_account?.idMeta}/trackers/${challengeData?.challengeId}/statistics`,
+          {
+            method: "GET",
+            headers: {
+              "auth-token": `${token}`,
+              "api-version": "1",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log(result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   if (isLoading || isMetricsLoading) {
     return (
