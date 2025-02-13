@@ -41,7 +41,7 @@ export default function Objetivos() {
 
     return (
         <>
-        <div className="   border-gray-200  border-2  dark:border-zinc-800  p-3  bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white ">
+        <div className="border-gray-200  border-2  dark:border-zinc-800 p-3  bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white ">
             <table className="min-w-full">
                 <thead>
                     <tr className="border-b">
