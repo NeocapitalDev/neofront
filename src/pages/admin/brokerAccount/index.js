@@ -195,18 +195,18 @@ export default function BrokerAccountsTable() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-    {data?.data?.map((account) => (
-        <TableRow key={account.id}>
-            {brokerAccountColumns.map((col) => (
-                <TableCell key={col.accessorKey}>
-                    {col.accessorKey === "used"
-                        ? account[col.accessorKey] === false ? "No" : "Sí"
-                        : account[col.accessorKey] ?? account.attributes?.[col.accessorKey] ?? "N/A"}
-                </TableCell>
-            ))}
-        </TableRow>
-    ))}
-</TableBody>
+                                {data?.data?.map((account) => (
+                                    <TableRow key={account.id}>
+                                        {brokerAccountColumns.map((col) => (
+                                            <TableCell key={col.accessorKey}>
+                                                {col.accessorKey === "used"
+                                                    ? account[col.accessorKey] === false ? "No" : "Sí"
+                                                    : account[col.accessorKey] ?? account.attributes?.[col.accessorKey] ?? "N/A"}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
 
 
                         </Table>

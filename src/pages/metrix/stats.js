@@ -5,6 +5,31 @@ export default function Stats(props) {
     console.log("Datos recibidos en Stats:", props);
   }, [props]);
 
+  // Función para formatear la fecha a dd/mm/aaaa
+  const formatDate = (dateString) => {
+    if (!dateString || dateString === "-") return "-";
+
+    let date;
+    
+    // Si dateString es un número (timestamp), conviértelo a fecha
+    if (typeof dateString === "number") {
+        date = new Date(dateString);
+    } else if (typeof dateString === "string") {
+        date = new Date(dateString);
+    } else {
+        return "-"; // Si no es válido, devuelve "-"
+    }
+
+    if (isNaN(date.getTime())) return "-"; // Verifica si es una fecha válida
+
+    return date.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    });
+};
+
+
   // Validar props antes de acceder a sus valores
   const {
     endDate = "-",
@@ -26,8 +51,8 @@ export default function Stats(props) {
 
   const data = [
     { label: "Resultado", value: translatedResult },
-    { label: "Inicio", value: startDate || "-" },
-    { label: "Fin", value: endDate || "-" },
+    { label: "Inicio", value: formatDate(startDate) },
+    { label: "Fin", value: formatDate(endDate) },
     { label: "Tamaño de cuenta", value: broker_account.balance ? `$${broker_account.balance}` : "-" },
     { label: "Plataforma", value: broker_account.platform || "-" },
   ];
