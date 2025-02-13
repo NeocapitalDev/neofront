@@ -121,9 +121,10 @@ export default function Index() {
                                                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                                         Balance:{" "}
                                                         <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                            ${balance}
+                                                            {balance === "Cargando..." ? balance : `$${balance}`}
                                                         </span>
                                                     </p>
+
                                                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                                         Fin:{" "}
                                                         <span className="font-bold text-slate-800 dark:text-slate-200">
@@ -132,8 +133,7 @@ export default function Index() {
                                                     </p>
                                                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                                         Resultado:{" "}
-                                                        <span className={`font-bold ${
-                                                            {
+                                                        <span className={`font-bold ${{
                                                                 progress: 'text-yellow-500',
                                                                 disapproved: 'text-red-500',
                                                                 approved: 'text-green-500'
