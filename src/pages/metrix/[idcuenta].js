@@ -13,6 +13,7 @@ import MetaApi, { MetaStats } from 'metaapi.cloud-sdk';
 import Balance from "./balance";
 import Stats from "./stats";
 import WinLoss from "./winloss";
+import Objetivos from "./objetivos";
 
 const fetcher = (url) =>
   fetch(url, {
@@ -130,6 +131,10 @@ const Metrix = () => {
             </div>
           </div>
 
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
+              <Objetivos/>
+          </div>
 
           <div className="mt-6">
             <h2 className="text-lg font-semibold">Detalles del desafío</h2>
