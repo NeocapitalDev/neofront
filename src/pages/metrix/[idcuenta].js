@@ -26,6 +26,7 @@ const fetcher = (url) =>
 const Metrix = () => {
   const router = useRouter();
   const { idcuenta } = router.query;
+  const [apiResult, setApiResult] = useState(null);
 
   const { data: challengeData, error, isLoading } = useSWR(
     idcuenta
@@ -61,16 +62,17 @@ const Metrix = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!challengeData?.data?.broker_account?.idMeta || !challengeData?.challengeId) return;
+      
       const token = process.env.NEXT_PUBLIC_TOKEN_META_API;
       try {
         const response = await fetch(
-          `https://risk-management-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${challengeData?.data?.broker_account?.idMeta}/trackers/${challengeData?.challengeId}/statistics`,
+          `https://risk-management-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${challengeData.data.broker_account.idMeta}/trackers/${challengeData.data.challengeId}/statistics`,
           {
             method: "GET",
             headers: {
               "auth-token": `${token}`,
-              "api-version": "1",
-              "Content-Type": "application/json",
+              "api-version": 1,
             },
           }
         );
@@ -80,14 +82,15 @@ const Metrix = () => {
         }
 
         const result = await response.json();
-        console.log(result);
+        console.log(result)
+        setApiResult(result);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [challengeData]);
 
   if (isLoading || isMetricsLoading) {
     return (
@@ -186,6 +189,18 @@ const Metrix = () => {
               <p>Cargando métricas adicionales...</p>
             )}
           </div>
+
+          <div className="mt-6">
+    
+    <h2 className="text-lg font-semibold">API Result</h2>
+    {apiResult ? (
+      <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
+        {JSON.stringify(apiResult, null, 2)}
+      </pre>
+    ) : (
+      <p>Cargando datos...</p>
+    )}
+  </div>
         </>
       )}
     </Layout>
