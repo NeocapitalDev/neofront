@@ -155,7 +155,8 @@ const Metrix = () => {
 
             <div className="w-full md:w-1/3  rounded-lg ">
               <h2 className="text-lg font-bold mb-4 pt-5">Estadísticas</h2>
-              <Statistics data={metricsData || {}}/>
+              <Statistics data={{ ...metricsData, phase: challengeData?.data?.phase || "Desconocida" }} />
+
             </div>
 
 
@@ -167,7 +168,7 @@ const Metrix = () => {
 
           <div className="mt-6">
             <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
-              <Objetivos/>
+              <Objetivos data={metricsData || {}} />
           </div>
 
           <div className="mt-6">
