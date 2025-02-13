@@ -48,7 +48,7 @@ export default function BrokerAccountsTable() {
         login: "",
         password: "",
         server: "",
-        balance: null,
+        balance: "",
         platform: "mt4",
         used: false,
         inversorPass: "",
@@ -130,7 +130,7 @@ export default function BrokerAccountsTable() {
                 login: "",
                 password: "",
                 server: "",
-                balance: null,
+                balance: "",
                 platform: "mt4",
                 used: false,
                 inversorPass: "",
@@ -174,14 +174,71 @@ export default function BrokerAccountsTable() {
                             ))}
                         </div>
 
-                        {/* Formulario */}
-                        <div className="mt-6 rounded-md shadow-md">
-                            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">Agregar cuenta - {selectedAccountType}</h2>
-                            <Input name="login" placeholder="Ingrese el login..." value={formData.login} onChange={handleInputChange} className="mt-4 border bg-zinc-700" />
-                            <Input name="password" placeholder="Ingrese la contraseña..." type="password" value={formData.password} onChange={handleInputChange} className="mt-2 border bg-zinc-700" />
-                            <Input name="server" placeholder="Ingrese el servidor..." value={formData.server} onChange={handleInputChange} className="mt-2 border bg-zinc-700" />
-                            <Button className="mt-4 w-full" onClick={saveBrokerAccount}>Guardar Cuenta</Button>
-                        </div>
+{/* Formulario */}
+<div className="mt-6 rounded-md shadow-md p-4 bg-white dark:bg-zinc-800">
+    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
+        Agregar cuenta - {selectedAccountType}
+    </h2>
+    
+    <Input
+        name="login"
+        placeholder="Ingrese el login..."
+        value={formData.login}
+        onChange={handleInputChange}
+        className="mt-4 border bg-zinc-700 text-white p-2 rounded-md"
+    />
+    
+    <Input
+        name="balance"
+        type="number"
+        placeholder="Ingrese el balance..."
+        value={formData.balance}
+        onChange={handleInputChange}
+        className="mt-4 border bg-zinc-700 text-white p-2 rounded-md"
+    />
+    
+    <select
+        name="platform"
+        value={formData.platform}
+        onChange={handleInputChange}
+        className="mt-4 border bg-zinc-700 text-white p-2 rounded-md"
+    >
+        <option value="mt4">MT4</option>
+        <option value="mt5">MT5</option>
+    </select>
+    
+    <Input
+        name="password"
+        type="password"
+        placeholder="Ingrese la contraseña..."
+        value={formData.password}
+        onChange={handleInputChange}
+        className="mt-2 border bg-zinc-700 text-white p-2 rounded-md"
+    />
+        
+    <Input
+        name="inversorPass"
+        placeholder="Ingrese el inversorPass..."
+        value={formData.inversorPass}
+        onChange={handleInputChange}
+        className="mt-2 border bg-zinc-700 text-white p-2 rounded-md"
+    />
+    
+    <Input
+        name="server"
+        placeholder="Ingrese el servidor..."
+        value={formData.server}
+        onChange={handleInputChange}
+        className="mt-2 border bg-zinc-700 text-white p-2 rounded-md"
+    />
+
+
+    
+    <Button className="mt-4 w-full" onClick={saveBrokerAccount}>
+        Guardar Cuenta
+    </Button>
+</div>
+
                     </div>
 
                     {/* Tabla de cuentas */}

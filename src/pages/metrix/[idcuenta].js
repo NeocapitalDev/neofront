@@ -62,7 +62,7 @@ const Metrix = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!challengeData?.data?.broker_account?.idMeta || !challengeData?.challengeId) return;
+      if (!challengeData?.data?.broker_account?.idMeta || !challengeData?.data?.challengeId) return;
       
       const token = process.env.NEXT_PUBLIC_TOKEN_META_API;
       try {
