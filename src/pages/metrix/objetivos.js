@@ -85,18 +85,27 @@ export default function Objetivos({ accountId, challengeId }) {
                                     {obj.estado ? (
                                         <div className="flex items-center">
                                             <CheckIcon className="h-6 w-6 mr-2 rounded-lg text-white bg-green-500" />
+<<<<<<< HEAD
                                             <span className="dark:text-white">Aprobado</span>
+=======
+                                            <span>Aprobado</span>
+>>>>>>> d5dcb1aeb2b0e0060f54a08de40af6deb9182593
                                         </div>
                                     ) : (
                                         <div className="flex items-center">
                                             <XMarkIcon className="h-6 w-6 mr-2 rounded-lg text-white bg-red-500" />
+<<<<<<< HEAD
                                             <span className="dark:text-white">No aprobado</span>
+=======
+                                            <span>No aprobado</span>
+>>>>>>> d5dcb1aeb2b0e0060f54a08de40af6deb9182593
                                         </div>
                                     )}
                                 </td>
                             </tr>
                             {expandedIndex === index && (
                                 <tr>
+<<<<<<< HEAD
                                     <td colSpan="3" className="text-center align-middle p-4 bg-gray-100 dark:bg-zinc-900 dark:text-gray-300">
                                         <p>{obj.descripcion}</p>
                                         <div className="mt-2 flex justify-center">
@@ -109,6 +118,23 @@ export default function Objetivos({ accountId, challengeId }) {
                                                 referrerPolicy="strict-origin-when-cross-origin"
                                                 allowFullScreen
                                             ></iframe>
+=======
+                                    <td colSpan="3" className="text-center align-middle p-4">
+                                        <div className="d-flex flex-column align-items-center">
+                                            <p>{obj.descripcion}</p>
+                                            <div className="mt-2 d-flex justify-content-center">
+                                                <center>
+                                                    <iframe
+                                                        width="200"
+                                                        src={obj.videoUrl.replace("watch?v=", "embed/")}
+                                                        title="YouTube video"
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                        referrerPolicy="strict-origin-when-cross-origin"
+                                                        allowFullScreen
+                                                    ></iframe>
+                                                </center>
+                                            </div>
+>>>>>>> d5dcb1aeb2b0e0060f54a08de40af6deb9182593
                                         </div>
                                     </td>
                                 </tr>
