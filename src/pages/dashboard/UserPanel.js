@@ -6,8 +6,10 @@ import CredencialesModal from './credentials';
 import Loader from '../../components/loaders/loader';
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import ButtonInit from '@/components/button_init';
+import ButtonInit from 'src/pages/dashboard/button_init';
 import MetaApi, { MetaStats } from 'metaapi.cloud-sdk';
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const fetcher = async (url, token) => {
     const response = await fetch(url, {
@@ -29,7 +31,13 @@ export default function Index() {
     );
 
     const [balances, setBalances] = useState({});
-    
+    const [visibility, setVisibility] = useState(() => {
+        if (typeof window !== "undefined") {
+            return JSON.parse(localStorage.getItem("visibility") || "{}");
+        }
+        return {};
+    });
+
     useEffect(() => {
         if (data?.challenges) {
             const fetchBalances = async () => {
@@ -54,10 +62,17 @@ export default function Index() {
         }
     }, [data?.challenges]);
 
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            localStorage.setItem("visibility", JSON.stringify(visibility));
+        }
+    }, [visibility]);
+
     if (isLoading) return <Loader />;
     if (error) return <p className="text-center text-red-500">Error al cargar los datos: {error.message}</p>;
 
     const isVerified = data?.isVerified;
+    const toggleVisibility = (id) => setVisibility((prev) => ({ ...prev, [id]: !prev[id] }));
 
     return (
         <div>
@@ -88,6 +103,7 @@ export default function Index() {
                             </div>
                         ) : (
                             challenges.map((challenge, index) => {
+                                const isVisible = visibility[challenge.id] ?? true;
                                 const balance = balances[challenge.broker_account?.idMeta] ?? "Cargando...";
 
                                 return (
@@ -98,45 +114,67 @@ export default function Index() {
                                         <p className="text-sm font-bold text-zinc-800 mb-2 dark:text-zinc-200">
                                             Login: {challenge.broker_account?.login || "-"}
                                         </p>
-                                        <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
-                                            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                Balance:{" "}
-                                                <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                    ${balance}
-                                                </span>
-                                            </p>
-                                            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                Fin:{" "}
-                                                <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                    {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "-"}
-                                                </span>
-                                            </p>
-                                            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                Resultado:{" "}
-                                                <span className={`font-bold ${{
-                                                    progress: 'text-yellow-500',
-                                                    disapproved: 'text-red-500',
-                                                    approved: 'text-green-500'
-                                                }[challenge.result] || 'text-slate-800 dark:text-slate-200'}`}>
-                                                    {{
-                                                        init: 'Iniciado',
-                                                        progress: 'En curso',
-                                                        disapproved: 'Desaprobado',
-                                                        approved: 'Aprobado'
-                                                    }[challenge.result] || challenge.result}
-                                                </span>
-                                            </p>
+
+                                        {isVisible && (
+                                            <>
+                                                <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
+                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                        Balance:{" "}
+                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                            ${balance}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                        Fin:{" "}
+                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                            {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "-"}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                        Resultado:{" "}
+                                                        <span className={`font-bold ${
+                                                            {
+                                                                progress: 'text-yellow-500',
+                                                                disapproved: 'text-red-500',
+                                                                approved: 'text-green-500'
+                                                            }[challenge.result] || 'text-slate-800 dark:text-slate-200'}`}>
+                                                            {{
+                                                                init: 'Por iniciar',
+                                                                progress: 'En curso',
+                                                                disapproved: 'Desaprobado',
+                                                                approved: 'Aprobado',
+                                                                retry: 'Repetir'
+                                                            }[challenge.result] || challenge.result}
+                                                        </span>
+                                                    </p>
+                                                </div>
+
+                                                <div className="mt-4 flex space-x-4">
+                                                    <CredencialesModal {...challenge.broker_account} />
+                                                    <Link href={`/metrix/${challenge.documentId}`}>
+                                                        <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
+                                                            <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+                                                            <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
+                                                        </button>
+                                                    </Link>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        <ButtonInit documentId={challenge.documentId} result={challenge.result} />
+
+                                        {/* Botón de visibilidad abajo */}
+                                        <div className="mt-4 flex items-center justify-end">
+                                            <div className="flex items-center space-x-2">
+                                                <Switch
+                                                    id={`visible-mode-${index}`}
+                                                    checked={isVisible}
+                                                    onCheckedChange={() => toggleVisibility(challenge.id)}
+                                                />
+                                                <Label htmlFor={`visible-mode-${index}`}>Visible</Label>
+                                            </div>
                                         </div>
-                                        <div className="mt-4 flex space-x-4">
-                                            <CredencialesModal {...challenge.broker_account} />
-                                            <Link href={`/metrix/${challenge.documentId}`}>
-                                                <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
-                                                    <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                                                    <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
-                                                </button>
-                                            </Link>
-                                        </div>
-                                        <ButtonInit />
+
                                     </div>
                                 );
                             })
