@@ -34,3 +34,4 @@ export default function Component({ data = {} as MetricsData }) {
         </div>
     );
 }
+
