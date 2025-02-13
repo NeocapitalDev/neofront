@@ -26,10 +26,10 @@ export default function Component({ data }) {
     
     
     return (
-        <div className="border-gray-200 border-2 dark:border-zinc-800 dark:shadow-black p-3 bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
+        <div className="border-gray-200 border-2 dark:border-zinc-800 dark:shadow-black p-2 bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
             <table className="w-full text-left border-collapse">
                 <thead>
-                    <tr className="border-b border-gray-300 dark:border-zinc-700">
+                    <tr className="border-b border-gray-300 dark:border-zinc-500">
                         <th className="py-2 px-4 font-medium">Fecha</th>
                         <th className="py-2 px-4 font-medium">Balance</th>
                         <th className="py-2 px-4 font-medium">Ganancias</th>
@@ -40,7 +40,7 @@ export default function Component({ data }) {
                 <tbody>
                     {data?.dailyGrowth?.length > 0 ? (
                         data.dailyGrowth.map((day, index) => (
-                            <tr key={index} className="border-b border-gray-200 dark:border-zinc-700">
+                            <tr key={index} className={`border-b  border-gray-200 dark:border-zinc-500 ${index === data.dailyGrowth.length - 1 ? 'border-none' : ''}`}>
                                 <td className="py-2 px-4">{formatDate(day.date)}</td>
                                 <td className="py-2 px-4">${(day.balance ?? 0).toFixed(2)}</td>
                                 <td className={`py-2 px-4 ${day.gains > 0 ? "text-green-500" : "text-red-500"}`}>
