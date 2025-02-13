@@ -40,8 +40,7 @@ export default function Objetivos() {
     };
 
     return (
-        <>
-        <div className="border-gray-200  border-2  dark:border-zinc-800 p-3  bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white ">
+        <div className="border-gray-200 border-2 dark:border-zinc-800 p-3 bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
             <table className="min-w-full">
                 <thead>
                     <tr className="border-b">
@@ -54,22 +53,22 @@ export default function Objetivos() {
                     {objetivos.map((obj, index) => (
                         <React.Fragment key={index}>
                             <tr
-                                className="border-b cursor-pointer dark:hover:bg-zinc-700 hover:bg-gray-100"
+                                className={`cursor-pointer border-b border-zinc-300 dark:border-zinc-400 dark:hover:bg-zinc-700 hover:bg-gray-100 ${index === objetivos.length - 1 ? 'border-b-0' : ''}`}
                                 onClick={() => toggleExpand(index)}
                             >
-                                <td className="px-4 py-2 text-amber-500 font-semibold">
+                                <td className="px-4 py-4 text-amber-500 font-semibold">
                                     {expandedIndex === index ? `- ${obj.nombre}` : `+ ${obj.nombre}`}
                                 </td>
-                                <td className="px-4 py-2">{obj.resultado}</td>
-                                <td className="px-4 py-2">
+                                <td className="px-4 py-4">{obj.resultado}</td>
+                                <td className="px-4 py-4">
                                     {obj.estado ? (
-                                        <div className="flex items-center  ">
-                                            <CheckIcon className="h-6 w-6 mr-2 rounded-lg text-white  bg-green-500" />
+                                        <div className="flex items-center">
+                                            <CheckIcon className="h-6 w-6 mr-2 rounded-lg text-white bg-green-500" />
                                             <span>Aprobado</span>
                                         </div>
                                     ) : (
-                                        <div className="flex items-center ">
-                                            <XMarkIcon className="h-6 w-6 mr-2 rounded-lg   text-white bg-red-500" />
+                                        <div className="flex items-center">
+                                            <XMarkIcon className="h-6 w-6 mr-2 rounded-lg text-white bg-red-500" />
                                             <span>No aprobado</span>
                                         </div>
                                     )}
@@ -88,8 +87,8 @@ export default function Objetivos() {
                                                         title="YouTube video"
                                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                                         referrerPolicy="strict-origin-when-cross-origin"
-                                                        allowFullScreen>
-                                                    </iframe>
+                                                        allowFullScreen
+                                                    ></iframe>
                                                 </center>
                                             </div>
                                         </div>
@@ -101,6 +100,5 @@ export default function Objetivos() {
                 </tbody>
             </table>
         </div>
-        </>
     );
 }
