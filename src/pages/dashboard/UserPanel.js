@@ -105,8 +105,12 @@ export default function Index() {
                         ) : (
                             challenges.map((challenge, index) => {
                                 const isVisible = visibility[challenge.id] ?? true;
-                                const balance = balances[challenge.broker_account?.idMeta] ?? "Cargando...";
 
+                                let balance = balances[challenge.balance] ?? "Cargando...";
+                                if (challenge.broker_account?.idMeta) {
+                                    balance = balances[challenge.broker_account.idMeta] ?? balance;
+                                }
+                                
                                 return (
                                     <div
                                         key={index}

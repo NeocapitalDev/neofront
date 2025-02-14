@@ -162,11 +162,11 @@ const Metrix = () => {
 
             </div>
 
-
+{/* 
             <div className="w-full md:w-1/2  rounded-lg ">
               <h2 className="text-lg font-bold mb-4 pt-5">Resumen Diario</h2>
-              <HistoricalOrders accountId={challengeData?.data?.broker_account?.idMeta} />
-            </div>
+              <HistoricalOrders accountId={challengeData?.data?.broker_account.idMeta}/>
+            </div> */}
           </div>
 
           <div className="mt-6">
