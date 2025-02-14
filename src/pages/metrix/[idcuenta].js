@@ -107,7 +107,7 @@ const Metrix = () => {
 
       <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
-        Account Metrix {challengeData?.data?.broker_account.login || "Sin nombre"}
+        Account Metrix {challengeData?.data?.broker_account?.login || "Sin nombre"}
       </h1>
 
       <div className="flex justify-start gap-3 my-6">
@@ -165,7 +165,7 @@ const Metrix = () => {
 
             <div className="w-full md:w-1/2  rounded-lg ">
               <h2 className="text-lg font-bold mb-4 pt-5">Resumen Diario</h2>
-              <HistoricalOrders accountId={challengeData?.data?.broker_account.idMeta}/>
+              <HistoricalOrders accountId={challengeData?.data?.broker_account?.idMeta}/>
             </div>
           </div>
 
