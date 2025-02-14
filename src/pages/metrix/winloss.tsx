@@ -14,18 +14,14 @@ export default function Component({ data }) {
 
   useEffect(() => {
     if (data) {
-      const wonBalance =
-        data.currencySummary?.[0]?.total?.profit > 0
-          ? data.currencySummary[0].total.profit
-          : 0;
+      const wonBalance = data.wonTrades > 0 ? data.wonTrades * data.averageWin : 0;
+      const lostBalance = data.lostTrades > 0 ? Math.abs(data.lostTrades * data.averageLoss) : 0;
 
       setChartData({
         wonTradesPercent: data.wonTradesPercent || 0,
         lostTradesPercent: data.lostTradesPercent || 0,
-        wonBalance: wonBalance, // Ganancia total obtenida
-        lostBalance: data.currencySummary?.[0]?.total?.profit < 0
-          ? Math.abs(data.currencySummary[0].total.profit)
-          : 0, // Perdida total en positivo
+        wonBalance,
+        lostBalance,
       });
     }
   }, [data]);

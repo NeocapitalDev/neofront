@@ -27,11 +27,9 @@ const chartConfig = {
 export default function Component({ data }) {
   const [chartData, setChartData] = useState([]);
   const [balance, setBalance] = useState(0);
-  const [winPercentage, setWinPercentage] = useState(0);
-  const [losePercentage, setLosePercentage] = useState(0);
-  const [totalWins, setTotalWins] = useState(0);
-  const [totalLosses, setTotalLosses] = useState(0);
-  console.log(data);
+  const [minY, setMinY] = useState(0);
+  const [maxY, setMaxY] = useState(0);
+
   useEffect(() => {
     if (data) {
       const { balance, openTradesByHour } = data;
@@ -58,30 +56,17 @@ export default function Component({ data }) {
 
         setChartData(extractedData);
 
-        const totalTrades = openTradesByHour.length;
-        const wins = openTradesByHour.filter((trade) => trade.profit > 0);
-        const losses = openTradesByHour.filter((trade) => trade.profit <= 0);
+        // Obtener el mínimo y máximo balance
+        const balances = extractedData.map((d) => d.balance);
+        const minVal = Math.min(...balances);
+        const maxVal = Math.max(...balances);
 
-        const totalWinAmount = wins.reduce((sum, trade) => sum + trade.profit, 0);
-        const totalLossAmount = losses.reduce(
-          (sum, trade) => sum + Math.abs(trade.profit || 0),
-          0
-        );
-
-        setTotalWins(totalWinAmount);
-        setTotalLosses(totalLossAmount);
-
-        setWinPercentage(
-          totalTrades > 0 ? parseFloat(((wins.length / totalTrades) * 100).toFixed(2)) : 0
-        );
-        setLosePercentage(
-          totalTrades > 0 ? parseFloat(((losses.length / totalTrades) * 100).toFixed(2)) : 0
-        );
+        // Ajustar valores a múltiplos de 1000
+        setMinY(Math.floor(minVal / 1000) * 1000);
+        setMaxY(Math.ceil(maxVal / 1000) * 1000);
       } else {
         setChartData([]);
       }
-    } else {
-      console.warn("Los datos de `metrics` no están disponibles.");
     }
   }, [data]);
 
@@ -127,12 +112,14 @@ export default function Component({ data }) {
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                tickFormatter={(value) => `$${value}`}
+                tickCount={5} // Define la cantidad de ticks visibles en el eje Y
+                domain={[minY, maxY]} // Ajusta el dominio a múltiplos de 1000
+                tickFormatter={(value) => `$${value.toLocaleString()}`} // Muestra valores en múltiplos de 1000
               />
               <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
               <Line
                 dataKey="balance"
-                type="natural"
+                type="monotone"
                 stroke="#FFC107"
                 strokeWidth={2}
                 dot={{
