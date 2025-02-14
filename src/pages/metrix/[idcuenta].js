@@ -14,6 +14,7 @@ import Balance from "./balance";
 import Stats from "./stats";
 import WinLoss from "./winloss";
 import Objetivos from "./objetivos";
+import HistorialTrades from "../demo/historialTrades"
 
 const fetcher = (url) =>
   fetch(url, {
@@ -45,14 +46,14 @@ const Metrix = () => {
       try {
         const metrics = await metaStats.getMetrics(idMeta);
         setMetricsData(metrics);
-  //      console.log(metricsData);
+        //      console.log(metricsData);
       } catch (err) {
         setMetricsError(err);
       } finally {
         setIsMetricsLoading(false);
       }
     };
-    
+
 
     if (challengeData?.data?.broker_account?.idMeta) {
       fetchAdditionalMetrics(challengeData.data.broker_account.idMeta);
@@ -63,7 +64,7 @@ const Metrix = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!challengeData?.data?.broker_account?.idMeta || !challengeData?.data?.challengeId) return;
-      
+
       const token = process.env.NEXT_PUBLIC_TOKEN_META_API;
       try {
         const response = await fetch(
@@ -102,6 +103,7 @@ const Metrix = () => {
 
   return (
     <Layout>
+
       <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
         Account Metrix {challengeData?.data?.broker_account.login || "Sin nombre"}
@@ -168,8 +170,10 @@ const Metrix = () => {
 
           <div className="mt-6">
             <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
-              <Objetivos data={metricsData || {}} />
+            <Objetivos data={metricsData || {}} />
           </div>
+
+          <HistorialTrades accountId={challengeData?.data?.broker_account.idMeta}/>
 
           <div className="mt-6">
             <h2 className="text-lg font-semibold">Detalles del desafío</h2>
@@ -192,18 +196,19 @@ const Metrix = () => {
           </div>
 
           <div className="mt-6">
-    
-    <h2 className="text-lg font-semibold">API Result</h2>
-    {apiResult ? (
-      <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
-        {JSON.stringify(apiResult, null, 2)}
-      </pre>
-    ) : (
-      <p>Cargando datos...</p>
-    )}
-  </div>
+
+            <h2 className="text-lg font-semibold">API Result</h2>
+            {apiResult ? (
+              <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
+                {JSON.stringify(apiResult, null, 2)}
+              </pre>
+            ) : (
+              <p>Cargando datos...</p>
+            )}
+          </div>
         </>
       )}
+
     </Layout>
   );
 };
