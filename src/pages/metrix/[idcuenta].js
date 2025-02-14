@@ -14,7 +14,8 @@ import Balance from "./balance";
 import Stats from "./stats";
 import WinLoss from "./winloss";
 import Objetivos from "./objetivos";
-import HistorialTrades from "../demo/historialTrades"
+import HistorialTrades from "@/components/historialTrades"
+import HistoricalOrders from "../../pages/metrix/daily_summary";
 
 const fetcher = (url) =>
   fetch(url, {
@@ -164,7 +165,7 @@ const Metrix = () => {
 
             <div className="w-full md:w-2/3  rounded-lg ">
               <h2 className="text-lg font-bold mb-4 pt-5">Resumen Diario</h2>
-              <Daily_summary data={metricsData || {}} />
+              <HistoricalOrders accountId={challengeData?.data?.broker_account.idMeta}/>
             </div>
           </div>
 
@@ -172,8 +173,6 @@ const Metrix = () => {
             <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
             <Objetivos data={metricsData || {}} />
           </div>
-
-          <HistorialTrades accountId={challengeData?.data?.broker_account.idMeta}/>
 
           <div className="mt-6">
             <h2 className="text-lg font-semibold">Detalles del desafío</h2>
