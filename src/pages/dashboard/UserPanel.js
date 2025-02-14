@@ -166,7 +166,7 @@ export default function Index() {
                                             </>
                                         )}
 
-                                        <ButtonInit documentId={challenge.documentId} result={challenge.result} />
+                                        <ButtonInit documentId={challenge.documentId} result={challenge.result} phase={challenge.phase} />
 
                                         {/* Botón de visibilidad abajo */}
                                         <div className="mt-4 flex items-center justify-end">

@@ -54,16 +54,16 @@ export default function Component({ data = {} as MetricsData }) {
     ];
 
     return (
-        <div className="border-gray-200 border-2 dark:border-zinc-800 dark:shadow-black p-4 bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="border-gray-200 border-2 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-0">
                 {metrics.map(({ label, value }, index) => (
-                 <li
-                 key={index}
-                 className={`pb-2 flex flex-col ${index < 8 ? "border-b dark:border-zinc-500" : ""}`}
-             >
-             
+                    <li
+                        key={index}
+                        className={`flex flex-col px-6 py-4 ${index < metrics.length - 2 ? "border-b border-gray-300 dark:border-zinc-500 w-full" : ""
+                            }`}
+                    >
                         <span className="text-sm font-medium">{label}</span>
-                        <span className="text-sm text-left mt-1">{value}</span>
+                        <span className="text-sm text-left mt-0.5">{value}</span>
                     </li>
                 ))}
             </ul>

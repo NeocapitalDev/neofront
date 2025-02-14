@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 export default function Stats(props) {
   useEffect(() => {
-    console.log("Datos recibidos en Stats:", props);
+    //console.log("Datos recibidos en Stats:", props);
   }, [props]);
 
   // Función para formatear la fecha a dd/mm/aaaa
@@ -59,7 +59,7 @@ export default function Stats(props) {
 
   return (
     <>
-      <p className="text-lg font-semibold mb-4">Estadísticas</p>
+      <p className="text-lg font-semibold mb-4">Resumen</p>
       <div className="px-3 h-auto max-w-full border-2 border-gray-100 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
         <table className="w-full border-collapse text-sm">
           <tbody>

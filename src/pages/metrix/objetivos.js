@@ -70,17 +70,17 @@ export default function Objetivos({ data, initBalance, pase }) {
     };
 
     return (
-        <div className="border-gray-200 border-2 dark:border-zinc-800 p-3 bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
-            <table className="min-w-full">
+        <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
+            <table className="w-full">
                 <thead>
-                    <tr className="border-b border-zinc-300 dark:border-zinc-400">
-                        <th className="px-4 py-2 text-md text-start text-gray-600 dark:text-gray-300">
+                    <tr className="border-b border-gray-500 dark:border-zinc-600">
+                        <th className="px-6 py-4 text-md text-start text-gray-700 dark:text-white">
                             Objetivos de Trading
                         </th>
-                        <th className="px-4 py-2 text-md text-start text-gray-600 dark:text-gray-300">
+                        <th className="px-6 py-4 text-md text-start text-gray-700 dark:text-white">
                             Resultados
                         </th>
-                        <th className="px-4 py-2 text-md text-start text-gray-600 dark:text-gray-300">
+                        <th className="px-6 py-4 text-md text-start text-gray-700 dark:text-white">
                             Estado
                         </th>
                     </tr>
@@ -88,12 +88,16 @@ export default function Objetivos({ data, initBalance, pase }) {
                 <tbody>
                     {objetivos.map((obj, index) => (
                         <React.Fragment key={index}>
-                            <tr className="cursor-pointer border-b border-zinc-300 dark:border-zinc-400 dark:hover:bg-zinc-700 hover:bg-gray-100" onClick={() => toggleExpand(index)}>
-                                <td className="px-4 py-4 text-amber-500 font-semibold">
+                            <tr
+                                className={`cursor-pointer dark:hover:bg-zinc-700 hover:bg-gray-100 ${index === objetivos.length - 1 ? "" : "border-b border-gray-500 dark:border-zinc-600"
+                                    }`}
+                                onClick={() => toggleExpand(index)}
+                            >
+                                <td className="px-6 py-4 text-amber-500 font-semibold">
                                     {expandedIndex === index ? `- ${obj.nombre}` : `+ ${obj.nombre}`}
                                 </td>
-                                <td className="px-4 py-4">{obj.resultado}</td>
-                                <td className="px-4 py-4">
+                                <td className="px-6 py-4 bg-gray-100 dark:bg-zinc-900">{obj.resultado}</td>
+                                <td className="px-6 py-4">
                                     {obj.estado ? (
                                         <div className="flex items-center">
                                             <CheckIcon className="h-6 w-6 mr-2 rounded-lg text-white bg-green-500" />
@@ -109,20 +113,18 @@ export default function Objetivos({ data, initBalance, pase }) {
                             </tr>
                             {expandedIndex === index && (
                                 <tr>
-                                    <td colSpan="3" className="text-center align-middle p-4">
-                                        <div className="d-flex flex-column align-items-center">
+                                    <td colSpan="3" className="text-center align-middle px-6 py-6">
+                                        <div className="flex flex-col items-center">
                                             <p>{obj.descripcion}</p>
-                                            <div className="mt-2 d-flex justify-content-center">
-                                                <center>
-                                                    <iframe
-                                                        width="200"
-                                                        src={obj.videoUrl.replace("watch?v=", "embed/")}
-                                                        title="YouTube video"
-                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                        referrerPolicy="strict-origin-when-cross-origin"
-                                                        allowFullScreen
-                                                    ></iframe>
-                                                </center>
+                                            <div className="mt-4 flex justify-center">
+                                                <iframe
+                                                    width="200"
+                                                    src={obj.videoUrl.replace("watch?v=", "embed/")}
+                                                    title="YouTube video"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                    referrerPolicy="strict-origin-when-cross-origin"
+                                                    allowFullScreen
+                                                ></iframe>
                                             </div>
                                         </div>
                                     </td>
@@ -133,5 +135,7 @@ export default function Objetivos({ data, initBalance, pase }) {
                 </tbody>
             </table>
         </div>
+
+
     );
 }

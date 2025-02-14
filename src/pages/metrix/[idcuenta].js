@@ -6,16 +6,14 @@ import Loader from "../../components/loaders/loader";
 import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import CredencialesModal from "../dashboard/credentials";
 import Link from "next/link";
-import Daily_summary from '../../pages/metrix/daily_summary';
 import Statistics from '../../pages/metrix/statistics';
 import MetaApi, { MetaStats } from 'metaapi.cloud-sdk';
-
 import Balance from "./balance";
-import Stats from "./stats";
+import Stats from "./summary";
 import WinLoss from "./winloss";
 import Objetivos from "./objetivos";
-import HistorialTrades from "@/components/historialTrades"
-import HistoricalOrders from "../../pages/metrix/daily_summary";
+import WinRates from "./winlossrates";
+
 
 const fetcher = (url) =>
   fetch(url, {
@@ -152,22 +150,10 @@ const Metrix = () => {
             </div>
           </div>
 
+          {/* <WinRates wins={metricsData?.winTrades || 0} losses={metricsData?.lostTrades || 0} /> */}
+
           <WinLoss data={metricsData || {}} />
-          <div className="flex flex-col md:flex-row gap-4">
 
-
-            <div className="w-full md:w-1/2  rounded-lg ">
-              <h2 className="text-lg font-bold mb-4 pt-5">Estadísticas</h2>
-              <Statistics data={{ ...metricsData, phase: challengeData?.data?.phase || "Desconocida" }} />
-
-            </div>
-
-{/* 
-            <div className="w-full md:w-1/2  rounded-lg ">
-              <h2 className="text-lg font-bold mb-4 pt-5">Resumen Diario</h2>
-              <HistoricalOrders accountId={challengeData?.data?.broker_account.idMeta}/>
-            </div> */}
-          </div>
 
           <div className="mt-6">
             <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
@@ -176,10 +162,27 @@ const Metrix = () => {
               initBalance={challengeData?.data?.broker_account?.balance}
               pase={challengeData?.data?.phase}
             />
-
           </div>
 
-          <div className="mt-6">
+
+
+          <div className="flex flex-col md:flex-row gap-4">
+
+
+            <div className="w-full md:w-1/1  rounded-lg ">
+              <h2 className="text-lg font-bold mb-4 pt-5">Estadísticas</h2>
+              <Statistics data={{ ...metricsData, phase: challengeData?.data?.phase || "Desconocida" }} />
+
+            </div>
+
+            {/* 
+            <div className="w-full md:w-1/2  rounded-lg ">
+              <h2 className="text-lg font-bold mb-4 pt-5">Resumen Diario</h2>
+              <HistoricalOrders accountId={challengeData?.data?.broker_account.idMeta}/>
+            </div> */}
+          </div>
+
+          {/* <div className="mt-6">
             <h2 className="text-lg font-semibold">Detalles del desafío</h2>
             <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
               {JSON.stringify(challengeData, null, 2)}
@@ -197,11 +200,11 @@ const Metrix = () => {
             ) : (
               <p>Cargando métricas adicionales...</p>
             )}
-          </div>
+          </div> */}
 
           <div className="mt-6">
 
-            <h2 className="text-lg font-semibold">API Result</h2>
+            <h2 className="text-lg font-semibold">Challenge Stats</h2>
             {apiResult ? (
               <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
                 {JSON.stringify(apiResult, null, 2)}
@@ -210,6 +213,8 @@ const Metrix = () => {
               <p>Cargando datos...</p>
             )}
           </div>
+
+
         </>
       )}
 

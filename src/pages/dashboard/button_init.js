@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from 'sonner';
 
-const ButtonInit = ({ documentId, result }) => {
-    const { data: session } = useSession(); // ✅ Obtiene sesión correctamente
-    const [isLoading, setIsLoading] = useState(false); // Estado de carga
+const ButtonInit = ({ documentId, result, phase }) => {
+    const { data: session } = useSession();
+    const [isLoading, setIsLoading] = useState(false);
 
     const sendToWebhook = async () => {
         if (!session) {
@@ -18,7 +18,7 @@ const ButtonInit = ({ documentId, result }) => {
             return;
         }
 
-        setIsLoading(true); // Inicia el estado de carga
+        setIsLoading(true);
 
         try {
             const response = await fetch(process.env.NEXT_PUBLIC_N8N_CHALLENGE_UPDATE, {
@@ -27,16 +27,15 @@ const ButtonInit = ({ documentId, result }) => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    userId: session.user.id, // ID del usuario autenticado
-                    documentId, // Document ID recibido como prop
-                    timestamp: new Date().toISOString(), // Marca de tiempo
+                    userId: session.user.id,
+                    documentId,
+                    timestamp: new Date().toISOString(),
                 }),
             });
 
             if (response.ok) {
-                // console.log("✅ Datos enviados correctamente a n8n");
                 toast.success('Solicitud procesada exitosamente');
-                window.location.reload(); // Recargar página si el envío fue exitoso
+                window.location.reload();
             } else {
                 console.error("❌ Error al enviar datos a n8n");
                 toast.error('Error al procesar la solicitud');
@@ -44,25 +43,39 @@ const ButtonInit = ({ documentId, result }) => {
         } catch (err) {
             console.error("❌ Error en la solicitud al webhook:", err);
         } finally {
-            setIsLoading(false); // Finaliza el estado de carga
+            setIsLoading(false);
         }
     };
 
-    // Solo muestra el mensaje si `result` es "init"
+    if (result === "disapproved") {
+        return (
+            <div className="flex items-center py-3 px-4 gap-3 mt-4 border border-red-500 bg-red-500 rounded-lg">
+                <p className="text-sm text-white font-medium">
+                    Tu desafío fue desaprobado. Puedes comprar otro.
+                </p>
+                <a 
+                    href="http://neocapitalfunding.com/desafio-neo/" 
+                    className="text-sm text-white font-bold uppercase underline"
+                >
+                    CLICK AQUÍ
+                </a>
+            </div>
+        );
+    }
+
     if (result !== "init") {
         return null;
     }
 
     return (
-        <div className="flex items-center py-3 px-4 gap-2 mt-4 border border-yellow-500 bg-yellow-500 rounded-lg">
+        <div className="flex items-center py-3 px-4 gap-3 mt-4 border border-yellow-500 bg-yellow-500 rounded-lg">
             <p className="text-sm text-black font-medium">
-                Tienes un challenge por iniciar
+                ⚡ Tienes un challenge por iniciar
             </p>
-
             <button
                 onClick={sendToWebhook}
                 className="text-sm text-black font-bold uppercase underline"
-                disabled={isLoading} // Deshabilitar botón mientras carga
+                disabled={isLoading}
             >
                 {isLoading ? "Cargando..." : "CLICK AQUÍ"}
             </button>
