@@ -62,8 +62,8 @@ export default function Component({ data = {} as MetricsData }) {
                  className={`pb-2 flex flex-col ${index < 8 ? "border-b dark:border-zinc-500" : ""}`}
              >
              
-                        <span className=" font-medium">{label}</span>
-                        <span className="text-left mt-1">{value}</span>
+                        <span className="text-sm font-medium">{label}</span>
+                        <span className="text-sm text-left mt-1">{value}</span>
                     </li>
                 ))}
             </ul>
