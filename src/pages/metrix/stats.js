@@ -53,8 +53,8 @@ export default function Stats(props) {
     { label: "Resultado", value: translatedResult },
     { label: "Inicio", value: formatDate(startDate) },
     { label: "Fin", value: formatDate(endDate) },
-    { label: "Tamaño de cuenta", value: broker_account.balance ? `$${broker_account.balance}` : "-" },
-    { label: "Plataforma", value: broker_account.platform || "-" },
+    { label: "Tamaño de cuenta", value: broker_account?.balance ? `$${broker_account.balance}` : "-" },
+    { label: "Plataforma", value: broker_account?.platform || "-" },
   ];
 
   return (

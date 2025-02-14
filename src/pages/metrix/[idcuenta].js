@@ -107,7 +107,7 @@ const Metrix = () => {
 
       <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
-        Account Metrix {challengeData?.data?.broker_account.login || "Sin nombre"}
+        Account Metrix {challengeData?.data?.broker_account?.login || "Sin nombre"}
       </h1>
 
       <div className="flex justify-start gap-3 my-6">

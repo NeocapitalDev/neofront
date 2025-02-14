@@ -43,7 +43,7 @@ export default function Index() {
             const fetchBalances = async () => {
                 const metaStats = new MetaStats(process.env.NEXT_PUBLIC_TOKEN_META_API);
                 const newBalances = {};
-
+    
                 for (const challenge of data.challenges) {
                     if (challenge.broker_account?.idMeta) {
                         try {
@@ -51,13 +51,14 @@ export default function Index() {
                             newBalances[challenge.broker_account.idMeta] = metrics.balance;
                         } catch (error) {
                             console.error(`Error obteniendo el balance para ${challenge.broker_account.idMeta}:`, error);
-                            newBalances[challenge.broker_account.idMeta] = "Error";
+                            // Usar el balance inicial en lugar de "Error"
+                            newBalances[challenge.broker_account.idMeta] = challenge.broker_account.balance || "No disponible";
                         }
                     }
                 }
                 setBalances(newBalances);
             };
-
+    
             fetchBalances();
         }
     }, [data?.challenges]);

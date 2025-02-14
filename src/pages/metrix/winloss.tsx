@@ -44,7 +44,9 @@ export default function Component({ data }) {
                 {/* Porcentaje de Wins */}
                 {chartData.wonTradesPercent > 0 && (
                   <div
-                    className="absolute top-0 left-0 h-full bg-green-600 text-xs font-medium text-center text-blue-100 flex items-center justify-center rounded-md"
+                    className={`absolute top-0 left-0 h-full bg-green-600 text-xs font-medium text-center text-blue-100 flex items-center justify-center ${
+                      chartData.wonTradesPercent === 100 ? "rounded-md" : "rounded-l-md"
+                    }`}
                     style={{
                       width: `${chartData.wonTradesPercent}%`,
                     }}
@@ -55,7 +57,9 @@ export default function Component({ data }) {
                 {/* Porcentaje de Losses */}
                 {chartData.lostTradesPercent > 0 && (
                   <div
-                    className="absolute top-0 h-full bg-red-600 text-xs font-medium text-center text-red-100 flex items-center justify-center rounded-md"
+                    className={`absolute top-0 h-full bg-red-600 text-xs font-medium text-center text-red-100 flex items-center justify-center ${
+                      chartData.lostTradesPercent === 100 ? "rounded-md" : "rounded-r-md"
+                    }`}
                     style={{
                       left: `${chartData.wonTradesPercent}%`,
                       width: `${chartData.lostTradesPercent}%`,
