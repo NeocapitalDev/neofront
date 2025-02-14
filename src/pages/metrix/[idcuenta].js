@@ -156,14 +156,14 @@ const Metrix = () => {
           <div className="flex flex-col md:flex-row gap-4">
 
 
-            <div className="w-full md:w-1/3  rounded-lg ">
+            <div className="w-full md:w-1/2  rounded-lg ">
               <h2 className="text-lg font-bold mb-4 pt-5">Estadísticas</h2>
               <Statistics data={{ ...metricsData, phase: challengeData?.data?.phase || "Desconocida" }} />
 
             </div>
 
 
-            <div className="w-full md:w-2/3  rounded-lg ">
+            <div className="w-full md:w-1/2  rounded-lg ">
               <h2 className="text-lg font-bold mb-4 pt-5">Resumen Diario</h2>
               <HistoricalOrders accountId={challengeData?.data?.broker_account.idMeta}/>
             </div>
