@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { Toaster } from 'sonner';
 import { AppProgressBar as ProgressBar } from 'next-nprogress-bar';
 import { ThemeProvider } from "../components/ui/theme-provider"; // Asegúrate de que la ruta sea correcta
+import ChatwootWidget from '@/components/ChatWidget';
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }) {
   return (
@@ -27,6 +28,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }) {
           <Toaster closeButton richColors position="top-right" />
           <Component {...pageProps} />
         </SessionProvider>
+        <ChatwootWidget />
       </ThemeProvider>
     </>
   );

@@ -130,7 +130,7 @@ export default function Navbar() {
                     </Menu>
 
                     {/* Theme Toggle */}
-                    <ThemeToggle />
+                    {/* <ThemeToggle /> */}
 
                     {/* Notificaciones */}
                     <Notifications />

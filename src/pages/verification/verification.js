@@ -59,7 +59,7 @@ const VeriffComponent = () => {
   return (
     <div className="mt-6">
       <p className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">
-        Verificación de cuenta
+        1. Verificación de identidad
       </p>
       <div className="flex flex-col md:flex-row items-start p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black space-y-4 md:space-y-0 md:space-x-6">
         <div className="flex-shrink-0">

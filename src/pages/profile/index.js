@@ -10,9 +10,6 @@ import React, { useState, useEffect } from "react";
 import { CountryDropdown } from '@/components/ui/country-dropdown';
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { toast } from 'sonner';
-import dynamic from "next/dynamic";
-
-const Verification = dynamic(() => import("./verification"), { ssr: false }); // 👈 Evita SSR
 
 const ProfilePage = () => {
   const [formData, setFormData] = useState({
@@ -378,13 +375,6 @@ const ProfilePage = () => {
           </button>
         </div>
       </form>
-
-      {/*Visualizacion de varificacion cuando no esta verificado y tiene challenges en fase 3*/}
-      {!isVerified && hasPhase3Challenge && (
-        <>
-        <Verification apiKey="dd8f7e39-0ef2-4c05-a872-b40235b2d24f"/>
-        </>
-      )}
 
     </Layout>
   );
