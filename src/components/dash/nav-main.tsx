@@ -50,7 +50,7 @@ export function NavMain({
               className="group/collapsible"
             >
               <SidebarMenuItem className="group/collapsible-trigger">
-                <div className="flex py-1 px-2 mt-2 w-full">
+                <div className="flex py-1  mt-2 w-full">
                   {isActive ? (
                     <div className="flex-grow">
                       <SidebarMenuButton
