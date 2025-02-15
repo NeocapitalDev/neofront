@@ -45,11 +45,12 @@ export default function UserProfile() {
         if (!data || data.length === 0) return [];
         const user = data[0];
         return user.challenges.filter((challenge) => {
-            const matchesSearch = challenge.login?.toLowerCase().includes(search.toLowerCase());
+            // const matchesSearch = challenge.login?.toLowerCase().includes(search.toLowerCase());
             const matchesResult = resultFilter ? challenge.result === resultFilter : true;
             const matchesPhase = phaseFilter ? String(challenge.phase) === phaseFilter : true;
+            // return matchesSearch && matchesResult && matchesPhase;
 
-            return matchesSearch && matchesResult && matchesPhase;
+            return matchesResult && matchesPhase;
         });
     }, [data, search, resultFilter, phaseFilter]);
 
@@ -106,12 +107,7 @@ export default function UserProfile() {
                 {/* Filtros */}
                 <h2 className="text-xl font-bold mt-8 mb-4">Challenges</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-2">
-                    <Input
-                        placeholder="Login..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="h-9 px-3 text-sm bg-zinc-800 text-zinc-200 border-zinc-700 rounded-md"
-                    />
+                
                     <select
                         value={resultFilter}
                         onChange={(e) => setResultFilter(e.target.value)}
@@ -153,7 +149,7 @@ export default function UserProfile() {
                                 filteredChallenges.map((challenge) => (
                                     <TableRow key={challenge.id}>
                                         <TableCell>{challenge.id}</TableCell>
-                                        <TableCell>{challenge.login}</TableCell>
+                                        {/* <TableCell>{challenge.login}</TableCell> */}
                                         <TableCell>{challenge.server}</TableCell>
                                         <TableCell>{challenge.platform}</TableCell>
                                         <TableCell>{translateResult(challenge.result)}</TableCell>
