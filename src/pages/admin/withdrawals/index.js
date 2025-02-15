@@ -21,7 +21,7 @@ import DashboardLayout from "..";
 
 const challengeColumns = [
   { accessorKey: "id", header: "ID" },
-  { accessorKey: "login", header: "Login" },
+  // { accessorKey: "login", header: "Login" },
   { accessorKey: "startDate", header: "Fecha de Inicio" },
   { accessorKey: "endDate", header: "Fecha de Fin" },
 ];
@@ -41,7 +41,7 @@ export default function ChallengesTable() {
     : null,
     ([url, token]) => fetcher(url, token)
   );
-
+  console.log(data);
   const [search, setSearch] = useState("");
   const [resultFilter, setResultFilter] = useState(""); // "Aprobado" o "No Aprobado"
   const [phaseFilter, setPhaseFilter] = useState(""); // "1", "2", "3"
@@ -61,8 +61,10 @@ export default function ChallengesTable() {
     if (!data || !data.data) return [];
 
     return data.data.filter((challenge) => {
-      const matchesSearch = challenge.login.toLowerCase().includes(search.toLowerCase());
-      const matchesResult =
+      // const matchesSearch = challenge.login 
+      // ? challenge.login.toLowerCase().includes(search.toLowerCase()) 
+      // : false;
+          const matchesResult =
         resultFilter && challenge.result
           ? challenge.result.toLowerCase() === resultFilter.toLowerCase()
           : true;
@@ -70,8 +72,9 @@ export default function ChallengesTable() {
       const matchesDateRange =
         (!startDateFilter || new Date(challenge.startDate) >= new Date(startDateFilter)) &&
         (!endDateFilter || new Date(challenge.endDate) <= new Date(endDateFilter));
+        return matchesResult && matchesPhase && matchesDateRange;
 
-      return matchesSearch && matchesResult && matchesPhase && matchesDateRange;
+      // return matchesSearch && matchesResult && matchesPhase && matchesDateRange;
     });
   }, [data, search, resultFilter, phaseFilter, startDateFilter, endDateFilter]);
 
@@ -89,12 +92,12 @@ export default function ChallengesTable() {
         {/* Barra de búsqueda y filtros */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-2">
           {/* Filtro por login */}
-          <Input
+          {/* <Input
             placeholder="Login..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
-          />
+          /> */}
 
           {/* Filtro por fecha de inicio */}
           <Input
@@ -130,7 +133,7 @@ export default function ChallengesTable() {
                 filteredData.map((challenge, index) => (
                   <TableRow key={index} className="border-b border-zinc-300 dark:border-zinc-700">
                     <TableCell>{challenge.id}</TableCell>
-                    <TableCell>{challenge.login}</TableCell>
+                    {/* <TableCell>{challenge.login}</TableCell> */}
                     <TableCell>{formatDate(challenge.startDate) ?? "N/A"}</TableCell>
                     <TableCell>{formatDate(challenge.endDate) ?? "N/A"}</TableCell>
                   </TableRow>

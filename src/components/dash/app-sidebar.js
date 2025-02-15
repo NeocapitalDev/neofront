@@ -43,7 +43,7 @@ export function AppSidebar({ ...props }) {
       setUserData({
         email: session.user.email || "correo@ejemplo.com",
         avatar: avatarUrl, // Avatar de Gravatar
-        name: session.firstName || session.user.email.split("@")[0], // Si no hay nombre, usar parte del email
+        name:  session.user.email.split("@")[0] ||  session.firstName , // Si no hay nombre, usar parte del email
       });
     }
   }, [session]);
@@ -51,22 +51,22 @@ export function AppSidebar({ ...props }) {
   const isLoading = status === "loading" || !userData;
 
   const navMain = [
-    {
-      title: "Users",
-      url: "/admin/users",
-      icon: Users,
-      isActive: false,
-      items: [
-        {
-          title: "History",
-          url: "/admin/users/history",
-        },
-        {
-          title: "Settings",
-          url: "/admin/users/settings",
-        },
-      ],
-    },
+    // {
+    //   title: "Users",
+    //   url: "/admin/users",
+    //   icon: Users,
+    //   isActive: false,
+    //   items: [
+    //     {
+    //       title: "History",
+    //       url: "/admin/users/history",
+    //     },
+    //     {
+    //       title: "Settings",
+    //       url: "/admin/users/settings",
+    //     },
+    //   ],
+    // },
     {
       title: "Challenges",
       url: "/admin/challenges",
