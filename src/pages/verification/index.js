@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import useSWR from "swr";
 import Loader from '../../components/loaders/loader';
 import { useSession } from "next-auth/react";
+import { toast } from "sonner"; // Importa Sonner
 
 const Verification = dynamic(() => import("../verification/verification"), { ssr: false });
 
@@ -20,6 +21,7 @@ const fetcher = async (url, token) => {
 const SocialsPage = () => {
     const { data: session } = useSession();
     const [accepted, setAccepted] = useState(false);
+    const [loading, setLoading] = useState(false); // Estado para el botón
 
     const { data, error, isLoading, mutate } = useSWR(
         session?.jwt
@@ -40,6 +42,7 @@ const SocialsPage = () => {
 
     const handleSign = async () => {
         if (accepted) {
+            setLoading(true); // Deshabilita el botón mientras se procesa la solicitud
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${data?.id}`, {
                     method: "PUT",
@@ -50,23 +53,28 @@ const SocialsPage = () => {
                     body: JSON.stringify({ statusSign: true }),
                 });
 
-                if (!response.ok) throw new Error("Error al actualizar la confirmación");
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("Error en la respuesta de Strapi:", errorData);
+                    toast.error("Error en la firma del contrato");
+                    throw new Error(`Error ${response.status} - ${errorData?.error?.message || "Error desconocido"}`);
+                }
 
-                alert("Contrato firmado exitosamente.");
+                toast.success("Contrato firmado exitosamente.");
                 mutate(); // Actualizar los datos en SWR
             } catch (error) {
                 console.error("Error al firmar el contrato:", error);
-                alert("Hubo un problema al firmar el contrato.");
+                toast.error("Hubo un problema al firmar el contrato.");
+            } finally {
+                setLoading(false); // Habilita el botón nuevamente
             }
         }
     };
 
-    // Si está cargando, mostramos un mensaje de carga
     if (isLoading) {
         return <Layout><Loader /></Layout>;
     }
 
-    // Si hay un error, mostramos el mensaje de error
     if (error) {
         return <Layout>Error al cargar los datos: {error.message}</Layout>;
     }
@@ -77,28 +85,12 @@ const SocialsPage = () => {
                 <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                     <h2 className="text-xl font-semibold mb-0 flex items-center">
                         <CheckCircleIcon className="h-6 w-6 mr-2" />
-                        Sección bloqueada
+                        Verificación
                     </h2>
-                    <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
-                        Para acceder a esta sección, necesitas haber alcanzado la fase NeoTrader en tu desafío. Esta etapa representa un nivel avanzado en tu camino y desbloquea todas las herramientas y beneficios exclusivos. Sigue avanzando para aprovechar todo lo que tenemos preparado para ti.
-                    </p>
                 </div>
-            </Layout>
-        );
-    }
 
-    return (
-        <Layout>
-            <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-                <h2 className="text-xl font-semibold mb-0 flex items-center">
-                    <CheckCircleIcon className="h-6 w-6 mr-2" />
-                    Verificación
-                </h2>
-            </div>
+                <Verification apiKey="dd8f7e39-0ef2-4c05-a872-b40235b2d24f" />
 
-            <Verification apiKey="dd8f7e39-0ef2-4c05-a872-b40235b2d24f" />
-
-            {(
                 <div className="mt-6">
                     <p className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">
                         2. Firma de contrato
@@ -135,14 +127,28 @@ const SocialsPage = () => {
                         </label>
                         <Button
                             className="mt-4 bg-[#1F6263] hover:bg-[#29716c] text-white text-sm font-medium px-6 py-5 rounded-md"
-                            disabled={statusSign|| !accepted}
+                            disabled={statusSign || !accepted || loading}
                             onClick={handleSign}
                         >
-                            Firmar
+                            {loading ? "Firmando..." : "Firmar"}
                         </Button>
                     </div>
                 </div>
-            )}
+            </Layout>
+        );
+    }
+
+    return (
+        <Layout>
+            <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+                <h2 className="text-xl font-semibold mb-0 flex items-center">
+                    <CheckCircleIcon className="h-6 w-6 mr-2" />
+                    Sección bloqueada
+                </h2>
+                <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
+                    Para acceder a esta sección, necesitas haber alcanzado la fase NeoTrader en tu desafío. Esta etapa representa un nivel avanzado en tu camino y desbloquea todas las herramientas y beneficios exclusivos. Sigue avanzando para aprovechar todo lo que tenemos preparado para ti.
+                </p>
+            </div>
         </Layout>
     );
 };
