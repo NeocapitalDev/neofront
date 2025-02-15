@@ -127,13 +127,13 @@ return (
         </div>
       </form>
 
-{/* 
+
       <p className="mt-10 text-sm text-center leading-6 text-zinc-900 font-medium dark:text-gray-400">
     ¿No tienes una cuenta?{" "}
     <Link href="/register" className="font-semibold leading-6 text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300">
       Regístrate ahora
     </Link>
-  </p> */}
+  </p> 
 
     </div>
   </Layout>
