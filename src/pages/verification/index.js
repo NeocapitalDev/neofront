@@ -4,6 +4,7 @@ import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 import useSWR from "swr";
+import Loader from '../../components/loaders/loader';
 import { useSession } from "next-auth/react";
 
 const Verification = dynamic(() => import("../verification/verification"), { ssr: false });
@@ -20,7 +21,7 @@ const SocialsPage = () => {
     const { data: session } = useSession();
     const [accepted, setAccepted] = useState(false);
 
-    const { data, mutate } = useSWR(
+    const { data, error, isLoading, mutate } = useSWR(
         session?.jwt
             ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate]=broker_account`, session.jwt]
             : null,
@@ -31,11 +32,11 @@ const SocialsPage = () => {
 
     const isVerified = data?.isVerified;
     const hasPhase3Challenge = data?.challenges?.filter(challenge => challenge.phase == "3") || [];
-    const isConfirmed = data?.confirmed;
+    const statusSign = data?.statusSign;
 
     console.log("Is Verified:", isVerified);
     console.log("Has Phase 3 Challenge:", hasPhase3Challenge);
-    console.log("Is Confirmed:", isConfirmed);
+    console.log("Is statusSign:", statusSign);
 
     const handleSign = async () => {
         if (accepted) {
@@ -46,7 +47,7 @@ const SocialsPage = () => {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${session.jwt}`,
                     },
-                    body: JSON.stringify({ confirmed: true }),
+                    body: JSON.stringify({ statusSign: true }),
                 });
 
                 if (!response.ok) throw new Error("Error al actualizar la confirmación");
@@ -60,6 +61,16 @@ const SocialsPage = () => {
         }
     };
 
+    // Si está cargando, mostramos un mensaje de carga
+    if (isLoading) {
+        return <Layout><Loader /></Layout>;
+    }
+
+    // Si hay un error, mostramos el mensaje de error
+    if (error) {
+        return <Layout>Error al cargar los datos: {error.message}</Layout>;
+    }
+    
     if (hasPhase3Challenge && !isVerified) {
         return (
             <Layout>
@@ -116,15 +127,15 @@ const SocialsPage = () => {
                         <label className="flex items-center space-x-2 mt-4">
                             <input
                                 type="checkbox"
-                                checked={true}
-                                onChange={() => {}}
+                                checked={statusSign || accepted}
+                                onChange={() => { if (!statusSign) setAccepted(!accepted); }}
                                 className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                             />
                             <span className="text-sm text-zinc-900 dark:text-white">Acepto los términos del contrato</span>
                         </label>
                         <Button
                             className="mt-4 bg-[#1F6263] hover:bg-[#29716c] text-white text-sm font-medium px-6 py-5 rounded-md"
-                            disabled={isConfirmed}
+                            disabled={statusSign|| !accepted}
                             onClick={handleSign}
                         >
                             Firmar
