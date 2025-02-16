@@ -61,7 +61,7 @@ export default function UsersTable() {
       : null,
     ([url, token]) => fetcher(url, token)
   );
-
+  console.log(data);  
   const [usernameSearch, setUsernameSearch] = useState("");
   const [emailSearch, setEmailSearch] = useState("");
   const [verificationFilter, setVerificationFilter] = useState("Todos");

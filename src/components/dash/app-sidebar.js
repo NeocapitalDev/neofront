@@ -41,11 +41,11 @@ export function AppSidebar({ ...props }) {
   const isLoading = status === "loading" || !userData;
 
   const navMain = [
-    // {
-    //   title: "Users",
-    //   url: "/admin/users",
-    //   icon: Users,
-    //   isActive: false,
+     {
+     title: "Users",
+       url: "/admin/users",
+       icon: Users,
+       isActive: false,
     //   items: [
     //     {
     //       title: "History",
@@ -56,7 +56,7 @@ export function AppSidebar({ ...props }) {
     //       url: "/admin/users/settings",
     //     },
     //   ],
-    // },
+     },
     {
       title: "Challenges",
       url: "/admin/challenges",
