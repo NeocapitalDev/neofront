@@ -5,18 +5,19 @@ import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { IdentificationIcon } from "@heroicons/react/24/outline";
 import { useStrapiData } from "@/services/strapiServiceJWT";
+import { CheckCircleIcon } from "lucide-react";
 
 // Carga Veriff dinámicamente para evitar errores en SSR
 const Veriff = dynamic(() => import("@veriff/js-sdk"), { ssr: false });
 
-const VeriffComponent = () => {
+const VeriffComponent = ({ isVerified }) => {
   const [veriffInstance, setVeriffInstance] = useState(null);
   const { data: session } = useSession();
   const token = session?.jwt;
   const { data, error: fetchError, isLoading } = useStrapiData("users/me", token);
 
   useEffect(() => {
-    if (isLoading || !data || typeof window === "undefined") return; // Solo ejecutar en cliente
+    if (isLoading || !data || typeof window === "undefined" || isVerified) return; // Solo ejecutar si no está verificado
 
     import("@veriff/js-sdk").then(({ Veriff }) => {
       import("@veriff/incontext-sdk").then(({ createVeriffFrame }) => {
@@ -29,7 +30,7 @@ const VeriffComponent = () => {
               console.error("Error en Veriff:", err);
             } else {
               console.log("Sesión iniciada:", response);
-              createVeriffFrame({ url: response.verification.url }); // Ahora sí está definido
+              createVeriffFrame({ url: response.verification.url });
             }
           },
         });
@@ -45,36 +46,44 @@ const VeriffComponent = () => {
         setVeriffInstance(veriff);
       });
     });
-  }, [isLoading, data]);
+  }, [isLoading, data, isVerified]);
 
   useEffect(() => {
     if (veriffInstance) {
-      veriffInstance.mount({
-        submitBtnText: "Obtener verificación",
-        loadingText: "Por favor espera...",
-      });
+      setTimeout(() => {
+        const veriffRoot = document.getElementById("veriff-root");
+        if (veriffRoot) {
+          veriffInstance.mount({
+            submitBtnText: "Obtener verificación",
+            loadingText: "Por favor espera...",
+          });
+        } else {
+          console.error("❌ No se encontró el elemento 'veriff-root'. Veriff no pudo montarse.");
+        }
+      }, 500); // Retraso de 500ms para asegurarnos de que el DOM ha cargado
     }
   }, [veriffInstance]);
+
 
   return (
     <div className="mt-6">
       <p className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">
         1. Verificación de identidad
       </p>
-      <div className="flex flex-col md:flex-row items-start p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black space-y-4 md:space-y-0 md:space-x-6">
-        <div className="flex-shrink-0">
-          <IdentificationIcon className="h-12 w-12 text-zinc-400 dark:text-white" />
-        </div>
-        <div>
-          <p className="text-sm leading-6 text-gray-700 dark:text-white mb-6">
-            Confirme su identidad. Para continuar, necesitará una identificación con foto válida y un dispositivo con
-            cámara. Al proceder, acepta que Veriff procese sus datos personales, incluidos los datos biométricos.
-          </p>
-          {!isLoading && data && <div id="veriff-root"></div>}
-        </div>
+
+      <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+        <h2 className="text-xl font-semibold mb-0 flex items-center">
+          <CheckCircleIcon className="h-6 w-6 mr-2 text-green-500" />
+          Cuenta Verificada
+        </h2>
+        <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
+          ✅ Tu cuenta ha sido verificada correctamente. Ahora puedes continuar con las operaciones sin restricciones y
+          acceder a todas las funcionalidades disponibles en la plataforma.
+        </p>
       </div>
     </div>
   );
+
 };
 
 export default VeriffComponent;
