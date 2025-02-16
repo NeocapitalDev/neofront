@@ -7,8 +7,9 @@ import useSWR from "swr";
 import Loader from '../../components/loaders/loader';
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import VeriffComponent from "./verification"; // Importamos el nuevo componente con el mensaje correcto
 
+// ✅ Importación corregida para VeriffComponent
+import VeriffComponent from "./verification"; // Asegúrate de que la ruta sea correcta
 const Verification = dynamic(() => import("../verification/verification"), { ssr: false });
 
 const fetcher = async (url, token) => {
@@ -34,8 +35,8 @@ const SocialsPage = () => {
     console.log("User Data:", data);
 
     const isVerified = data?.isVerified;
-    const hasPhase3Challenge = data?.challenges?.filter(challenge => challenge.phase == "3") || [];
-    const hasPhase1Or2Challenge = data?.challenges?.some(challenge => challenge.phase == "1" || challenge.phase == "2");
+    const hasPhase3Challenge = data?.challenges?.some(challenge => challenge.phase === "3");
+    const hasPhase1Or2Challenge = data?.challenges?.some(challenge => challenge.phase === "1" || challenge.phase === "2");
     const statusSign = data?.statusSign;
 
     console.log("Is Verified:", isVerified);
@@ -43,6 +44,7 @@ const SocialsPage = () => {
     console.log("Has Phase 1 or 2 Challenge:", hasPhase1Or2Challenge);
     console.log("Is statusSign:", statusSign);
 
+    // ✅ Función para firmar el contrato
     const handleSign = async () => {
         if (accepted) {
             setLoading(true);
@@ -92,17 +94,17 @@ const SocialsPage = () => {
                         Sección bloqueada
                     </h2>
                     <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
-                        Para acceder a esta sección, necesitas haber alcanzado la fase NeoTrader en tu desafío. Esta etapa representa un nivel avanzado en tu camino y desbloquea todas las herramientas y beneficios exclusivos. Sigue avanzando para aprovechar todo lo que tenemos preparado para ti.
+                        Para acceder a esta sección, necesitas haber alcanzado la fase NeoTrader en tu desafío.
                     </p>
                 </div>
             </Layout>
         );
     }
 
-    // ✅ Si está en fase 3 sin verificar o ya está verificado, mostrar verificación + firma
     return (
         <Layout>
-            <VeriffComponent isVerified={isVerified} /> {/* Mostramos el componente con el mensaje correcto */}
+            {/* ✅ Mostramos el componente Veriff para manejar la verificación */}
+            <VeriffComponent isVerified={isVerified} />
 
             <div className="mt-6">
                 <p className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">

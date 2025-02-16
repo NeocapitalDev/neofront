@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
-import { IdentificationIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon } from "@heroicons/react/24/outline"; 
 import { useStrapiData } from "@/services/strapiServiceJWT";
-import { CheckCircleIcon } from "lucide-react";
 
 // Carga Veriff dinámicamente para evitar errores en SSR
 const Veriff = dynamic(() => import("@veriff/js-sdk"), { ssr: false });
@@ -16,8 +15,9 @@ const VeriffComponent = ({ isVerified }) => {
   const token = session?.jwt;
   const { data, error: fetchError, isLoading } = useStrapiData("users/me", token);
 
+  // ✅ Solo ejecutar Veriff si la cuenta NO está verificada
   useEffect(() => {
-    if (isLoading || !data || typeof window === "undefined" || isVerified) return; // Solo ejecutar si no está verificado
+    if (isLoading || !data || typeof window === "undefined" || isVerified) return; 
 
     import("@veriff/js-sdk").then(({ Veriff }) => {
       import("@veriff/incontext-sdk").then(({ createVeriffFrame }) => {
@@ -60,10 +60,9 @@ const VeriffComponent = ({ isVerified }) => {
         } else {
           console.error("❌ No se encontró el elemento 'veriff-root'. Veriff no pudo montarse.");
         }
-      }, 500); // Retraso de 500ms para asegurarnos de que el DOM ha cargado
+      }, 500);
     }
   }, [veriffInstance]);
-
 
   return (
     <div className="mt-6">
@@ -71,19 +70,29 @@ const VeriffComponent = ({ isVerified }) => {
         1. Verificación de identidad
       </p>
 
-      <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-        <h2 className="text-xl font-semibold mb-0 flex items-center">
-          <CheckCircleIcon className="h-6 w-6 mr-2 text-green-500" />
-          Cuenta Verificada
-        </h2>
-        <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
-          ✅ Tu cuenta ha sido verificada correctamente. Ahora puedes continuar con las operaciones sin restricciones y
-          acceder a todas las funcionalidades disponibles en la plataforma.
-        </p>
-      </div>
+      {isVerified ? (
+        // ✅ Mostrar mensaje de cuenta verificada si el usuario está verificado
+        <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+          <h2 className="text-xl font-semibold mb-0 flex items-center">
+            <CheckCircleIcon className="h-6 w-6 mr-2 text-green-500" />
+            Cuenta Verificada
+          </h2>
+          <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
+            ✅ Tu cuenta ha sido verificada correctamente. Ahora puedes continuar con las operaciones sin restricciones y
+            acceder a todas las funcionalidades disponibles en la plataforma.
+          </p>
+        </div>
+      ) : (
+        // ❌ Si NO está verificado, mostrar Veriff
+        <div className="flex flex-col p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+          <p className="text-sm text-zinc-900 dark:text-white">
+            Confirme su identidad. Para continuar, necesitará una identificación con foto válida y un dispositivo con cámara.
+          </p>
+          <div id="veriff-root" className="mt-4"></div>
+        </div>
+      )}
     </div>
   );
-
 };
 
 export default VeriffComponent;
