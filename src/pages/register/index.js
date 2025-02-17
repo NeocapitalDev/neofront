@@ -100,7 +100,6 @@ export default function SignUp() {
 
   return (
     <>
-
       <Layout className="bg-zinc-200 min-h-screen">
         <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-black dark:text-white">
           🎉 Crea una cuenta nueva
