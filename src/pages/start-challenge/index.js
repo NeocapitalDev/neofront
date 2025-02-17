@@ -27,7 +27,7 @@ const StartChallenge = () => {
                 <div className="mb-6">
                     <h3 className="text-sm font-medium mb-2">Balance de Cuenta</h3>
                     <div className="grid mt-6 grid-cols-3 gap-2">
-                        {["100000", "50000", "25000", "10000", "5000"].map((balance) => (
+                        {["5,000", "10,000", "25,000", "50,000", "100,000"].map((balance) => (
                             <button
                                 key={balance}
                                 onClick={() => setSelectedBalance(balance)}
@@ -95,11 +95,11 @@ const StartChallenge = () => {
                 <div className="text-center">
                     <p className="text-xl font-semibold text-green-400">
 
-                        {selectedBalance === "5000" ? "$44" :
-                            selectedBalance === "10000" ? "$79" :
-                                selectedBalance === "25000" ? "$179" :
-                                    selectedBalance === "50000" ? "$299" : // Aquí puse 75000 en lugar del duplicado de 50000
-                                        selectedBalance === "100000" ? "$499" : ""}
+                        {selectedBalance === "5,000" ? "$44" :
+                            selectedBalance === "10,000" ? "$79" :
+                                selectedBalance === "25,000" ? "$179" :
+                                    selectedBalance === "50,000" ? "$299" : // Aquí puse 75000 en lugar del duplicado de 50000
+                                        selectedBalance === "100,000" ? "$499" : ""}
 
 
 
