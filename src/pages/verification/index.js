@@ -8,8 +8,8 @@ import Loader from '../../components/loaders/loader';
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 
-// ✅ Importación corregida para VeriffComponent
-import VeriffComponent from "./verification"; // Asegúrate de que la ruta sea correcta
+// ✅ Importación corregida de VeriffComponent
+import VeriffComponent from "./verification"; 
 const Verification = dynamic(() => import("../verification/verification"), { ssr: false });
 
 const fetcher = async (url, token) => {
@@ -35,9 +35,11 @@ const SocialsPage = () => {
     console.log("User Data:", data);
 
     const isVerified = data?.isVerified;
-    const hasPhase3Challenge = data?.challenges?.some(challenge => challenge.phase === "3");
-    const hasPhase1Or2Challenge = data?.challenges?.some(challenge => challenge.phase === "1" || challenge.phase === "2");
     const statusSign = data?.statusSign;
+
+    // ✅ Corrección: Asegurar que `challenges` es un array antes de evaluarlo
+    const hasPhase3Challenge = Array.isArray(data?.challenges) && data.challenges.some(challenge => challenge.phase === 3);
+    const hasPhase1Or2Challenge = Array.isArray(data?.challenges) && data.challenges.some(challenge => challenge.phase === 1 || challenge.phase === 2);
 
     console.log("Is Verified:", isVerified);
     console.log("Has Phase 3 Challenge:", hasPhase3Challenge);
