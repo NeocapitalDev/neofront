@@ -1,37 +1,26 @@
-// components/Layout.js
-
 import React from 'react';
-
 import Link from 'next/link';
-
 import Image from 'next/image';
 
 const Layout = ({ children }) => {
   return (
-    <div className="h-screen bg-white dark:bg-zinc-900">
-      <div className="flex min-h-full flex-1">
+    <div className="relative h-screen">
+      {/* Imagen de fondo ocupando todo el ancho */}
+      <Image
+        className="absolute inset-0 w-full h-full object-cover z-[-1]"
+        src="/images/bg-auth.webp"
+        alt="Fondo de pantalla"
+        layout="fill"
+        objectFit="cover"
+        priority={true} // Carga prioritaria para mejorar la experiencia
+      />
 
-
-        {/* <div className="relative hidden w-1/2 lg:block ">
-          <Image
-            className="absolute inset-0 h-full w-full object-cover "
-            src="/images/bg-register.jpg"
-            alt="Login Background"
-            width={960} // Ajusta el ancho deseado
-            height={1080} // Ajusta la altura deseada
-          />
-        </div> */}
-
+      {/* Capa de opacidad con degradado */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/80 to-black z-0"></div>
+    
+      <div className="flex min-h-full flex-1 relative z-10">
+        {/* Contenedor para la imagen de monedas */}
         <div className="relative hidden w-1/2 lg:block">
-          {/* Imagen de fondo */}
-          <Image
-            className="absolute inset-0 h-full w-full object-cover"
-            src="/images/bg-auth.webp"
-            alt="Login Background"
-            width={960}
-            height={1080}
-          />
-
           {/* Imagen de monedas superpuesta */}
           <Image
             className="absolute inset-0 m-auto w-[70%] h-auto object-contain"
@@ -43,12 +32,9 @@ const Layout = ({ children }) => {
           />
         </div>
 
-
-        {/* Parte del Registro Login  */}
-
+        {/* Contenedor del formulario */}
         <div className="flex flex-1 w-1/2 flex-col justify-center px-8 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
           <div className="mx-auto w-full max-w-sm lg:w-96">
-
             <Link href="/">
               <Image
                 className="h-8 w-auto dark:hidden"
@@ -69,9 +55,6 @@ const Layout = ({ children }) => {
             <main>{children}</main>
           </div>
         </div>
-
-
-
       </div>
     </div>
   );
