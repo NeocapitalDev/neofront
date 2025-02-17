@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
 
 import Layout from '../../components/layout/auth';
 
@@ -17,7 +16,10 @@ export default function SignUp() {
 
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
+    firstName: '',
+    lastName: '',
+    phone: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,7 +71,10 @@ export default function SignUp() {
       const response = await axios.post(`${strapiUrl}/api/auth/local/register`, {
         username,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone
       },
         {
           headers: {
@@ -103,6 +108,63 @@ export default function SignUp() {
 
         <div className="mt-8">
           <form className="space-y-6" onSubmit={handleSubmit}>
+
+            {/* Nombre */}
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">
+                Nombre
+              </label>
+              <div className="mt-2">
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  placeholder="Tu nombre"
+                  required
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="block w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:focus:ring-amber-500 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            {/* Apellido */}
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">
+                Apellido
+              </label>
+              <div className="mt-2">
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  placeholder="Tu apellido"
+                  required
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="block w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:focus:ring-amber-500 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            {/* Teléfono */}
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">
+                Teléfono
+              </label>
+              <div className="mt-2">
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="Tu teléfono"
+                  required
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="block w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:focus:ring-amber-500 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
 
             {/* Email */}
             <div>
