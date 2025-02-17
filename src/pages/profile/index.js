@@ -38,7 +38,7 @@ const ProfilePage = () => {
 
   const { data: session } = useSession();
   const token = session?.jwt;
-
+  console.log(token);
   const { data, error: fetchError, isLoading } = useStrapiData('users/me?populate=challenges', token);
 
   const handleChange = (e) => {
