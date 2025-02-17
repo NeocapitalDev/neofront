@@ -20,7 +20,7 @@ export const userNavigation = [
 
 // Puedes colocar esta constante en un archivo de configuración o en el mismo componente
 export const principalButton = [
-    { name: 'Nuevo desafío NEO', href: 'https://neocapitalfunding.com/desafio-neo/' }
+    { name: 'Nuevo desafío NEO', href: '/start-challenge' }
 ];
 
 export const FooterNav = [
