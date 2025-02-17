@@ -82,7 +82,7 @@ export default function SignUp() {
             'Content-Type': 'application/json',
           },
         }
-      );
+      );  
       console.log('Registration successful:', response.data);
       toast.success('Registro exitoso.');
       router.replace('/email-confirmation');

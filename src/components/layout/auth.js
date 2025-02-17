@@ -7,7 +7,7 @@ const Layout = ({ children }) => {
     <div className="relative min-h-screen flex flex-col">
       {/* Imagen de fondo ocupando todo el ancho */}
       <Image
-        className="absolute inset-0 w-full h-full object-cover z-[-1]"
+        className="absolute inset-0 w-full h-full object-cover z-[-2]" // 🔥 Asegura que la imagen de fondo esté bien atrás
         src="/images/bg-auth.webp"
         alt="Fondo de pantalla"
         layout="fill"
@@ -16,12 +16,11 @@ const Layout = ({ children }) => {
       />
 
       {/* Capa de opacidad con degradado */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/80 to-black z-0"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/80 to-black z-[-1]"></div>
 
       <div className="flex flex-1 min-h-full relative z-10">
         {/* Contenedor para la imagen de monedas */}
         <div className="relative hidden w-1/2 lg:block">
-          {/* Imagen de monedas superpuesta */}
           <Image
             className="absolute inset-0 m-auto w-[70%] h-auto object-contain"
             src="/images/moneda.webp"
@@ -32,9 +31,9 @@ const Layout = ({ children }) => {
           />
         </div>
 
-        {/* Contenedor del formulario con altura dinámica */}
-        <div className="flex flex-1 w-1/2 flex-col justify-center px-8 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 min-h-full">
-          <div className="mx-auto w-full max-w-sm lg:w-96">
+        {/* Contenedor del formulario con altura dinámica y eventos de clic */}
+        <div className="flex flex-1 w-1/2 flex-col justify-center px-8 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 min-h-full z-20">
+          <div className="mx-auto w-full max-w-sm lg:w-96 bg-white p-6 rounded-lg shadow-md dark:bg-zinc-900"> 
             <Link href="/">
               <Image
                 className="h-8 w-auto dark:hidden"
@@ -52,7 +51,8 @@ const Layout = ({ children }) => {
               />
             </Link>
 
-            <main>{children}</main>
+            {/* ✅ Aseguramos que el formulario esté bien visible */}
+            <main className="mt-6">{children}</main>
           </div>
         </div>
       </div>
