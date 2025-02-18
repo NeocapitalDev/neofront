@@ -1,13 +1,13 @@
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 
 const Layout = ({ children }) => {
   return (
-    <div className="relative min-h-screen flex flex-col">
+    <div className="relative h-screen">
       {/* Imagen de fondo ocupando todo el ancho */}
       <Image
-        className="absolute inset-0 w-full h-full object-cover z-[-1]"
+        className="absolute inset-0 w-full h-full object-cover z-[-1] hidden sm:block"
         src="/images/bg-auth.webp"
         alt="Fondo de pantalla"
         layout="fill"
@@ -15,10 +15,9 @@ const Layout = ({ children }) => {
         priority={true} // Carga prioritaria para mejorar la experiencia
       />
 
-      {/* Capa de opacidad con degradado */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/80 to-black z-0"></div>
-
-      <div className="flex flex-1 min-h-full relative z-10">
+      {/* Fondo negro para móviles */}
+      <div className="absolute inset-0 w-full h-full bg-zinc-800 sm:hidden z-[-1]"></div>
+      <div className="flex min-h-full flex-1 relative z-10">
         {/* Contenedor para la imagen de monedas */}
         <div className="relative hidden w-1/2 lg:block">
           {/* Imagen de monedas superpuesta */}
@@ -32,8 +31,8 @@ const Layout = ({ children }) => {
           />
         </div>
 
-        {/* Contenedor del formulario con altura dinámica */}
-        <div className="flex flex-1 w-1/2 flex-col justify-center px-8 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 min-h-full">
+        {/* Contenedor del formulario */}
+        <div className="flex flex-1 w-1/2 flex-col justify-center px-8 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
           <div className="mx-auto w-full max-w-sm lg:w-96">
             <Link href="/">
               <Image
