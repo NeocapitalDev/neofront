@@ -5,7 +5,7 @@ import { UserIcon } from '@heroicons/react/24/outline';
 
 const StartChallenge = () => {
     const [selectedCurrency, setSelectedCurrency] = useState("USD");
-    const [selectedBalance, setSelectedBalance] = useState("100000");
+    const [selectedBalance, setSelectedBalance] = useState("5,000");
     const [selectedAccount, setSelectedAccount] = useState("NEO");
     const [selectedPlatform, setSelectedPlatform] = useState("MT4");
     const [termsAccepted, setTermsAccepted] = useState(false);
@@ -117,7 +117,15 @@ const StartChallenge = () => {
                                     selectedBalance === "50,000" ? "$299" :
                                         selectedBalance === "100,000" ? "$499" : ""}
                     </p>
-                    <a href={getChallengeLink()} className="mt-9 bg-amber-600 text-white px-6 py-3 rounded-md w-full font-semibold">
+                    <a
+                        href={getChallengeLink()}
+                        className={`mt-9 bg-amber-600 text-white px-6 py-3 rounded-md w-full font-semibold ${!termsAccepted || !refundPolicyAccepted ? "opacity-50 cursor-not-allowed" : ""}`}
+                        onClick={(e) => {
+                            if (!termsAccepted || !refundPolicyAccepted) {
+                                e.preventDefault();
+                            }
+                        }}
+                    >
                         Confirmar y Proceder al Pago
                     </a>
                 </div>
