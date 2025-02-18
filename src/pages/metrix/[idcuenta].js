@@ -208,6 +208,19 @@ const Metrix = () => {
             )}
           </div> */}
 
+<div className="mt-6">
+            <h2 className="text-lg font-semibold">Métricas adicionales</h2>
+            {metricsError ? (
+              <p className="text-red-500">Error al cargar las métricas: {metricsError.message}</p>
+            ) : metricsData ? (
+              <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
+                {JSON.stringify(metricsData, null, 2)}
+              </pre>
+            ) : (
+              <p>Cargando métricas adicionales...</p>
+            )}
+          </div>
+
           <div className="mt-6">
 
             <h2 className="text-lg font-semibold">Challenge Stats</h2>

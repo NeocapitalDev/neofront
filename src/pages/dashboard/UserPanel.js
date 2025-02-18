@@ -45,7 +45,7 @@ export default function Index() {
             const fetchBalances = async () => {
                 const metaStats = new MetaStats(process.env.NEXT_PUBLIC_TOKEN_META_API);
                 const newBalances = {};
-    
+
                 for (const challenge of data.challenges) {
                     if (challenge.broker_account?.idMeta) {
                         try {
@@ -60,7 +60,7 @@ export default function Index() {
                 }
                 setBalances(newBalances);
             };
-    
+
             fetchBalances();
         }
     }, [data?.challenges]);
@@ -81,7 +81,7 @@ export default function Index() {
         <div>
             {/* Mostrar la tarjeta NeoChallengeCard solo cuando no haya desafíos activos */}
             {data?.challenges?.length === 0 && <NeoChallengeCard />}
-            
+
             {["3", "2", "1"].map(key => {
                 const challenges = data?.challenges?.filter(challenge => challenge.phase == key) || [];
                 if (challenges.length === 0) return null;
@@ -93,20 +93,17 @@ export default function Index() {
                         </h2>
 
                         {key === "3" && !isVerified ? (
-                            <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg shadow-md mb-6">
-                                <div className="flex items-center space-x-2">
-                                    <BellIcon className="h-6 w-6 text-amber-500 dark:text-amber-300" />
-                                    <span className="text-sm text-amber-800 dark:text-yellow-300 font-medium">
-                                        Por favor verifica tu cuenta para acceder a la fase Neotrader.
-                                    </span>
-                                </div>
-                                <button
-                                    onClick={() => router.push("/profile")}
-                                    className="mt-4 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-md text-sm"
-                                >
-                                    Verificar ahora
-                                </button>
-                            </div>
+     <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg shadow-md mb-6">
+     <div className="flex items-center gap-3">
+       <BellIcon className="h-7 w-7 text-amber-500 dark:text-amber-300" />
+       <p className="text-base font-medium text-amber-800 dark:text-yellow-300">
+         Verifica tu cuenta para acceder a la fase <strong>Neotrader</strong>.
+       </p>
+     </div>
+     <Link href="/verification" className="block mt-4 px-5 py-2.5 text-center bg-amber-500 hover:bg-amber-600 text-black font-semibold rounded-lg shadow-md text-base transition">
+       Verificar ahora
+     </Link>
+   </div>
                         ) : (
                             challenges.map((challenge, index) => {
                                 const isVisible = visibility[challenge.id] ?? true;
@@ -115,7 +112,7 @@ export default function Index() {
                                 if (challenge.broker_account?.idMeta) {
                                     balance = balances[challenge.broker_account.idMeta] ?? balance;
                                 }
-                                
+
                                 return (
                                     <div
                                         key={index}
@@ -144,10 +141,10 @@ export default function Index() {
                                                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                                         Resultado:{" "}
                                                         <span className={`font-bold ${{
-                                                                progress: 'text-yellow-500',
-                                                                disapproved: 'text-red-500',
-                                                                approved: 'text-green-500'
-                                                            }[challenge.result] || 'text-slate-800 dark:text-slate-200'}`}>
+                                                            progress: 'text-yellow-500',
+                                                            disapproved: 'text-red-500',
+                                                            approved: 'text-green-500'
+                                                        }[challenge.result] || 'text-slate-800 dark:text-slate-200'}`}>
                                                             {{
                                                                 init: 'Por iniciar',
                                                                 progress: 'En curso',
