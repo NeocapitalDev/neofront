@@ -44,7 +44,7 @@ const Layout = ({ children }) => {
                 height={60}
               />
               <Image
-                className="h-8 w-auto hidden dark:block"
+                className="h-12 w-auto hidden dark:block"
                 src="/images/logo-dark.png"
                 alt="Logo"
                 width={236}
