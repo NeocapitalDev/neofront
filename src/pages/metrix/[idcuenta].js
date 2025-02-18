@@ -158,12 +158,18 @@ const Metrix = () => {
           <div className="mt-6">
             <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
             <Objetivos
-              data={metricsData || {}}
+              data={{
+                tradeDayCount: 5, // Número ficticio de días de trading
+                maxDailyDrawdown: 500.00, // Pérdida diaria máxima ficticia en dólares
+                maxAbsoluteDrawdown: 1000.00, // Pérdida absoluta máxima ficticia en dólares
+                maxRelativeProfit: 1500.00, // Ganancia relativa máxima ficticia en dólares
+              }}
               initBalance={challengeData?.data?.broker_account?.balance}
               pase={challengeData?.data?.phase}
             />
           </div>
 
+          {/* data={metricsData || {}} */}
 
 
           <div className="flex flex-col md:flex-row gap-4">
