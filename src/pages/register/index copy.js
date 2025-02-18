@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { CountryDropdown } from '@/components/ui/country-dropdown';
 
 import Layout from '../../components/layout/auth';
 
@@ -19,7 +20,8 @@ export default function SignUp() {
     password: '',
     firstName: '',
     lastName: '',
-    phone: ''
+    phone: '',
+    country: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,6 +34,7 @@ export default function SignUp() {
   });
   const [showPasswordConditions, setShowPasswordConditions] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState({ country: '', form: false });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,6 +43,10 @@ export default function SignUp() {
     if (name === 'password') {
       validatePasswordConditions(value);
     }
+  };
+
+  const handleCountryChange = (value) => {
+    setFormData((prev) => ({ ...prev, country: value.alpha3 }));
   };
 
   const generateUsername = (email) => {
@@ -64,6 +71,10 @@ export default function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.country) {
+      setError({ ...error, form: true });
+      return;
+    }
     try {
       setIsSubmitting(true);
 
@@ -74,7 +85,8 @@ export default function SignUp() {
         password: formData.password,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phone: formData.phone
+        phone: formData.phone,
+        country: formData.country
       },
         {
           headers: {
@@ -82,7 +94,7 @@ export default function SignUp() {
             'Content-Type': 'application/json',
           },
         }
-      );
+      );  
       console.log('Registration successful:', response.data);
       toast.success('Registro exitoso.');
       router.replace('/email-confirmation');
@@ -162,6 +174,23 @@ export default function SignUp() {
                   onChange={handleChange}
                   className="block w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:focus:ring-amber-500 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
                 />
+              </div>
+            </div>
+
+            {/* País */}
+            <div className="grid w-full items-center gap-1.5">
+              <label htmlFor="country" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">País</label>
+              <CountryDropdown
+                placeholder="Elige un país"
+                defaultValue={formData.country}
+                onChange={handleCountryChange}
+                disabled={isSubmitting}
+              />
+              <div className="h-1">
+                {error.country && <div className="text-red-500">{error.country}</div>}
+                {!formData.country && error.form && (
+                  <div className="text-red-500">Campo obligatorio</div>
+                )}
               </div>
             </div>
 
@@ -285,8 +314,6 @@ export default function SignUp() {
           </p>
         </div>
       </Layout>
-
-
     </>
   );
 };
