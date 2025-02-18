@@ -9,24 +9,29 @@ export default function NeoChallengeCard() {
                 <p className="text-amber-400 mt-2">Opere hasta $200,000 en la NEO Account</p>
                 <p className="text-sm mt-4">Demuestre sus habilidades de trading. ¡Apruebe el curso de evaluación y reciba la NEO Account!</p>
             </div>
-            <div className="mt-6 space-y-3">
-                <div className="flex items-center space-x-2">
-                    <CheckIcon className="h-5 w-5 text-amber-400" />
-                    <span>Le facilitaremos una NEO Account de hasta $200,000 USD</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                    <CheckIcon className="h-5 w-5 text-amber-400" />
-                    <span>Demuestre sus habilidades de trading</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                    <CheckIcon className="h-5 w-5 text-amber-400" />
-                    <span>Análisis completo de cuenta</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                    <CheckIcon className="h-5 w-5 text-amber-400" />
-                    <span>Aplicaciones Premium</span>
+            
+            {/* Contenedor centrado para la lista de características */}
+            <div className="flex justify-center w-full">
+                <div className="mt-6 space-y-3 flex flex-col items-center md:items-start md:w-3/4">
+                    <div className="flex items-center space-x-2">
+                        <CheckIcon className="h-5 w-5 text-amber-400" />
+                        <span>Le facilitaremos una NEO Account de hasta $200,000 USD</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <CheckIcon className="h-5 w-5 text-amber-400" />
+                        <span>Demuestre sus habilidades de trading</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <CheckIcon className="h-5 w-5 text-amber-400" />
+                        <span>Análisis completo de cuenta</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <CheckIcon className="h-5 w-5 text-amber-400" />
+                        <span>Aplicaciones Premium</span>
+                    </div>
                 </div>
             </div>
+            
             <div className="mt-6 text-center">
                 <Link href="/start-challenge">
                     <button className="px-6 py-3 w-full bg-amber-500 text-black font-semibold rounded-lg shadow-md hover:bg-amber-600 transition">

@@ -40,11 +40,13 @@ const SocialsPage = () => {
     // ✅ Corrección: Asegurar que `challenges` es un array antes de evaluarlo
     const hasPhase3Challenge = Array.isArray(data?.challenges) && data.challenges.some(challenge => challenge.phase === 3);
     const hasPhase1Or2Challenge = Array.isArray(data?.challenges) && data.challenges.some(challenge => challenge.phase === 1 || challenge.phase === 2);
+    const newAccount = !data?.challenges || data.challenges.length === 0;
 
     console.log("Is Verified:", isVerified);
     console.log("Has Phase 3 Challenge:", hasPhase3Challenge);
     console.log("Has Phase 1 or 2 Challenge:", hasPhase1Or2Challenge);
     console.log("Is statusSign:", statusSign);
+    console.log("newAccount:", newAccount);
 
     // ✅ Función para firmar el contrato
     const handleSign = async () => {
@@ -87,7 +89,7 @@ const SocialsPage = () => {
     }
 
     // 🔒 Si está en fase 1 o 2 sin verificar, mostrar la sección bloqueada
-    if (hasPhase1Or2Challenge && !isVerified) {
+    if ((hasPhase1Or2Challenge || newAccount) && !isVerified) {
         return (
             <Layout>
                 <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
@@ -96,12 +98,26 @@ const SocialsPage = () => {
                         Sección bloqueada
                     </h2>
                     <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
-                        Para acceder a esta sección, necesitas haber alcanzado la fase NeoTrader en tu desafío.
+                        Para acceder a esta sección, necesitas haber alcanzado la fase NeoTrader en tu desafío. 
+                    </p>
+                    {newAccount ? (
+                        <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
+                            Actualmente no tienes ningún desafío activo. Una vez que inicies tu primer NEO Challenge, 
+                            esta sección se desbloqueará automáticamente y podrás avanzar en tu proceso de evaluación.
+                        </p>
+                    ) : (
+                        <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
+                            Tu desafío está en curso en la fase 1 o 2. Continúa operando y alcanza la fase NeoTrader para desbloquear esta sección.
+                        </p>
+                    )}
+                    <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
+                        ¡Empieza ahora y demuestra tus habilidades en el mundo del trading!
                     </p>
                 </div>
             </Layout>
         );
     }
+    
 
     return (
         <Layout>
