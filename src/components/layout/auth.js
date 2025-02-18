@@ -33,7 +33,7 @@ const Layout = ({ children }) => {
         </div>
 
         {/* Contenedor del formulario con altura dinámica */}
-        <div className="flex flex-1 w-1/2 flex-col justify-center px-8 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 min-h-full">
+        <div className="flex flex-1 w-full lg:w-1/2 flex-col justify-center px-8 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 min-h-full bg-zinc-800 lg:bg-transparent">
           <div className="mx-auto w-full max-w-sm lg:w-96">
             <Link href="/">
               <Image
