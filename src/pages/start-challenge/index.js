@@ -119,7 +119,7 @@ const StartChallenge = () => {
                     </p>
                     <a
                         href={getChallengeLink()}
-                        className={`mt-9 bg-amber-600 text-white px-6 py-3 rounded-md w-full font-semibold ${!termsAccepted || !refundPolicyAccepted ? "opacity-50 cursor-not-allowed" : ""}`}
+                        className={`mt-9 bg-amber-600 text-black px-6 py-3 rounded-md w-full font-semibold ${!termsAccepted || !refundPolicyAccepted ? "opacity-50 cursor-not-allowed" : ""}`}
                         onClick={(e) => {
                             if (!termsAccepted || !refundPolicyAccepted) {
                                 e.preventDefault();
