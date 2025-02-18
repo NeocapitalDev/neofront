@@ -10,6 +10,8 @@ import ButtonInit from 'src/pages/dashboard/button_init';
 import MetaApi, { MetaStats } from 'metaapi.cloud-sdk';
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import NeoChallengeCard from './neoCard';
+
 
 const fetcher = async (url, token) => {
     const response = await fetch(url, {
@@ -77,6 +79,9 @@ export default function Index() {
 
     return (
         <div>
+            {/* Mostrar la tarjeta NeoChallengeCard solo cuando no haya desafíos activos */}
+            {data?.challenges?.length === 0 && <NeoChallengeCard />}
+            
             {["3", "2", "1"].map(key => {
                 const challenges = data?.challenges?.filter(challenge => challenge.phase == key) || [];
                 if (challenges.length === 0) return null;
