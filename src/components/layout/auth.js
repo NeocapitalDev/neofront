@@ -7,7 +7,7 @@ const Layout = ({ children }) => {
     <div className="relative h-screen">
       {/* Imagen de fondo ocupando todo el ancho */}
       <Image
-        className="absolute inset-0 w-full h-full object-cover z-[-1] hidden sm:block"
+        className="absolute inset-0 w-full h-full object-cover z-[-1]"
         src="/images/bg-auth.webp"
         alt="Fondo de pantalla"
         layout="fill"
@@ -15,8 +15,9 @@ const Layout = ({ children }) => {
         priority={true} // Carga prioritaria para mejorar la experiencia
       />
 
-      {/* Fondo negro para móviles */}
-      <div className="absolute inset-0 w-full h-full bg-zinc-800 sm:hidden z-[-1]"></div>
+      {/* Capa de opacidad con degradado */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/80 to-black z-0"></div>
+    
       <div className="flex min-h-full flex-1 relative z-10">
         {/* Contenedor para la imagen de monedas */}
         <div className="relative hidden w-1/2 lg:block">
