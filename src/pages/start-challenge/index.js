@@ -11,23 +11,6 @@ const StartChallenge = () => {
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [refundPolicyAccepted, setRefundPolicyAccepted] = useState(false);
 
-    const getChallengeLink = () => {
-        switch (selectedBalance) {
-            case "5,000":
-                return "https://neocapitalfunding.com/desafio-neo-5k/";
-            case "10,000":
-                return "https://neocapitalfunding.com/desafio-neo-10k/";
-            case "25,000":
-                return "https://neocapitalfunding.com/desafio-neo-25k/";
-            case "50,000":
-                return "https://neocapitalfunding.com/desafio-neo-50k/";
-            case "100,000":
-                return "https://neocapitalfunding.com/desafio-neo-100k/";
-            default:
-                return "#";
-        }
-    };
-
     return (
         <Layout>
             <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
@@ -110,16 +93,17 @@ const StartChallenge = () => {
 
                 {/* Precio y Botón de Pago */}
                 <div className="text-center">
-                    <p className="text-xl py-5 font-semibold text-green-400">
+                    <p className="text-xl font-semibold text-green-400">
+
                         {selectedBalance === "5,000" ? "$44" :
                             selectedBalance === "10,000" ? "$79" :
                                 selectedBalance === "25,000" ? "$179" :
-                                    selectedBalance === "50,000" ? "$299" :
+                                    selectedBalance === "50,000" ? "$299" : 
                                         selectedBalance === "100,000" ? "$499" : ""}
                     </p>
-                    <a href={getChallengeLink()} className="mt-9 bg-amber-600 text-white px-6 py-3 rounded-md w-full font-semibold">
+                    <button className="mt-4 bg-amber-600 text-white px-6 py-3 rounded-md w-full font-semibold">
                         Confirmar y Proceder al Pago
-                    </a>
+                    </button>
                 </div>
             </div>
         </Layout>
