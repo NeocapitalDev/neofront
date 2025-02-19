@@ -42,7 +42,7 @@ export default function UserProfile() {
 
     const filteredChallenges = useMemo(() => {
         if (!data || !data.challenges) return [];
-        
+
         return data.challenges.filter((challenge) => {
             const matchesResult = resultFilter ? challenge.result === resultFilter : true;
             const matchesPhase = phaseFilter ? String(challenge.phase) === phaseFilter : true;
@@ -70,6 +70,8 @@ export default function UserProfile() {
 
     const translateResult = (result) => {
         switch (result) {
+            case "init":
+                return "Iniciado";
             case "approved":
                 return "Aprobado";
             case "disapproved":
@@ -138,14 +140,14 @@ export default function UserProfile() {
                             {filteredChallenges.length > 0 ? (
                                 filteredChallenges.map((challenge) => {
                                     // Extraer datos de broker_account
-                                    const broker = challenge.broker_account || {}; 
+                                    const broker = challenge.broker_account || {};
                                     return (
                                         <TableRow key={challenge.id}>
                                             <TableCell>{challenge.id}</TableCell>
                                             <TableCell>{broker.login || "N/A"}</TableCell>
                                             <TableCell>{broker.server || "N/A"}</TableCell>
                                             <TableCell>{broker.platform || "N/A"}</TableCell>
-                                            <TableCell>{challenge.result}</TableCell>
+                                            <TableCell>{translateResult(challenge.result)}</TableCell>
                                             <TableCell>{challenge.phase}</TableCell>
                                             <TableCell>{broker.balance || "N/A"}</TableCell>
                                         </TableRow>

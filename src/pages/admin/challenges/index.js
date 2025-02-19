@@ -61,6 +61,8 @@ export default function ChallengesTable() {
 
   const translateResult = (result) => {
     switch (result) {
+      case "init":
+        return "Iniciado";
       case "approved":
         return "Aprobado";
       case "disapproved":
@@ -118,6 +120,7 @@ export default function ChallengesTable() {
             className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
           >
             <option value="">Resultado</option>
+            <option value="init">Iniado</option>
             <option value="approved">Aprobado</option>
             <option value="disapproved">Desaprobado</option>
             <option value="progress">En Curso</option>
