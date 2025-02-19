@@ -52,6 +52,8 @@ export default function ChallengesTable() {
 
   const translateResult = (result) => {
     switch (result) {
+      case "init":
+        return "Iniciado";
       case "approved":
         return "Approved";
       case "disapproved":
