@@ -137,7 +137,7 @@ export default function Navbar() {
 
 
                     {/* Mostrar el ícono solo si el rol es 'admin' */}
-                    {session.rol === 'Admin' && (
+                    {session.roleName === 'Webmaster' && (
                       <Link href="/admin">
                         <PresentationChartBarIcon className="h-6 w-6 text-red-500 cursor-pointer" />
                       </Link>

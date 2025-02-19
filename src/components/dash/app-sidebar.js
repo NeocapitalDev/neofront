@@ -41,6 +41,12 @@ export function AppSidebar({ ...props }) {
   const isLoading = status === "loading" || !userData;
 
   const navMain = [
+    {
+      title: "Dashboard",
+      url: "/admin/dashboard",
+      icon: Users,
+      isActive: false,
+    },
      {
      title: "Users",
        url: "/admin/users",
@@ -60,6 +66,18 @@ export function AppSidebar({ ...props }) {
     {
       title: "Challenges",
       url: "/admin/challenges",
+      icon: Award,
+      isActive: false,
+    },
+    {
+      title: "Movements",
+      url: "/admin/movements",
+      icon: Award,
+      isActive: false,
+    },
+    {
+      title: "Payouts",
+      url: "/admin/payouts",
       icon: Award,
       isActive: false,
     },
