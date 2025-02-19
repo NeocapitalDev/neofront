@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { CheckCircle, XCircle } from "lucide-react";
 import DashboardLayout from "..";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import Flag from "react-world-flags";
 
 import { PencilSquareIcon } from "@heroicons/react/24/solid";
@@ -22,14 +22,14 @@ import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import EditUserModal from "./editUserModal";
 
 const userColumns = (router) => [
-  { accessorKey: "username", header: "Nombre de Usuario" },
+  { accessorKey: "fullName", header: "Nombre Completo" },
   { accessorKey: "email", header: "Email" },
   { accessorKey: "phone", header: "Teléfono" },
   {
     accessorKey: "country",
     header: "País",
     cell: ({ row }) => {
-      const countryCode = row.original.countryCode?.toLowerCase(); // Debes asegurarte de tener un código ISO 3166-1 alpha-2
+      const countryCode = row.original.countryCode?.toLowerCase(); 
       return (
         <div className="flex items-center space-x-2">
           {countryCode && <Flag country={countryCode} className="w-6 h-4" />}
@@ -60,7 +60,12 @@ const userColumns = (router) => [
   {
     accessorKey: "id",
     header: "Acciones",
-    cell: ({ row }) => <RedirectButton userId={row.original.id} />,
+    cell: ({ row }) => (
+      <div className="flex space-x-2">
+        <RedirectButton userdocumentId={row.original.documentId} />
+        <EditButton user={row.original} />
+      </div>
+    ),
   },
 ];
 
@@ -80,26 +85,29 @@ export default function UsersTable() {
       : null,
     ([url, token]) => fetcher(url, token)
   );
+
   console.log(data);
-  const [usernameSearch, setUsernameSearch] = useState("");
+
+  const [nameSearch, setNameSearch] = useState("");
   const [emailSearch, setEmailSearch] = useState("");
   const [verificationFilter, setVerificationFilter] = useState("Todos");
 
   const filteredData = useMemo(() => {
     if (!Array.isArray(data)) return [];
+
     return data
-      .filter(
-        (user) =>
-          user?.username?.toLowerCase().includes(usernameSearch.toLowerCase()) &&
-          user?.email?.toLowerCase().includes(emailSearch.toLowerCase())
-      )
+      .filter((user) => {
+        const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+        return fullName.includes(nameSearch.toLowerCase());
+      })
+      .filter((user) => user.email.toLowerCase().includes(emailSearch.toLowerCase()))
       .filter((user) => {
         if (verificationFilter === "Todos") return true;
         return verificationFilter === "Verificado"
           ? user.isVerified
           : !user.isVerified;
       });
-  }, [data, usernameSearch, emailSearch, verificationFilter]);
+  }, [data, nameSearch, emailSearch, verificationFilter]);
 
   if (isLoading) {
     return (
@@ -124,8 +132,8 @@ export default function UsersTable() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4">
           <Input
             placeholder="Buscar por nombre..."
-            value={usernameSearch}
-            onChange={(e) => setUsernameSearch(e.target.value)}
+            value={nameSearch}
+            onChange={(e) => setNameSearch(e.target.value)}
             className="max-w-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
           />
           <Input
@@ -177,7 +185,7 @@ export default function UsersTable() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <div className="flex space-x-2"> {/* Flexbox para alinear los botones en fila */}
+                      <div className="flex space-x-2">
                         <RedirectButton userdocumentId={user.documentId} />
                         <EditButton user={user} />
                       </div>
