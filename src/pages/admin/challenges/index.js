@@ -85,7 +85,7 @@ export default function ChallengesTable() {
       brokerGroup: challenge.broker_account?.server ?? "N/A",
       actions: (
         <Button variant="outline" size="sm" onClick={() => handleButtonClick(challenge.documentId)}>
-          See Details
+          Ver Detalles
         </Button>
       ),
     }));
