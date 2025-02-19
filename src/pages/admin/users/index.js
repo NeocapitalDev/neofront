@@ -15,10 +15,29 @@ import { Input } from "@/components/ui/input";
 import { CheckCircle, XCircle } from "lucide-react";
 import DashboardLayout from "..";
 import { useRouter } from 'next/router';
+import Flag from "react-world-flags";
+
+import { PencilSquareIcon } from "@heroicons/react/24/solid";
+
+import EditUserModal from "./editUserModal"; 
 
 const userColumns = (router) => [
   { accessorKey: "username", header: "Nombre de Usuario" },
   { accessorKey: "email", header: "Email" },
+  { accessorKey: "phone", header: "Teléfono" },
+  {
+    accessorKey: "country",
+    header: "País",
+    cell: ({ row }) => {
+      const countryCode = row.original.countryCode?.toLowerCase(); // Debes asegurarte de tener un código ISO 3166-1 alpha-2
+      return (
+        <div className="flex items-center space-x-2">
+          {countryCode && <Flag country={countryCode} className="w-6 h-4" />}
+          <span>{row.getValue("country")}</span>
+        </div>
+      );
+    },
+  },
   {
     accessorKey: "isVerified",
     header: "Verificado",
@@ -140,8 +159,10 @@ export default function UsersTable() {
               {filteredData.length > 0 ? (
                 filteredData.map((user, index) => (
                   <TableRow key={index} className="border-b border-zinc-300 dark:border-zinc-700">
-                    <TableCell>{user.username}</TableCell>
+                    <TableCell>{user.firstName+" "+user.lastName}</TableCell>
                     <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.phone}</TableCell>
+                    <TableCell>{user.country}</TableCell>
                     <TableCell>
                       {user.isVerified ? (
                         <div className="flex items-center space-x-2">
@@ -157,6 +178,7 @@ export default function UsersTable() {
                     </TableCell>
                     <TableCell>
                       <RedirectButton userdocumentId={user.documentId} />
+                      <EditButton user={user} /> {/* Agregamos el botón "Editar" */}
                     </TableCell>
                   </TableRow>
                 ))
@@ -182,7 +204,7 @@ const Select = ({ value, onChange }) => {
       <select
         value={value}
         onChange={onChange}
-        className=" max-w-sm bg-white dark:bg-zinc-800 text-zinc-700 rounded-md dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
+        className=" max-w-sm py-1  bg-white dark:bg-zinc-800 text-zinc-700 rounded-md dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
       >
         <option className="" value="Todos">Estado de cuenta</option>
         <option value="Verificado">Verificado</option>
@@ -206,5 +228,33 @@ const RedirectButton = ({ userdocumentId }) => {
     >
       Ver Detalles
     </button>
+  );
+};
+
+const EditButton = ({ user }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleEdit = () => {
+    setIsModalOpen(true);
+  };
+
+  return (
+    <>
+      <button
+        onClick={handleEdit}
+        className="ml-2 px-3 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 flex items-center space-x-1"
+      >
+        <PencilSquareIcon className="w-5 h-5" />
+        <span>Editar</span>
+      </button>
+
+      {isModalOpen && (
+        <EditUserModal
+          user={user} // Pasamos el usuario seleccionado al modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+    </>
   );
 };
