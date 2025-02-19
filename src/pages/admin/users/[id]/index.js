@@ -32,27 +32,23 @@ export default function UserProfile() {
 
     const { data, error, isLoading } = useSWR(
         session?.jwt && id
-            ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users?filters[documentId][$eq]=${id}&populate=*`, session.jwt]
+            ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate]=broker_account`, session.jwt]
             : null,
         ([url, token]) => fetcher(url, token)
     );
 
-    const [search, setSearch] = useState("");
     const [resultFilter, setResultFilter] = useState("");
     const [phaseFilter, setPhaseFilter] = useState("");
 
     const filteredChallenges = useMemo(() => {
-        if (!data || data.length === 0) return [];
-        const user = data[0];
-        return user.challenges.filter((challenge) => {
-            // const matchesSearch = challenge.login?.toLowerCase().includes(search.toLowerCase());
+        if (!data || !data.challenges) return [];
+        
+        return data.challenges.filter((challenge) => {
             const matchesResult = resultFilter ? challenge.result === resultFilter : true;
             const matchesPhase = phaseFilter ? String(challenge.phase) === phaseFilter : true;
-            // return matchesSearch && matchesResult && matchesPhase;
-
             return matchesResult && matchesPhase;
         });
-    }, [data, search, resultFilter, phaseFilter]);
+    }, [data, resultFilter, phaseFilter]);
 
     if (isLoading) {
         return (
@@ -62,7 +58,7 @@ export default function UserProfile() {
         );
     }
 
-    if (error || !data || data.length === 0) {
+    if (error || !data || !data.challenges) {
         return (
             <DashboardLayout>
                 <p className="text-center text-red-500">
@@ -71,10 +67,6 @@ export default function UserProfile() {
             </DashboardLayout>
         );
     }
-
-    const user = data[0];
-
-    // Removed unused formatDate function
 
     const translateResult = (result) => {
         switch (result) {
@@ -94,20 +86,18 @@ export default function UserProfile() {
             <div className="p-8 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
                 <h1 className="text-2xl font-bold mb-4">Perfil de Usuario</h1>
                 <p>
-                    <strong>Nombre:</strong> {user.username}
+                    <strong>Nombre:</strong> {data.firstName} {data.lastName}
                 </p>
                 <p>
-                    <strong>Email:</strong> {user.email}
+                    <strong>Email:</strong> {data.email}
                 </p>
                 <p>
-                    <strong>Verificado:</strong> {user.isVerified ? "Sí" : "No"}
+                    <strong>Verificado:</strong> {data.isVerified ? "Sí" : "No"}
                 </p>
-             
 
                 {/* Filtros */}
                 <h2 className="text-xl font-bold mt-8 mb-4">Challenges</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-2">
-                
                     <select
                         value={resultFilter}
                         onChange={(e) => setResultFilter(e.target.value)}
@@ -146,17 +136,21 @@ export default function UserProfile() {
                         </TableHeader>
                         <TableBody>
                             {filteredChallenges.length > 0 ? (
-                                filteredChallenges.map((challenge) => (
-                                    <TableRow key={challenge.id}>
-                                        <TableCell>{challenge.id}</TableCell>
-                                        {/* <TableCell>{challenge.login}</TableCell> */}
-                                        <TableCell>{challenge.server}</TableCell>
-                                        <TableCell>{challenge.platform}</TableCell>
-                                        <TableCell>{translateResult(challenge.result)}</TableCell>
-                                        <TableCell>{challenge.phase}</TableCell>
-                                        <TableCell>{challenge.initBalance}</TableCell>
-                                    </TableRow>
-                                ))
+                                filteredChallenges.map((challenge) => {
+                                    // Extraer datos de broker_account
+                                    const broker = challenge.broker_account || {}; 
+                                    return (
+                                        <TableRow key={challenge.id}>
+                                            <TableCell>{challenge.id}</TableCell>
+                                            <TableCell>{broker.login || "N/A"}</TableCell>
+                                            <TableCell>{broker.server || "N/A"}</TableCell>
+                                            <TableCell>{broker.platform || "N/A"}</TableCell>
+                                            <TableCell>{challenge.result}</TableCell>
+                                            <TableCell>{challenge.phase}</TableCell>
+                                            <TableCell>{broker.balance || "N/A"}</TableCell>
+                                        </TableRow>
+                                    );
+                                })
                             ) : (
                                 <TableRow>
                                     <TableCell colSpan={7} className="text-center text-zinc-500 py-6">

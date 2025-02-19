@@ -19,7 +19,7 @@ import Flag from "react-world-flags";
 
 import { PencilSquareIcon } from "@heroicons/react/24/solid";
 
-import EditUserModal from "./editUserModal"; 
+import EditUserModal from "./editUserModal";
 
 const userColumns = (router) => [
   { accessorKey: "username", header: "Nombre de Usuario" },
@@ -80,7 +80,7 @@ export default function UsersTable() {
       : null,
     ([url, token]) => fetcher(url, token)
   );
-  console.log(data);  
+  console.log(data);
   const [usernameSearch, setUsernameSearch] = useState("");
   const [emailSearch, setEmailSearch] = useState("");
   const [verificationFilter, setVerificationFilter] = useState("Todos");
@@ -159,7 +159,7 @@ export default function UsersTable() {
               {filteredData.length > 0 ? (
                 filteredData.map((user, index) => (
                   <TableRow key={index} className="border-b border-zinc-300 dark:border-zinc-700">
-                    <TableCell>{user.firstName+" "+user.lastName}</TableCell>
+                    <TableCell>{user.firstName + " " + user.lastName}</TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.phone}</TableCell>
                     <TableCell>{user.country}</TableCell>
@@ -177,8 +177,10 @@ export default function UsersTable() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <RedirectButton userdocumentId={user.documentId} />
-                      <EditButton user={user} /> {/* Agregamos el botón "Editar" */}
+                      <div className="flex space-x-2"> {/* Flexbox para alinear los botones en fila */}
+                        <RedirectButton userdocumentId={user.documentId} />
+                        <EditButton user={user} />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
