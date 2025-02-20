@@ -145,12 +145,18 @@ export default function SignUp() {
                 </div>
               </div>
 
-              <PhoneInput
+              {/* Telefono */}
+              <div>
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-300">Telefono</label>
+                <div className="mt-2">
+                <PhoneInput
                       value={formData.phone}
                       onChange={(value) => setFormData({ ...formData, phone: value })}
                       defaultCountry="US"
                       />
-
+                </div>
+              </div>
+              
               {/* Correo Electrónico */}
               
               <div>
