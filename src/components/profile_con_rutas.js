@@ -35,7 +35,7 @@ function Index() {
                         <select
                             id="tabs"
                             name="tabs"
-                            className="block w-full rounded-md border-gray-300 focus:border-amber-400 focus:ring-amber-400"
+                            className="block w-full rounded-md border-gray-300 focus:border-[var(--app-primary)] focus:ring-[var(--app-primary)]"
                             value={currentTab.name}
                             onChange={(e) => handleTabClick(tabs.find((tab) => tab.name === e.target.value))}
                         >
@@ -58,7 +58,7 @@ function Index() {
                                         }}
                                         className={classNames(
                                             tab.name === currentTab.name
-                                                ? 'border-amber-400 text-amber-500'
+                                                ? 'border-[var(--app-primary)] text-[var(--app-secondary)]'
                                                 : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
                                             'w-1/4 border-b-2 py-4 px-1 text-center text-sm font-medium'
                                         )}

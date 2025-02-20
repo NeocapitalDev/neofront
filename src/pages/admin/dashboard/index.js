@@ -43,7 +43,7 @@ export default function Index() {
               <Button
                 key={tab}
                 className={`px-4 py-2 rounded-lg ${
-                  selectedTab === tab ? "bg-amber-600" : "bg-zinc-800"
+                  selectedTab === tab ? "bg-[var(--app-secondary)]" : "bg-zinc-800"
                 }`}
                 onClick={() => setSelectedTab(tab)}
               >
@@ -71,7 +71,7 @@ export default function Index() {
         <div className="grid grid-cols-3 gap-4 mt-6">
           {[BanknotesIcon, FlagIcon, HandRaisedIcon].map((Icon, index) => (
             <div key={index} className="bg-zinc-800 p-6 rounded-lg text-center">
-              <Icon className="w-11 text-amber-500 text-sm mx-auto" />
+              <Icon className="w-11 text-[var(--app-secondary)] text-sm mx-auto" />
               <p className="text-xl font-bold mt-2">{stats[index].label}</p>
               <p className="text-zinc-400">{stats[index].subLabel}</p>
             </div>

@@ -100,7 +100,7 @@ export default function Index() {
                                         Verifica tu cuenta para acceder a la fase <strong>Neotrader</strong>.
                                     </p>
                                 </div>
-                                <Link href="/verification" className="block mt-4 px-5 py-2.5 text-center bg-[var(--app-primary)] hover:bg-[var(--app-secundary)] text-black font-semibold rounded-lg shadow-md text-base transition">
+                                <Link href="/verification" className="block mt-4 px-5 py-2.5 text-center bg-[var(--app-primary)] hover:bg-[var(--app-secondary)] text-black font-semibold rounded-lg shadow-md text-base transition">
                                     Verificar ahora
                                 </Link>
                             </div>

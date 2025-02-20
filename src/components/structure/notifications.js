@@ -51,7 +51,7 @@ export default function Example() {
                           <div className="ml-3 flex h-7 items-center pl-3 dark:bg-zinc-800">
                             <button
                               type="button"
-                              className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 border-0 dark:border-0 dark:text-gray-400"
+                              className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--app-secondary)] border-0 dark:border-0 dark:text-gray-400"
                               onClick={() => setOpen(false)}
                             >
                               <span className="absolute -inset-2.5 " />

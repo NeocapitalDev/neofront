@@ -34,7 +34,7 @@ export default function NeoChallengeCard() {
             
             <div className="mt-6 text-center">
                 <Link href="/start-challenge">
-                    <button className="px-6 py-3 w-full bg-[var(--app-primary)] text-black font-semibold rounded-lg shadow-md hover:bg-[var(--app-secundary)] transition">
+                    <button className="px-6 py-3 w-full bg-[var(--app-primary)] text-black font-semibold rounded-lg shadow-md hover:bg-[var(--app-secondary)] transition">
                         Iniciar NEO Challenge
                     </button>
                 </Link>

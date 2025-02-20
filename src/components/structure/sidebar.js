@@ -27,7 +27,7 @@ export default function Sidebar() {
                         key={id}
                         className={`w-full flex items-center py-7 px-6 font-semibold transition duration-200 last:rounded-b-md relative 
             ${router.pathname === href
-                                ? 'bg-gradient-to-r from-amber-50 via-white to-transparent border-l-4 border-amber-500 dark:bg-gradient-to-r dark:from-amber-800 dark:via-zinc-800 dark:to-transparent dark:border-l-4 dark:border-amber-500'
+                                ? 'bg-gradient-to-r from-amber-50 via-white to-transparent border-l-4 border-[var(--app-secondary)] dark:bg-gradient-to-r dark:from-amber-800 dark:via-zinc-800 dark:to-transparent dark:border-l-4 dark:border-[var(--app-secondary)]'
                                 : 'hover:bg-zinc-300 dark:hover:bg-zinc-700'
                             }`}
                     >
@@ -42,13 +42,13 @@ export default function Sidebar() {
                         ></div>
                         <Icon
                             className={`h-7 w-7 mr-4 z-10 ${router.pathname === href
-                                ? 'text-amber-500 dark:text-amber-400'
+                                ? 'text-[var(--app-secondary)] dark:text-[var(--app-primary)]'
                                 : 'text-gray-700 dark:text-gray-300'
                                 }`}
                         />
                         <p
                             className={`text-md z-10 font-medium ${router.pathname === href
-                                ? 'text-amber-500 dark:text-amber-400'
+                                ? 'text-[var(--app-secondary)] dark:text-[var(--app-primary)]'
                                 : 'text-gray-700 dark:text-white'
                                 }`}
                         >

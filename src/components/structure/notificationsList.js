@@ -30,7 +30,7 @@ const NotificationsPage = () => {
                         >
                             <div className="flex items-start">
                                 <div>
-                                    <h3 className="font-bold text-amber-400 mb-4">
+                                    <h3 className="font-bold text-[var(--app-primary)] mb-4">
                                         {notification.title}
                                     </h3>
                                     <p className="text-black dark:text-white">{notification.description}</p>
@@ -55,7 +55,7 @@ const NotificationsPage = () => {
                                         href={notification.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="block text-center bg-amber-400 text-black font-semibold py-2 px-4 rounded hover:bg-amber-500 transition"
+                                        className="block text-center bg-[var(--app-primary)] text-black font-semibold py-2 px-4 rounded hover:bg-[var(--app-secondary)] transition"
                                     >
                                         Ver más
                                     </a>

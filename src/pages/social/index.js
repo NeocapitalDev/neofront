@@ -70,7 +70,7 @@ const SocialsPage = () => {
                                 href={plataforma.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center justify-center bg-amber-500 text-black font-medium py-2 px-4 rounded-lg hover:bg-amber-600 transition w-full"
+                                className="inline-flex items-center justify-center bg-[var(--app-secondary)] text-black font-medium py-2 px-4 rounded-lg hover:bg-[var(--app-secondary)] transition w-full"
                             >
                                 {plataforma.accion}
                                 {/* Icono de redirección usando ArrowTopRightOnSquareIcon */}

@@ -46,7 +46,7 @@ const StartChallenge = () => {
                             <button
                                 key={balance}
                                 onClick={() => setSelectedBalance(balance)}
-                                className={`px-4 py-3 rounded-md shadow-md transition-colors ${selectedBalance === balance ? "bg-amber-500 text-black" : "bg-zinc-700 text-white"}`}
+                                className={`px-4 py-3 rounded-md shadow-md transition-colors ${selectedBalance === balance ? "bg-[var(--app-secondary)] text-black" : "bg-zinc-700 text-white"}`}
                             >
                                 {balance} USD
                             </button>
@@ -62,7 +62,7 @@ const StartChallenge = () => {
                             <button
                                 key={platform}
                                 onClick={() => setSelectedPlatform(platform)}
-                                className={`px-4 py-3 rounded-md shadow-md transition-colors ${selectedPlatform === platform ? "bg-amber-500 text-black" : "bg-zinc-700 text-white"}`}
+                                className={`px-4 py-3 rounded-md shadow-md transition-colors ${selectedPlatform === platform ? "bg-[var(--app-secondary)] text-black" : "bg-zinc-700 text-white"}`}
                             >
                                 {platform}
                             </button>
@@ -84,7 +84,7 @@ const StartChallenge = () => {
                         <div key={index} className="flex items-center gap-2">
                             <input type="checkbox" className="rounded-md" checked={state} onChange={() => setter(!state)} />
                             <span>
-                                Declaro que he leído y estoy de acuerdo con <span className="text-amber-500">{label}</span>
+                                Declaro que he leído y estoy de acuerdo con <span className="text-[var(--app-secondary)]">{label}</span>
                             </span>
                         </div>
                     ))}
@@ -95,7 +95,7 @@ const StartChallenge = () => {
                     <p className="text-xl py-5 font-semibold text-green-400">{selectedChallenge.price}</p>
                     <a
                         href={challengeLink}
-                        className={`mt-9 bg-amber-500 text-black px-6 py-3 rounded-md w-full font-semibold block text-center transition-opacity ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : "hover:bg-amber-400"}`}
+                        className={`mt-9 bg-[var(--app-secondary)] text-black px-6 py-3 rounded-md w-full font-semibold block text-center transition-opacity ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : "hover:bg-[var(--app-primary)]"}`}
                         onClick={(e) => isButtonDisabled && e.preventDefault()}
                     >
                         Confirmar y Proceder al Pago
