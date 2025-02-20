@@ -93,7 +93,7 @@ export default function Objetivos({ data, initBalance, pase }) {
                                     }`}
                                 onClick={() => toggleExpand(index)}
                             >
-                                <td className="px-6 py-4 text-amber-500 font-semibold">
+                                <td className="px-6 py-4 text-[var(--app-primary)] font-semibold">
                                     {expandedIndex === index ? `- ${obj.nombre}` : `+ ${obj.nombre}`}
                                 </td>
                                 <td className="px-6 py-4 bg-gray-100 dark:bg-zinc-900">{obj.resultado}</td>

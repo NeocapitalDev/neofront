@@ -93,17 +93,17 @@ export default function Index() {
                         </h2>
 
                         {key === "3" && !isVerified ? (
-     <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg shadow-md mb-6">
-     <div className="flex items-center gap-3">
-       <BellIcon className="h-7 w-7 text-amber-500 dark:text-amber-300" />
-       <p className="text-base font-medium text-amber-800 dark:text-yellow-300">
-         Verifica tu cuenta para acceder a la fase <strong>Neotrader</strong>.
-       </p>
-     </div>
-     <Link href="/verification" className="block mt-4 px-5 py-2.5 text-center bg-amber-500 hover:bg-amber-600 text-black font-semibold rounded-lg shadow-md text-base transition">
-       Verificar ahora
-     </Link>
-   </div>
+                            <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg shadow-md mb-6">
+                                <div className="flex items-center gap-3">
+                                    <BellIcon className="h-7 w-7 text-[var(--app-primary)] dark:text-[var(--app-primary)]" />
+                                    <p className="text-base font-medium text-amber-800 dark:text-[var(--app-primary)]">
+                                        Verifica tu cuenta para acceder a la fase <strong>Neotrader</strong>.
+                                    </p>
+                                </div>
+                                <Link href="/verification" className="block mt-4 px-5 py-2.5 text-center bg-[var(--app-primary)] hover:bg-[var(--app-secundary)] text-black font-semibold rounded-lg shadow-md text-base transition">
+                                    Verificar ahora
+                                </Link>
+                            </div>
                         ) : (
                             challenges.map((challenge, index) => {
                                 const isVisible = visibility[challenge.id] ?? true;
@@ -141,7 +141,7 @@ export default function Index() {
                                                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                                         Resultado:{" "}
                                                         <span className={`font-bold ${{
-                                                            progress: 'text-yellow-500',
+                                                            progress: 'text-[var(--app-primary)]',
                                                             disapproved: 'text-red-500',
                                                             approved: 'text-green-500'
                                                         }[challenge.result] || 'text-slate-800 dark:text-slate-200'}`}>
