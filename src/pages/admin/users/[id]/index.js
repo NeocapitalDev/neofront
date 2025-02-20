@@ -12,17 +12,25 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import DashboardLayout from "../..";
 
 const fetcher = async (url, token) => {
+    console.log("Fetching data from:", url); // Depuración
+
     const res = await fetch(url, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
-    if (!res.ok) throw new Error("Error al obtener datos");
-    return res.json();
+
+    if (!res.ok) {
+        console.error("Error en la API:", res.status, res.statusText);
+        throw new Error("Error al obtener datos");
+    }
+
+    const json = await res.json();
+    console.log("Datos recibidos de la API:", json); // Ver datos en consola
+    return json;
 };
 
 export default function UserProfile() {
@@ -30,24 +38,29 @@ export default function UserProfile() {
     const router = useRouter();
     const { id } = router.query;
 
+    // Se mantiene la ruta original
     const { data, error, isLoading } = useSWR(
         session?.jwt && id
-            ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate]=broker_account`, session.jwt]
+            ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users?filters[documentId][$eq]=${id}&populate[challenges][populate]=broker_account`, session.jwt]
             : null,
         ([url, token]) => fetcher(url, token)
     );
+
+    console.log("Datos en UserProfile:", data); // Depuración
 
     const [resultFilter, setResultFilter] = useState("");
     const [phaseFilter, setPhaseFilter] = useState("");
 
     const filteredChallenges = useMemo(() => {
-        if (!data || !data.challenges) return [];
+        if (!data || data.length === 0) return [];
 
-        return data.challenges.filter((challenge) => {
+        const user = data[0];
+
+        return user.challenges?.filter((challenge) => {
             const matchesResult = resultFilter ? challenge.result === resultFilter : true;
             const matchesPhase = phaseFilter ? String(challenge.phase) === phaseFilter : true;
             return matchesResult && matchesPhase;
-        });
+        }) || [];
     }, [data, resultFilter, phaseFilter]);
 
     if (isLoading) {
@@ -58,7 +71,7 @@ export default function UserProfile() {
         );
     }
 
-    if (error || !data || !data.challenges) {
+    if (error || !data || data.length === 0) {
         return (
             <DashboardLayout>
                 <p className="text-center text-red-500">
@@ -67,6 +80,8 @@ export default function UserProfile() {
             </DashboardLayout>
         );
     }
+
+    const user = data[0];
 
     const translateResult = (result) => {
         switch (result) {
@@ -88,13 +103,13 @@ export default function UserProfile() {
             <div className="p-8 bg-zinc-900 text-zinc-200 rounded-lg shadow-lg">
                 <h1 className="text-2xl font-bold mb-4">Perfil de Usuario</h1>
                 <p>
-                    <strong>Nombre:</strong> {data.firstName} {data.lastName}
+                    <strong>Nombre:</strong> {user.firstName} {user.lastName}
                 </p>
                 <p>
-                    <strong>Email:</strong> {data.email}
+                    <strong>Email:</strong> {user.email}
                 </p>
                 <p>
-                    <strong>Verificado:</strong> {data.isVerified ? "Sí" : "No"}
+                    <strong>Verificado:</strong> {user.isVerified ? "Sí" : "No"}
                 </p>
 
                 {/* Filtros */}
@@ -137,30 +152,34 @@ export default function UserProfile() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredChallenges.length > 0 ? (
-                                filteredChallenges.map((challenge) => {
-                                    // Extraer datos de broker_account
-                                    const broker = challenge.broker_account || {};
-                                    return (
-                                        <TableRow key={challenge.id}>
-                                            <TableCell>{challenge.id}</TableCell>
-                                            <TableCell>{broker.login || "N/A"}</TableCell>
-                                            <TableCell>{broker.server || "N/A"}</TableCell>
-                                            <TableCell>{broker.platform || "N/A"}</TableCell>
-                                            <TableCell>{translateResult(challenge.result)}</TableCell>
-                                            <TableCell>{challenge.phase}</TableCell>
-                                            <TableCell>{broker.balance || "N/A"}</TableCell>
-                                        </TableRow>
-                                    );
-                                })
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={7} className="text-center text-zinc-500 py-6">
-                                        No se encontraron resultados.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
+    {filteredChallenges.map((challenge) => {
+        console.log("Challenge ID:", challenge.id);
+        console.log("Broker Account:", challenge.broker_account);
+
+        // Verificamos si `broker_account` existe antes de acceder a sus atributos
+        const broker = challenge.broker_account
+            ? {
+                login: challenge.broker_account.login || "N/A",
+                server: challenge.broker_account.server || "N/A",
+                platform: challenge.broker_account.platform || "N/A",
+                balance: challenge.broker_account.balance || "N/A",
+            }
+            : { login: "N/A", server: "N/A", platform: "N/A", balance: "N/A" };
+
+        return (
+            <TableRow key={challenge.id}>
+                <TableCell>{challenge.id}</TableCell>
+                <TableCell>{broker.login}</TableCell>
+                <TableCell>{broker.server}</TableCell>
+                <TableCell>{broker.platform}</TableCell>
+                <TableCell>{translateResult(challenge.result)}</TableCell>
+                <TableCell>{challenge.phase}</TableCell>
+                <TableCell>{broker.balance}</TableCell>
+            </TableRow>
+        );
+    })}
+</TableBody>
+
                     </Table>
                 </div>
             </div>
