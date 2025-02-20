@@ -49,7 +49,7 @@ const Layout = ({ children }) => {
               />
             </Link>
 
-            <main className="mt-6">{children}</main>
+            <main className="mt-8">{children}</main>
           </div>
         </div>
       </div>
