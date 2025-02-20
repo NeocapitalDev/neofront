@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { CheckCircle, XCircle } from "lucide-react";
-import DashboardLayout from "..";
+import DashboardLayout from "../../../components/phone-input";
 import { useRouter } from "next/router";
 import Flag from "react-world-flags";
 

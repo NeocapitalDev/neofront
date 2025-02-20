@@ -1,6 +1,6 @@
 "use client";
 
-import DashboardLayout from "..";
+import DashboardLayout from "../../../components/phone-input";
 import { useState } from "react";
 import { BanknotesIcon, FlagIcon, HandRaisedIcon } from "@heroicons/react/24/solid";
 import { Button } from "@/components/ui/button";

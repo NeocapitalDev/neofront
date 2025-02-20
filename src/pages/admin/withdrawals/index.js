@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import DashboardLayout from "..";
+import DashboardLayout from "../../../components/phone-input";
 
 const challengeColumns = [
   { accessorKey: "id", header: "ID" },

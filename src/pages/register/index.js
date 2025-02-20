@@ -64,6 +64,8 @@ export default function SignUp() {
   };
 
   const handleSubmit = async (e) => {
+    alert(formData.phone);
+
     e.preventDefault();
     try {
       setIsSubmitting(true);
@@ -141,22 +143,11 @@ export default function SignUp() {
                 </div>
               </div>
 
-              {/* Teléfono */}
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-300">Teléfono</label>
-                <div className="mt-2">
-                  <PhoneInput
-                    id="phone"
-                    name="phone"
-                    placeholder="Tu teléfono"
-                    required
-                    value={formData.phone}
-                    onChange={(value) => setFormData({ ...formData, phone: value })} // Aquí deberías estar actualizando el estado correctamente
-                    defaultCountry="PE" // Establece Perú como país por defecto
-                    className="w-full rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition"
-                  />
-                </div>
-              </div>
+              <PhoneInput
+                      value={formData.phone}
+                      onChange={(value) => setFormData({ ...formData, phone: value })}
+                      defaultCountry="US"
+                      />
 
               {/* Correo Electrónico */}
               <div>
@@ -205,14 +196,33 @@ export default function SignUp() {
               {showPasswordConditions && (
                 <div className="text-sm text-gray-400">
                   <ul>
-                    {[ { condition: passwordConditions.uppercase, label: "Una letra mayúscula" }, { condition: passwordConditions.lowercase, label: "Una letra minúscula" }, { condition: passwordConditions.number, label: "Un número" }, { condition: passwordConditions.specialChar, label: "Un carácter especial" }, { condition: passwordConditions.length, label: "6 caracteres o más" },].map(({ condition, label }, index) => ( <li key={index} className={condition ? "text-[var(--app-primary)]" : "text-gray-500"}> <div className="inline-flex items-center"> <CheckCircleIcon className="h-4 w-4 mr-1" aria-hidden="true" /> {label} </div> </li> ))} </ul> </div>)}
+                    {[
+                      { condition: passwordConditions.uppercase, label: "Una letra mayúscula" },
+                      { condition: passwordConditions.lowercase, label: "Una letra minúscula" },
+                      { condition: passwordConditions.number, label: "Un número" },
+                      { condition: passwordConditions.specialChar, label: "Un carácter especial" },
+                      { condition: passwordConditions.length, label: "6 caracteres o más" },
+                    ].map(({ condition, label }, index) => (
+                      <li key={index} className={condition ? "text-[var(--app-primary)]" : "text-gray-500"}>
+                        <div className="inline-flex items-center">
+                          <CheckCircleIcon className="h-4 w-4 mr-1" aria-hidden="true" />
+                          {label}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Botón de Registro */}
               <div>
                 <button
                   type="submit"
                   disabled={isSubmitting || !isPasswordValid()}
-                  className={`w-full rounded-md p-3 text-sm font-semibold transition ${isSubmitting || !isPasswordValid() ? "bg-gray-700 text-gray-400 cursor-not-allowed" : "bg-[var(--app-primary)] text-black hover:bg-[var(--app-secondary)] focus:ring-2 focus:ring-[var(--app-primary)]"}`}
+                  className={`w-full rounded-md p-3 text-sm font-semibold transition ${isSubmitting || !isPasswordValid()
+                      ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                      : "bg-[var(--app-primary)] text-black hover:bg-[var(--app-secondary)] focus:ring-2 focus:ring-[var(--app-primary)]"
+                    }`}
                 >
                   {isSubmitting ? (
                     <>

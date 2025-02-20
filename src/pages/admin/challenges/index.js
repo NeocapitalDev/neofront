@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import DashboardLayout from "..";
+import DashboardLayout from "../../../components/phone-input";
 import { useRouter } from "next/router";
 
 const tableColumns = [
