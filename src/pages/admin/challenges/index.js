@@ -17,15 +17,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import DashboardLayout from "..";
+import { useRouter } from "next/router";
 
-const challengeColumns = [
-  { accessorKey: "id", header: "ID" },
-  // { accessorKey: "login", header: "Login" },
-  { accessorKey: "result", header: "Resultado" },
-  { accessorKey: "startDate", header: "Fecha de Inicio" },
-  { accessorKey: "endDate", header: "Fecha de Fin" },
-  { accessorKey: "phase", header: "Etapa" },
+const tableColumns = [
+  { accessorKey: "traderAccount", header: "Trader Account" },
+  { accessorKey: "traderEmail", header: "Trader Email" },
+  { accessorKey: "state", header: "State" },
+  { accessorKey: "step", header: "Step" },
+  { accessorKey: "equity", header: "Equity" },
+  { accessorKey: "brokerGroup", header: "Broker Group" },
+  { accessorKey: "actions", header: "Actions" },
 ];
 
 const fetcher = (url, token) =>
@@ -39,61 +42,58 @@ export default function ChallengesTable() {
   const { data: session } = useSession();
   const { data, error, isLoading } = useSWR(
     session?.jwt
-      ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges`, session.jwt]
+      ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges?populate=*`, session.jwt]
       : null,
     ([url, token]) => fetcher(url, token)
   );
-  console.log(data);
-  const [search, setSearch] = useState("");
-  const [resultFilter, setResultFilter] = useState("");
-  const [phaseFilter, setPhaseFilter] = useState("");
-  const [startDateFilter, setStartDateFilter] = useState("");
-  const [endDateFilter, setEndDateFilter] = useState("");
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-  };
+  const formatCurrency = (amount) =>
+    amount ? `$${parseFloat(amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}` : "N/A";
 
   const translateResult = (result) => {
     switch (result) {
+      case "init":
+        return "Iniciado";
       case "approved":
-        return "Aprobado";
+        return "Approved";
       case "disapproved":
-        return "Desaprobado";
+        return "Disapproved";
       case "progress":
-        return "En Curso";
+        return "On Challenge";
+      case "init":
+        return "Not Started";
       default:
         return "N/A";
     }
   };
 
+  const router = useRouter();
+
+  const handleButtonClick = (documentId) => {
+    router.push(`/admin/challenges/${documentId}`);
+  };
+
   const filteredData = useMemo(() => {
     if (!data || !data.data) return [];
 
-    return data.data.filter((challenge) => {
-      // const matchesSearch = challenge.login?.toLowerCase().includes(search.toLowerCase());
-      const matchesResult =
-        resultFilter && challenge.result
-          ? challenge.result.toLowerCase() === resultFilter.toLowerCase()
-          : true;
-      const matchesPhase = phaseFilter ? String(challenge.phase) === phaseFilter : true;
-      const matchesDateRange =
-        (!startDateFilter || new Date(challenge.startDate) >= new Date(startDateFilter)) &&
-        (!endDateFilter || new Date(challenge.endDate) <= new Date(endDateFilter));
-        return  matchesResult && matchesPhase && matchesDateRange;
-
-      // return matchesSearch && matchesResult && matchesPhase && matchesDateRange;
-    });
-  }, [data, search, resultFilter, phaseFilter, startDateFilter, endDateFilter]);
+    return data.data.map((challenge) => ({
+      traderAccount: challenge.broker_account?.login ?? "N/A",
+      traderEmail: challenge.user?.email ?? "N/A",
+      state: translateResult(challenge.result),
+      step: `Phase ${challenge.phase ?? "N/A"}`,
+      equity: formatCurrency(challenge.broker_account?.balance),
+      brokerGroup: challenge.broker_account?.server ?? "N/A",
+      actions: (
+        <Button variant="outline" size="sm" onClick={() => handleButtonClick(challenge.documentId)}>
+          Ver Detalles
+        </Button>
+      ),
+    }));
+  }, [data]);
 
   const table = useReactTable({
     data: filteredData,
-    columns: challengeColumns,
+    columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
@@ -101,63 +101,11 @@ export default function ChallengesTable() {
   return (
     <DashboardLayout>
       <div className="p-6 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 rounded-lg shadow-lg">
-        {/* Barra de búsqueda y filtros */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-2">
-          {/* Filtro por login */}
-          {/* <Input
-            placeholder="Login..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
-          /> */}
-
-          {/* Filtro por resultado */}
-          <select
-            value={resultFilter}
-            onChange={(e) => setResultFilter(e.target.value)}
-            className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
-          >
-            <option value="">Resultado</option>
-            <option value="approved">Aprobado</option>
-            <option value="disapproved">Desaprobado</option>
-            <option value="progress">En Curso</option>
-          </select>
-
-          {/* Filtro por etapa */}
-          <select
-            value={phaseFilter}
-            onChange={(e) => setPhaseFilter(e.target.value)}
-            className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
-          >
-            <option value="">Etapa</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
-
-          {/* Filtro por fecha de inicio */}
-          <Input
-            type="date"
-            value={startDateFilter}
-            onChange={(e) => setStartDateFilter(e.target.value)}
-            className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
-          />
-
-          {/* Filtro por fecha de fin */}
-          <Input
-            type="date"
-            value={endDateFilter}
-            onChange={(e) => setEndDateFilter(e.target.value)}
-            className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
-          />
-        </div>
-
-        {/* Tabla */}
         <div className="border border-zinc-300 dark:border-zinc-700 rounded-md overflow-hidden mt-4">
           <Table>
             <TableHeader className="bg-zinc-200 dark:bg-zinc-800">
               <TableRow>
-                {challengeColumns.map((column) => (
+                {tableColumns.map((column) => (
                   <TableHead key={column.accessorKey} className="text-zinc-900 dark:text-zinc-200 border-b border-zinc-300 dark:border-zinc-700">
                     {column.header}
                   </TableHead>
@@ -168,18 +116,19 @@ export default function ChallengesTable() {
               {filteredData.length > 0 ? (
                 filteredData.map((challenge, index) => (
                   <TableRow key={index} className="border-b border-zinc-300 dark:border-zinc-700">
-                    <TableCell>{challenge.id}</TableCell>
-                    {/* <TableCell>{challenge.login}</TableCell> */}
-                    <TableCell>{translateResult(challenge.result)}</TableCell>
-                    <TableCell>{formatDate(challenge.startDate) ?? "N/A"}</TableCell>
-                    <TableCell>{formatDate(challenge.endDate) ?? "N/A"}</TableCell>
-                    <TableCell>{challenge.phase}</TableCell>
+                    <TableCell>{challenge.traderAccount}</TableCell>
+                    <TableCell>{challenge.traderEmail}</TableCell>
+                    <TableCell>{challenge.state}</TableCell>
+                    <TableCell>{challenge.step}</TableCell>
+                    <TableCell>{challenge.equity}</TableCell>
+                    <TableCell>{challenge.brokerGroup}</TableCell>
+                    <TableCell>{challenge.actions}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={challengeColumns.length} className="text-center text-zinc-500 py-6">
-                    No se encontraron resultados.
+                  <TableCell colSpan={tableColumns.length} className="text-center text-zinc-500 py-6">
+                    No data found.
                   </TableCell>
                 </TableRow>
               )}

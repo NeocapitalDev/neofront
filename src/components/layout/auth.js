@@ -14,10 +14,8 @@ const Layout = ({ children }) => {
         objectFit="cover"
         priority={true} // Carga prioritaria para mejorar la experiencia
       />
-
       {/* Capa de opacidad con degradado */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/80 to-black z-0"></div>
-
       <div className="flex flex-1 min-h-full relative z-10">
         {/* Contenedor para la imagen de monedas */}
         <div className="relative hidden w-1/2 lg:block">
@@ -31,7 +29,6 @@ const Layout = ({ children }) => {
             unoptimized={true}
           />
         </div>
-
         {/* Contenedor del formulario con altura dinámica */}
         <div className="flex flex-1 w-full lg:w-1/2 flex-col justify-center px-8 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 min-h-full bg-black lg:bg-transparent">
           <div className="mx-auto w-full max-w-sm lg:w-96">
@@ -51,8 +48,12 @@ const Layout = ({ children }) => {
                 height={60}
               />
             </Link>
+<<<<<<< HEAD
 
             <main className="mt-6">{children}</main>
+=======
+            <main>{children}</main>
+>>>>>>> c317a22b336021699196bc984cdacc925d963eb6
           </div>
         </div>
       </div>
