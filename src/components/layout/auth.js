@@ -48,7 +48,7 @@ const Layout = ({ children }) => {
                 height={60}
               />
             </Link>
-            <main>{children}</main>
+            <main className="mt-6">{children}</main>
           </div>
         </div>
       </div>
