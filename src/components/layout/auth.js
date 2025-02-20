@@ -33,18 +33,18 @@ const Layout = ({ children }) => {
         </div>
 
         {/* Contenedor del formulario con altura dinámica */}
-        <div className="flex flex-1 w-full lg:w-1/2 flex-col justify-center px-8 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 min-h-full bg-zinc-800 lg:bg-transparent">
+        <div className="flex flex-1 w-full lg:w-1/2 flex-col justify-center px-8 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 min-h-full bg-black lg:bg-transparent">
           <div className="mx-auto w-full max-w-sm lg:w-96">
             <Link href="/">
               <Image
-                className="h-8 w-auto dark:hidden"
+                className="h-10 w-auto dark:hidden"
                 src="/images/logo-light.png"
                 alt="Logo"
                 width={236}
                 height={60}
               />
               <Image
-                className="h-12 w-auto hidden dark:block"
+                className="h-10 w-auto hidden dark:block"
                 src="/images/logo-dark.png"
                 alt="Logo"
                 width={236}
@@ -52,7 +52,7 @@ const Layout = ({ children }) => {
               />
             </Link>
 
-            <main>{children}</main>
+            <main className="mt-6">{children}</main>
           </div>
         </div>
       </div>

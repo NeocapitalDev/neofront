@@ -62,18 +62,19 @@ export default function ForgotPassword() {
 
   return (
     <Layout className=" min-h-screen">
-      <h2 className="mt-6 text-2xl font-bold leading-9 tracking-tight text-black dark:text-white">
-        Recuperar contraseña
-      </h2>
+    <div className="max-w-md mx-auto">
+      {/* Título */}
+      <h2 className="text-xl font-semibold text-left text-white">Recuperar contraseña</h2>
 
-      <p className="mt-2 text-sm leading-6 text-black dark:text-gray-400">
+      <p className="mt-2 text-sm leading-6 text-gray-400">
         Escribe tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
       </p>
 
-      <div className="mt-8">
+      <div className="mt-6">
         <form className="space-y-6" onSubmit={handleSubmit}>
+          {/* Campo de Correo Electrónico */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium leading-6 text-zinc-800 dark:text-gray-300">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300">
               Correo electrónico
             </label>
             <div className="mt-2">
@@ -86,31 +87,39 @@ export default function ForgotPassword() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@ejemplo.com"
                 required
-                className="block w-full rounded-md border-0 py-1.5 dark:bg-gray-800 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:focus:ring-amber-500 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
+                className="w-full rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition"
               />
             </div>
           </div>
-          {/* Componente Turnstile */}
+
+          {/* Captcha */}
           <Recaptcha onVerify={handleCaptcha} />
 
+          {/* Botón de Enviar */}
           <div>
             <button
               type="submit"
-              className={`text-zinc-900 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 ${isSubmitting ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed" : "bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 focus:ring-amber-400"}`}
               disabled={isSubmitting}
+              className={`w-full rounded-md p-3 text-sm font-semibold transition ${
+                isSubmitting
+                  ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                  : "bg-[var(--app-primary)] text-black hover:bg-[var(--app-secondary)] focus:ring-2 focus:ring-[var(--app-primary)]"
+              }`}
             >
-              {isSubmitting ? 'Enviando...' : 'Enviar correo de reinicio'}
+              {isSubmitting ? "Enviando..." : "Enviar correo de reinicio"}
             </button>
           </div>
         </form>
 
-        <p className="mt-10 text-sm text-center leading-6 text-black dark:text-gray-400">
-          ¿Ya tienes una cuenta?{' '}
-          <Link href="/login" className="font-semibold leading-6 text-amber-500 hover:text-amber-400 dark:text-amber-400 dark:hover:text-amber-300">
+        {/* Enlace para volver al login */}
+        <p className="mt-6 text-sm text-center text-gray-400">
+          ¿Ya tienes una cuenta?{" "}
+          <Link href="/login" className="font-semibold text-[var(--app-primary)] hover:text-[var(--app-secondary)] transition">
             Iniciar sesión
           </Link>
         </p>
       </div>
+    </div>
     </Layout>
 
   );
