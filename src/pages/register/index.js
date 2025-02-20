@@ -8,7 +8,8 @@ import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 import Layout from '../../components/layout/auth';
-import { PhoneInput } from '@/components/phone-input';
+import {PhoneInput} from '@/components/phone-input';
+
 
 const strapiUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -20,7 +21,7 @@ export default function SignUp() {
     password: '',
     firstName: '',
     lastName: '',
-    phone: '+51' // Valor por defecto de Perú
+    phone: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -84,7 +85,8 @@ export default function SignUp() {
             'Authorization': `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
             'Content-Type': 'application/json',
           },
-        });
+        }
+      );
       console.log('Registration successful:', response.data);
       toast.success('Registro exitoso.');
       router.replace('/email-confirmation');
@@ -150,6 +152,7 @@ export default function SignUp() {
                       />
 
               {/* Correo Electrónico */}
+              
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-300">Correo electrónico</label>
                 <div className="mt-2">
@@ -249,6 +252,8 @@ export default function SignUp() {
           </div>
         </div>
       </Layout>
+
+
     </>
   );
 };

@@ -12,7 +12,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import DashboardLayout from "../../../components/phone-input";
+import DashboardLayout from "..";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 

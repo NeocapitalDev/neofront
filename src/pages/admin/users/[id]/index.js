@@ -12,7 +12,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import DashboardLayout from "../../../../components/phone-input";
+import DashboardLayout from "../..";
 
 const fetcher = async (url, token) => {
     console.log("Fetching data from:", url); // Depuración

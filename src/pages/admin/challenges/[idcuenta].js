@@ -12,7 +12,7 @@ import Stats from "../../../pages/metrix/summary";
 import WinLoss from "../../../pages/metrix/winloss";
 import Objetivos from "../../../pages/metrix/objetivos";
 import WinRates from "../../../pages/metrix/winlossrates";
-import Layout from "../../../components/phone-input";
+import Layout from "..";
 
 
 const fetcher = (url) =>

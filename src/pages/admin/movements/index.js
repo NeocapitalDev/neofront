@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import DashboardLayout from "../../../components/phone-input";
+import DashboardLayout from "..";
 import {
   Table,
   TableBody,
