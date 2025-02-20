@@ -89,7 +89,7 @@ export default function Index() {
             </thead>
             <tbody>
               {cohortStats.map((stat, index) => (
-                <tr key={index} className="border-b border-zinc-600 bg-amber-700">
+                <tr key={index} className="border-b border-zinc-600 bg-[var(--app-primary)]">
                   <td className="p-3 font-semibold text-black border border-zinc-800">
                     {stat.label}
                   </td>
