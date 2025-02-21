@@ -6,9 +6,10 @@ import Loader from "../../components/loaders/loader";
 import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import CredencialesModal from "../dashboard/credentials";
 import Link from "next/link";
-import Statistics from '../../pages/metrix/statistics';
-import MetaApi, { MetaStats } from 'metaapi.cloud-sdk';
+import { MetaStats } from 'metaapi.cloud-sdk';
 import MyPage from "./grafico";
+import  CircularProgress  from '@/components/barrascircular'
+
 
 
 const fetcher = (url) =>
@@ -134,9 +135,10 @@ const Metrix = () => {
         </div>
       ) : (
         <>
-        <MyPage />
+          <CircularProgress  />
+          <MyPage />
 
-           <div className="mt-6">
+          <div className="mt-6">
             <h2 className="text-lg font-semibold">Métricas de Meta API</h2>
             {metricsError ? (
               <p className="text-red-500">Error al cargar las métricas: {metricsError.message}</p>
@@ -159,7 +161,7 @@ const Metrix = () => {
             ) : (
               <p>Cargando datos...</p>
             )}
-          </div> 
+          </div>
 
 
         </>

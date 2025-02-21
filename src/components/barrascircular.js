@@ -56,12 +56,12 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-centerp-6 py-5 text-white">
+    <div className="flex flex-col items-center justify-center  py-8 text-white bg-black my-6 rounded-md">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {Object.keys(data).map((key) => {
           const item = data[key];
           return (
-            <div key={key} className="flex items-center gap-4">
+            <div key={key} className="flex  gap-4">
               <CircularProgress percentage={item.percentage} color={item.color} />
               <div>
                 <p className="text-gray-400 capitalize">{key.replace(/([A-Z])/g, " $1")}</p>
