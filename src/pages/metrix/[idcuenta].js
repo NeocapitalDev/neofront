@@ -13,6 +13,7 @@ import Stats from "./summary";
 import WinLoss from "./winloss";
 import Objetivos from "./objetivos";
 import WinRates from "./winlossrates";
+import Index from "../../components/barrascircular";
 
 
 const fetcher = (url) =>
@@ -138,6 +139,10 @@ const Metrix = () => {
         </div>
       ) : (
         <>
+
+
+<Index/>
+
           <div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2">
