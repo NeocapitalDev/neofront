@@ -35,6 +35,11 @@ export default NextAuth({
       },
     }),
   ],
+  session: {
+    strategy: 'jwt',
+    // 2) Definimos el tiempo máximo de vida del token en segundos
+    maxAge: 60*60*72, // Ej: 1 hora
+  },
 
   pages: {
     signIn: '/login', // Ruta a tu página de inicio de sesión personalizada
@@ -51,6 +56,7 @@ export default NextAuth({
       session.firstName = token.firstName; // Agregando firstName a la sesión
       session.lastName = token.lastName; // Agregando firstName a la sesión
       session.roleName = token.roleName; // Agregando roleName a la sesión
+      
 
       return Promise.resolve(session);
     },
