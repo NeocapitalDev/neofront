@@ -27,7 +27,7 @@ const fetcher = async (url, token) => {
 
 // Función para obtener datos de Strapi (reutilizable)
 export function useStrapiData(endpoint, token) {
-  const { data, error } = useSWR(
+  const { data, error, mutate } = useSWR(
     token ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${endpoint}`, token] : null,
     ([url, token]) => fetcher(url, token) // El token se pasa como argumento adicional al fetcher
   );
@@ -35,6 +35,7 @@ export function useStrapiData(endpoint, token) {
   return {
     data,
     error,
+    mutate,
     isLoading: !error && !data,
   };
 }

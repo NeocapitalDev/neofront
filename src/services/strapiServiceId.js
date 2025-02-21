@@ -1,6 +1,5 @@
 // lib/strapiService.js
 import useSWR from 'swr';
-
 // Función fetcher para obtener los datos
 const fetcher = async (url) => {
   const res = await fetch(url, {
@@ -17,11 +16,8 @@ const fetcher = async (url) => {
 
   const data = await res.json();
 
-  // if (url.includes('challenges')) {
-  //   return data;
-  // }
-  if (data.data && Array.isArray(data.data)) {
-    return data.data;  // Devolver los datos del array 'socials'
+  if (data) {
+    return data;  // Devolver los datos del objeto 'user'
   } else {
     throw new Error('No se encontraron datos válidos');
   }
