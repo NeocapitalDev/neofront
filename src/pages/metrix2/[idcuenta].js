@@ -8,39 +8,28 @@ import CredencialesModal from "../dashboard/credentials";
 import Link from "next/link";
 import Statistics from '../../pages/metrix/statistics';
 import MetaApi, { MetaStats } from 'metaapi.cloud-sdk';
-import Balance from "./balance";
-import Stats from "./summary";
-import WinLoss from "./winloss";
-import Objetivos from "./objetivos";
-import WinRates from "./winlossrates";
-import { useStrapiData } from "src/services/strapiServiceId";
+import MyPage from "./grafico";
 
-import Index from "../../components/barrascircular";
 
-// const fetcher = (url) =>
-//   fetch(url, {
-//     method: "GET",
-//     headers: {
-//       Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-//       "Content-Type": "application/json",
-//     },
-//   }).then((res) => res.json());
+const fetcher = (url) =>
+  fetch(url, {
+    headers: {
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+  }).then((res) => res.json());
 
 const Metrix = () => {
   const router = useRouter();
   const { idcuenta } = router.query;
   const [apiResult, setApiResult] = useState(null);
 
-  // const { data: challengeData, error, isLoading } = useSWR(
-  //   idcuenta
-  //     ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${idcuenta}?populate=broker_account`
-  //     : null,
-  //   fetcher
-  // );
-  const route = idcuenta ? `challenges/${idcuenta}?populate=broker_account` : null;
-  const { data: challengeData, error, isLoading } = useStrapiData(route);
-
-
+  const { data: challengeData, error, isLoading } = useSWR(
+    idcuenta
+      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${idcuenta}?populate=broker_account`
+      : null,
+    fetcher
+  );
 
   const [metricsData, setMetricsData] = useState(null);
   const [metricsError, setMetricsError] = useState(null);
@@ -145,82 +134,10 @@ const Metrix = () => {
         </div>
       ) : (
         <>
+        <MyPage />
 
-
-<Index/>
-
-          <div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-2">
-                {console.log("Datos enviados a Balance:", metricsData)}
-                <Balance data={metricsData || {}} />
-              </div>
-              <div className="md:col-span-1">
-                {challengeData?.data && <Stats {...challengeData.data} />}
-              </div>
-            </div>
-          </div>
-
-          {/* <WinRates wins={metricsData?.winTrades || 0} losses={metricsData?.lostTrades || 0} /> */}
-
-          <WinLoss data={metricsData || {}} />
-
-
-          <div className="mt-6">
-            <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
-            <Objetivos
-              data={{
-                tradeDayCount: 5, // Número ficticio de días de trading
-                maxDailyDrawdown: 500.00, // Pérdida diaria máxima ficticia en dólares
-                maxAbsoluteDrawdown: 1000.00, // Pérdida absoluta máxima ficticia en dólares
-                maxRelativeProfit: 1500.00, // Ganancia relativa máxima ficticia en dólares
-              }}
-              initBalance={challengeData?.data?.broker_account?.balance}
-              pase={challengeData?.data?.phase}
-            />
-          </div>
-
-          {/* data={metricsData || {}} */}
-
-
-          <div className="flex flex-col md:flex-row gap-4">
-
-
-            <div className="w-full md:w-1/1  rounded-lg ">
-              <h2 className="text-lg font-bold mb-4 pt-5">Estadísticas</h2>
-              <Statistics data={{ ...metricsData, phase: challengeData?.data?.phase || "Desconocida" }} />
-
-            </div>
-
-            {/* 
-            <div className="w-full md:w-1/2  rounded-lg ">
-              <h2 className="text-lg font-bold mb-4 pt-5">Resumen Diario</h2>
-              <HistoricalOrders accountId={challengeData?.data?.broker_account.idMeta}/>
-            </div> */}
-          </div>
-
-          {/* <div className="mt-6">
-            <h2 className="text-lg font-semibold">Detalles del desafío</h2>
-            <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
-              {JSON.stringify(challengeData, null, 2)}
-            </pre>
-          </div>
-
-          <div className="mt-6">
-            <h2 className="text-lg font-semibold">Métricas adicionales</h2>
-            {metricsError ? (
-              <p className="text-red-500">Error al cargar las métricas: {metricsError.message}</p>
-            ) : metricsData ? (
-              <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
-                {JSON.stringify(metricsData, null, 2)}
-              </pre>
-            ) : (
-              <p>Cargando métricas adicionales...</p>
-            )}
-          </div> */}
-
-          <div className="mt-6">
-            <h2 className="text-lg font-semibold">Métricas adicionales</h2>
+           <div className="mt-6">
+            <h2 className="text-lg font-semibold">Métricas de Meta API</h2>
             {metricsError ? (
               <p className="text-red-500">Error al cargar las métricas: {metricsError.message}</p>
             ) : metricsData ? (
@@ -242,7 +159,7 @@ const Metrix = () => {
             ) : (
               <p>Cargando datos...</p>
             )}
-          </div>
+          </div> 
 
 
         </>

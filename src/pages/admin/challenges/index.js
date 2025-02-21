@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import DashboardLayout from "..";
 import { useRouter } from "next/router";
-
+import { useStrapiData } from "@/services/strapiServiceJWT";
 const tableColumns = [
   { accessorKey: "traderAccount", header: "Trader Account" },
   { accessorKey: "traderEmail", header: "Trader Email" },
@@ -31,21 +31,27 @@ const tableColumns = [
   { accessorKey: "actions", header: "Actions" },
 ];
 
-const fetcher = (url, token) =>
-  fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }).then((res) => res.json());
+// const fetcher = (url, token) =>
+//   fetch(url, {
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//     },
+//   }).then((res) => res.json());
 
 export default function ChallengesTable() {
   const { data: session } = useSession();
-  const { data, error, isLoading } = useSWR(
-    session?.jwt
-      ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges?populate=*`, session.jwt]
-      : null,
-    ([url, token]) => fetcher(url, token)
-  );
+
+  const route = session?.jwt ? "challenges?populate=*" : null;
+  const { data, error, isLoading } = useStrapiData(route, session?.jwt);
+
+  // const { data, error, isLoading } = useSWR(
+  //   session?.jwt
+  //     ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges?populate=*`, session.jwt]
+  //     : null,
+  //   ([url, token]) => fetcher(url, token)
+  // );
+
+
 
   const formatCurrency = (amount) =>
     amount ? `$${parseFloat(amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}` : "N/A";

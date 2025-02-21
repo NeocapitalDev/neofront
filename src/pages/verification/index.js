@@ -4,6 +4,7 @@ import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 import useSWR from "swr";
+import { useStrapiData } from "src/services/strapiServiceJWT";
 import Loader from "../../components/loaders/loader";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
@@ -13,18 +14,18 @@ import VeriffComponent from "./verification";
 
 const Verification = dynamic(() => import("../verification/verification"), { ssr: false });
 
-const fetcher = async (url, token) => {
-    try {
-        const response = await fetch(url, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return response.json();
-    } catch (error) {
-        console.error("Fetcher Error:", error);
-        throw error;
-    }
-};
+// const fetcher = async (url, token) => {
+//     try {
+//         const response = await fetch(url, {
+//             headers: { Authorization: `Bearer ${token}` },
+//         });
+//         if (!response.ok) throw new Error(`Error: ${response.status}`);
+//         return response.json();
+//     } catch (error) {
+//         console.error("Fetcher Error:", error);
+//         throw error;
+//     }
+// };
 
 const SocialsPage = () => {
     const { data: session } = useSession();
@@ -33,16 +34,26 @@ const SocialsPage = () => {
     const [accepted, setAccepted] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const { data, error, isLoading, mutate } = useSWR(
-        token
-            ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate]=broker_account`, token]
-            : null,
-        ([url, token]) => fetcher(url, token)
-    );
+
+
+    // const { data, error, isLoading, mutate } = useSWR(
+    //     token
+    //         ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate]=broker_account`, token]
+    //         : null,
+    //     ([url, token]) => fetcher(url, token)
+    // );
+
+
+    const route = token ? "users/me?populate[challenges][populate]=broker_account" : null;
+    const { data, error, isLoading, mutate } = useStrapiData(route, token);
+
+
+
+
 
     const { isVerified, statusSign, challenges = [] } = data || {};
 
-    const { hasPhase3Challenge, hasPhase1Or2Challenge, newAccount } = useMemo(() => ({
+    const { hasPhase1Or2Challenge, newAccount } = useMemo(() => ({
         hasPhase3Challenge: challenges.some(challenge => challenge.phase === 3),
         hasPhase1Or2Challenge: challenges.some(challenge => [1, 2].includes(challenge.phase)),
         newAccount: challenges.length === 0,
@@ -61,7 +72,7 @@ const SocialsPage = () => {
                 },
                 body: JSON.stringify({ statusSign: true }),
             });
-
+            console.log("token: ", token);
             if (!response.ok) {
                 const errorData = await response.json();
                 toast.error(errorData?.error?.message || "Error en la firma del contrato");
@@ -98,7 +109,7 @@ const SocialsPage = () => {
                             </div>
                         </div>
                     </div>
-                    
+
                     {((hasPhase1Or2Challenge || newAccount) && !isVerified) ? (
                         <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                             <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
