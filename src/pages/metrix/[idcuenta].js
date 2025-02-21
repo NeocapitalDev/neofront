@@ -13,27 +13,33 @@ import Stats from "./summary";
 import WinLoss from "./winloss";
 import Objetivos from "./objetivos";
 import WinRates from "./winlossrates";
+import { useStrapiData } from "src/services/strapiServiceId";
 
 
-const fetcher = (url) =>
-  fetch(url, {
-    headers: {
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-  }).then((res) => res.json());
+// const fetcher = (url) =>
+//   fetch(url, {
+//     method: "GET",
+//     headers: {
+//       Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+//       "Content-Type": "application/json",
+//     },
+//   }).then((res) => res.json());
 
 const Metrix = () => {
   const router = useRouter();
   const { idcuenta } = router.query;
   const [apiResult, setApiResult] = useState(null);
 
-  const { data: challengeData, error, isLoading } = useSWR(
-    idcuenta
-      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${idcuenta}?populate=broker_account`
-      : null,
-    fetcher
-  );
+  // const { data: challengeData, error, isLoading } = useSWR(
+  //   idcuenta
+  //     ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${idcuenta}?populate=broker_account`
+  //     : null,
+  //   fetcher
+  // );
+  const route = idcuenta ? `challenges/${idcuenta}?populate=broker_account` : null;
+  const { data: challengeData, error, isLoading } = useStrapiData(route);
+
+
 
   const [metricsData, setMetricsData] = useState(null);
   const [metricsError, setMetricsError] = useState(null);
