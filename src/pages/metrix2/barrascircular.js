@@ -56,20 +56,19 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center  py-8 text-white bg-black my-6 rounded-md">
+    <div className="flex flex-col items-center justify-center py-8 text-white bg-black my-6 rounded-md">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {Object.keys(data).map((key) => {
           const item = data[key];
+          const textColorClass = item.color === "green" ? "text-green-500" : "text-red-500";
           return (
-            <div key={key} className="flex  gap-4">
+            <div key={key} className="flex gap-4">
               <CircularProgress percentage={item.percentage} color={item.color} />
               <div>
                 <p className="text-gray-400 capitalize">{key.replace(/([A-Z])/g, " $1")}</p>
                 <p className="text-xl font-bold">${item.value.toFixed(2)}</p>
-                <p className={item.color === "green" ? "text-green-500" : "text-red-500"}>Current</p>
-                <p className={`${item.color === "green" ? "text-green-500" : "text-red-500"} font-bold`}>
-                  ${item.current.toFixed(2)}
-                </p>
+                <p className={textColorClass}>Current</p>
+                <p className={`${textColorClass} font-bold`}>${item.current.toFixed(2)}</p>
               </div>
             </div>
           );
