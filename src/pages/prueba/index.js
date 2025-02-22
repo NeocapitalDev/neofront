@@ -1,77 +1,180 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-
-export default function ProductList() {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    async function fetchProducts() {
-        try {
-            const response = await fetch("http://localhost:1337/api/products?populate=*", {
-                headers: {
-                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-                },
-            });
-            if (!response.ok) {
-                throw new Error("Error al obtener los productos");
-            }
-            const data = await response.json();
-            setProducts(data.data);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    }
-
+import { useState, useEffect, use } from "react"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
+import { type } from "os"
+export default function Interfaz() {
+    const [categories, setCategories] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+    const [selectedPlan, setSelectedPlan] = useState(null)
+    const [selectedType, setSelectedType] = useState(null)
+    const [selectedAmount, setSelectedAmount] = useState("10k")
+    const [types, setTypes] = useState([])
+    const [products, setProducts] = useState([])
     useEffect(() => {
-        fetchProducts();
-    }, []);
+        const types = categories.find((p) => p.id === selectedPlan)?.type || []
+        setTypes(types)
+    }, [selectedPlan])
+    console.log("products", categories)
+    console.log("selectedPlan", selectedPlan)
+    console.log("selectedType", selectedType)
+    console.log("selectedAmount", selectedAmount)
+    console.log("types", types.length)
+    useEffect(() => {
+        async function fetchCategories() {
+            try {
+                const response = await fetch("http://localhost:1337/api/categories?populate=*", {
+                    headers: {
+                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+                    },
+                })
+                if (!response.ok) {
+                    throw new Error("Error al obtener los productos")
+                }
+                const data = await response.json()
+                setCategories(data.data)
+                // Establecer selecciones iniciales
+                if (data.data.length > 0) {
+                    setSelectedPlan(data.data[0].id)
+                }
+            } catch (err) {
+                setError(err.message)
+            } finally {
+                setLoading(false)
+            }
+        }
+        async function fetchProducts() {
+            try {
+                const response = await fetch("http://localhost:1337/api/products?populate=*", {
+                    headers: {
+                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+                    },
+                })
+                if (!response.ok) {
+                    throw new Error("Error al obtener los productos")
+                }
+                const data = await response.json()
+                setProducts(data.data) //5k, 10k, 25k, 50k, 100k
+            } catch (err) {
+                setError(err.message)
+            } finally {
+                setLoading(false)
+            }
+        }
 
-    if (loading) return <p>Cargando productos...</p>;
-    if (error) return <p>Error: {error}</p>;
+        fetchCategories()
+        fetchProducts()
+
+    }, [])
+
+
+    // Encontrar las subcategorías del plan seleccionado
+    // const currentSubcategories = products.find((p) => p.id === selectedPlan)?.subcategories || []
+
+
+    if (loading) return <div className="flex items-center justify-center min-h-screen">Cargando...</div>
+    if (error) return <div className="flex items-center justify-center min-h-screen text-red-500">{error}</div>
 
     return (
-        <div className="border-gray-200 border-2 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-4">
-            {products.map((product) => (
-                <div key={product.id} className="p-4 border-b border-gray-200">
-                    <h2 className="text-xl font-bold">{product.name}</h2>
-                    <p>Precio: ${product.price}</p>
-                    <p>ID de WooCommerce: {product.woocommerce_product_id}</p>
-                    <p>Etiqueta del desafío: {product.challenge_tag}</p>
-                    <div className="mt-4">
-                        <h3 className="text-lg font-semibold">Condiciones del desafío:</h3>
-                        <table className="w-full border-collapse border border-gray-300 mt-2">
-                            <thead>
-                                <tr className="bg-gray-100 dark:bg-gray-700">
-                                    <th className="border border-gray-300 p-2">ID Documento</th>
-                                    <th className="border border-gray-300 p-2">Tipo</th>
-                                    <th className="border border-gray-300 p-2">Periodo</th>
-                                    <th className="border border-gray-300 p-2">Drawdown Relativo (%)</th>
-                                    <th className="border border-gray-300 p-2">Drawdown Absoluto (%)</th>
-                                    <th className="border border-gray-300 p-2">Beneficio Absoluto (%)</th>
-                                    <th className="border border-gray-300 p-2">Paso</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {product.challenge_conditions.map((condition) => (
-                                    <tr key={condition.id} className="text-center border border-gray-300">
-                                        <td className="border border-gray-300 p-2">{condition.documentId}</td>
-                                        <td className="border border-gray-300 p-2">{condition.type}</td>
-                                        <td className="border border-gray-300 p-2">{condition.period}</td>
-                                        <td className="border border-gray-300 p-2">{condition.relativeDrawdownThreshold}%</td>
-                                        <td className="border border-gray-300 p-2">{condition.absoluteDrawdownThreshold}%</td>
-                                        <td className="border border-gray-300 p-2">{condition.absoluteProfitThreshold}%</td>
-                                        <td className="border border-gray-300 p-2">{condition.step}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+        <div className="min-h-screen bg-black p-6 md:p-12">
+            <div className="max-w-6xl mx-auto space-y-8">
+                {/* Plan Selection */}
+                <div className="flex justify-center gap-2 flex-wrap">
+                    {categories.map((plan) => (
+                        <button
+                            key={plan.id}
+                            onClick={() => setSelectedPlan(plan.id)}
+                            className={cn(
+                                "px-6 py-2 rounded-full transition-all",
+                                selectedPlan === plan.id
+                                    ? "bg-[var(--app-primary)] text-black font-bold"
+                                    : "bg-zinc-900 text-white hover:bg-zinc-800",
+                            )}
+                        >
+                            {plan.name}
+                        </button>
+                    ))}
                 </div>
-            ))}
-        </div>
-    );
+
+                {/* Subcategory Selection */}
+                <div className="flex justify-center gap-2 flex-wrap">
+                    {categories
+                        .find((p) => p.id === selectedPlan)
+                        ?.subcategories.map((type) => (
+                            <button
+                                key={type.id}
+                                onClick={() => setSelectedType(type.id)}
+                                className={cn(
+                                    "px-6 py-2 rounded-full transition-all flex items-center gap-2",
+                                    selectedType === type.id
+                                        ? "bg-yellow-400 text-black font-bold"
+                                        : "bg-zinc-900 text-white hover:bg-zinc-800",
+                                )}
+                            >
+                                {type.name}
+                                <Badge variant="secondary" className="bg-red-500 text-white">
+                                    Limited time
+                                </Badge>
+                            </button>
+                        ))}
+                </div>
+
+                {/* Amount Selection */}
+                <div className="flex justify-center gap-2 flex-wrap">
+                    {products.map((amount) => (
+                        <button
+                            key={amount.id}
+                            onClick={() => setSelectedAmount(amount.id)}
+                            className={cn(
+                                "px-6 py-2 rounded-full transition-all",
+                                selectedAmount.id === amount.id
+                                    ? "bg-yellow-400 text-black font-bold"
+                                    : "bg-zinc-900 text-white hover:bg-zinc-800",
+                            )}
+                        >
+                            ${amount.name}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Trading Cards */}
+                <div className={`grid grid-cols-${types.length} gap-4 w-full`}>
+                    {types.map((level) => (
+                        <Card key={level.id} className="bg-zinc-900 border-zinc-800 text-white">
+                            <CardHeader>
+                                <CardTitle className="text-lg text-yellow-400">Evaluation Stage</CardTitle>
+                                <h3 className="text-2xl font-bold">{level.titulo}</h3>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-zinc-400">Minimum Trading Days</span>
+                                    <span className="font-bold">3 days</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-zinc-400">Maximum Daily Loss</span>
+                                    <span className="font-bold">5%</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-zinc-400">Maximum Loss</span>
+                                    <span className="font-bold">10%</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-zinc-400">Profit Target</span>
+                                    <span className="font-bold">{level.titulo === "Student" ? "$800 (8%)" : "$500 (5%)"}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-zinc-400">Leverage</span>
+                                    <span className="font-bold">1:100</span>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </div >
+    )
 }
+
