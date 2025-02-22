@@ -2,7 +2,6 @@ import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { ChartBarIcon, BellIcon } from '@heroicons/react/24/outline';
-import CredencialesModal from './credentials';
 import Loader from '../../components/loaders/loader';
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -157,7 +156,7 @@ export default function Index() {
                                                 </div>
 
                                                 <div className="mt-4 flex space-x-4">
-                                                    <CredencialesModal {...challenge.broker_account} />
+                                                    
                                                     <Link href={`/metrix2/${challenge.documentId}`}>
                                                         <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
                                                             <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
