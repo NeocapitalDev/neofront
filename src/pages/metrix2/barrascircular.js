@@ -66,7 +66,7 @@ const Dashboard = () => {
               <div>
                 <p className="text-gray-400 capitalize">{key.replace(/([A-Z])/g, " $1")}</p>
                 <p className="text-xl font-bold">${item.value.toFixed(2)}</p>
-                <p className={item.color === "green" ? "text-green-400" : "text-red-400"}>Current</p>
+                <p className={item.color === "green" ? "text-green-500" : "text-red-500"}>Current</p>
                 <p className={`${item.color === "green" ? "text-green-500" : "text-red-500"} font-bold`}>
                   ${item.current.toFixed(2)}
                 </p>
