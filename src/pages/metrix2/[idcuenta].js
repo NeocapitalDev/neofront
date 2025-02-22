@@ -8,7 +8,7 @@ import CredencialesModal from "../dashboard/credentials";
 import Link from "next/link";
 import { MetaStats } from 'metaapi.cloud-sdk';
 import MyPage from "./grafico";
-import  CircularProgress  from '@/components/barrascircular'
+import  CircularProgress  from 'src/pages/metrix2/barrascircular'
 
 
 
