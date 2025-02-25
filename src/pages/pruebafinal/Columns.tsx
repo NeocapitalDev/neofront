@@ -6,9 +6,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "./DataTableColumnHeader";
 import { DetailModal } from "./DetailModal";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Edit, Eye, Newspaper, Plus, PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { PropDetails } from "./PropDetails";
+import { NewspaperIcon } from "@heroicons/react/24/outline";
 
 
 export type ChallengeRelationsStages = {
@@ -64,25 +65,6 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-
-
-  //  {
-  //    accessorKey: "name",
-  //    header: ({ column }) => (
-  //      <DataTableColumnHeader column={column} title="Name" />
-  //    ),
-  //    cell: ({ row }) => {
-  //      return (
-  //        <div className="flex space-x-2">
-  //          <span className="max-w-[500px] truncate font-medium">
-  //            {row.getValue("name")}
-  //          </span>
-  //        </div>
-  //      );
-  //    },
-  //  },
-
-
   {
     accessorKey: "challenge_subcategory",
     header: ({ column }) => (
@@ -94,22 +76,19 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
       ) as ChallengeRelationsStages["challenge_subcategory"];
       return (
         <div className="flex flex-wrap gap-1">
-            <Badge key={subcategories?.id} variant="secondary">
-              {subcategories?.name}
-            </Badge>
+          <Badge key={subcategories?.id} variant="secondary">
+            {subcategories?.name}
+          </Badge>
         </div>
       );
     },
-      filterFn: (row, id, value) => {
-        const subcategories = row.getValue(
+    filterFn: (row, id, value) => {
+      const subcategories = row.getValue(
         "challenge_subcategory"
-        ) as ChallengeRelationsStages["challenge_subcategory"];
-        return subcategories.name.toLowerCase().includes(value.toLowerCase());
-      },
+      ) as ChallengeRelationsStages["challenge_subcategory"];
+      return subcategories?.name.toLowerCase().includes(value.toLowerCase());
+    },
   },
-
-
-
   {
     accessorKey: "challenge_products",
     header: ({ column }) => (
@@ -138,47 +117,58 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
       );
     },
   },
-
-
-   {
-     id: "actions",
-     header: "Actions",
-     cell: ({ row }) => {
-       const data = row.original;
-       const prop = {
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      const data = row.original;
+      const prop = {
         minimumTradingDays: data.minimumTradingDays,
         maximumDailyLoss: data.maximumDailyLoss,
         maximumLoss: data.maximumLoss,
         profitTarget: data.profitTarget,
         leverage: data.leverage,
-
         challenge_subcategory: data.challenge_subcategory,
         challenge_products: data.challenge_products,
-       };
-       const [isModalOpen, setIsModalOpen] = useState(false);
+      };
+      const [isModalOpen, setIsModalOpen] = useState(false);
+      const [modalType, setModalType] = useState<number | null>(null);
 
-       return (
-         <>
-           <Button
-             variant="ghost"
-             size="icon"
-             onClick={() => setIsModalOpen(true)}
-           >
-             <Eye className="h-4 w-4" />
-           </Button>
+      const openModal = (type: number) => {
+        setModalType(type);
+        setIsModalOpen(true);
+      };
 
-           <DetailModal
-             isOpen={isModalOpen}
-             onClose={() => setIsModalOpen(false)}
-             title={`Prop Details: ${prop}`}
-             maxWidth="xl"
-           >
-             <PropDetails prop={prop} />
-           </DetailModal>
-         </>
-       );
-     },
-   },
+      return (
+        <>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => openModal(1)}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
 
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => openModal(2)}
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
 
+        
+
+          <DetailModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            title={`Prop Details: ${prop}`}
+            maxWidth="xl"
+          >
+            <PropDetails prop={prop} modalType={modalType} />
+          </DetailModal>
+        </>
+      );
+    },
+  },
 ];
