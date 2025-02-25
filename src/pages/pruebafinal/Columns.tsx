@@ -8,7 +8,7 @@ import { DetailModal } from "./DetailModal";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 import { useState } from "react";
-import { StepDetails } from "./StepDetails";
+import { PropDetails } from "./PropDetails";
 
 
 export type ChallengeRelationsStages = {
@@ -145,10 +145,15 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
      header: "Actions",
      cell: ({ row }) => {
        const data = row.original;
-       const step = {
-         data: data,
-         subcategories: data.challenge_subcategory,
-         stages: data.challenge_products,
+       const prop = {
+        minimumTradingDays: data.minimumTradingDays,
+        maximumDailyLoss: data.maximumDailyLoss,
+        maximumLoss: data.maximumLoss,
+        profitTarget: data.profitTarget,
+        leverage: data.leverage,
+
+        challenge_subcategory: data.challenge_subcategory,
+        challenge_products: data.challenge_products,
        };
        const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -165,10 +170,10 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
            <DetailModal
              isOpen={isModalOpen}
              onClose={() => setIsModalOpen(false)}
-             title={`Step Details: ${step.data}`}
+             title={`Prop Details: ${prop}`}
              maxWidth="xl"
            >
-             <StepDetails step={step} />
+             <PropDetails prop={prop} />
            </DetailModal>
          </>
        );

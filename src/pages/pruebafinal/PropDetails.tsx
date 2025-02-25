@@ -7,27 +7,37 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export interface Subcategory {
+export interface Challenge_products {
   id: string | number;
   name: string;
 }
 
-export interface Stage {
+export interface Challenge_subcategory {
   id: string | number;
   name: string;
 }
 
-export interface Step {
-  name: string;
-  subcategories: Subcategory[];
-  stages: Stage[];
+export interface ChallengeRelationsStages {
+  minimumTradingDays: number;
+  maximumDailyLoss: number;
+  maximumLoss: number;
+  profitTarget: number;
+  leverage: number;
+
+  challenge_subcategory: Challenge_subcategory;
+  challenge_products: Challenge_products[];
 }
 
-interface StepDetailsProps {
-  step: Step;
+interface DetailsProps {
+  prop: ChallengeRelationsStages;
 }
 
-export function StepDetails({ step }: StepDetailsProps) {
+
+
+
+
+export function PropDetails({ prop }: DetailsProps) {
+ 
   return (
     <Card>
       <CardHeader>
@@ -39,20 +49,20 @@ export function StepDetails({ step }: StepDetailsProps) {
         {/* Subcategories Section */}
         <div>
           <h3 className="text-sm font-medium text-muted-foreground mb-3">
-            Subcategories
+            Productos
           </h3>
           <div className="grid grid-cols-1 gap-2">
-            {step.subcategories.map((subcat) => (
-              <Card key={subcat.id}>
+            {prop.challenge_products.map((product) => (
+              <Card key={product.id}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">{subcat.name}</p>
+                      <p className="font-medium">{product.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        ID: {subcat.id}
+                        ID: {product.id}
                       </p>
                     </div>
-                    <Badge variant="secondary">Subcategory</Badge>
+                    <Badge variant="secondary">Producto</Badge>
                   </div>
                 </CardContent>
               </Card>
@@ -63,24 +73,22 @@ export function StepDetails({ step }: StepDetailsProps) {
         {/* Stages Section */}
         <div>
           <h3 className="text-sm font-medium text-muted-foreground mb-3">
-            Stages
+            Subcategoria
           </h3>
           <div className="grid grid-cols-1 gap-2">
-            {step.stages.map((stage) => (
-              <Card key={stage.id}>
+              <Card key={prop.challenge_subcategory.id}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">{stage.name}</p>
+                      <p className="font-medium">{prop.challenge_subcategory.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        ID: {stage.id}
+                        ID: {prop.challenge_subcategory.id}
                       </p>
                     </div>
-                    <Badge>Stage</Badge>
+                    <Badge>Subcategoria</Badge>
                   </div>
                 </CardContent>
               </Card>
-            ))}
           </div>
         </div>
       </CardContent>
