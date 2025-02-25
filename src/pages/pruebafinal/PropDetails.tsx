@@ -43,7 +43,12 @@ export function PropDetails({ prop }: DetailsProps) {
       <CardHeader>
         <CardTitle>Parámetros y condiciones</CardTitle>
         {/* <CardTitle>{step.name}</CardTitle> */}
-        <CardDescription>Detailed information about this step</CardDescription>
+        <CardDescription>Días mínimos de trading: {prop.minimumTradingDays}</CardDescription>
+        <CardDescription>Pérdida diaria máxima: {prop.maximumDailyLoss}</CardDescription>
+        <CardDescription>Pérdida máxima: {prop.maximumLoss}</CardDescription>
+        <CardDescription>Objetivo de ganancia: {prop.profitTarget}</CardDescription>
+        <CardDescription>Apalancamiento: {prop.leverage}</CardDescription>
+
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Subcategories Section */}

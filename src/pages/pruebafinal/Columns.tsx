@@ -95,7 +95,7 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
       return (
         <div className="flex flex-wrap gap-1">
             <Badge key={subcategories.id} variant="secondary">
-              {subcategories.name}
+              {subcategories?.name}
             </Badge>
         </div>
       );
