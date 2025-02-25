@@ -36,6 +36,13 @@ const challengeProducts = [
   { value: "fundingpips-pro", label: "FundingPips Pro" },
   { value: "fundingpips-zero", label: "FundingPips Zero" },
 ];
+const challengeAccounts = [
+  { value: "5k", label: "5k" },
+  { value: "10k", label: "10k" },
+  { value: "20k", label: "20k" },
+  { value: "50k", label: "50k" },
+  { value: "100k", label: "100k" },
+];
 
 const stages = [
   { value: "evaluation", label: "Evaluation" },
@@ -62,11 +69,19 @@ const stepFormSchema = z.object({
       })
     )
     .min(1, "Selecciona al menos un stage"),
+  challenge_accounts: z
+    .array(
+      z.enum(["5k", "10k", "20k", "50k", "100k"], {
+        errorMap: () => ({ message: "Producto no válido" }),
+      })
+    )
+    .min(1, "Selecciona al menos un producto"),
 });
 
 export default function StepForm() {
   const [formData, setFormData] = useState(null);
   const [openProducts, setOpenProducts] = useState(false);
+  const [openAccount, setOpenAccounts] = useState(false);
   const [openStages, setOpenStages] = useState(false);
 
   const form = useForm({
@@ -75,6 +90,7 @@ export default function StepForm() {
       name: "",
       idChallengeStep: "",
       challenge_products: [],
+      challenge_accounts: [],
       stage: [],
     },
   });
@@ -178,6 +194,133 @@ export default function StepForm() {
                                 Seleccionar Todos
                               </CommandItem>
                               {challengeProducts.map((product) => (
+                                <CommandItem
+                                  key={product.value}
+                                  onSelect={() => {
+                                    const currentValues = field.value || [];
+                                    const newValues = currentValues.includes(
+                                      product.value
+                                    )
+                                      ? currentValues.filter(
+                                          (value) => value !== product.value
+                                        )
+                                      : [...currentValues, product.value];
+                                    field.onChange(newValues);
+                                  }}
+                                  className="text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-400"
+                                >
+                                  <div
+                                    className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${
+                                      field.value?.includes(product.value)
+                                        ? "bg-yellow-500 text-black"
+                                        : "opacity-50"
+                                    }`}
+                                  >
+                                    {field.value?.includes(product.value) &&
+                                      "✓"}
+                                  </div>
+                                  {product.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    {field.value?.length > 0 && (
+                      <div className="flex gap-2 flex-wrap mt-2">
+                        {field.value.map((value) => (
+                          <Badge
+                            key={value}
+                            className="bg-yellow-500 text-black hover:bg-yellow-400 cursor-pointer"
+                            onClick={() =>
+                              field.onChange(
+                                field.value.filter((v) => v !== value)
+                              )
+                            }
+                          >
+                            {
+                              challengeProducts.find((p) => p.value === value)
+                                ?.label
+                            }
+                            <X className="ml-1 h-3 w-3" />
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Campo Cuentas (5k, 10k, 20k) */}
+              <FormField
+                control={form.control}
+                name="challenge_accounts"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-yellow-500">Cuentas</FormLabel>
+                    <Popover open={openAccount} onOpenChange={setOpenAccounts}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={`w-full justify-between rounded-md border border-gray-700 bg-transparent text-white p-3 ${
+                              !field.value?.length && "text-muted-foreground"
+                            }`}
+                          >
+                            {field.value?.length > 0
+                              ? `${field.value.length} seleccionados`
+                              : "Seleccionar Cuentas"}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0 bg-black border-yellow-500">
+                        <Command className="bg-black border-2">
+                          <CommandInput
+                            placeholder="Buscar cuentas..."
+                            className="text-yellow-500"
+                          />
+                          <CommandList>
+                            <CommandEmpty className="text-yellow-500">
+                              No se encontraron cuentas.
+                            </CommandEmpty>
+                            <CommandGroup className="max-h-64 overflow-auto">
+                              <CommandItem
+                                onSelect={() => {
+                                  if (
+                                    field.value &&
+                                    field.value.length ===
+                                      challengeAccounts.length
+                                  ) {
+                                    field.onChange([]);
+                                  } else {
+                                    field.onChange(
+                                      challengeAccounts.map((p) => p.value)
+                                    );
+                                  }
+                                }}
+                                className="text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-400"
+                              >
+                                <div
+                                  className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${
+                                    field.value &&
+                                    field.value.length ===
+                                      challengeAccounts.length
+                                      ? "bg-yellow-500 text-black"
+                                      : "opacity-50"
+                                  }`}
+                                >
+                                  {field.value &&
+                                  field.value.length ===
+                                    challengeAccounts.length
+                                    ? "✓"
+                                    : ""}
+                                </div>
+                                Seleccionar Todos
+                              </CommandItem>
+                              {challengeAccounts.map((product) => (
                                 <CommandItem
                                   key={product.value}
                                   onSelect={() => {

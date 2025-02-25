@@ -45,38 +45,56 @@ const stages = [
 ];
 
 // Esquema de validación con Zod
-const productFormSchema = z.object({
+const challengeFormSchema = z.object({
   name: z.string().nonempty("El nombre es requerido"),
-  idChallengeproduct: z.string().optional(),
   challenge_products: z
-    .array(
-      z.enum(["fundingpips", "fundingpips-pro", "fundingpips-zero"], {
-        errorMap: () => ({ message: "Producto no válido" }),
-      })
-    )
+    .array(z.enum(["fundingpips", "fundingpips-pro", "fundingpips-zero"]))
     .min(1, "Selecciona al menos un producto"),
   stage: z
-    .array(
-      z.enum(["evaluation", "verification", "funded", "completed"], {
-        errorMap: () => ({ message: "Stage no válido" }),
-      })
-    )
-    .min(1, "Selecciona al menos un stage"),
+    .array(z.enum(["evaluation", "verification", "funded", "completed"]))
+    .min(1, "Selecciona al menos un step"),
+  min_tra_day: z.preprocess(
+    (val) => Number(val),
+    z.number().min(1, "Debe ser al menos 1")
+  ),
+  max_day_loss: z.preprocess(
+    (val) => Number(val),
+    z
+      .number()
+      .min(0, "No puede ser negativo")
+      .gt(0, "El valor debe ser mayor a 0")
+  ),
+  max_loss: z.preprocess(
+    (val) => Number(val),
+    z
+      .number()
+      .min(0, "No puede ser negativo")
+      .gt(0, "El valor debe ser mayor a 0")
+  ),
+  profit_target: z.preprocess(
+    (val) => Number(val),
+    z
+      .number()
+      .min(0, "No puede ser negativo")
+      .gt(0, "El valor debe ser mayor a 0")
+  ),
 });
 
-export default function ProductForm() {
+export default function ChallengeForm() {
   const [formData, setFormData] = useState(null);
   const [openProducts, setOpenProducts] = useState(false);
   const [openStages, setOpenStages] = useState(false);
 
   const form = useForm({
-    resolver: zodResolver(productFormSchema),
+    resolver: zodResolver(challengeFormSchema),
     defaultValues: {
       name: "",
-      idChallengeproduct: "",
       challenge_products: [],
       stage: [],
-      woocomerce_id: "",
+      min_tra_day: 0,
+      max_day_loss: 0,
+      max_loss: 0,
+      profit_target: 0,
     },
   });
 
@@ -87,7 +105,7 @@ export default function ProductForm() {
 
   return (
     <div className="p-6 flex flex-col items-center justify-center gap-6">
-      <h3 className="text-white text-xl">Crear Product</h3>
+      <h2 className="text-white text-xl">Crear Stage</h2>
       <Card className="w-full max-w-md bg-black">
         <CardContent className="pt-6">
           <Form {...form}>
@@ -103,7 +121,7 @@ export default function ProductForm() {
                       <Input
                         {...field}
                         placeholder="Ingresa el nombre"
-                        className="w-full rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition"
+                        className="w-full rounded-md border border-gray-700 bg-transparent text-white p-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition"
                       />
                     </FormControl>
                     <FormMessage />
@@ -129,7 +147,7 @@ export default function ProductForm() {
                             }`}
                           >
                             {field.value?.length > 0
-                              ? `${field.value.length} seleccionados`
+                              ? `${field.value.length} Seleccionados`
                               : "Seleccionar Productos"}
                           </Button>
                         </FormControl>
@@ -145,6 +163,7 @@ export default function ProductForm() {
                               No se encontraron productos.
                             </CommandEmpty>
                             <CommandGroup className="max-h-64 overflow-auto">
+                              {/* Opción para seleccionar/deseleccionar todos */}
                               <CommandItem
                                 onSelect={() => {
                                   if (
@@ -182,14 +201,14 @@ export default function ProductForm() {
                                 <CommandItem
                                   key={product.value}
                                   onSelect={() => {
-                                    const currentValues = field.value || [];
-                                    const newValues = currentValues.includes(
+                                    const current = field.value || [];
+                                    const newValues = current.includes(
                                       product.value
                                     )
-                                      ? currentValues.filter(
-                                          (value) => value !== product.value
+                                      ? current.filter(
+                                          (v) => v !== product.value
                                         )
-                                      : [...currentValues, product.value];
+                                      : [...current, product.value];
                                     field.onChange(newValues);
                                   }}
                                   className="text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-400"
@@ -244,7 +263,7 @@ export default function ProductForm() {
                 name="stage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-yellow-500">Stage</FormLabel>
+                    <FormLabel className="text-yellow-500">Step</FormLabel>
                     <Popover open={openStages} onOpenChange={setOpenStages}>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -256,20 +275,20 @@ export default function ProductForm() {
                             }`}
                           >
                             {field.value?.length > 0
-                              ? `${field.value.length} seleccionados`
-                              : "Seleccionar Stage"}
+                              ? `${field.value.length} Seleccionados`
+                              : "Seleccionar Steps"}
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
                       <PopoverContent className="w-full p-0 bg-black border-yellow-500">
                         <Command className="bg-black">
                           <CommandInput
-                            placeholder="Buscar stage..."
+                            placeholder="Buscar steps..."
                             className="text-yellow-500"
                           />
                           <CommandList>
                             <CommandEmpty className="text-yellow-500">
-                              No se encontraron stage.
+                              No se encontraron steps.
                             </CommandEmpty>
                             <CommandGroup className="max-h-64 overflow-auto">
                               <CommandItem
@@ -304,14 +323,12 @@ export default function ProductForm() {
                                 <CommandItem
                                   key={stage.value}
                                   onSelect={() => {
-                                    const currentValues = field.value || [];
-                                    const newValues = currentValues.includes(
+                                    const current = field.value || [];
+                                    const newValues = current.includes(
                                       stage.value
                                     )
-                                      ? currentValues.filter(
-                                          (value) => value !== stage.value
-                                        )
-                                      : [...currentValues, stage.value];
+                                      ? current.filter((v) => v !== stage.value)
+                                      : [...current, stage.value];
                                     field.onChange(newValues);
                                   }}
                                   className="text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-400"
@@ -356,20 +373,87 @@ export default function ProductForm() {
                 )}
               />
 
-              {/* Woocommerce id */}
+              {/* Campo Días Mínimos de Trading */}
               <FormField
                 control={form.control}
-                name="woocommerce_id"
+                name="min_tra_day"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-yellow-500">
-                      Woocommerce id
+                      Días Mínimos de Trading
                     </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="Ingresa el nombre"
-                        className="w-full rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition"
+                        type="number"
+                        placeholder="Ingrese los días mínimos"
+                        className="w-full rounded-md border border-gray-700 bg-transparent text-white p-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Campo Profit Target */}
+              <FormField
+                control={form.control}
+                name="profit_target"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-yellow-500">
+                      Profit Target
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        placeholder="Ingrese el profit target"
+                        className="w-full rounded-md border border-gray-700 bg-transparent text-white p-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Campo Máximo de Pérdida Diario */}
+              <FormField
+                control={form.control}
+                name="max_day_loss"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-yellow-500">
+                      Máximo de Pérdida Diario
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        placeholder="Ingrese el máximo de pérdida diaria"
+                        className="w-full rounded-md border border-gray-700 bg-transparent text-white p-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Campo Pérdida Máxima */}
+              <FormField
+                control={form.control}
+                name="max_loss"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-yellow-500">
+                      Pérdida Máxima
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        placeholder="Ingrese la pérdida máxima"
+                        className="w-full rounded-md border border-gray-700 bg-transparent text-white p-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition"
                       />
                     </FormControl>
                     <FormMessage />
@@ -387,7 +471,6 @@ export default function ProductForm() {
           </Form>
         </CardContent>
       </Card>
-
       {formData && (
         <Card className="w-full max-w-md border-yellow-500 bg-black">
           <CardContent className="pt-6">

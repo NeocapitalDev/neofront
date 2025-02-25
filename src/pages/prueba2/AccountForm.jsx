@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/popover";
 
 // Opciones para los selects
-const challengeProducts = [
+const challengeProduct = [
   { value: "fundingpips", label: "FundingPips" },
   { value: "fundingpips-pro", label: "FundingPips Pro" },
   { value: "fundingpips-zero", label: "FundingPips Zero" },
@@ -45,13 +45,13 @@ const stages = [
 ];
 
 // Esquema de validación con Zod
-const productFormSchema = z.object({
+const accountFormSchema = z.object({
   name: z.string().nonempty("El nombre es requerido"),
-  idChallengeproduct: z.string().optional(),
+  idChallengeaccount: z.string().optional(),
   challenge_products: z
     .array(
       z.enum(["fundingpips", "fundingpips-pro", "fundingpips-zero"], {
-        errorMap: () => ({ message: "Producto no válido" }),
+        errorMap: () => ({ message: "Accounto no válido" }),
       })
     )
     .min(1, "Selecciona al menos un producto"),
@@ -64,16 +64,16 @@ const productFormSchema = z.object({
     .min(1, "Selecciona al menos un stage"),
 });
 
-export default function ProductForm() {
+export default function AccountForm() {
   const [formData, setFormData] = useState(null);
-  const [openProducts, setOpenProducts] = useState(false);
+  const [openAccounts, setOpenAccounts] = useState(false);
   const [openStages, setOpenStages] = useState(false);
 
   const form = useForm({
-    resolver: zodResolver(productFormSchema),
+    resolver: zodResolver(accountFormSchema),
     defaultValues: {
       name: "",
-      idChallengeproduct: "",
+      idChallengeaccount: "",
       challenge_products: [],
       stage: [],
       woocomerce_id: "",
@@ -87,7 +87,7 @@ export default function ProductForm() {
 
   return (
     <div className="p-6 flex flex-col items-center justify-center gap-6">
-      <h3 className="text-white text-xl">Crear Product</h3>
+      <h3 className="text-white text-xl">Crear Account</h3>
       <Card className="w-full max-w-md bg-black">
         <CardContent className="pt-6">
           <Form {...form}>
@@ -111,14 +111,14 @@ export default function ProductForm() {
                 )}
               />
 
-              {/* Campo Productos */}
+              {/* Campo productos */}
               <FormField
                 control={form.control}
-                name="challenge_products"
+                name="challenge_accounts"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-yellow-500">Productos</FormLabel>
-                    <Popover open={openProducts} onOpenChange={setOpenProducts}>
+                    <Popover open={openAccounts} onOpenChange={setOpenAccounts}>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
@@ -150,12 +150,12 @@ export default function ProductForm() {
                                   if (
                                     field.value &&
                                     field.value.length ===
-                                      challengeProducts.length
+                                      challengeProduct.length
                                   ) {
                                     field.onChange([]);
                                   } else {
                                     field.onChange(
-                                      challengeProducts.map((p) => p.value)
+                                      challengeProduct.map((p) => p.value)
                                     );
                                   }
                                 }}
@@ -165,46 +165,45 @@ export default function ProductForm() {
                                   className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${
                                     field.value &&
                                     field.value.length ===
-                                      challengeProducts.length
+                                      challengeProduct.length
                                       ? "bg-yellow-500 text-black"
                                       : "opacity-50"
                                   }`}
                                 >
                                   {field.value &&
-                                  field.value.length ===
-                                    challengeProducts.length
+                                  field.value.length === challengeProduct.length
                                     ? "✓"
                                     : ""}
                                 </div>
                                 Seleccionar Todos
                               </CommandItem>
-                              {challengeProducts.map((product) => (
+                              {challengeProduct.map((account) => (
                                 <CommandItem
-                                  key={product.value}
+                                  key={account.value}
                                   onSelect={() => {
                                     const currentValues = field.value || [];
                                     const newValues = currentValues.includes(
-                                      product.value
+                                      account.value
                                     )
                                       ? currentValues.filter(
-                                          (value) => value !== product.value
+                                          (value) => value !== account.value
                                         )
-                                      : [...currentValues, product.value];
+                                      : [...currentValues, account.value];
                                     field.onChange(newValues);
                                   }}
                                   className="text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-400"
                                 >
                                   <div
                                     className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${
-                                      field.value?.includes(product.value)
+                                      field.value?.includes(account.value)
                                         ? "bg-yellow-500 text-black"
                                         : "opacity-50"
                                     }`}
                                   >
-                                    {field.value?.includes(product.value) &&
+                                    {field.value?.includes(account.value) &&
                                       "✓"}
                                   </div>
-                                  {product.label}
+                                  {account.label}
                                 </CommandItem>
                               ))}
                             </CommandGroup>
@@ -225,7 +224,7 @@ export default function ProductForm() {
                             }
                           >
                             {
-                              challengeProducts.find((p) => p.value === value)
+                              challengeProduct.find((p) => p.value === value)
                                 ?.label
                             }
                             <X className="ml-1 h-3 w-3" />
