@@ -101,14 +101,94 @@ function ExampleForm() {
   // Manejar envío
   const onSubmit = (data) => {
     console.log("JSON final:", data);
-    /**
-     *  Estructura de data:
-     *  {
-     *    name: "...",
-     *    subcategories: [ { id, name }, { id, name } ],
-     *    stages: [ { id, name }, ... ]
-     *  }
-     */
+
+    async function createStepWithRelations(stepPayload) {
+      try {
+        // 1. Crear el challenge step primero.
+        const stepResponse = await fetch('http://localhost:1337/api/challenge-steps', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`, },
+          body: JSON.stringify({ data: { name: stepPayload.name } })
+        });
+        const stepResult = await stepResponse.json();
+        console.log('Challenge Step creado:', stepResult);
+        const stepId = stepResult.data.documentId; // id del step creado
+        console.log('ID del Challenge Step:', stepId);
+        // 2. Procesar las subcategorías
+        for (const subcat of stepPayload.subcategories) {
+          // Si el id es un string, asumimos que es un id temporal y se debe crear
+          if (typeof subcat.id === 'string') {
+            const newSubcatResponse = await fetch('http://localhost:1337/api/challenge-subcategories', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`, },
+
+              body: JSON.stringify({
+                data: {
+                  name: subcat.name,
+                  // Se asocia el step recién creado
+                  challenge_step: stepId
+                }
+              })
+            });
+            const newSubcat = await newSubcatResponse.json();
+            console.log('Subcategoría creada:', newSubcat);
+            // Se actualiza el campo de relación con el id del step
+
+          } else {
+            // Si ya existe, se actualiza la relación para vincularle el step
+            await fetch(`http://localhost:1337/api/challenge-subcategories/${subcat.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`, },
+              body: JSON.stringify({
+                data: {
+                  // Se actualiza el campo de relación con el id del step
+                  challenge_step: stepId
+                }
+              })
+            });
+          }
+        }
+
+        // 3. Procesar los stages
+        for (const stage of stepPayload.stages) {
+          console.log('Procesando stage:', stage);
+          if (typeof stage.id === 'string') {
+            const newStageResponse = await fetch('http://localhost:1337/api/challenge-stages', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`, },
+              body: JSON.stringify({
+                data: {
+                  name: stage.name,
+                  challenge_steps: stepId
+                }
+              })
+            });
+            const newStage = await newStageResponse.json();
+            console.log('Stage creado:', newStage);
+          } else {
+            // Actualizar registro existente para asociarlo al step
+            await fetch(`http://localhost:1337/api/challenge-stages/${stage.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`, },
+              body: JSON.stringify({
+                data: {
+                  challenge_steps: stepId
+                }
+              })
+            });
+          }
+        }
+
+        console.log('Challenge Step y relaciones creados correctamente.');
+      } catch (error) {
+        console.error('Error al crear el challenge step y sus relaciones:', error);
+      }
+    }
+
+    // Ejecución de ejemplo
+    createStepWithRelations(data);
+
+
   };
 
   // ------------------
