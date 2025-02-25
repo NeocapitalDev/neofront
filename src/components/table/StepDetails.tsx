@@ -46,7 +46,7 @@ export function StepDetails({ step, data }: StepDetailsProps) {
         )}
         <CardDescription>Detailed information about this step</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="">
         {/* Subcategories Section */}
         {/* <div>
           <h3 className="text-sm font-medium text-muted-foreground mb-3">

@@ -160,7 +160,7 @@ export const getColumns = (
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             // title={`Step Details: ${step.name}`}
-            maxWidth="xl"
+            maxWidth="2xl"
           >
             <StepDetails step={step} data={data} />
           </DetailModal>
