@@ -1,468 +1,447 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { stepFormSchema } from "./schemas"; // <-- importa el esquema anterior
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { X, Plus } from "lucide-react";
 import { useStrapiData } from "../../services/strapiService";
-
 import {
   Form,
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
+  FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { Badge } from "@/components/ui/badge";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import {
   Popover,
-  PopoverContent,
   PopoverTrigger,
+  PopoverContent,
 } from "@/components/ui/popover";
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from "@/components/ui/command";
 
-// Esquema de validación modificado para permitir valores personalizados
-const stepFormSchema = z.object({
-  name: z.string().nonempty("El nombre es requerido"),
-  idChallengeStep: z.string().optional(),
-  challenge_products: z
-    .array(z.string().nonempty("Producto no válido"))
-    .min(1, "Selecciona al menos un producto"),
-  stage: z
-    .array(z.string().nonempty("Stage no válido"))
-    .min(1, "Selecciona al menos un stage"),
-  challenge_accounts: z
-    .array(
-      z.enum(["5k", "10k", "20k", "50k", "100k"], {
-        errorMap: () => ({ message: "Cuenta no válida" }),
-      })
-    )
-    .min(1, "Selecciona al menos una cuenta"),
-});
-
-function StepForm() {
-  const [formData, setFormData] = useState(null);
-  const [openProducts, setOpenProducts] = useState(false);
-  const [openStages, setOpenStages] = useState(false);
-
-  // Estados para agregar nuevos elementos a productos
-  const [customProducts, setCustomProducts] = useState([]);
-  const [addingCustomProduct, setAddingCustomProduct] = useState(false);
-  const [customProductInput, setCustomProductInput] = useState("");
-
-  // Estados para agregar nuevos elementos a stage
-  const [customStages, setCustomStages] = useState([]);
-  const [addingCustomStage, setAddingCustomStage] = useState(false);
-  const [customStageInput, setCustomStageInput] = useState("");
-
-  // Datos para productos (subcategories)
+function ExampleForm() {
+  // ------------------
+  //  Data simulada
+  // ------------------
   const {
-    data: products,
-    error: productError,
-    isLoading: productsLoading,
-  } = useStrapiData("challenge-subcategories?populate=*");
+    data: subcategories,
+    error: subError,
+    isLoading: subLoading,
+  } = useStrapiData("challenge-subcategories?filters[challenge_step][$null]=true");
 
-  // Datos para stage
+  // Stages
   const {
-    data: stagesData,
+    data: stageData,
     error: stageError,
     isLoading: stageLoading,
-  } = useStrapiData("challenge-stages?populate=*");
+  } = useStrapiData("challenge-stages?filters[challenge_steps][$null]=true");
 
-  // Procesamos los productos disponibles: se filtran los que no tienen challenge_step asignado
-  const challengeProducts = products
-    ? products
+  const subcategoriesData = subcategories
+    ? subcategories
       .filter(
-        (product) =>
-          !product.challenge_step ||
-          product.challenge_step === "" ||
-          product.challenge_step === null
+        (subcategory) =>
+          !subcategory.challenge_steps ||
+          subcategory.challenge_steps === "" ||
+          subcategory.challenge_steps === null
       )
       .map(({ id, name }) => ({ id, name }))
     : [];
+  // const stageData = stages
+  //   ? stages
+  //     .filter(
+  //       (stage) =>
+  //         !stage.challenge_steps ||
+  //         stage.challenge_steps === "" ||
+  //         stage.challenge_steps === null
+  //     )
+  //     .map(({ id, name }) => ({ id, name }))
+  //   : [];
 
-  // Se combinan los productos provenientes de la API con los agregados manualmente
-  const allProducts = [...challengeProducts, ...customProducts];
+  // ------------------
+  //   Estados locales
+  // ------------------
+  // Control de popover
+  const [openSubcat, setOpenSubcat] = useState(false);
+  const [openStages, setOpenStages] = useState(false);
 
-  // Para stage, asumimos que el endpoint retorna un arreglo de objetos con propiedades { id, name }
-  const defaultStages = stagesData || [];
-  // Combinamos los stage por defecto con los agregados manualmente
-  const allStages = [...defaultStages, ...customStages];
+  // Para crear "custom" subcategorías y productos
+  const [customSubcategories, setCustomSubcategories] = useState([]);
+  const [customSubcatInput, setCustomSubcatInput] = useState("");
 
+  const [customStages, setCustomStages] = useState([]);
+  const [customStagesInput, setCustomStagesInput] = useState("");
+
+  // Combinar datos originales + custom
+  const allSubcategories = [...subcategoriesData, ...customSubcategories];
+  const allStages = [...(stageData || []), ...customStages]; // Solución: usa [] si stageData es null
+
+  // ------------------
+  //   useForm
+  // ------------------
   const form = useForm({
     resolver: zodResolver(stepFormSchema),
     defaultValues: {
       name: "",
-      idChallengeStep: "",
-      challenge_products: [],
-      challenge_accounts: [],
-      stage: [],
+      subcategories: [],
+      stages: [],
     },
   });
 
-  function onSubmit(data) {
-    setFormData(data);
-    console.log(data);
-  }
-
-  // Función para agregar nuevo producto
-  const handleAddProduct = (field) => {
-    if (!customProductInput.trim()) return;
-    const newProduct = {
-      id: `custom-${Date.now()}`,
-      name: customProductInput.trim(),
-    };
-    setCustomProducts((prev) => [...prev, newProduct]);
-    // Seleccionamos automáticamente el nuevo producto
-    field.onChange([...field.value, newProduct.id]);
-    setCustomProductInput("");
-    setAddingCustomProduct(false);
+  // Manejar envío
+  const onSubmit = (data) => {
+    console.log("JSON final:", data);
+    /**
+     *  Estructura de data:
+     *  {
+     *    name: "...",
+     *    subcategories: [ { id, name }, { id, name } ],
+     *    stages: [ { id, name }, ... ]
+     *  }
+     */
   };
 
-  // Función para agregar nuevo stage
-  const handleAddStage = (field) => {
-    if (!customStageInput.trim()) return;
-    const newStage = {
+  // ------------------
+  //  Handlers custom
+  // ------------------
+  const handleAddCustomSubcat = (field) => {
+    if (!customSubcatInput.trim()) return;
+    const newSubcat = {
       id: `custom-${Date.now()}`,
-      name: customStageInput.trim(),
+      name: customSubcatInput.trim(),
     };
-    setCustomStages((prev) => [...prev, newStage]);
-    // Seleccionamos automáticamente el nuevo stage
-    field.onChange([...field.value, newStage.id]);
-    setCustomStageInput("");
-    setAddingCustomStage(false);
+    // Agregar al array "custom"
+    setCustomSubcategories((prev) => [...prev, newSubcat]);
+    // Agregarlo también a la selección actual
+    field.onChange([...field.value, newSubcat]);
+    // Limpiar
+    setCustomSubcatInput("");
+  };
+
+  const handleAddCustomProduct = (field) => {
+    if (!customStagesInput.trim()) return;
+    const newProduct = {
+      id: `custom-${Date.now()}`,
+      name: customStagesInput.trim(),
+    };
+    setCustomStages((prev) => [...prev, newProduct]);
+    field.onChange([...field.value, newProduct]);
+    setCustomStagesInput("");
   };
 
   return (
-    <div className="p-6 flex flex-col items-center justify-center gap-6">
-      <h3 className="text-white text-xl">Crear Step</h3>
-      <Card className="w-full max-w-md bg-black">
-        <CardContent className="pt-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Campo Nombre */}
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-yellow-500">Nombre</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Ingresa el nombre"
-                        className="w-full rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <div className="p-4 max-w-2xl mx-auto rounded-xl border-2 border-gray-800">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* NOMBRE */}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-yellow-500">Nombre</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Nombre del Step"
+                    className="text-white bg-black border border-gray-600"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-              {/* Campo Productos */}
-              <FormField
-                control={form.control}
-                name="challenge_products"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-yellow-500">
-                      Productos
-                    </FormLabel>
-                    <Popover open={openProducts} onOpenChange={setOpenProducts}>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            disabled={productsLoading || productError}
-                            className={`w-full justify-between rounded-md border border-gray-700 bg-transparent text-white p-3 ${!field.value?.length && "text-muted-foreground"
-                              }`}
-                          >
-                            {productsLoading
-                              ? "Cargando productos..."
-                              : productError
-                                ? "Error al cargar productos"
-                                : field.value?.length > 0
-                                  ? `${field.value.length} seleccionados`
-                                  : "Seleccionar Productos"}
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      {!productsLoading && !productError && (
-                        <PopoverContent className="w-full p-0 bg-black border-yellow-500">
-                          <Command className="bg-black border-2">
-                            <CommandInput
-                              placeholder="Buscar productos..."
-                              className="text-yellow-500"
-                            />
-                            <CommandList>
-                              <CommandEmpty className="text-yellow-500">
-                                No se encontraron productos.
-                              </CommandEmpty>
-                              <CommandGroup className="max-h-64 overflow-auto">
-                                {/* Opción para seleccionar/deseleccionar todos */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* SUBCATEGORÍAS */}
+            <FormField
+              control={form.control}
+              name="subcategories"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-yellow-500">Subcategorías</FormLabel>
+                  {subLoading ? <p className="text-center">Cargando</p> : subError ? <p>Error: {subError.message}</p> : <Popover open={openSubcat} onOpenChange={setOpenSubcat}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          className="w-full text-white border border-gray-600"
+                        >
+                          {field.value.length > 0
+                            ? `${field.value.length} seleccionadas`
+                            : "Seleccionar Subcategorías"}
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0 bg-black border-yellow-500 w-64">
+                      <Command className="bg-black">
+                        <CommandInput
+                          placeholder="Buscar subcategorías..."
+                          className="text-yellow-500 focus:outline-none focus:ring-0 outline-none border-0"
+                        />
+                        <CommandList>
+                          <CommandEmpty>No se encontraron resultados</CommandEmpty>
+                          <CommandGroup>
+                            {/* Seleccionar todas */}
+                            <CommandItem
+                              className="text-yellow-500 hover:bg-yellow-500/10"
+                              onSelect={() => {
+                                // Si ya las tenemos todas seleccionadas, limpiamos. Si no, seleccionamos todas.
+                                if (
+                                  field.value.length === allSubcategories.length
+                                ) {
+                                  field.onChange([]);
+                                } else {
+                                  field.onChange(allSubcategories);
+                                }
+                              }}
+                            >
+                              <div
+                                className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value.length === allSubcategories.length
+                                  ? "bg-yellow-500 text-black"
+                                  : "opacity-50"
+                                  }`}
+                              >
+                                {field.value.length === allSubcategories.length &&
+                                  "✓"}
+                              </div>
+                              Seleccionar Todas
+                            </CommandItem>
+
+                            {/* Lista de subcategorías */}
+                            {allSubcategories.map((subcat) => {
+                              const isSelected = field.value.some(
+                                (item) => item.id === subcat.id
+                              );
+                              return (
                                 <CommandItem
+                                  key={subcat.id}
                                   onSelect={() => {
-                                    if (
-                                      field.value &&
-                                      field.value.length === allProducts.length
-                                    ) {
-                                      field.onChange([]);
-                                    } else {
-                                      field.onChange(
-                                        allProducts.map((p) => p.id)
+                                    const current = field.value;
+                                    let newValues;
+                                    if (isSelected) {
+                                      newValues = current.filter(
+                                        (v) => v.id !== subcat.id
                                       );
+                                    } else {
+                                      newValues = [...current, subcat];
                                     }
+                                    field.onChange(newValues);
                                   }}
-                                  className="text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-400"
+                                  className="text-yellow-500 hover:bg-yellow-500/10"
                                 >
                                   <div
-                                    className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value &&
-                                        field.value.length === allProducts.length
-                                        ? "bg-yellow-500 text-black"
-                                        : "opacity-50"
+                                    className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected
+                                      ? "bg-yellow-500 text-black"
+                                      : "opacity-50"
                                       }`}
                                   >
-                                    {field.value &&
-                                      field.value.length === allProducts.length &&
-                                      "✓"}
+                                    {isSelected && "✓"}
                                   </div>
-                                  Seleccionar Todos
+                                  {subcat.name}
                                 </CommandItem>
-                                {allProducts.map((product) => (
-                                  <CommandItem
-                                    key={product.id}
-                                    onSelect={() => {
-                                      const current = field.value || [];
-                                      const newValues = current.includes(product.id)
-                                        ? current.filter((v) => v !== product.id)
-                                        : [...current, product.id];
-                                      field.onChange(newValues);
-                                    }}
-                                    className="text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-400"
-                                  >
-                                    <div
-                                      className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value?.includes(product.id)
-                                          ? "bg-yellow-500 text-black"
-                                          : "opacity-50"
-                                        }`}
-                                    >
-                                      {field.value?.includes(product.id) && "✓"}
-                                    </div>
-                                    {product.name}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                              {/* Opción para agregar nuevo producto */}
-                              {addingCustomProduct ? (
-                                <div className="p-2 flex gap-2">
-                                  <Input
-                                    placeholder="Nuevo producto"
-                                    value={customProductInput}
-                                    onChange={(e) =>
-                                      setCustomProductInput(e.target.value)
-                                    }
-                                    className="bg-gray-800 text-white"
-                                  />
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleAddProduct(field)}
-                                  >
-                                    Agregar
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() =>
-                                      setAddingCustomProduct(false)
-                                    }
-                                  >
-                                    Cancelar
-                                  </Button>
-                                </div>
-                              ) : (
-                                <CommandItem
-                                  onSelect={() => setAddingCustomProduct(true)}
-                                  className="text-green-500 hover:bg-green-500/10 hover:text-green-400"
-                                >
-                                  <Plus className="mr-2 h-4 w-4" />
-                                  Agregar nuevo producto
-                                </CommandItem>
-                              )}
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      )}
-                    </Popover>
-                    {field.value?.length > 0 && (
-                      <div className="flex gap-2 flex-wrap mt-2">
-                        {field.value.map((value) => (
-                          <Badge
-                            key={value}
-                            className="bg-yellow-500 text-black hover:bg-yellow-400 cursor-pointer"
-                            onClick={() =>
-                              field.onChange(field.value.filter((v) => v !== value))
-                            }
-                          >
-                            {allProducts.find((p) => p.id === value)?.name || value}
-                            <X className="ml-1 h-3 w-3" />
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                              );
+                            })}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>}
 
-              {/* Campo Stage */}
-              <FormField
-                control={form.control}
-                name="stage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-yellow-500">Stage</FormLabel>
+
+                  {/* Campo para agregar una subcategoría custom */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <Input
+                      placeholder="Nueva Subcategoría"
+                      value={customSubcatInput}
+                      onChange={(e) => setCustomSubcatInput(e.target.value)}
+                      className=" text-white"
+                    />
+                    <div
+                      variant="outline"
+                      onClick={() => handleAddCustomSubcat(field)}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </div>
+                  </div>
+
+                  {/* Badges de subcategorías seleccionadas */}
+                  {field.value.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {field.value.map((subcat) => (
+                        <Badge
+                          key={subcat.id}
+                          className="bg-yellow-500 text-black hover:bg-yellow-400 cursor-pointer"
+                          onClick={() => {
+                            field.onChange(
+                              field.value.filter((v) => v.id !== subcat.id)
+                            );
+                          }}
+                        >
+                          {subcat.name}
+                          <X className="ml-1 h-3 w-3" />
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Stages */}
+            <FormField
+              control={form.control}
+              name="stages"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-yellow-500">Stages</FormLabel>
+                  {stageLoading ? <p className="text-center">Cargando</p> : stageError ? <p>Error: {stageError.message}</p> :
                     <Popover open={openStages} onOpenChange={setOpenStages}>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
                             variant="outline"
-                            role="combobox"
-                            disabled={stageLoading || stageError}
-                            className={`w-full justify-between rounded-md border border-gray-700 bg-transparent text-yellow-500 p-3 ${!field.value?.length && "text-muted-foreground"
-                              }`}
+                            className="w-full text-white border border-gray-600"
                           >
-                            {stageLoading
-                              ? "Cargando stage..."
-                              : stageError
-                                ? "Error al cargar stage"
-                                : field.value?.length > 0
-                                  ? `${field.value.length} seleccionados`
-                                  : "Seleccionar Stage"}
+                            {field.value.length > 0
+                              ? `${field.value.length} seleccionados`
+                              : "Seleccionar Productos"}
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      {!stageLoading && !stageError && (
-                        <PopoverContent className="w-full p-0 bg-black border-yellow-500">
-                          <Command className="bg-black">
-                            <CommandInput
-                              placeholder="Buscar stage..."
-                              className="text-yellow-500"
-                            />
-                            <CommandList>
-                              <CommandEmpty className="text-yellow-500">
-                                No se encontraron stage.
-                              </CommandEmpty>
-                              <CommandGroup className="max-h-64 overflow-auto">
-                                <CommandItem
-                                  onSelect={() => {
-                                    if (
-                                      field.value &&
-                                      field.value.length === allStages.length
-                                    ) {
-                                      field.onChange([]);
-                                    } else {
-                                      field.onChange(allStages.map((p) => p.id));
-                                    }
-                                  }}
-                                  className="text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-400"
+                      <PopoverContent className="p-0 bg-black border-yellow-500 w-64">
+                        <Command className="bg-black">
+                          <CommandInput
+                            placeholder="Buscar productos..."
+                            className="text-yellow-500 focus:outline-none focus:ring-0 outline-none border-0"
+                          />
+                          <CommandList>
+                            <CommandEmpty>No se encontraron resultados</CommandEmpty>
+                            <CommandGroup>
+                              {/* Seleccionar todos */}
+                              <CommandItem
+                                className="text-yellow-500 hover:bg-yellow-500/10"
+                                onSelect={() => {
+                                  if (field.value.length === allStages.length) {
+                                    field.onChange([]);
+                                  } else {
+                                    field.onChange(allStages);
+                                  }
+                                }}
+                              >
+                                <div
+                                  className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value.length === allStages.length
+                                    ? "bg-yellow-500 text-black"
+                                    : "opacity-50"
+                                    }`}
                                 >
-                                  <div
-                                    className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value &&
-                                        field.value.length === allStages.length
-                                        ? "bg-yellow-500 text-black"
-                                        : "opacity-50"
-                                      }`}
-                                  >
-                                    {field.value &&
-                                      field.value.length === allStages.length &&
-                                      "✓"}
-                                  </div>
-                                  Seleccionar Todos
-                                </CommandItem>
-                                {allStages.map((stage) => (
+                                  {field.value.length === allStages.length && "✓"}
+                                </div>
+                                Seleccionar Todos
+                              </CommandItem>
+
+                              {/* Lista de productos */}
+                              {allStages.map((prod) => {
+                                const isSelected = field.value.some(
+                                  (item) => item.id === prod.id
+                                );
+                                return (
                                   <CommandItem
-                                    key={stage.id}
+                                    key={prod.id}
                                     onSelect={() => {
-                                      const currentValues = field.value || [];
-                                      const newValues = currentValues.includes(stage.id)
-                                        ? currentValues.filter((value) => value !== stage.id)
-                                        : [...currentValues, stage.id];
+                                      const current = field.value;
+                                      let newValues;
+                                      if (isSelected) {
+                                        newValues = current.filter(
+                                          (v) => v.id !== prod.id
+                                        );
+                                      } else {
+                                        newValues = [...current, prod];
+                                      }
                                       field.onChange(newValues);
                                     }}
-                                    className="text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-400"
+                                    className="text-yellow-500 hover:bg-yellow-500/10"
                                   >
                                     <div
-                                      className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value?.includes(stage.id)
-                                          ? "bg-yellow-500 text-black"
-                                          : "opacity-50"
+                                      className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected
+                                        ? "bg-yellow-500 text-black"
+                                        : "opacity-50"
                                         }`}
                                     >
-                                      {field.value?.includes(stage.id) && "✓"}
+                                      {isSelected && "✓"}
                                     </div>
-                                    {stage.name}
+                                    {prod.name}
                                   </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      )}
-                    </Popover>
-                    {field.value?.length > 0 && (
-                      <div className="flex gap-2 flex-wrap mt-2">
-                        {field.value.map((value) => (
-                          <Badge
-                            key={value}
-                            className="bg-yellow-500 text-black hover:bg-yellow-400 cursor-pointer"
-                            onClick={() =>
-                              field.onChange(field.value.filter((v) => v !== value))
-                            }
-                          >
-                            {allStages.find((s) => s.id === value)?.name}
-                            <X className="ml-1 h-3 w-3" />
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                                );
+                              })}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>}
 
-              <Button
-                type="submit"
-                className="w-full bg-yellow-500 text-black hover:bg-yellow-400 focus:ring-yellow-500"
-              >
-                Crear
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                  {/* Campo para agregar un producto custom */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <Input
+                      placeholder="Nuevo Stage"
+                      value={customStagesInput}
+                      onChange={(e) => setCustomStagesInput(e.target.value)}
+                      className=" text-white"
+                    />
+                    <div
+                      variant="outline"
+                      onClick={() => handleAddCustomProduct(field)}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </div>
+                  </div>
 
-      {formData && (
-        <Card className="w-full max-w-md border-yellow-500 bg-black">
-          <CardContent className="pt-6">
-            <pre className="text-yellow-500 whitespace-pre-wrap">
-              {JSON.stringify(formData, null, 2)}
-            </pre>
-          </CardContent>
-        </Card>
-      )}
+                  {/* Badges de productos seleccionados */}
+                  {field.value.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {field.value.map((prod) => (
+                        <Badge
+                          key={prod.id}
+                          className="bg-yellow-500 text-black hover:bg-yellow-400 cursor-pointer"
+                          onClick={() => {
+                            field.onChange(
+                              field.value.filter((v) => v.id !== prod.id)
+                            );
+                          }}
+                        >
+                          {prod.name}
+                          <X className="ml-1 h-3 w-3" />
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* BOTÓN SUBMIT */}
+          <Button type="submit" className="bg-yellow-500 text-black w-full">
+            Crear / Guardar
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 }
 
-export default StepForm;
+export default ExampleForm;
