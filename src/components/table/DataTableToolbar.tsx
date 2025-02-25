@@ -19,16 +19,17 @@ export function DataTableToolbar<TData>({
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
-        <Input
-          placeholder="Filtrar por Nombre"
+        <input
+          placeholder="Nombre"
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
-          className="h-8 w-[150px] lg:w-[250px]"
+          className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
         />
-        <Input
-          placeholder="Filtrar por Categoría"
+
+        <input
+          placeholder="Subcategoria"
           value={
             (table
               .getColumn("challenge_subcategories")
@@ -39,20 +40,21 @@ export function DataTableToolbar<TData>({
               .getColumn("challenge_subcategories")
               ?.setFilterValue(event.target.value)
           }
-          className="h-8 w-[150px] lg:w-[250px]"
+          className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
         />
-        <Input
-          placeholder="Filtrar por Etapa"
+        <input
+          placeholder="Etapa"
           value={
             (table.getColumn("challenge_stages")?.getFilterValue() as string) ??
             ""
           }
-          onChange={(event) =>
+          onChange={(event) => {
+            const value = event.target.value;
             table
               .getColumn("challenge_stages")
-              ?.setFilterValue(event.target.value)
-          }
-          className="h-8 w-[150px] lg:w-[250px]"
+              ?.setFilterValue(value === "" ? undefined : value);
+          }}
+          className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
         />
         {isFiltered && (
           <Button
@@ -65,7 +67,9 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      <div className="z-10">
+        <DataTableViewOptions table={table} />
+      </div>{" "}
     </div>
   );
 }

@@ -229,13 +229,13 @@ export function CreateStepForm() {
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
                   <FormLabel className="text-yellow-500">Nombre</FormLabel>
                   <FormControl>
-                    <Input
+                    <input
                       {...field}
                       placeholder="Nombre del Step"
-                      className="text-white bg-black border border-gray-600"
+                      className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
                     />
                   </FormControl>
                   <FormMessage />
@@ -263,7 +263,7 @@ export function CreateStepForm() {
                           <FormControl>
                             <Button
                               variant="outline"
-                              className="w-full text-white border border-gray-600"
+                              className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
                             >
                               {field.value.length > 0
                                 ? `${field.value.length} seleccionadas`
@@ -297,9 +297,9 @@ export function CreateStepForm() {
                                 >
                                   <div
                                     className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value.length ===
-                                        allSubcategories.length
-                                        ? "bg-yellow-500 text-black"
-                                        : "opacity-50"
+                                      allSubcategories.length
+                                      ? "bg-yellow-500 text-black"
+                                      : "opacity-50"
                                       }`}
                                   >
                                     {field.value.length === allSubcategories.length &&
@@ -330,8 +330,8 @@ export function CreateStepForm() {
                                     >
                                       <div
                                         className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected
-                                            ? "bg-yellow-500 text-black"
-                                            : "opacity-50"
+                                          ? "bg-yellow-500 text-black"
+                                          : "opacity-50"
                                           }`}
                                       >
                                         {isSelected && "✓"}
@@ -349,13 +349,13 @@ export function CreateStepForm() {
 
                     {/* Campo para nueva subcategoría custom */}
                     <div className="flex items-center gap-2 mt-2">
-                      <Input
+                      <input
                         placeholder="Nueva Subcategoría"
                         value={customSubcatInput}
                         onChange={(e) => setCustomSubcatInput(e.target.value)}
-                        className="text-white"
+                        className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
                       />
-                      <div onClick={() => handleAddCustomSubcat(field)}>
+                      <div onClick={() => handleAddCustomSubcat(field)} className="cursor-pointer hover:scale-105">
                         <Plus className="w-4 h-4" />
                       </div>
                     </div>
@@ -391,6 +391,7 @@ export function CreateStepForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-yellow-500">Stages</FormLabel>
+                    <br />
                     {stageLoading ? (
                       <p className="text-center">Cargando</p>
                     ) : stageError ? (
@@ -401,7 +402,7 @@ export function CreateStepForm() {
                           <FormControl>
                             <Button
                               variant="outline"
-                              className="w-full text-white border border-gray-600"
+                              className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
                             >
                               {field.value.length > 0
                                 ? `${field.value.length} seleccionados`
@@ -434,8 +435,8 @@ export function CreateStepForm() {
                                 >
                                   <div
                                     className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value.length === allStages.length
-                                        ? "bg-yellow-500 text-black"
-                                        : "opacity-50"
+                                      ? "bg-yellow-500 text-black"
+                                      : "opacity-50"
                                       }`}
                                   >
                                     {field.value.length === allStages.length &&
@@ -468,8 +469,8 @@ export function CreateStepForm() {
                                     >
                                       <div
                                         className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected
-                                            ? "bg-yellow-500 text-black"
-                                            : "opacity-50"
+                                          ? "bg-yellow-500 text-black"
+                                          : "opacity-50"
                                           }`}
                                       >
                                         {isSelected && "✓"}
@@ -487,13 +488,13 @@ export function CreateStepForm() {
 
                     {/* Campo para nuevo stage custom */}
                     <div className="flex items-center gap-2 mt-2">
-                      <Input
+                      <input
                         placeholder="Nuevo Stage"
                         value={customStagesInput}
                         onChange={(e) => setCustomStagesInput(e.target.value)}
-                        className="text-white"
+                        className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
                       />
-                      <div onClick={() => handleAddCustomStage(field)}>
+                      <div onClick={() => handleAddCustomStage(field)} className="cursor-pointer hover:scale-105">
                         <Plus className="w-4 h-4" />
                       </div>
                     </div>

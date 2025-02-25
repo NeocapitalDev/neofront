@@ -65,7 +65,7 @@ export const getColumns = (
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
+      <DataTableColumnHeader column={column} title="Nombre" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
@@ -78,7 +78,7 @@ export const getColumns = (
   {
     accessorKey: "challenge_subcategories",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Subcategories" />
+      <DataTableColumnHeader column={column} title="Subcategorias" />
     ),
     cell: ({ row }) => {
       const subcategories = row.getValue(
@@ -95,18 +95,18 @@ export const getColumns = (
       );
     },
     filterFn: (row, id, value) => {
-      const stages = row.getValue(
+      const subcategories = row.getValue(
         "challenge_subcategories"
       ) as Challenge["challenge_subcategories"];
-      return stages.some((stage) =>
-        stage.name.toLowerCase().includes(value.toLowerCase())
+      return subcategories.some((stage) =>
+        String(stage.name).toLowerCase().includes(String(value).toLowerCase())
       );
     },
   },
   {
     accessorKey: "challenge_stages",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Stages" />
+      <DataTableColumnHeader column={column} title="Etapas" />
     ),
     cell: ({ row }) => {
       const stages = row.getValue(
@@ -133,7 +133,7 @@ export const getColumns = (
   },
   {
     id: "actions",
-    header: "Actions",
+    header: "Acciones",
     cell: ({ row }) => {
       const data = row.original;
       const step = {
@@ -150,16 +150,16 @@ export const getColumns = (
             size="icon"
             onClick={() => setIsModalOpen(true)}
           >
-            <Eye className="h-4 w-4" />
-          </Button>
-          {/* Botón de edición que invoca el callback recibido */}
-          <Button variant="ghost" size="icon" onClick={() => onEdit(data)}>
             <Pencil className="h-4 w-4" />
           </Button>
+          {/* Botón de edición que invoca el callback recibido */}
+          {/* <Button variant="ghost" size="icon" onClick={() => onEdit(data)}>
+            <Pencil className="h-4 w-4" />
+          </Button> */}
           <DetailModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
-            title={`Step Details: ${step.name}`}
+            // title={`Step Details: ${step.name}`}
             maxWidth="xl"
           >
             <StepDetails step={step} data={data} />

@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 import { UpdateStepForm } from "@/pages/prueba3/UpdateStepForm";
 
 export interface Subcategory {
@@ -31,10 +32,18 @@ interface StepDetailsProps {
 
 export function StepDetails({ step, data }: StepDetailsProps) {
   console.log(data);
+  const [newData, setnewData] = useState(null);
+  const handleEditing = (data) => {
+    setnewData(data);
+  };
   return (
-    <Card>
+    <Card className="border-0">
       <CardHeader>
-        <CardTitle>{step.name}</CardTitle>
+        {newData ? (
+          <CardTitle>{newData.name}</CardTitle>
+        ) : (
+          <CardTitle>{step.name}</CardTitle>
+        )}
         <CardDescription>Detailed information about this step</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -86,7 +95,7 @@ export function StepDetails({ step, data }: StepDetailsProps) {
           </div>
         </div> */}
 
-        <UpdateStepForm step={data} />
+        <UpdateStepForm step={data} setNewData={handleEditing} />
       </CardContent>
     </Card>
   );

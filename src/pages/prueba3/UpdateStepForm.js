@@ -30,7 +30,7 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 
-export function UpdateStepForm({ step }) {
+export function UpdateStepForm({ step, setNewData }) {
   // --- Datos desde Strapi ---
   const {
     data: subcategories,
@@ -274,6 +274,7 @@ export function UpdateStepForm({ step }) {
   // --- Manejo del submit para actualizar ---
   const handleUpdateSubmit = form.handleSubmit(async (data) => {
     setIsLoading(true);
+    setNewData(data);
     console.log("JSON final:", data);
     await updateStepWithRelations(data);
     form.reset();
@@ -308,7 +309,7 @@ export function UpdateStepForm({ step }) {
   return (
     <div className="p-4 max-w-2xl mx-auto rounded-xl border-2 border-gray-800">
       {isLoading ? (
-        <p className="text-center">Cargando...</p>
+        <p className="text-center">Cargando</p>
       ) : (
         <Form {...form}>
           <form className="space-y-4">
@@ -318,14 +319,12 @@ export function UpdateStepForm({ step }) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-yellow-500">Nombre</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Nombre del Step"
-                      className="text-white bg-black border border-gray-600"
-                    />
-                  </FormControl>
+                  <input
+                    {...field}
+                    placeholder="Nombre del Step"
+                    className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
+                  />
+
                   <FormMessage />
                 </FormItem>
               )}
