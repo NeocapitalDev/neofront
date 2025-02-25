@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { UpdateStepForm } from "@/pages/prueba3/UpdateStepForm";
 
 export interface Subcategory {
   id: string | number;
@@ -25,9 +26,11 @@ export interface Step {
 
 interface StepDetailsProps {
   step: Step;
+  data: any;
 }
 
-export function StepDetails({ step }: StepDetailsProps) {
+export function StepDetails({ step, data }: StepDetailsProps) {
+  console.log(data);
   return (
     <Card>
       <CardHeader>
@@ -36,7 +39,7 @@ export function StepDetails({ step }: StepDetailsProps) {
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Subcategories Section */}
-        <div>
+        {/* <div>
           <h3 className="text-sm font-medium text-muted-foreground mb-3">
             Subcategories
           </h3>
@@ -57,10 +60,10 @@ export function StepDetails({ step }: StepDetailsProps) {
               </Card>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Stages Section */}
-        <div>
+        {/* <div>
           <h3 className="text-sm font-medium text-muted-foreground mb-3">
             Stages
           </h3>
@@ -81,7 +84,9 @@ export function StepDetails({ step }: StepDetailsProps) {
               </Card>
             ))}
           </div>
-        </div>
+        </div> */}
+
+        <UpdateStepForm step={data} />
       </CardContent>
     </Card>
   );

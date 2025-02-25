@@ -6,9 +6,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "./DataTableColumnHeader";
 import { DetailModal } from "./DetailModal";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Eye, Pencil } from "lucide-react";
 import { useState } from "react";
 import { StepDetails } from "./StepDetails";
+
 export type Challenge = {
   id: number;
   name: string;
@@ -34,7 +35,10 @@ export type Challenge = {
   }[];
 };
 
-export const Columns: ColumnDef<Challenge>[] = [
+// Función que recibe el callback para edición y retorna el arreglo de columnas
+export const getColumns = (
+  onEdit: (row: Challenge) => void
+): ColumnDef<Challenge>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -63,15 +67,13 @@ export const Columns: ColumnDef<Challenge>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("name")}
-          </span>
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <div className="flex space-x-2">
+        <span className="max-w-[500px] truncate font-medium">
+          {row.getValue("name")}
+        </span>
+      </div>
+    ),
   },
   {
     accessorKey: "challenge_subcategories",
@@ -93,11 +95,11 @@ export const Columns: ColumnDef<Challenge>[] = [
       );
     },
     filterFn: (row, id, value) => {
-      const subcategories = row.getValue(
+      const stages = row.getValue(
         "challenge_subcategories"
       ) as Challenge["challenge_subcategories"];
-      return subcategories.some((subcategory) =>
-        subcategory.name.toLowerCase().includes(value.toLowerCase())
+      return stages.some((stage) =>
+        stage.name.toLowerCase().includes(value.toLowerCase())
       );
     },
   },
@@ -118,6 +120,14 @@ export const Columns: ColumnDef<Challenge>[] = [
             </Badge>
           ))}
         </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      const stages = row.getValue(
+        "challenge_stages"
+      ) as Challenge["challenge_stages"];
+      return stages.some((stage) =>
+        stage.name.toLowerCase().includes(value.toLowerCase())
       );
     },
   },
@@ -142,14 +152,17 @@ export const Columns: ColumnDef<Challenge>[] = [
           >
             <Eye className="h-4 w-4" />
           </Button>
-
+          {/* Botón de edición que invoca el callback recibido */}
+          <Button variant="ghost" size="icon" onClick={() => onEdit(data)}>
+            <Pencil className="h-4 w-4" />
+          </Button>
           <DetailModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             title={`Step Details: ${step.name}`}
             maxWidth="xl"
           >
-            <StepDetails step={step} />
+            <StepDetails step={step} data={data} />
           </DetailModal>
         </>
       );
