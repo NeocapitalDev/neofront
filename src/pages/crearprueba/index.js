@@ -26,33 +26,36 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+// Validación
 const nameSchema = z.object({
   name: z.string().nonempty("El nombre es requerido"),
 });
 
 export default function IndexPage() {
+  // Datos
   const [subcats, setSubcats] = useState([]);
   const [products, setProducts] = useState([]);
   const [stages, setStages] = useState([]);
 
   // Modal
   const [openModal, setOpenModal] = useState(false);
-  // "subcategory" | "product" | "stage"
   const [currentTable, setCurrentTable] = useState(null);
-  // Guardamos docId y name para editar
   const [editItem, setEditItem] = useState(null);
 
+  // Un solo pageSize para las 3 tablas
+  const [pageSize, setPageSize] = useState(10);
+
+  // Form
   const form = useForm({
     resolver: zodResolver(nameSchema),
     defaultValues: { name: "" },
   });
 
-  // ------------------------------
+  // -------------------------------------
   // 1. Helpers de Strapi
-  // ------------------------------
+  // -------------------------------------
   async function fetchStrapiData(endpoint) {
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${endpoint}`;
-    console.log("[fetchStrapiData] GET =>", url);
     const res = await fetch(url, {
       headers: {
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
@@ -60,16 +63,16 @@ export default function IndexPage() {
       cache: "no-store",
     });
     if (!res.ok) {
-      throw new Error(`Error al obtener datos de ${endpoint}: ${res.status} ${res.statusText}`);
+      throw new Error(
+        `Error al obtener datos de ${endpoint}: ${res.status} ${res.statusText}`
+      );
     }
     const json = await res.json();
-    console.log("[fetchStrapiData] RESPONSE =>", json);
     return json.data;
   }
 
   async function createStrapiItem(endpoint, payload) {
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${endpoint}`;
-    console.log("[createStrapiItem] POST =>", url, payload);
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -79,17 +82,15 @@ export default function IndexPage() {
       body: JSON.stringify({ data: payload }),
     });
     if (!res.ok) {
-      throw new Error(`Error al crear en ${endpoint}: ${res.status} ${res.statusText}`);
+      throw new Error(
+        `Error al crear en ${endpoint}: ${res.status} ${res.statusText}`
+      );
     }
-    const json = await res.json();
-    console.log("[createStrapiItem] CREATED =>", json);
-    return json;
+    return res.json();
   }
 
-  // NOTA: idOrDoc es el param que usaremos, sea docId o id
   async function updateStrapiItem(endpoint, idOrDoc, payload) {
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${endpoint}/${idOrDoc}`;
-    console.log("[updateStrapiItem] PUT =>", url, payload);
     const res = await fetch(url, {
       method: "PUT",
       headers: {
@@ -103,14 +104,12 @@ export default function IndexPage() {
         `Error al actualizar en ${endpoint}/${idOrDoc}: ${res.status} ${res.statusText}`
       );
     }
-    const json = await res.json();
-    console.log("[updateStrapiItem] UPDATED =>", json);
-    return json;
+    return res.json();
   }
 
-  // ------------------------------
-  // 2. Cargar datos al montar
-  // ------------------------------
+  // -------------------------------------
+  // 2. Cargar datos
+  // -------------------------------------
   useEffect(() => {
     const loadAll = async () => {
       try {
@@ -120,11 +119,10 @@ export default function IndexPage() {
           fetchStrapiData("challenge-stages"),
         ]);
 
-        // Mapeamos { id, documentId, name }
         setSubcats(
           scData.map((item) => ({
             id: item.id,
-            documentId: item.documentId, // UID
+            documentId: item.documentId,
             name: item.name,
           }))
         );
@@ -149,9 +147,9 @@ export default function IndexPage() {
     loadAll();
   }, []);
 
-  // ------------------------------
+  // -------------------------------------
   // 3. Crear / Editar
-  // ------------------------------
+  // -------------------------------------
   function handleOpenCreate(table) {
     setCurrentTable(table);
     setEditItem(null);
@@ -161,9 +159,8 @@ export default function IndexPage() {
 
   function handleOpenEdit(table, item) {
     setCurrentTable(table);
-    // Guardamos docId (UID) y name
     setEditItem({
-      docId: item.documentId, // este es el UID que usaremos en la ruta
+      docId: item.documentId, // si usas UID
       name: item.name,
     });
     form.reset({ name: item.name });
@@ -180,7 +177,7 @@ export default function IndexPage() {
 
     try {
       if (editItem) {
-        // Editar con docId (UID) en la ruta
+        // Editar con docId (UID) o id
         await updateStrapiItem(endpoint, editItem.docId, payload);
       } else {
         // Crear
@@ -188,13 +185,14 @@ export default function IndexPage() {
       }
       setOpenModal(false);
 
-      // Refrescar data
+      // Refrescar
       const newData = await fetchStrapiData(endpoint);
       const mapped = newData.map((item) => ({
         id: item.id,
         documentId: item.documentId,
         name: item.name,
       }));
+
       if (currentTable === "subcategory") setSubcats(mapped);
       if (currentTable === "product") setProducts(mapped);
       if (currentTable === "stage") setStages(mapped);
@@ -204,49 +202,65 @@ export default function IndexPage() {
     }
   }
 
-  // ------------------------------
+  // -------------------------------------
   // 4. Render
-  // ------------------------------
+  // -------------------------------------
   return (
-    <div className="p-4 space-y-8">
-      {/* Ejemplo de 3 tablas en horizontal */}
-      <div className="flex gap-4">
-        {/* Subcategory */}
-        <div className="w-1/3">
-          <ChallengeTable
-            title="Challenge Subcategory"
-            data={subcats}
-            onCreate={() => handleOpenCreate("subcategory")}
-            onEdit={(item) => handleOpenEdit("subcategory", item)}
-          />
-        </div>
-
-        {/* Product */}
-        <div className="w-1/3">
-          <ChallengeTable
-            title="Challenge Product"
-            data={products}
-            onCreate={() => handleOpenCreate("product")}
-            onEdit={(item) => handleOpenEdit("product", item)}
-          />
-        </div>
-
-        {/* Stage */}
-        <div className="w-1/3">
-          <ChallengeTable
-            title="Challenge Stage"
-            data={stages}
-            onCreate={() => handleOpenCreate("stage")}
-            onEdit={(item) => handleOpenEdit("stage", item)}
-          />
+    <div className="p-2 space-y-4 bg-black min-h-screen text-white">
+      {/* Barra superior con Rows per page */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+        <h1 className="text-base sm:text-lg md:text-xl font-bold text-yellow-400">
+          Administración de Challenges
+        </h1>
+        <div className="flex items-center space-x-2">
+          <span className="text-gray-300 text-sm">Rows per page:</span>
+          <select
+            value={pageSize}
+            onChange={(e) => setPageSize(Number(e.target.value))}
+            className="bg-zinc-800 border border-zinc-700 rounded px-10 py-1 text-white text-sm"
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+          </select>
         </div>
       </div>
 
-      {/* Modal para Crear/Editar */}
+      {/* Grid responsivo */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Subcategory */}
+        <ChallengeTable
+          title="Challenge Subcategory"
+          data={subcats}
+          pageSize={pageSize}
+          onCreate={() => handleOpenCreate("subcategory")}
+          onEdit={(item) => handleOpenEdit("subcategory", item)}
+        />
+
+        {/* Product */}
+        <ChallengeTable
+          title="Challenge Product"
+          data={products}
+          pageSize={pageSize}
+          onCreate={() => handleOpenCreate("product")}
+          onEdit={(item) => handleOpenEdit("product", item)}
+        />
+
+        {/* Stage */}
+        <ChallengeTable
+          title="Challenge Stage"
+          data={stages}
+          pageSize={pageSize}
+          onCreate={() => handleOpenCreate("stage")}
+          onEdit={(item) => handleOpenEdit("stage", item)}
+        />
+      </div>
+
+      {/* Modal */}
       <Dialog open={openModal} onOpenChange={setOpenModal}>
-        <DialogContent className="bg-black text-white border border-yellow-500">
+        <DialogContent className="bg-black text-white border border-yellow-500 max-w-md mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-yellow-400">
+            <DialogTitle className="text-yellow-400 text-sm sm:text-base md:text-lg">
               {editItem ? "Editar" : "Crear"}{" "}
               {currentTable === "subcategory"
                 ? "Subcategory"
@@ -254,7 +268,7 @@ export default function IndexPage() {
                 ? "Product"
                 : "Stage"}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm md:text-base">
               {editItem
                 ? "Modifica el nombre y confirma para guardar cambios."
                 : "Ingresa el nombre para crear un nuevo registro."}
@@ -262,18 +276,23 @@ export default function IndexPage() {
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-3 mt-3"
+            >
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-yellow-500">Nombre</FormLabel>
+                    <FormLabel className="text-yellow-500 text-sm">
+                      Nombre
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Nombre"
-                        className="bg-transparent border border-gray-700 text-white"
+                        className="bg-transparent border border-gray-700 text-white text-sm"
                       />
                     </FormControl>
                     <FormMessage />
@@ -281,17 +300,18 @@ export default function IndexPage() {
                 )}
               />
 
-              <DialogFooter>
+              <DialogFooter className="mt-2">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setOpenModal(false)}
+                  className="px-3 py-1 text-sm"
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-yellow-500 text-black hover:bg-yellow-400"
+                  className="bg-yellow-500 text-black hover:bg-yellow-400 px-3 py-1 text-sm"
                 >
                   {editItem ? "Guardar" : "Crear"}
                 </Button>

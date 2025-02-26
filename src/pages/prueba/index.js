@@ -1,83 +1,97 @@
-"use client"
+"use client";
 
-import { useState, useEffect, use } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
-import { type } from "os"
+import { useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+
 export default function Interfaz() {
-    const [categories, setCategories] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
-    const [selectedPlan, setSelectedPlan] = useState(null)
-    const [selectedType, setSelectedType] = useState(null)
-    const [selectedAmount, setSelectedAmount] = useState("10k")
-    const [types, setTypes] = useState([])
-    const [products, setProducts] = useState([])
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [selectedPlan, setSelectedPlan] = useState(null);
+    const [selectedType, setSelectedType] = useState(null);
+    const [selectedAmount, setSelectedAmount] = useState("10k");
+    const [types, setTypes] = useState([]);
+    const [products, setProducts] = useState([]);
+
+    // Cuando cambie el plan, ajustamos "types" según el plan seleccionado
     useEffect(() => {
-        const types = categories.find((p) => p.id === selectedPlan)?.type || []
-        setTypes(types)
-    }, [selectedPlan])
-    console.log("products", categories)
-    console.log("selectedPlan", selectedPlan)
-    console.log("selectedType", selectedType)
-    console.log("selectedAmount", selectedAmount)
-    console.log("types", types.length)
+        const foundTypes = categories.find((p) => p.id === selectedPlan)?.type || [];
+        setTypes(foundTypes);
+    }, [selectedPlan, categories]);
+
     useEffect(() => {
         async function fetchCategories() {
             try {
-                const response = await fetch("http://localhost:1337/api/categories?populate=*", {
-                    headers: {
-                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-                    },
-                })
+                // Reemplazamos "categories" => "challenge-subcategories"
+                const response = await fetch(
+                    "http://localhost:1337/api/challenge-subcategories?populate=*",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+                        },
+                    }
+                );
                 if (!response.ok) {
-                    throw new Error("Error al obtener los productos")
+                    throw new Error("Error al obtener subcategorías (challenge-subcategories)");
                 }
-                const data = await response.json()
-                setCategories(data.data)
-                // Establecer selecciones iniciales
+                const data = await response.json();
+                setCategories(data.data);
+                // Establecer plan inicial si hay datos
                 if (data.data.length > 0) {
-                    setSelectedPlan(data.data[0].id)
+                    setSelectedPlan(data.data[0].id);
                 }
             } catch (err) {
-                setError(err.message)
+                setError(err.message);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         }
+
         async function fetchProducts() {
             try {
-                const response = await fetch("http://localhost:1337/api/products?populate=*", {
-                    headers: {
-                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-                    },
-                })
+                // Reemplazamos "products" => "challenge-products"
+                const response = await fetch(
+                    "http://localhost:1337/api/challenge-products?populate=*",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+                        },
+                    }
+                );
                 if (!response.ok) {
-                    throw new Error("Error al obtener los productos")
+                    throw new Error("Error al obtener los productos (challenge-products)");
                 }
-                const data = await response.json()
-                setProducts(data.data) //5k, 10k, 25k, 50k, 100k
+                const data = await response.json();
+                setProducts(data.data); // 5k, 10k, 25k, 50k, 100k
             } catch (err) {
-                setError(err.message)
+                setError(err.message);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         }
 
-        fetchCategories()
-        fetchProducts()
+        fetchCategories();
+        fetchProducts();
+    }, []);
 
-    }, [])
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                Cargando...
+            </div>
+        );
+    }
+    if (error) {
+        return (
+            <div className="flex items-center justify-center min-h-screen text-red-500">
+                {error}
+            </div>
+        );
+    }
 
-
-    // Encontrar las subcategorías del plan seleccionado
-    // const currentSubcategories = products.find((p) => p.id === selectedPlan)?.subcategories || []
-
-
-    if (loading) return <div className="flex items-center justify-center min-h-screen">Cargando...</div>
-    if (error) return <div className="flex items-center justify-center min-h-screen text-red-500">{error}</div>
-
+    // Render principal
     return (
         <div className="min-h-screen bg-black p-6 md:p-12">
             <div className="max-w-6xl mx-auto space-y-8">
@@ -91,7 +105,7 @@ export default function Interfaz() {
                                 "px-6 py-2 rounded-full transition-all",
                                 selectedPlan === plan.id
                                     ? "bg-[var(--app-primary)] text-black font-bold"
-                                    : "bg-zinc-900 text-white hover:bg-zinc-800",
+                                    : "bg-zinc-900 text-white hover:bg-zinc-800"
                             )}
                         >
                             {plan.name}
@@ -103,7 +117,7 @@ export default function Interfaz() {
                 <div className="flex justify-center gap-2 flex-wrap">
                     {categories
                         .find((p) => p.id === selectedPlan)
-                        ?.subcategories.map((type) => (
+                        ?.subcategories?.map((type) => (
                             <button
                                 key={type.id}
                                 onClick={() => setSelectedType(type.id)}
@@ -111,11 +125,14 @@ export default function Interfaz() {
                                     "px-6 py-2 rounded-full transition-all flex items-center gap-2",
                                     selectedType === type.id
                                         ? "bg-yellow-400 text-black font-bold"
-                                        : "bg-zinc-900 text-white hover:bg-zinc-800",
+                                        : "bg-zinc-900 text-white hover:bg-zinc-800"
                                 )}
                             >
                                 {type.name}
-                                <Badge variant="secondary" className="bg-red-500 text-white">
+                                <Badge
+                                    variant="secondary"
+                                    className="bg-red-500 text-white"
+                                >
                                     Limited time
                                 </Badge>
                             </button>
@@ -130,9 +147,9 @@ export default function Interfaz() {
                             onClick={() => setSelectedAmount(amount.id)}
                             className={cn(
                                 "px-6 py-2 rounded-full transition-all",
-                                selectedAmount.id === amount.id
+                                selectedAmount === amount.id
                                     ? "bg-yellow-400 text-black font-bold"
-                                    : "bg-zinc-900 text-white hover:bg-zinc-800",
+                                    : "bg-zinc-900 text-white hover:bg-zinc-800"
                             )}
                         >
                             ${amount.name}
@@ -143,9 +160,14 @@ export default function Interfaz() {
                 {/* Trading Cards */}
                 <div className={`grid grid-cols-${types.length} gap-4 w-full`}>
                     {types.map((level) => (
-                        <Card key={level.id} className="bg-zinc-900 border-zinc-800 text-white">
+                        <Card
+                            key={level.id}
+                            className="bg-zinc-900 border-zinc-800 text-white"
+                        >
                             <CardHeader>
-                                <CardTitle className="text-lg text-yellow-400">Evaluation Stage</CardTitle>
+                                <CardTitle className="text-lg text-yellow-400">
+                                    Evaluation Stage
+                                </CardTitle>
                                 <h3 className="text-2xl font-bold">{level.titulo}</h3>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -163,7 +185,11 @@ export default function Interfaz() {
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-zinc-400">Profit Target</span>
-                                    <span className="font-bold">{level.titulo === "Student" ? "$800 (8%)" : "$500 (5%)"}</span>
+                                    <span className="font-bold">
+                                        {level.titulo === "Student"
+                                            ? "$800 (8%)"
+                                            : "$500 (5%)"}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-zinc-400">Leverage</span>
@@ -174,7 +200,6 @@ export default function Interfaz() {
                     ))}
                 </div>
             </div>
-        </div >
-    )
+        </div>
+    );
 }
-
