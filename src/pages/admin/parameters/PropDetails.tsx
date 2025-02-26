@@ -118,7 +118,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
 
   const inputDarkClasses =
-    "dark:bg-zinc-800 dark:text-white dark:border-gray-600 p-1 rounded w-full";
+    "dark:bg-zinc-900 dark:text-white dark:border-gray-600 p-1 rounded w-full";
 
   return (
     <div className="flex gap-4 justify-center ">
@@ -148,7 +148,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                               <div>
                                 <p className="font-medium">{editableProp.challenge_subcategory?.name}</p>
 
-                                <Button variant="destructive" className="absolute -mx-4" size="icon" onClick={() => changeSubcategory(null)}>
+                                <Button variant="destructive" className="absolute -mt-7 ml-40" size="sm"  onClick={() => changeSubcategory(null)}>
                                   -
                                 </Button>
                               </div>
@@ -261,7 +261,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                               <div>
                                 <p className="font-medium">{product.name}</p>
 
-                                <Button variant="destructive" className="absolute -mx-4" size="icon" onClick={() => removeProduct(product.id)}>
+                                <Button variant="destructive" className="absolute -mt-7 ml-12" size="sm"  onClick={() => removeProduct(product.id)}>
                                   -
                                 </Button>
                               </div>
@@ -323,7 +323,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                                   <div>
                                     <p className="font-medium">{product.name}</p>
 
-                                    <Button variant="default" className="absolute -mx-4" size="icon" onClick={() => addProduct(product)}>
+                                    <Button variant="default" className="absolute -mt-7 ml-10" size="sm"  onClick={() => addProduct(product)}>
                                       +
                                     </Button>
                                   </div>
@@ -383,7 +383,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
                                     <p className="font-medium">{subcategory.name}</p>
 
-                                    <Button variant="default" className="absolute " size="icon" onClick={() => changeSubcategory(subcategory)}>
+                                    <Button variant="default" className="absolute -mt-7 ml-12" size="sm" onClick={() => changeSubcategory(subcategory)}>
                                       +
                                     </Button>
                                   </div>
