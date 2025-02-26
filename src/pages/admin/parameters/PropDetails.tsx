@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button"; // Assuming you have a Button component
-import { useStrapiData } from "../../services/strapiService";
+import { useStrapiData } from "../../../services/strapiService";
 
 export interface Challenge_products {
   id: string | number;
@@ -89,8 +89,8 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
   };
 
   const handleSave = async () => {
-    console.log("Datos a enviar:", editableProp);
-  
+    console.log("Datos a enviar:", { data: editableProp });
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations-stages/${editableProp.documentId}/update-with-relations`,
@@ -100,32 +100,31 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
           },
-          body: JSON.stringify(editableProp), // Envía el JSON actualizado
+          body: JSON.stringify({ data: editableProp }), // Envía el JSON actualizado
         }
       );
-  
+
       if (!response.ok) {
         throw new Error(`Error en la actualización: ${response.statusText}`);
       }
-  
+
       const data = await response.json();
       console.log("Respuesta del servidor:", data);
-      alert("Datos guardados exitosamente!");
     } catch (error) {
       console.error("Error al guardar los datos:", error);
       alert("Hubo un error al guardar.");
     }
   };
-  
+
 
   const inputDarkClasses =
-    "dark:bg-zinc-800 dark:text-white dark:border-gray-600 p-1 rounded w-full";
+    "dark:bg-zinc-900 dark:text-white dark:border-gray-600 p-1 rounded w-full";
 
   return (
-    <div className="flex gap-4 ">
+    <div className="flex gap-4 justify-center ">
       <Card >
 
-        <CardContent className="space-y-6 ">
+        <CardContent className="space-y-6 w-full ">
 
 
 
@@ -138,45 +137,34 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                 <Badge>Subcategoria</Badge>
               </h3>
               <div className="grid grid-cols-1 gap-2">
-                <Card key={editableProp.challenge_subcategory?.id}>
-                  <CardContent className="p-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">
-                          {modalType === 2 ? (
-                            <div>
-                              <input
-                                type="text"
-                                readOnly
-                                name="challenge_subcategory.name"
-                                value={editableProp.challenge_subcategory?.name}
-                                onChange={(e) => {
-                                  setEditableProp((prev) => ({
-                                    ...prev,
-                                    challenge_subcategory: {
-                                      ...prev.challenge_subcategory,
-                                      name: e.target.value,
-                                    },
-                                  }));
-                                }}
-                                className={inputDarkClasses}
-                              />
-                              <Button variant="destructive" size="icon" onClick={() => changeSubcategory({ id: 0, name: "" })}>
-                                -
-                              </Button>
-                            </div>
+                {editableProp.challenge_subcategory && editableProp.challenge_subcategory.name ? (
 
-                          ) : (
-                            prop.challenge_subcategory?.name
-                          )}
-                        </p>
-                        {/* <p className="text-sm text-muted-foreground">
+                  <Card key={editableProp.challenge_subcategory?.id}>
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">
+                            {modalType === 2 ? (
+                              <div>
+                                <p className="font-medium">{editableProp.challenge_subcategory?.name}</p>
+
+                                <Button variant="destructive" className="absolute -mt-7 ml-40" size="sm"  onClick={() => changeSubcategory(null)}>
+                                  -
+                                </Button>
+                              </div>
+
+                            ) : (
+                              prop.challenge_subcategory.name
+                            )}
+                          </p>
+                          {/* <p className="text-sm text-muted-foreground">
                         ID: {prop.challenge_subcategory?.id}
                       </p> */}
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                ) : null}
               </div>
 
               <CardHeader>
@@ -271,22 +259,9 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                           <p className="font-medium">
                             {modalType === 2 ? (
                               <div>
-                                <input
-                                  type="text"
-                                  readOnly
-                                  name={`challenge_products[${index}].name`}
-                                  value={product.name}
-                                  onChange={(e) => {
-                                    const newProducts = [...editableProp.challenge_products];
-                                    newProducts[index].name = e.target.value;
-                                    setEditableProp((prev) => ({
-                                      ...prev,
-                                      challenge_products: newProducts,
-                                    }));
-                                  }}
-                                  className={inputDarkClasses}
-                                />
-                                <Button variant="destructive" size="icon" onClick={() => removeProduct(product.id)}>
+                                <p className="font-medium">{product.name}</p>
+
+                                <Button variant="destructive" className="absolute -mt-7 ml-12" size="sm"  onClick={() => removeProduct(product.id)}>
                                   -
                                 </Button>
                               </div>
@@ -335,7 +310,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
                 <div className="flex-[1] mt-6">
                   <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                    <Badge variant="secondary">Productos disponibles</Badge>
+                    <Badge className="bg-amber-200 text-black">Productos disponibles</Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
                     {productavailable?.map((product, index) => (
@@ -346,22 +321,9 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                               <p className="font-medium">
                                 {modalType === 2 ? (
                                   <div>
-                                    <input
-                                      type="text"
-                                      readOnly
-                                      name={`challenge_products[${index}].name`}
-                                      value={product.name}
-                                      // onChange={(e) => {
-                                      //   const newProducts = [...editableProp.challenge_products];
-                                      //   newProducts[index].name = e.target.value;
-                                      //   setEditableProp((prev) => ({
-                                      //     ...prev,
-                                      //     challenge_products: newProducts,
-                                      //   }));
-                                      // }}
-                                      className={inputDarkClasses}
-                                    />
-                                    <Button variant="default" size="icon" onClick={() => addProduct(product)}>
+                                    <p className="font-medium">{product.name}</p>
+
+                                    <Button variant="default" className="absolute -mt-7 ml-10" size="sm"  onClick={() => addProduct(product)}>
                                       +
                                     </Button>
                                   </div>
@@ -406,7 +368,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
                 <div className="flex-[1] mt-6">
                   <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                    <Badge variant="secondary">Subcategorias disponibles</Badge>
+                    <Badge  className="bg-amber-200 text-black">Subcategorias disponibles</Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
                     {subcategoriesavailable?.map((subcategory, index) => (
@@ -419,22 +381,9 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
                                   <div>
 
-                                    <input
-                                      type="text"
-                                      readOnly
-                                      name={`challenge_products[${index}].name`}
-                                      value={subcategory.name}
-                                      // onChange={(e) => {
-                                      //   const newProducts = [...editableProp.challenge_products];
-                                      //   newProducts[index].name = e.target.value;
-                                      //   setEditableProp((prev) => ({
-                                      //     ...prev,
-                                      //     challenge_products: newProducts,
-                                      //   }));
-                                      // }}
-                                      className={inputDarkClasses}
-                                    />
-                                    <Button variant="default" size="icon" onClick={() => changeSubcategory(subcategory)}>
+                                    <p className="font-medium">{subcategory.name}</p>
+
+                                    <Button variant="default" className="absolute -mt-7 ml-12" size="sm" onClick={() => changeSubcategory(subcategory)}>
                                       +
                                     </Button>
                                   </div>

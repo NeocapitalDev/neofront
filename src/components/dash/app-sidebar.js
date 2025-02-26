@@ -104,7 +104,13 @@ export function AppSidebar({ ...props }) {
       url: "/admin/manager",
       icon: Activity,
       isActive: false,
-    }
+    },
+    {
+      title: "Parameters",
+      url: "/admin/parameters",
+      icon: Activity,
+      isActive: false,
+    },
 
 
   ];

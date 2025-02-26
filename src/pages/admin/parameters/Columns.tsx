@@ -165,7 +165,7 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             title={`Details ${prop.challenge_subcategory?.name}`}
-            maxWidth="2xl"
+            maxWidth="3xl"
           >
             <PropDetails prop={prop} modalType={modalType} />
           </DetailModal>
