@@ -1,14 +1,14 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { stepFormSchema } from "../../lib/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { X, Plus } from "lucide-react";
 import { useStrapiData } from "../../services/strapiService";
-import { Card } from "@/components/ui/card";
 import {
   Form,
   FormField,
@@ -31,22 +31,18 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 
-export function CreateStepForm() {
+export function UpdateStepFormC({ step, setNewData }) {
   // --- Datos desde Strapi ---
   const {
     data: subcategories,
     error: subError,
     isLoading: subLoading,
-  } = useStrapiData(
-    "challenge-subcategories?filters[challenge_step][$null]=true"
-  );
+  } = useStrapiData("challenge-subcategories?filters[challenge_step][$null]=true");
   const {
     data: stageData,
     error: stageError,
     isLoading: stageLoading,
-  } = useStrapiData(
-    "challenge-stages?filters[challenge_steps][$null]=true"
-  );
+  } = useStrapiData("challenge-stages?filters[challenge_steps][$null]=true");
 
   const subcategoriesData = subcategories
     ? subcategories
@@ -63,8 +59,6 @@ export function CreateStepForm() {
   const [openSubcat, setOpenSubcat] = useState(false);
   const [openStages, setOpenStages] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Estados para agregar nuevos elementos custom
   const [customSubcategories, setCustomSubcategories] = useState([]);
   const [customSubcatInput, setCustomSubcatInput] = useState("");
   const [customStages, setCustomStages] = useState([]);
@@ -73,133 +67,90 @@ export function CreateStepForm() {
   const allSubcategories = [...subcategoriesData, ...customSubcategories];
   const allStages = [...(stageData || []), ...customStages];
 
-  // --- useForm ---
+  // --- useForm: se inicializa con los valores del step a actualizar ---
   const form = useForm({
     resolver: zodResolver(stepFormSchema),
     defaultValues: {
-      documentId: "",
-      name: "",
-      subcategories: [],
-      stages: [],
+      documentId: step?.documentId || "",
+      name: step?.name || "",
+      subcategories: step?.challenge_subcategories
+        ? step.challenge_subcategories.map(({ id, documentId, name }) => ({
+          id,
+          documentId,
+          name,
+        }))
+        : [],
+      stages: step?.challenge_stages
+        ? step.challenge_stages.map(({ id, documentId, name }) => ({
+          id,
+          documentId,
+          name,
+        }))
+        : [],
     },
   });
 
-  // --- Función para crear el Step y sus relaciones ---
-  const createStepWithRelations = async (stepPayload) => {
-    try {
-      // Crear el challenge step
-      const stepResponse = await fetch(
-        "http://localhost:1337/api/challenge-steps",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-          },
-          body: JSON.stringify({ data: { name: stepPayload.name } }),
-        }
-      );
-      const stepResult = await stepResponse.json();
-      console.log("Challenge Step creado:", stepResult);
-      const stepId = stepResult.data.documentId;
-
-      // Crear o asociar subcategorías
-      for (const subcat of stepPayload.subcategories) {
-        if (typeof subcat.id === "string" && subcat.id.startsWith("custom")) {
-          // Crear subcategoría nueva
-          const newSubcatResponse = await fetch(
-            "http://localhost:1337/api/challenge-subcategories",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-              },
-              body: JSON.stringify({
-                data: { name: subcat.name, challenge_step: stepId },
-              }),
-            }
-          );
-          const newSubcat = await newSubcatResponse.json();
-          console.log("Subcategoría creada:", newSubcat);
-        } else {
-          // Asociar subcategoría existente
-          await fetch(
-            `http://localhost:1337/api/challenge-subcategories/${subcat.documentId}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-              },
-              body: JSON.stringify({
-                data: { challenge_step: stepId },
-              }),
-            }
-          );
-        }
-      }
-
-      // Crear o asociar stages
-      for (const stage of stepPayload.stages) {
-        if (typeof stage.id === "string" && stage.id.startsWith("custom")) {
-          // Crear stage nuevo
-          const newStageResponse = await fetch(
-            "http://localhost:1337/api/challenge-stages",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-              },
-              body: JSON.stringify({
-                data: { name: stage.name, challenge_steps: stepId },
-              }),
-            }
-          );
-          const newStage = await newStageResponse.json();
-          console.log("Stage creado:", newStage);
-        } else {
-          // Asociar stage existente
-          await fetch(
-            `http://localhost:1337/api/challenge-stages/${stage.documentId}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-              },
-              body: JSON.stringify({
-                data: { challenge_steps: stepId },
-              }),
-            }
-          );
-        }
-      }
-      console.log("Challenge Step y relaciones creados correctamente.");
-    } catch (error) {
-      console.error("Error al crear el challenge step y sus relaciones:", error);
+  // Actualizar valores cuando "step" cambie
+  useEffect(() => {
+    if (step) {
+      const defaultValues = {
+        documentId: step.documentId || "",
+        name: step.name || "",
+        subcategories: step.challenge_subcategories
+          ? step.challenge_subcategories.map(({ id, documentId, name }) => ({
+            id,
+            documentId,
+            name,
+          }))
+          : [],
+        stages: step.challenge_stages
+          ? step.challenge_stages.map(({ id, documentId, name }) => ({
+            id,
+            documentId,
+            name,
+          }))
+          : [],
+      };
+      form.reset(defaultValues);
+      setCustomSubcategories(defaultValues.subcategories);
+      setCustomStages(defaultValues.stages);
     }
+  }, [step, form]);
+
+  // --- Función para actualizar el Step y sus relaciones ---
+  const updateStepWithRelations = async (stepPayload) => {
+    console.log("Payload recibido:", stepPayload);
+    const { documentId } = stepPayload;
+    fetch(`http://localhost:1337/api/challenge-steps/${documentId}/update-with-relations`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+      },
+      body: JSON.stringify(stepPayload)
+    })
+      .then(response => response.json())
+      .then(data => console.log('Step actualizado:', data))
+      .catch(error => console.error('Error al actualizar el step:', error));
   };
 
-  // --- Manejo del submit para crear ---
-  const handleCreateSubmit = form.handleSubmit(async (data) => {
+  // --- Manejo del submit para actualizar ---
+  const handleUpdateSubmit = form.handleSubmit(async (data) => {
     setIsLoading(true);
-    // Nos aseguramos de que no exista un documentId
-    data.documentId = "";
+    setNewData(data);
     console.log("JSON final:", data);
-    await createStepWithRelations(data);
+    await updateStepWithRelations(data);
     form.reset();
     setCustomSubcategories([]);
     setCustomStages([]);
     setIsLoading(false);
   });
 
-  // --- Handlers para agregar nuevos items custom ---
+  // --- Handlers para agregar items custom ---
   const handleAddCustomSubcat = (field) => {
     if (!customSubcatInput.trim()) return;
     const newSubcat = {
-      id: `custom-${Date.now()}`,
+      // id: `custom-${Date.now()}`,
       name: customSubcatInput.trim(),
     };
     setCustomSubcategories((prev) => [...prev, newSubcat]);
@@ -210,7 +161,7 @@ export function CreateStepForm() {
   const handleAddCustomStage = (field) => {
     if (!customStagesInput.trim()) return;
     const newStage = {
-      id: `custom-${Date.now()}`,
+      // id: `custom-${Date.now()}`,
       name: customStagesInput.trim(),
     };
     setCustomStages((prev) => [...prev, newStage]);
@@ -231,7 +182,7 @@ export function CreateStepForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-yellow-500 text-lg">Nombre</FormLabel>
+                  <FormLabel className="text-yellow-500 text-lg">Nombrec</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -522,8 +473,8 @@ export function CreateStepForm() {
             </div>
 
             {/* Submit Button */}
-            <Button onClick={handleCreateSubmit} className="w-full bg-yellow-500 text-black hover:bg-yellow-400">
-              Crear
+            <Button onClick={handleUpdateSubmit} className="w-full bg-yellow-500 text-black hover:bg-yellow-400">
+              Actualizar
             </Button>
           </form>
         </Form>

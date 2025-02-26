@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { stepFormSchema } from "./schemas";
+import { stepFormSchema } from "../../lib/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 // import { Badge } from "@/components/ui/badge";
@@ -612,7 +612,7 @@ export function UpdateStepForm({ step, setNewData }) {
 
             {/* Submit Button */}
             <Button onClick={handleUpdateSubmit} className="w-full bg-yellow-500 text-black hover:bg-yellow-400">
-              Crear
+              Actualizar
             </Button>
           </form>
         </Form>

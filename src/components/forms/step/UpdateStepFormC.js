@@ -1,14 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { stepFormSchema } from "../../lib/schemas";
+import { stepFormSchema } from "../../../lib/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { X, Plus } from "lucide-react";
-import { useStrapiData } from "../../services/strapiService";
 import { Card } from "@/components/ui/card";
+import { X, Plus } from "lucide-react";
+import { useStrapiData } from "../../../services/strapiService";
 import {
   Form,
   FormField,
@@ -31,7 +30,7 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 
-export function CreateStepForm() {
+export function UpdateStepFormC({ step }) {
   // --- Datos desde Strapi ---
   const {
     data: subcategories,
@@ -44,9 +43,7 @@ export function CreateStepForm() {
     data: stageData,
     error: stageError,
     isLoading: stageLoading,
-  } = useStrapiData(
-    "challenge-stages?filters[challenge_steps][$null]=true"
-  );
+  } = useStrapiData("challenge-stages?filters[challenge_steps][$null]=true");
 
   const subcategoriesData = subcategories
     ? subcategories
@@ -63,8 +60,6 @@ export function CreateStepForm() {
   const [openSubcat, setOpenSubcat] = useState(false);
   const [openStages, setOpenStages] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Estados para agregar nuevos elementos custom
   const [customSubcategories, setCustomSubcategories] = useState([]);
   const [customSubcatInput, setCustomSubcatInput] = useState("");
   const [customStages, setCustomStages] = useState([]);
@@ -73,129 +68,104 @@ export function CreateStepForm() {
   const allSubcategories = [...subcategoriesData, ...customSubcategories];
   const allStages = [...(stageData || []), ...customStages];
 
-  // --- useForm ---
+  // --- useForm: se inicializa con los valores del step a actualizar ---
   const form = useForm({
     resolver: zodResolver(stepFormSchema),
     defaultValues: {
-      documentId: "",
-      name: "",
-      subcategories: [],
-      stages: [],
+      documentId: step?.documentId || "",
+      name: step?.name || "",
+      subcategories: step?.challenge_subcategories
+        ? step.challenge_subcategories.map(({ id, documentId, name }) => ({
+          id,
+          documentId,
+          name,
+        }))
+        : [],
+      stages: step?.challenge_stages
+        ? step.challenge_stages.map(({ id, documentId, name }) => ({
+          id,
+          documentId,
+          name,
+        }))
+        : [],
     },
   });
 
-  // --- Función para crear el Step y sus relaciones ---
-  const createStepWithRelations = async (stepPayload) => {
+  // Actualizar valores cuando "step" cambie
+  useEffect(() => {
+    if (step) {
+      const defaultValues = {
+        documentId: step.documentId || "",
+        name: step.name || "",
+        subcategories: step.challenge_subcategories
+          ? step.challenge_subcategories.map(({ id, documentId, name }) => ({
+            id,
+            documentId,
+            name,
+          }))
+          : [],
+        stages: step.challenge_stages
+          ? step.challenge_stages.map(({ id, documentId, name }) => ({
+            id,
+            documentId,
+            name,
+          }))
+          : [],
+      };
+      form.reset(defaultValues);
+      setCustomSubcategories(defaultValues.subcategories);
+      setCustomStages(defaultValues.stages);
+    }
+  }, [step, form]);
+
+  // --- Función para actualizar el Step y sus relaciones ---
+  const updateStepWithRelations = async (stepPayload) => {
+    console.log("Payload recibido:", stepPayload);
     try {
-      // Crear el challenge step
-      const stepResponse = await fetch(
-        "http://localhost:1337/api/challenge-steps",
+      const response = await fetch(
+        `http://localhost:1337/api/challenge-steps/${stepPayload.documentId}/update-with-relations`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
           },
-          body: JSON.stringify({ data: { name: stepPayload.name } }),
+          body: JSON.stringify(stepPayload),
         }
       );
-      const stepResult = await stepResponse.json();
-      console.log("Challenge Step creado:", stepResult);
-      const stepId = stepResult.data.documentId;
-
-      // Crear o asociar subcategorías
-      for (const subcat of stepPayload.subcategories) {
-        if (typeof subcat.id === "string" && subcat.id.startsWith("custom")) {
-          // Crear subcategoría nueva
-          const newSubcatResponse = await fetch(
-            "http://localhost:1337/api/challenge-subcategories",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-              },
-              body: JSON.stringify({
-                data: { name: subcat.name, challenge_step: stepId },
-              }),
-            }
-          );
-          const newSubcat = await newSubcatResponse.json();
-          console.log("Subcategoría creada:", newSubcat);
-        } else {
-          // Asociar subcategoría existente
-          await fetch(
-            `http://localhost:1337/api/challenge-subcategories/${subcat.documentId}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-              },
-              body: JSON.stringify({
-                data: { challenge_step: stepId },
-              }),
-            }
-          );
-        }
-      }
-
-      // Crear o asociar stages
-      for (const stage of stepPayload.stages) {
-        if (typeof stage.id === "string" && stage.id.startsWith("custom")) {
-          // Crear stage nuevo
-          const newStageResponse = await fetch(
-            "http://localhost:1337/api/challenge-stages",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-              },
-              body: JSON.stringify({
-                data: { name: stage.name, challenge_steps: stepId },
-              }),
-            }
-          );
-          const newStage = await newStageResponse.json();
-          console.log("Stage creado:", newStage);
-        } else {
-          // Asociar stage existente
-          await fetch(
-            `http://localhost:1337/api/challenge-stages/${stage.documentId}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-              },
-              body: JSON.stringify({
-                data: { challenge_steps: stepId },
-              }),
-            }
-          );
-        }
-      }
-      console.log("Challenge Step y relaciones creados correctamente.");
+      const data = await response.json();
+      console.log("Step actualizado:", data);
+      return data; // Se asume que el endpoint retorna el objeto actualizado
     } catch (error) {
-      console.error("Error al crear el challenge step y sus relaciones:", error);
+      console.error("Error al actualizar el step:", error);
+      throw error;
     }
   };
 
-  // --- Manejo del submit para crear ---
-  const handleCreateSubmit = form.handleSubmit(async (data) => {
+  // --- Manejo del submit para actualizar ---
+  const handleUpdateSubmit = form.handleSubmit(async (data) => {
     setIsLoading(true);
-    // Nos aseguramos de que no exista un documentId
-    data.documentId = "";
     console.log("JSON final:", data);
-    await createStepWithRelations(data);
-    form.reset();
-    setCustomSubcategories([]);
-    setCustomStages([]);
-    setIsLoading(false);
+    try {
+      const updatedStep = await updateStepWithRelations(data);
+      // Actualizamos el formulario con los datos retornados
+      form.reset({
+        documentId: updatedStep.documentId || data.documentId,
+        name: updatedStep.name,
+        subcategories: updatedStep.challenge_subcategories || [],
+        stages: updatedStep.challenge_stages || [],
+      });
+      setCustomSubcategories(updatedStep.challenge_subcategories || []);
+      setCustomStages(updatedStep.challenge_stages || []);
+    } catch (error) {
+      // Manejo de error: podrías mostrar una notificación al usuario
+      console.error("Error en la actualización:", error);
+    } finally {
+      setIsLoading(false);
+    }
   });
 
-  // --- Handlers para agregar nuevos items custom ---
+  // --- Handlers para agregar items custom ---
   const handleAddCustomSubcat = (field) => {
     if (!customSubcatInput.trim()) return;
     const newSubcat = {
@@ -221,7 +191,7 @@ export function CreateStepForm() {
   return (
     <Card className="p-6 max-w-4xl mx-auto bg-black border-2 border-yellow-500">
       {isLoading ? (
-        <p className="text-center">Cargando...</p>
+        <p className="text-center text-white">Cargando...</p>
       ) : (
         <Form {...form}>
           <form className="space-y-8">
@@ -231,7 +201,9 @@ export function CreateStepForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-yellow-500 text-lg">Nombre</FormLabel>
+                  <FormLabel className="text-yellow-500 text-lg">
+                    Nombre
+                  </FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -252,15 +224,20 @@ export function CreateStepForm() {
                   name="subcategories"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-yellow-500 text-lg">Subcategorías</FormLabel>
+                      <FormLabel className="text-yellow-500 text-lg">
+                        Subcategorías
+                      </FormLabel>
                       <Card className="p-4 border border-gray-700 bg-black/50">
                         {subLoading ? (
-                          <p className="text-center">Cargando</p>
+                          <p className="text-center text-white">Cargando</p>
                         ) : subError ? (
                           <p>Error: {subError.message}</p>
                         ) : (
                           <div className="space-y-4">
-                            <Popover open={openSubcat} onOpenChange={setOpenSubcat}>
+                            <Popover
+                              open={openSubcat}
+                              onOpenChange={setOpenSubcat}
+                            >
                               <PopoverTrigger asChild>
                                 <FormControl>
                                   <Button
@@ -275,56 +252,82 @@ export function CreateStepForm() {
                               </PopoverTrigger>
                               <PopoverContent className="p-0 bg-black border-yellow-500 w-full">
                                 <Command className="bg-black">
-                                  <CommandInput placeholder="Buscar subcategorías..." className="text-yellow-500" />
+                                  <CommandInput
+                                    placeholder="Buscar subcategorías..."
+                                    className="text-yellow-500"
+                                  />
                                   <CommandList>
-                                    <CommandEmpty>No se encontraron resultados</CommandEmpty>
+                                    <CommandEmpty>
+                                      No se encontraron resultados
+                                    </CommandEmpty>
                                     <CommandGroup>
                                       <CommandItem
                                         className="text-yellow-500 hover:bg-yellow-500/10"
                                         onSelect={() => {
-                                          if (field.value.length === allSubcategories.length) {
-                                            field.onChange([])
+                                          if (
+                                            field.value.length ===
+                                            allSubcategories.length
+                                          ) {
+                                            field.onChange([]);
                                           } else {
-                                            field.onChange(allSubcategories)
+                                            field.onChange(allSubcategories);
                                           }
                                         }}
                                       >
                                         <div
-                                          className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value.length === allSubcategories.length
+                                          className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value.length ===
+                                            allSubcategories.length
                                             ? "bg-yellow-500 text-black"
                                             : "opacity-50"
                                             }`}
                                         >
-                                          {field.value.length === allSubcategories.length && "✓"}
+                                          {field.value.length ===
+                                            allSubcategories.length &&
+                                            "✓"}
                                         </div>
                                         Seleccionar Todas
                                       </CommandItem>
-                                      {allSubcategories.map((subcat) => {
-                                        const isSelected = field.value.some((item) => item.id === subcat.id)
+                                      {allSubcategories.map((subcat, index) => {
+                                        const keySubcat =
+                                          subcat.documentId ||
+                                          subcat.id ||
+                                          `custom-${index}`;
+                                        const isSelected = field.value.some(
+                                          (item) =>
+                                            (item.documentId || item.id) ===
+                                            (subcat.documentId || subcat.id)
+                                        );
                                         return (
                                           <CommandItem
-                                            key={subcat.id}
+                                            key={keySubcat}
                                             onSelect={() => {
-                                              const current = field.value
-                                              let newValues
+                                              const current = field.value;
+                                              let newValues;
                                               if (isSelected) {
-                                                newValues = current.filter((v) => v.id !== subcat.id)
+                                                newValues = current.filter(
+                                                  (v) =>
+                                                    (v.documentId || v.id) !==
+                                                    (subcat.documentId ||
+                                                      subcat.id)
+                                                );
                                               } else {
-                                                newValues = [...current, subcat]
+                                                newValues = [...current, subcat];
                                               }
-                                              field.onChange(newValues)
+                                              field.onChange(newValues);
                                             }}
                                             className="text-yellow-500 hover:bg-yellow-500/10"
                                           >
                                             <div
-                                              className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected ? "bg-yellow-500 text-black" : "opacity-50"
+                                              className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected
+                                                ? "bg-yellow-500 text-black"
+                                                : "opacity-50"
                                                 }`}
                                             >
                                               {isSelected && "✓"}
                                             </div>
                                             {subcat.name}
                                           </CommandItem>
-                                        )
+                                        );
                                       })}
                                     </CommandGroup>
                                   </CommandList>
@@ -336,7 +339,9 @@ export function CreateStepForm() {
                               <Input
                                 placeholder="Nueva Subcategoría"
                                 value={customSubcatInput}
-                                onChange={(e) => setCustomSubcatInput(e.target.value)}
+                                onChange={(e) =>
+                                  setCustomSubcatInput(e.target.value)
+                                }
                                 className="border-gray-700 bg-transparent text-white"
                               />
                               <Button
@@ -352,17 +357,29 @@ export function CreateStepForm() {
 
                             {field.value.length > 0 && (
                               <div className="grid gap-2 pt-4">
-                                {field.value.map((subcat) => (
+                                {field.value.map((subcat, index) => (
                                   <Card
-                                    key={subcat.id}
+                                    key={
+                                      subcat.documentId ||
+                                      subcat.id ||
+                                      `custom-${index}`
+                                    }
                                     className="p-2 bg-yellow-500/10 border-yellow-500/20 flex justify-between items-center"
                                   >
-                                    <span className="text-white">{subcat.name}</span>
+                                    <span className="text-white">
+                                      {subcat.name}
+                                    </span>
                                     <Button
                                       variant="ghost"
                                       size="icon"
                                       onClick={() => {
-                                        field.onChange(field.value.filter((v) => v.id !== subcat.id))
+                                        field.onChange(
+                                          field.value.filter(
+                                            (v) =>
+                                              (v.documentId || v.id) !==
+                                              (subcat.documentId || subcat.id)
+                                          )
+                                        );
                                       }}
                                       className="h-8 w-8 hover:bg-yellow-500/20"
                                     >
@@ -388,16 +405,20 @@ export function CreateStepForm() {
                   name="stages"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-yellow-500 text-lg">Stages</FormLabel>
+                      <FormLabel className="text-yellow-500 text-lg">
+                        Stages
+                      </FormLabel>
                       <Card className="p-4 border border-gray-700 bg-black/50">
                         {stageLoading ? (
-                          <p className="text-center">Cargando</p>
+                          <p className="text-center text-white">Cargando</p>
                         ) : stageError ? (
                           <p>Error: {stageError.message}</p>
                         ) : (
                           <div className="space-y-4">
-                            {/* ... [Similar structure as Subcategories] */}
-                            <Popover open={openStages} onOpenChange={setOpenStages}>
+                            <Popover
+                              open={openStages}
+                              onOpenChange={setOpenStages}
+                            >
                               <PopoverTrigger asChild>
                                 <FormControl>
                                   <Button
@@ -412,17 +433,24 @@ export function CreateStepForm() {
                               </PopoverTrigger>
                               <PopoverContent className="p-0 bg-black border-yellow-500 w-full">
                                 <Command className="bg-black">
-                                  <CommandInput placeholder="Buscar productos..." className="text-yellow-500" />
+                                  <CommandInput
+                                    placeholder="Buscar stages..."
+                                    className="text-yellow-500"
+                                  />
                                   <CommandList>
-                                    <CommandEmpty>No se encontraron resultados</CommandEmpty>
+                                    <CommandEmpty>
+                                      No se encontraron resultados
+                                    </CommandEmpty>
                                     <CommandGroup>
                                       <CommandItem
                                         className="text-yellow-500 hover:bg-yellow-500/10"
                                         onSelect={() => {
-                                          if (field.value.length === allStages.length) {
-                                            field.onChange([])
+                                          if (
+                                            field.value.length === allStages.length
+                                          ) {
+                                            field.onChange([]);
                                           } else {
-                                            field.onChange(allStages)
+                                            field.onChange(allStages);
                                           }
                                         }}
                                       >
@@ -432,38 +460,52 @@ export function CreateStepForm() {
                                             : "opacity-50"
                                             }`}
                                         >
-                                          {field.value.length === allStages.length && "✓"}
+                                          {field.value.length === allStages.length &&
+                                            "✓"}
                                         </div>
                                         Seleccionar Todas
                                       </CommandItem>
-                                      {allStages.map((stage) => {
+                                      {allStages.map((stage, index) => {
+                                        const keyStage =
+                                          stage.documentId ||
+                                          stage.id ||
+                                          `custom-${index}`;
                                         const isSelected = field.value.some(
-                                          (item) => item.documentId === stage.documentId,
-                                        )
+                                          (item) =>
+                                            (item.documentId || item.id) ===
+                                            (stage.documentId || stage.id)
+                                        );
                                         return (
                                           <CommandItem
-                                            key={stage.documentId}
+                                            key={keyStage}
                                             onSelect={() => {
-                                              const current = field.value
-                                              let newValues
+                                              const current = field.value;
+                                              let newValues;
                                               if (isSelected) {
-                                                newValues = current.filter((v) => v.documentId !== stage.documentId)
+                                                newValues = current.filter(
+                                                  (v) =>
+                                                    (v.documentId || v.id) !==
+                                                    (stage.documentId ||
+                                                      stage.id)
+                                                );
                                               } else {
-                                                newValues = [...current, stage]
+                                                newValues = [...current, stage];
                                               }
-                                              field.onChange(newValues)
+                                              field.onChange(newValues);
                                             }}
                                             className="text-yellow-500 hover:bg-yellow-500/10"
                                           >
                                             <div
-                                              className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected ? "bg-yellow-500 text-black" : "opacity-50"
+                                              className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected
+                                                ? "bg-yellow-500 text-black"
+                                                : "opacity-50"
                                                 }`}
                                             >
                                               {isSelected && "✓"}
                                             </div>
                                             {stage.name}
                                           </CommandItem>
-                                        )
+                                        );
                                       })}
                                     </CommandGroup>
                                   </CommandList>
@@ -475,7 +517,9 @@ export function CreateStepForm() {
                               <Input
                                 placeholder="Nuevo Stage"
                                 value={customStagesInput}
-                                onChange={(e) => setCustomStagesInput(e.target.value)}
+                                onChange={(e) =>
+                                  setCustomStagesInput(e.target.value)
+                                }
                                 className="border-gray-700 bg-transparent text-white"
                               />
                               <Button
@@ -491,17 +535,29 @@ export function CreateStepForm() {
 
                             {field.value.length > 0 && (
                               <div className="grid gap-2 pt-4">
-                                {field.value.map((stage) => (
+                                {field.value.map((stage, index) => (
                                   <Card
-                                    key={stage.documentId || stage.id}
+                                    key={
+                                      stage.documentId ||
+                                      stage.id ||
+                                      `custom-${index}`
+                                    }
                                     className="p-2 bg-yellow-500/10 border-yellow-500/20 flex justify-between items-center"
                                   >
-                                    <span className="text-white">{stage.name}</span>
+                                    <span className="text-white">
+                                      {stage.name}
+                                    </span>
                                     <Button
                                       variant="ghost"
                                       size="icon"
                                       onClick={() => {
-                                        field.onChange(field.value.filter((v) => v.documentId !== stage.documentId))
+                                        field.onChange(
+                                          field.value.filter(
+                                            (v) =>
+                                              (v.documentId || v.id) !==
+                                              (stage.documentId || stage.id)
+                                          )
+                                        );
                                       }}
                                       className="h-8 w-8 hover:bg-yellow-500/20"
                                     >
@@ -522,8 +578,11 @@ export function CreateStepForm() {
             </div>
 
             {/* Submit Button */}
-            <Button onClick={handleCreateSubmit} className="w-full bg-yellow-500 text-black hover:bg-yellow-400">
-              Crear
+            <Button
+              onClick={handleUpdateSubmit}
+              className="w-full bg-yellow-500 text-black hover:bg-yellow-400"
+            >
+              Actualizar
             </Button>
           </form>
         </Form>

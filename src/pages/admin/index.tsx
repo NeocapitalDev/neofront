@@ -19,20 +19,25 @@ import {
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dash/app-sidebar";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const [segments, setSegments] = useState<string[]>([]);
 
   // Generar los segmentos solo en el cliente
   useEffect(() => {
-    if (pathname) { // Verifica que pathname no sea null
+    if (pathname) {
+      // Verifica que pathname no sea null
       const pathSegments = pathname.split("/").filter(Boolean);
       setSegments(pathSegments);
     }
   }, [pathname]);
 
   return (
-    <SidebarProvider>
+    <SidebarProvider className="">
       <AppSidebar className="pt-4" />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">

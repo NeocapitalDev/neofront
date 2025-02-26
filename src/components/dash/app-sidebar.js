@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useSession } from "next-auth/react";
 
-import { Users, Award, UserCheck,Activity } from "lucide-react";
+import { Users, Award, UserCheck, Activity } from "lucide-react";
 
 import { NavMain } from "@/components/dash/nav-main";
 import { NavUser } from "@/components/dash/nav-user";
@@ -33,12 +33,12 @@ export function AppSidebar({ ...props }) {
       setUserData({
         email: session.user.email || "correo@ejemplo.com",
         avatar: avatarUrl, // Avatar de Gravatar
-        name:  session.user.email ||  session.firstName , // Si no hay nombre, usar parte del email
+        name: session.user.email || session.firstName, // Si no hay nombre, usar parte del email
       });
     }
   }, [session]);
 
-  const isLoading = status === "loading" || !userData;
+  const isLoading = status === "Cargando" || !userData;
 
   const navMain = [
     {
@@ -47,22 +47,22 @@ export function AppSidebar({ ...props }) {
       icon: Users,
       isActive: false,
     },
-     {
-     title: "Users",
-       url: "/admin/users",
-       icon: Users,
-       isActive: false,
-    //   items: [
-    //     {
-    //       title: "History",
-    //       url: "/admin/users/history",
-    //     },
-    //     {
-    //       title: "Settings",
-    //       url: "/admin/users/settings",
-    //     },
-    //   ],
-     },
+    {
+      title: "Users",
+      url: "/admin/users",
+      icon: Users,
+      isActive: false,
+      //   items: [
+      //     {
+      //       title: "History",
+      //       url: "/admin/users/history",
+      //     },
+      //     {
+      //       title: "Settings",
+      //       url: "/admin/users/settings",
+      //     },
+      //   ],
+    },
     {
       title: "Challenges",
       url: "/admin/challenges",
@@ -93,7 +93,20 @@ export function AppSidebar({ ...props }) {
       icon: Activity,
       isActive: false,
     },
-    
+    {
+      title: "steps",
+      url: "/admin/steps",
+      icon: Activity,
+      isActive: false,
+    },
+    {
+      title: "manager",
+      url: "/admin/manager",
+      icon: Activity,
+      isActive: false,
+    }
+
+
   ];
 
   return (

@@ -4,11 +4,10 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "./DataTableColumnHeader";
-import { DetailModal } from "./DetailModal";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil } from "lucide-react";
 import { useState } from "react";
-import { StepDetails } from "./StepDetails";
+import { useRouter } from "next/router";
 
 export type Challenge = {
   id: number;
@@ -115,7 +114,7 @@ export const getColumns = (
       return (
         <div className="flex flex-wrap gap-1">
           {stages.map((stage) => (
-            <Badge key={stage.id} variant="outline">
+            <Badge key={stage.id} variant="secondary">
               {stage.name}
             </Badge>
           ))}
@@ -142,28 +141,29 @@ export const getColumns = (
         stages: data.challenge_stages,
       };
       const [isModalOpen, setIsModalOpen] = useState(false);
+      const router = useRouter();
 
+      const handleRedirect = () => {
+        console.log("Redirecting to", `/admin/steps/${data.documentId}`);
+        router.push(`/admin/steps/${data.documentId}`);
+      };
       return (
         <>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsModalOpen(true)}
-          >
-            <Pencil className="h-4 w-4" />
+          <Button variant="ghost" size="icon" onClick={handleRedirect}>
+            <Eye className="h-4 w-4" />
           </Button>
           {/* Botón de edición que invoca el callback recibido */}
           {/* <Button variant="ghost" size="icon" onClick={() => onEdit(data)}>
             <Pencil className="h-4 w-4" />
           </Button> */}
-          <DetailModal
+          {/* <DetailModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             // title={`Step Details: ${step.name}`}
             maxWidth="2xl"
           >
             <StepDetails step={step} data={data} />
-          </DetailModal>
+          </DetailModal> */}
         </>
       );
     },

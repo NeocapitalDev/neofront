@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { set, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { stepFormSchema } from "./schemas"; // <-- importa el esquema anterior
+import { stepFormSchema } from "../../lib/schemas"; // <-- importa el esquema anterior
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
