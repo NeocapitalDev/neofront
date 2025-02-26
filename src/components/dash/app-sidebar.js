@@ -93,6 +93,13 @@ export function AppSidebar({ ...props }) {
       icon: Activity,
       isActive: false,
     },
+    {
+      title: "Parameters",
+      url: "/admin/parameters",
+      icon: Activity,
+      isActive: false,
+    },
+    
     
   ];
 
