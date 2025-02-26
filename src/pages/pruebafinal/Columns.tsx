@@ -127,6 +127,8 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
         maximumDailyLoss: data.maximumDailyLoss,
         maximumLoss: data.maximumLoss,
         profitTarget: data.profitTarget,
+        documentId: data.documentId,
+
         leverage: data.leverage,
         challenge_subcategory: data.challenge_subcategory,
         challenge_products: data.challenge_products,
