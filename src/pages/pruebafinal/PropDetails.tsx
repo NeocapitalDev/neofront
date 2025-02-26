@@ -121,10 +121,10 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
     "dark:bg-zinc-800 dark:text-white dark:border-gray-600 p-1 rounded w-full";
 
   return (
-    <div className="flex gap-4 ">
+    <div className="flex gap-4 justify-center ">
       <Card >
 
-        <CardContent className="space-y-6 ">
+        <CardContent className="space-y-6 w-full ">
 
 
 
@@ -310,7 +310,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
                 <div className="flex-[1] mt-6">
                   <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                    <Badge variant="secondary" className="bg-amber-200 text-black">Productos disponibles</Badge>
+                    <Badge className="bg-amber-200 text-black">Productos disponibles</Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
                     {productavailable?.map((product, index) => (
@@ -368,7 +368,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
                 <div className="flex-[1] mt-6">
                   <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                    <Badge variant="secondary" className="bg-amber-200 text-black">Subcategorias disponibles</Badge>
+                    <Badge  className="bg-amber-200 text-black">Subcategorias disponibles</Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
                     {subcategoriesavailable?.map((subcategory, index) => (
