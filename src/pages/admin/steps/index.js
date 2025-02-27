@@ -6,15 +6,19 @@ import DashboardLayout from "..";
 import { useRouter } from "next/router";
 import { X, Plus } from "lucide-react";
 import Skeleton from "@/components/loaders/loader";
+import { FetchChallengeSteps } from "./Nuevo";
 
 
 export default function ViewSteps() {
-  const { data, error, isLoading } = useStrapiData("challenge-steps?populate=*");
+  const { data, error, isLoading } = useStrapiData("challenge-steps/get-all-data");
+  console.log("steps", data);
+  // const data = stepsData.data;
+  // console.log("data", data);
 
   // Estado que guarda la fila seleccionada para editar
   const [selectedRow, setSelectedRow] = useState(null);
-  console.log("selectedRow", selectedRow);
-  console.log("data", data);
+  // console.log("selectedRow", selectedRow);
+  // console.log("data", data);
   // console.log("data 0", data[0]);
   const router = useRouter();
   const handleCreate = () => {
@@ -39,6 +43,7 @@ export default function ViewSteps() {
       )}
 
       {/* <UpdateStepFormC step={data[0]}></UpdateStepFormC> */}
+      <FetchChallengeSteps></FetchChallengeSteps>
     </DashboardLayout>
   );
 }

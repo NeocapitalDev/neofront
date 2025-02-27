@@ -47,23 +47,15 @@ export function CreateStepFormC() {
     data: stages,
     error: stageError,
     isLoading: stageLoading,
-  } = useStrapiData("challenge-stages?filters[challenge_steps][$null]=true");
-  console.log("stageData", stages);
+  } = useStrapiData("challenge-stages?populate=*");
   // 2. Mapeo y filtrado de datos
   const subcategoriesData = subcategories
-    ? subcategories
-      .filter(
-        (subcategory) =>
-          !subcategory.challenge_steps ||
-          subcategory.challenge_steps === "" ||
-          subcategory.challenge_steps === null
-      )
-      .map(({ id, documentId, name }) => ({ id, documentId, name }))
+    ? subcategories.map(({ id, documentId, name }) => ({ id, documentId, name }))
     : [];
   const stageData = stages
     ? stages.map(({ id, documentId, name }) => ({ id, documentId, name }))
     : [];
-
+  console.log("stageData", stageData);
   console.log("subcategoriesData", subcategoriesData);
   // 3. Estados locales para la creación
   const [openSubcat, setOpenSubcat] = useState(false);

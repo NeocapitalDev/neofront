@@ -32,12 +32,12 @@ const nameSchema = z.object({
   name: z.string().nonempty("El nombre es requerido"),
 });
 
-export function SubcategoriesManager() {
+export function SubcategoriesManager({ pageSize }) {
   // Estado
   const [subcats, setSubcats] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
-  const [pageSize, setPageSize] = useState(10);
+  // const [pageSize, setPageSize] = useState(10);
 
   // Form
   const form = useForm({
@@ -174,7 +174,7 @@ export function SubcategoriesManager() {
   // --------------------------------------------------
   return (
     <div>
-      <RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} />
+      {/* <RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} /> */}
       <ChallengeTable
         title="Challenge Subcategory"
         data={subcats}

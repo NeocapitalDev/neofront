@@ -32,12 +32,12 @@ const nameSchema = z.object({
   name: z.string().nonempty("El nombre es requerido"),
 });
 
-export function StagesManager() {
+export function StagesManager({ pageSize }) {
   // Estado
   const [stages, setStages] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
-  const [pageSize, setPageSize] = useState(10);
+  // const [pageSize, setPageSize] = useState(10);
 
   // Form
   const form = useForm({
@@ -174,7 +174,7 @@ export function StagesManager() {
   // --------------------------------------------------
   return (
     <div>
-      <RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} />
+      {/* <RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} /> */}
 
       <ChallengeTable
         title="Challenge Stage"

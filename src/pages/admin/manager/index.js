@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { SubcategoriesManager } from "@/components/manager/SubcategoriesManager";
 import { ProductsManager } from "@/components/manager/ProductsManager";
 import { StagesManager } from "@/components/manager/StagesManager";
+import { RowsPerPage } from "@/components/table/RowsPerPage";
+
 import DashboardLayout from "..";
 
 export default function IndexPage() {
@@ -13,7 +15,7 @@ export default function IndexPage() {
   return (
     <DashboardLayout>
       <div className="p-2 space-y-4 bg-black min-h-screen text-white">
-
+        <RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} />
         {/* Grid con las 3 tablas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Subcategorías */}

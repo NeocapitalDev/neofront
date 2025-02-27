@@ -189,7 +189,7 @@ export function UpdateStepFormC({ step }) {
     field.onChange([...field.value, newStage]);
     setCustomStagesInput("");
   };
-  const isGlobalLoading = subLoading || stageLoading;
+  const isGlobalLoading = subLoading || stageLoading || isLoading;
   const hasError = subError || stageError;
   if (isGlobalLoading) {
     return <div className="grid place-items-center h-[calc(100vh-100px)]"><Skeleton /></div>;
@@ -197,8 +197,6 @@ export function UpdateStepFormC({ step }) {
   if (hasError) {
     return <p className="text-center text-red-400">Error al cargar datos.</p>;
   }
-
-
   return (
     <Card className="p-6 max-w-4xl mx-auto grid place-items-center h-[calc(100vh-100px)] border-none">
       <Form {...form}>
