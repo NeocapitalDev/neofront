@@ -5,6 +5,8 @@ import { getColumns, Challenge } from "@/components/table/Columns";
 import DashboardLayout from "..";
 import { useRouter } from "next/router";
 import { X, Plus } from "lucide-react";
+import Skeleton from "@/components/loaders/loader";
+
 
 export default function ViewSteps() {
   const { data, error, isLoading } = useStrapiData("challenge-steps?populate=*");
@@ -20,7 +22,7 @@ export default function ViewSteps() {
   };
   return (
     <DashboardLayout>
-      {isLoading && <div className="grid place-items-center h-screen">Cargando...</div>}
+      {isLoading && <StepLoader></StepLoader>}
       {error && <div>Error: {error.message}</div>}
       {data && (
         <div className="w-[70%] mx-auto">
@@ -39,4 +41,9 @@ export default function ViewSteps() {
       {/* <UpdateStepFormC step={data[0]}></UpdateStepFormC> */}
     </DashboardLayout>
   );
+}
+export const StepLoader = () => {
+  return (
+    <div className='grid place-items-center h-[calc(100vh-100px)]'><Skeleton></Skeleton></div>
+  )
 }

@@ -167,9 +167,9 @@ export function CreateStepFormC() {
     return <p className="text-center text-red-400">Error al cargar datos.</p>;
   }
   return (
-    <Card className="p-6 max-w-4xl mx-auto bg-black border-2 border-yellow-500 grid place-items-center h-[calc(100vh-100px)]">
+    <Card className="p-6 max-w-4xl mx-auto grid place-items-center h-[calc(100vh-100px)] border-none">
       <Form {...form}>
-        <form className="space-y-8">
+        <form className="space-y-8 p-6 max-w-4xl mx-auto bg-black border-2 rounded-xl">
           {/* Campo Nombre */}
           <FormField
             control={form.control}

@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { X, Plus } from "lucide-react";
 import { useStrapiData } from "../../../services/strapiService";
+import Skeleton from "@/components/loaders/loader";
+
 import {
   Form,
   FormField,
@@ -187,406 +189,411 @@ export function UpdateStepFormC({ step }) {
     field.onChange([...field.value, newStage]);
     setCustomStagesInput("");
   };
+  const isGlobalLoading = subLoading || stageLoading;
+  const hasError = subError || stageError;
+  if (isGlobalLoading) {
+    return <div className="grid place-items-center h-[calc(100vh-100px)]"><Skeleton /></div>;
+  }
+  if (hasError) {
+    return <p className="text-center text-red-400">Error al cargar datos.</p>;
+  }
+
 
   return (
-    <Card className="p-6 max-w-4xl mx-auto bg-black border-2 border-yellow-500">
-      {isLoading ? (
-        <p className="text-center text-white">Cargando...</p>
-      ) : (
-        <Form {...form}>
-          <form className="space-y-8">
-            {/* Campo Nombre */}
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-yellow-500 text-lg">
-                    Nombre
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Nombre del Step"
-                      className="border-gray-700 bg-transparent text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <Card className="p-6 max-w-4xl mx-auto grid place-items-center h-[calc(100vh-100px)] border-none">
+      <Form {...form}>
+        <form className="space-y-8 space-y-8 p-6 max-w-4xl mx-auto bg-black border-2 rounded-xl">
+          {/* Campo Nombre */}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-yellow-500 text-lg">
+                  Nombre
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Nombre del Step"
+                    className="border-gray-700 bg-transparent text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Subcategorías Section */}
-              <div className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="subcategories"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-yellow-500 text-lg">
-                        Subcategorías
-                      </FormLabel>
-                      <Card className="p-4 border border-gray-700 bg-black/50">
-                        {subLoading ? (
-                          <p className="text-center text-white">Cargando</p>
-                        ) : subError ? (
-                          <p>Error: {subError.message}</p>
-                        ) : (
-                          <div className="space-y-4">
-                            <Popover
-                              open={openSubcat}
-                              onOpenChange={setOpenSubcat}
-                            >
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant="outline"
-                                    className="w-full border-gray-700 bg-transparent text-white hover:bg-yellow-500/10"
-                                  >
-                                    {field.value.length > 0
-                                      ? `${field.value.length} seleccionadas`
-                                      : "Seleccionar"}
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className="p-0 bg-black border-yellow-500 w-full">
-                                <Command className="bg-black">
-                                  <CommandInput
-                                    placeholder="Buscar subcategorías..."
-                                    className="text-yellow-500"
-                                  />
-                                  <CommandList>
-                                    <CommandEmpty>
-                                      No se encontraron resultados
-                                    </CommandEmpty>
-                                    <CommandGroup>
-                                      <CommandItem
-                                        className="text-yellow-500 hover:bg-yellow-500/10"
-                                        onSelect={() => {
-                                          if (
-                                            field.value.length ===
-                                            allSubcategories.length
-                                          ) {
-                                            field.onChange([]);
-                                          } else {
-                                            field.onChange(allSubcategories);
-                                          }
-                                        }}
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Subcategorías Section */}
+            <div className="space-y-6">
+              <FormField
+                control={form.control}
+                name="subcategories"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-yellow-500 text-lg">
+                      Subcategorías
+                    </FormLabel>
+                    <Card className="p-4 border border-gray-700 bg-black/50">
+                      {subLoading ? (
+                        <p className="text-center text-white">Cargando</p>
+                      ) : subError ? (
+                        <p>Error: {subError.message}</p>
+                      ) : (
+                        <div className="space-y-4">
+                          <Popover
+                            open={openSubcat}
+                            onOpenChange={setOpenSubcat}
+                          >
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  className="w-full border-gray-700 bg-transparent text-white hover:bg-yellow-500/10"
+                                >
+                                  {field.value.length > 0
+                                    ? `${field.value.length} seleccionadas`
+                                    : "Seleccionar"}
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="p-0 bg-black border-yellow-500 w-full">
+                              <Command className="bg-black">
+                                <CommandInput
+                                  placeholder="Buscar subcategorías..."
+                                  className="text-yellow-500"
+                                />
+                                <CommandList>
+                                  <CommandEmpty>
+                                    No se encontraron resultados
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    <CommandItem
+                                      className="text-yellow-500 hover:bg-yellow-500/10"
+                                      onSelect={() => {
+                                        if (
+                                          field.value.length ===
+                                          allSubcategories.length
+                                        ) {
+                                          field.onChange([]);
+                                        } else {
+                                          field.onChange(allSubcategories);
+                                        }
+                                      }}
+                                    >
+                                      <div
+                                        className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value.length ===
+                                          allSubcategories.length
+                                          ? "bg-yellow-500 text-black"
+                                          : "opacity-50"
+                                          }`}
                                       >
-                                        <div
-                                          className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value.length ===
-                                            allSubcategories.length
-                                            ? "bg-yellow-500 text-black"
-                                            : "opacity-50"
-                                            }`}
+                                        {field.value.length ===
+                                          allSubcategories.length &&
+                                          "✓"}
+                                      </div>
+                                      Seleccionar Todas
+                                    </CommandItem>
+                                    {allSubcategories.map((subcat, index) => {
+                                      const keySubcat =
+                                        subcat.documentId ||
+                                        subcat.id ||
+                                        `custom-${index}`;
+                                      const isSelected = field.value.some(
+                                        (item) =>
+                                          (item.documentId || item.id) ===
+                                          (subcat.documentId || subcat.id)
+                                      );
+                                      return (
+                                        <CommandItem
+                                          key={keySubcat}
+                                          onSelect={() => {
+                                            const current = field.value;
+                                            let newValues;
+                                            if (isSelected) {
+                                              newValues = current.filter(
+                                                (v) =>
+                                                  (v.documentId || v.id) !==
+                                                  (subcat.documentId ||
+                                                    subcat.id)
+                                              );
+                                            } else {
+                                              newValues = [...current, subcat];
+                                            }
+                                            field.onChange(newValues);
+                                          }}
+                                          className="text-yellow-500 hover:bg-yellow-500/10"
                                         >
-                                          {field.value.length ===
-                                            allSubcategories.length &&
-                                            "✓"}
-                                        </div>
-                                        Seleccionar Todas
-                                      </CommandItem>
-                                      {allSubcategories.map((subcat, index) => {
-                                        const keySubcat =
-                                          subcat.documentId ||
-                                          subcat.id ||
-                                          `custom-${index}`;
-                                        const isSelected = field.value.some(
-                                          (item) =>
-                                            (item.documentId || item.id) ===
+                                          <div
+                                            className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected
+                                              ? "bg-yellow-500 text-black"
+                                              : "opacity-50"
+                                              }`}
+                                          >
+                                            {isSelected && "✓"}
+                                          </div>
+                                          {subcat.name}
+                                        </CommandItem>
+                                      );
+                                    })}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+
+                          <div className="flex gap-2 items-center">
+                            <Input
+                              placeholder="Nueva Subcategoría"
+                              value={customSubcatInput}
+                              onChange={(e) =>
+                                setCustomSubcatInput(e.target.value)
+                              }
+                              className="border-gray-700 bg-transparent text-white"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleAddCustomSubcat(field)}
+                              className="hover:bg-yellow-500/10"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          {field.value.length > 0 && (
+                            <div className="grid gap-2 pt-4">
+                              {field.value.map((subcat, index) => (
+                                <Card
+                                  key={
+                                    subcat.documentId ||
+                                    subcat.id ||
+                                    `custom-${index}`
+                                  }
+                                  className="p-2 bg-yellow-500/10 border-yellow-500/20 flex justify-between items-center"
+                                >
+                                  <span className="text-white">
+                                    {subcat.name}
+                                  </span>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => {
+                                      field.onChange(
+                                        field.value.filter(
+                                          (v) =>
+                                            (v.documentId || v.id) !==
                                             (subcat.documentId || subcat.id)
-                                        );
-                                        return (
-                                          <CommandItem
-                                            key={keySubcat}
-                                            onSelect={() => {
-                                              const current = field.value;
-                                              let newValues;
-                                              if (isSelected) {
-                                                newValues = current.filter(
-                                                  (v) =>
-                                                    (v.documentId || v.id) !==
-                                                    (subcat.documentId ||
-                                                      subcat.id)
-                                                );
-                                              } else {
-                                                newValues = [...current, subcat];
-                                              }
-                                              field.onChange(newValues);
-                                            }}
-                                            className="text-yellow-500 hover:bg-yellow-500/10"
-                                          >
-                                            <div
-                                              className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected
-                                                ? "bg-yellow-500 text-black"
-                                                : "opacity-50"
-                                                }`}
-                                            >
-                                              {isSelected && "✓"}
-                                            </div>
-                                            {subcat.name}
-                                          </CommandItem>
-                                        );
-                                      })}
-                                    </CommandGroup>
-                                  </CommandList>
-                                </Command>
-                              </PopoverContent>
-                            </Popover>
-
-                            <div className="flex gap-2 items-center">
-                              <Input
-                                placeholder="Nueva Subcategoría"
-                                value={customSubcatInput}
-                                onChange={(e) =>
-                                  setCustomSubcatInput(e.target.value)
-                                }
-                                className="border-gray-700 bg-transparent text-white"
-                              />
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                onClick={() => handleAddCustomSubcat(field)}
-                                className="hover:bg-yellow-500/10"
-                              >
-                                <Plus className="h-4 w-4" />
-                              </Button>
-                            </div>
-
-                            {field.value.length > 0 && (
-                              <div className="grid gap-2 pt-4">
-                                {field.value.map((subcat, index) => (
-                                  <Card
-                                    key={
-                                      subcat.documentId ||
-                                      subcat.id ||
-                                      `custom-${index}`
-                                    }
-                                    className="p-2 bg-yellow-500/10 border-yellow-500/20 flex justify-between items-center"
+                                        )
+                                      );
+                                    }}
+                                    className="h-8 w-8 hover:bg-yellow-500/20"
                                   >
-                                    <span className="text-white">
-                                      {subcat.name}
-                                    </span>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => {
-                                        field.onChange(
-                                          field.value.filter(
-                                            (v) =>
-                                              (v.documentId || v.id) !==
-                                              (subcat.documentId || subcat.id)
-                                          )
-                                        );
-                                      }}
-                                      className="h-8 w-8 hover:bg-yellow-500/20"
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  </Card>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </Card>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Stages Section */}
-              <div className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="stages"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-yellow-500 text-lg">
-                        Stages
-                      </FormLabel>
-                      <Card className="p-4 border border-gray-700 bg-black/50">
-                        {stageLoading ? (
-                          <p className="text-center text-white">Cargando</p>
-                        ) : stageError ? (
-                          <p>Error: {stageError.message}</p>
-                        ) : (
-                          <div className="space-y-4">
-                            <Popover
-                              open={openStages}
-                              onOpenChange={setOpenStages}
-                            >
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant="outline"
-                                    className="w-full border-gray-700 bg-transparent text-white hover:bg-yellow-500/10"
-                                  >
-                                    {field.value.length > 0
-                                      ? `${field.value.length} seleccionados`
-                                      : "Seleccionar"}
+                                    <X className="h-4 w-4" />
                                   </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className="p-0 bg-black border-yellow-500 w-full">
-                                <Command className="bg-black">
-                                  <CommandInput
-                                    placeholder="Buscar stages..."
-                                    className="text-yellow-500"
-                                  />
-                                  <CommandList>
-                                    <CommandEmpty>
-                                      No se encontraron resultados
-                                    </CommandEmpty>
-                                    <CommandGroup>
-                                      <CommandItem
-                                        className="text-yellow-500 hover:bg-yellow-500/10"
-                                        onSelect={() => {
-                                          if (
-                                            field.value.length === allStages.length
-                                          ) {
-                                            field.onChange([]);
-                                          } else {
-                                            field.onChange(allStages);
-                                          }
-                                        }}
-                                      >
-                                        <div
-                                          className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value.length === allStages.length
-                                            ? "bg-yellow-500 text-black"
-                                            : "opacity-50"
-                                            }`}
-                                        >
-                                          {field.value.length === allStages.length &&
-                                            "✓"}
-                                        </div>
-                                        Seleccionar Todas
-                                      </CommandItem>
-                                      {allStages.map((stage, index) => {
-                                        const keyStage =
-                                          stage.documentId ||
-                                          stage.id ||
-                                          `custom-${index}`;
-                                        const isSelected = field.value.some(
-                                          (item) =>
-                                            (item.documentId || item.id) ===
-                                            (stage.documentId || stage.id)
-                                        );
-                                        return (
-                                          <CommandItem
-                                            key={keyStage}
-                                            onSelect={() => {
-                                              const current = field.value;
-                                              let newValues;
-                                              if (isSelected) {
-                                                newValues = current.filter(
-                                                  (v) =>
-                                                    (v.documentId || v.id) !==
-                                                    (stage.documentId ||
-                                                      stage.id)
-                                                );
-                                              } else {
-                                                newValues = [...current, stage];
-                                              }
-                                              field.onChange(newValues);
-                                            }}
-                                            className="text-yellow-500 hover:bg-yellow-500/10"
-                                          >
-                                            <div
-                                              className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected
-                                                ? "bg-yellow-500 text-black"
-                                                : "opacity-50"
-                                                }`}
-                                            >
-                                              {isSelected && "✓"}
-                                            </div>
-                                            {stage.name}
-                                          </CommandItem>
-                                        );
-                                      })}
-                                    </CommandGroup>
-                                  </CommandList>
-                                </Command>
-                              </PopoverContent>
-                            </Popover>
-
-                            <div className="flex gap-2 items-center">
-                              <Input
-                                placeholder="Nuevo Stage"
-                                value={customStagesInput}
-                                onChange={(e) =>
-                                  setCustomStagesInput(e.target.value)
-                                }
-                                className="border-gray-700 bg-transparent text-white"
-                              />
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                onClick={() => handleAddCustomStage(field)}
-                                className="hover:bg-yellow-500/10"
-                              >
-                                <Plus className="h-4 w-4" />
-                              </Button>
+                                </Card>
+                              ))}
                             </div>
-
-                            {field.value.length > 0 && (
-                              <div className="grid gap-2 pt-4">
-                                {field.value.map((stage, index) => (
-                                  <Card
-                                    key={
-                                      stage.documentId ||
-                                      stage.id ||
-                                      `custom-${index}`
-                                    }
-                                    className="p-2 bg-yellow-500/10 border-yellow-500/20 flex justify-between items-center"
-                                  >
-                                    <span className="text-white">
-                                      {stage.name}
-                                    </span>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => {
-                                        field.onChange(
-                                          field.value.filter(
-                                            (v) =>
-                                              (v.documentId || v.id) !==
-                                              (stage.documentId || stage.id)
-                                          )
-                                        );
-                                      }}
-                                      className="h-8 w-8 hover:bg-yellow-500/20"
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  </Card>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </Card>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                          )}
+                        </div>
+                      )}
+                    </Card>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
-            {/* Submit Button */}
-            <Button
-              onClick={handleUpdateSubmit}
-              className="w-full bg-yellow-500 text-black hover:bg-yellow-400"
-            >
-              Actualizar
-            </Button>
-          </form>
-        </Form>
-      )}
+            {/* Stages Section */}
+            <div className="space-y-6">
+              <FormField
+                control={form.control}
+                name="stages"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-yellow-500 text-lg">
+                      Stages
+                    </FormLabel>
+                    <Card className="p-4 border border-gray-700 bg-black/50">
+                      {stageLoading ? (
+                        <p className="text-center text-white">Cargando</p>
+                      ) : stageError ? (
+                        <p>Error: {stageError.message}</p>
+                      ) : (
+                        <div className="space-y-4">
+                          <Popover
+                            open={openStages}
+                            onOpenChange={setOpenStages}
+                          >
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  className="w-full border-gray-700 bg-transparent text-white hover:bg-yellow-500/10"
+                                >
+                                  {field.value.length > 0
+                                    ? `${field.value.length} seleccionados`
+                                    : "Seleccionar"}
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="p-0 bg-black border-yellow-500 w-full">
+                              <Command className="bg-black">
+                                <CommandInput
+                                  placeholder="Buscar stages..."
+                                  className="text-yellow-500"
+                                />
+                                <CommandList>
+                                  <CommandEmpty>
+                                    No se encontraron resultados
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    <CommandItem
+                                      className="text-yellow-500 hover:bg-yellow-500/10"
+                                      onSelect={() => {
+                                        if (
+                                          field.value.length === allStages.length
+                                        ) {
+                                          field.onChange([]);
+                                        } else {
+                                          field.onChange(allStages);
+                                        }
+                                      }}
+                                    >
+                                      <div
+                                        className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${field.value.length === allStages.length
+                                          ? "bg-yellow-500 text-black"
+                                          : "opacity-50"
+                                          }`}
+                                      >
+                                        {field.value.length === allStages.length &&
+                                          "✓"}
+                                      </div>
+                                      Seleccionar Todas
+                                    </CommandItem>
+                                    {allStages.map((stage, index) => {
+                                      const keyStage =
+                                        stage.documentId ||
+                                        stage.id ||
+                                        `custom-${index}`;
+                                      const isSelected = field.value.some(
+                                        (item) =>
+                                          (item.documentId || item.id) ===
+                                          (stage.documentId || stage.id)
+                                      );
+                                      return (
+                                        <CommandItem
+                                          key={keyStage}
+                                          onSelect={() => {
+                                            const current = field.value;
+                                            let newValues;
+                                            if (isSelected) {
+                                              newValues = current.filter(
+                                                (v) =>
+                                                  (v.documentId || v.id) !==
+                                                  (stage.documentId ||
+                                                    stage.id)
+                                              );
+                                            } else {
+                                              newValues = [...current, stage];
+                                            }
+                                            field.onChange(newValues);
+                                          }}
+                                          className="text-yellow-500 hover:bg-yellow-500/10"
+                                        >
+                                          <div
+                                            className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected
+                                              ? "bg-yellow-500 text-black"
+                                              : "opacity-50"
+                                              }`}
+                                          >
+                                            {isSelected && "✓"}
+                                          </div>
+                                          {stage.name}
+                                        </CommandItem>
+                                      );
+                                    })}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+
+                          <div className="flex gap-2 items-center">
+                            <Input
+                              placeholder="Nuevo Stage"
+                              value={customStagesInput}
+                              onChange={(e) =>
+                                setCustomStagesInput(e.target.value)
+                              }
+                              className="border-gray-700 bg-transparent text-white"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleAddCustomStage(field)}
+                              className="hover:bg-yellow-500/10"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          {field.value.length > 0 && (
+                            <div className="grid gap-2 pt-4">
+                              {field.value.map((stage, index) => (
+                                <Card
+                                  key={
+                                    stage.documentId ||
+                                    stage.id ||
+                                    `custom-${index}`
+                                  }
+                                  className="p-2 bg-yellow-500/10 border-yellow-500/20 flex justify-between items-center"
+                                >
+                                  <span className="text-white">
+                                    {stage.name}
+                                  </span>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => {
+                                      field.onChange(
+                                        field.value.filter(
+                                          (v) =>
+                                            (v.documentId || v.id) !==
+                                            (stage.documentId || stage.id)
+                                        )
+                                      );
+                                    }}
+                                    className="h-8 w-8 hover:bg-yellow-500/20"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </Card>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </Card>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <Button
+            onClick={handleUpdateSubmit}
+            className="w-full bg-yellow-500 text-black hover:bg-yellow-400"
+          >
+            Actualizar
+          </Button>
+        </form>
+      </Form>
     </Card>
   );
 }

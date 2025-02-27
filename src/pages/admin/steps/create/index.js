@@ -4,9 +4,7 @@ import DashboardLayout from "../../";
 export default function Index() {
   return (
     <DashboardLayout>
-      <div>
-        <CreateStepFormC />
-      </div>
+      <CreateStepFormC />
     </DashboardLayout>
   )
 }
