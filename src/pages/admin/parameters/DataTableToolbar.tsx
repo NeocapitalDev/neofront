@@ -24,6 +24,13 @@ export function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>)
           className="h-8 w-[150px] lg:w-[250px]"
         /> */}
         <Input
+          placeholder="Filter by category..."
+          value={(table.getColumn("challenge_step")?.getFilterValue() as string) ?? ""}
+          onChange={(event) => table.getColumn("challenge_step")?.setFilterValue(event.target.value)}
+          className="h-8 w-[150px] lg:w-[250px]"
+        />
+
+        <Input
           placeholder="Filter by subcategory..."
           value={(table.getColumn("challenge_subcategory")?.getFilterValue() as string) ?? ""}
           onChange={(event) => table.getColumn("challenge_subcategory")?.setFilterValue(event.target.value)}

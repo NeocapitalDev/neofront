@@ -20,6 +20,16 @@ export interface Challenge_subcategory {
   name: string;
 }
 
+export interface Challenge_stages {
+  id: string | number;
+  name: string;
+}
+
+export interface Challenge_step {
+  id: string | number;
+  name: string;
+}
+
 export interface ChallengeRelationsStages {
   minimumTradingDays: number;
   maximumDailyLoss: number;
@@ -28,6 +38,10 @@ export interface ChallengeRelationsStages {
   leverage: number;
   challenge_subcategory: Challenge_subcategory;
   challenge_products: Challenge_products[];
+  challenge_step: Challenge_step;
+  challenge_stages: Challenge_stages[];
+  
+
   documentId: string;
 }
 
@@ -40,6 +54,8 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
   const { data: productsData, error: productsError, isLoading: productsLoading } = useStrapiData("challenge-products");
   const { data: subcategoriesData, error: subcategoriesError, isLoading: subcategoriesLoading } = useStrapiData("challenge-subcategories");
+  const { data: stagesdata, error: stagesError, isLoading: stagesLoading } = useStrapiData("challenge-stages");
+  const { data: stepsdata, error: stepsError, isLoading: stepsLoading } = useStrapiData("challenge-steps");
 
   // Estado local basado en prop para manipular seleccionados
   const [editableProp, setEditableProp] = useState(prop);
@@ -48,6 +64,18 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
   const productavailable = productsData?.filter((product) =>
     !editableProp.challenge_products.some(p => p.id === product.id)
   );
+    // Stages disponibles (excluyendo la ya seleccionada)
+
+  const stagesavailable = stagesdata?.filter((stages) =>
+    !editableProp.challenge_stages.some(p => p.id === stages.id)
+  );
+
+
+    // Subcategorías disponibles (excluyendo la ya seleccionada)
+    const stepavailable = stepsdata?.filter((steps) =>
+      steps.id !== editableProp.challenge_step?.id
+    ) || [];
+
 
   // Subcategorías disponibles (excluyendo la ya seleccionada)
   const subcategoriesavailable = subcategoriesData?.filter((subcategory) =>
@@ -75,6 +103,31 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
     setEditableProp((prev) => ({
       ...prev,
       challenge_subcategory: subcategory
+    }));
+  };
+
+  // Función para agregar stage
+
+  const addStage = (stages: Challenge_stages) => {
+    setEditableProp((prev) => ({
+      ...prev,
+      challenge_stages: [...prev.challenge_stages, stages]
+    }));
+  };
+
+  // Función para quitar un producto
+  const removeStage = (productId: string | number) => {
+    setEditableProp((prev) => ({
+      ...prev,
+      challenge_stages: prev.challenge_stages.filter(p => p.id !== productId)
+    }));
+  };
+
+  // Función para cambiar la subcategoría
+  const changeCategory = (category: Challenge_step) => {
+    setEditableProp((prev) => ({
+      ...prev,
+      challenge_step: category
     }));
   };
 
@@ -128,12 +181,45 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
 
 
-          <div className="flex gap-4">
+          <div className="flex gap-2">
 
 
             {/* Sección de Subcategoria */}
             <div className="flex-[2] my-6">
-              <h3 className="text-sm font-medium text-muted-foreground mb-3">
+              <h3 className="text-sm   text-muted-foreground mb-3">
+                <Badge>Categoria</Badge>
+              </h3>
+              <div className="grid grid-cols-1 gap-2">
+                {editableProp.challenge_step && editableProp.challenge_step.name ? (
+
+                  <Card key={editableProp.challenge_step?.id}>
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs ">
+                            {modalType === 2 ? (
+                              <div>
+                                <p className="text-xs ">{editableProp.challenge_step?.name}</p>
+
+                                <Button variant="destructive" className="absolute -mt-7 ml-40" size="sm"  onClick={() => changeSubcategory(null)}>
+                                  -
+                                </Button>
+                              </div>
+
+                            ) : (
+                              prop.challenge_step.name
+                            )}
+                          </p>
+                          {/* <p className="text-sm text-muted-foreground">
+                        ID: {prop.challenge_step?.id}
+                      </p> */}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : null}
+              </div>
+              <h3 className="text-sm  text-muted-foreground mb-3">
                 <Badge>Subcategoria</Badge>
               </h3>
               <div className="grid grid-cols-1 gap-2">
@@ -143,10 +229,10 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                     <CardContent className="p-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium">
+                          <p className="text-xs ">
                             {modalType === 2 ? (
                               <div>
-                                <p className="font-medium">{editableProp.challenge_subcategory?.name}</p>
+                                <p className="text-xs ">{editableProp.challenge_subcategory?.name}</p>
 
                                 <Button variant="destructive" className="absolute -mt-7 ml-40" size="sm"  onClick={() => changeSubcategory(null)}>
                                   -
@@ -164,8 +250,12 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                       </div>
                     </CardContent>
                   </Card>
+
+                  
                 ) : null}
               </div>
+
+
 
               <CardHeader>
                 <CardTitle>Parámetros y condiciones</CardTitle>
@@ -244,10 +334,47 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
             </div>
 
+            {/* Sección de Stages */}
+
+            <div className="flex-[1] mt-6">
+              <h3 className="text-sm   text-muted-foreground mb-3">
+                <Badge variant="secondary">Stages</Badge>
+              </h3>
+              <div className="grid grid-cols-1 gap-2">
+                {editableProp.challenge_stages.map((stages, index) => (
+                  <Card key={stages.id}>
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs ">
+                            {modalType === 2 ? (
+                              <div>
+                                <p className="text-xs  ">{stages.name}</p>
+
+                                <Button variant="destructive" className="absolute -mt-7 ml-12" size="sm"  onClick={() => removeStage(stages.id)}>
+                                  -
+                                </Button>
+                              </div>
+
+                            ) : (
+                              stages.name
+                            )}
+                          </p>
+                          {/* <p className="text-sm text-muted-foreground">
+                          ID: {stages.id}
+                        </p> */}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
             {/* Sección de Productos */}
 
             <div className="flex-[1] mt-6">
-              <h3 className="text-sm font-medium text-muted-foreground mb-3">
+              <h3 className="text-sm   text-muted-foreground mb-3">
                 <Badge variant="secondary">Productos</Badge>
               </h3>
               <div className="grid grid-cols-1 gap-2">
@@ -256,10 +383,10 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                     <CardContent className="p-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium">
+                          <p className="text-xs ">
                             {modalType === 2 ? (
                               <div>
-                                <p className="font-medium">{product.name}</p>
+                                <p className="text-xs ">{product.name}</p>
 
                                 <Button variant="destructive" className="absolute -mt-7 ml-12" size="sm"  onClick={() => removeProduct(product.id)}>
                                   -
@@ -295,21 +422,21 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
       {modalType === 2 && (
 
 
-        <div className="flex gap-4">
+        <div className="flex gap-2">
           <Card >
 
             <CardContent className="space-y-6 ">
 
 
 
-              <div className="flex gap-4">
+              <div className="flex gap-2">
 
 
 
                 {/* Sección de Productos disponibles*/}
 
                 <div className="flex-[1] mt-6">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                  <h3 className="text-sm text-xs  text-muted-foreground mb-3">
                     <Badge className="bg-amber-200 text-black">Productos disponibles</Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
@@ -318,10 +445,10 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                         <CardContent className="p-3">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="font-medium">
+                              <p className="text-xs ">
                                 {modalType === 2 ? (
                                   <div>
-                                    <p className="font-medium">{product.name}</p>
+                                    <p className="text-xs ">{product.name}</p>
 
                                     <Button variant="default" className="absolute -mt-7 ml-10" size="sm"  onClick={() => addProduct(product)}>
                                       +
@@ -352,6 +479,62 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
           </Card>
 
+          <Card >
+
+            <CardContent className="space-y-6 ">
+
+
+
+              <div className="flex gap-2">
+
+
+
+                {/* Sección de Productos disponibles*/}
+
+                <div className="flex-[1] mt-6">
+                  <h3 className="text-sm  text-muted-foreground mb-3">
+                    <Badge className="bg-amber-200 text-black">Fases disponibles</Badge>
+                  </h3>
+                  <div className="grid grid-cols-1 gap-2">
+                    {stagesavailable?.map((stages, index) => (
+                      <Card key={stages.id}>
+                        <CardContent className="p-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-xs ">
+                                {modalType === 2 ? (
+                                  <div>
+                                    <p className="text-xs ">{stages.name}</p>
+
+                                    <Button variant="default" className="absolute -mt-7 ml-10" size="sm"  onClick={() => addStage(stages)}>
+                                      +
+                                    </Button>
+                                  </div>
+
+                                ) : (
+                                  stages.name
+                                )}
+                              </p>
+                              {/* <p className="text-sm text-muted-foreground">
+          ID: {product.id}
+        </p> */}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+
+
+            </CardContent>
+
+
+          </Card>
+
 
           <Card >
 
@@ -360,14 +543,14 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
 
 
-              <div className="flex gap-4">
+              <div className="flex gap-2">
 
 
 
                 {/* Sección de Subcategorias disponibles*/}
 
                 <div className="flex-[1] mt-6">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                  <h3 className="text-sm  text-muted-foreground mb-3">
                     <Badge  className="bg-amber-200 text-black">Subcategorias disponibles</Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
@@ -376,12 +559,12 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                         <CardContent className="p-3">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="font-medium">
+                              <p className="text-xs ">
                                 {modalType === 2 ? (
 
                                   <div>
 
-                                    <p className="font-medium">{subcategory.name}</p>
+                                    <p className="text-xs ">{subcategory.name}</p>
 
                                     <Button variant="default" className="absolute -mt-7 ml-12" size="sm" onClick={() => changeSubcategory(subcategory)}>
                                       +
@@ -411,6 +594,64 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
           </Card>
 
+
+          <Card >
+
+
+            <CardContent className="space-y-6 ">
+
+
+
+              <div className="flex gap-2">
+
+
+
+                {/* Sección de Subcategorias disponibles*/}
+
+                <div className="flex-[1] mt-6">
+                  <h3 className="text-sm   text-muted-foreground mb-3">
+                    <Badge  className="bg-amber-200 text-black">Categorias disponibles</Badge>
+                  </h3>
+                  <div className="grid grid-cols-1 gap-2">
+                    {stepavailable?.map((step, index) => (
+                      <Card key={step.id}>
+                        <CardContent className="p-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-xs ">
+                                {modalType === 2 ? (
+
+                                  <div>
+
+                                    <p className="text-xs ">{step.name}</p>
+
+                                    <Button variant="default" className="absolute -mt-7 ml-12" size="sm" onClick={() => changeCategory(step)}>
+                                      +
+                                    </Button>
+                                  </div>
+
+                                ) : (
+                                  step.name
+                                )}
+                              </p>
+                              {/* <p className="text-sm text-muted-foreground">
+  ID: {product.id}
+</p> */}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+
+            </CardContent>
+
+
+          </Card>
         </div>
 
       )}

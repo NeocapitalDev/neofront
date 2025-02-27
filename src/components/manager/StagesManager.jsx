@@ -170,15 +170,29 @@ export function StagesManager({ pageSize }) {
   }
 
   // --------------------------------------------------
-  // 4. Render
+  // 4. Procesar datos para la tabla:
+  //    - Eliminar nombres duplicados.
+  //    - Enumerar secuencialmente (1,2,3,...) en lugar de usar el id real.
+  // --------------------------------------------------
+  const uniqueStages = stages.filter(
+    (item, index, self) =>
+      index === self.findIndex((t) => t.name === item.name)
+  );
+  const tableData = uniqueStages.map((item, index) => ({
+    ...item,
+    id: index + 1, // Se reemplaza el id real por el número de fila
+  }));
+
+  // --------------------------------------------------
+  // 5. Render
   // --------------------------------------------------
   return (
     <div>
-      {/* <RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} /> */}
+      <RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} />
 
       <ChallengeTable
         title="Challenge Stage"
-        data={stages}
+        data={tableData}
         pageSize={pageSize}
         onCreate={handleOpenCreate}
         onEdit={handleOpenEdit}
@@ -198,18 +212,13 @@ export function StagesManager({ pageSize }) {
           </DialogHeader>
 
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-3 mt-3"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 mt-3">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-yellow-500 text-sm">
-                      Nombre
-                    </FormLabel>
+                    <FormLabel className="text-yellow-500 text-sm">Nombre</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
