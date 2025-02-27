@@ -23,6 +23,14 @@ export type ChallengeRelationsStages = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
+  challenge_step: {
+    id: number;
+    documentId: string;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+    publishedAt: string;
+  };
   challenge_subcategory: {
     id: number;
     documentId: string;
@@ -39,6 +47,16 @@ export type ChallengeRelationsStages = {
     updatedAt: string;
     publishedAt: string;
   }[];
+
+  challenge_stages: {
+    id: number;
+    documentId: string;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+    publishedAt: string;
+  }[];
+  
 };
 
 export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
@@ -65,6 +83,31 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
     enableSorting: false,
     enableHiding: false,
   },
+  {
+    accessorKey: "challenge_step",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="challenge_step" />
+    ),
+    cell: ({ row }) => {
+      const subcategories = row.getValue(
+        "challenge_step"
+      ) as ChallengeRelationsStages["challenge_step"];
+      return (
+        <div className="flex flex-wrap gap-1">
+          <Badge key={subcategories?.id} variant="secondary">
+            {subcategories?.name}
+          </Badge>
+        </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      const subcategories = row.getValue(
+        "challenge_step"
+      ) as ChallengeRelationsStages["challenge_step"];
+      return subcategories?.name.toLowerCase().includes(value.toLowerCase());
+    },
+  },
+
   {
     accessorKey: "challenge_subcategory",
     header: ({ column }) => (
@@ -117,6 +160,36 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
       );
     },
   },
+
+  {
+    accessorKey: "challenge_stages",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Fases" />
+    ),
+    cell: ({ row }) => {
+      const products = row.getValue(
+        "challenge_stages"
+      ) as ChallengeRelationsStages["challenge_stages"];
+      return (
+        <div className="flex flex-wrap gap-1">
+          {products.map((product) => (
+            <Badge key={product.id} variant="secondary">
+              {product.name}
+            </Badge>
+          ))}
+        </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      const products = row.getValue(
+        "challenge_stages"
+      ) as ChallengeRelationsStages["challenge_stages"];
+      return products.some((product) =>
+        product.name.toLowerCase().includes(value.toLowerCase())
+      );
+    },
+  },
+
   {
     id: "actions",
     header: "Actions",
@@ -130,6 +203,9 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
         documentId: data.documentId,
 
         leverage: data.leverage,
+        challenge_stages: data.challenge_stages,
+        challenge_step: data.challenge_step,
+
         challenge_subcategory: data.challenge_subcategory,
         challenge_products: data.challenge_products,
       };
@@ -165,7 +241,7 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             title={`Details ${prop.challenge_subcategory?.name}`}
-            maxWidth="3xl"
+            maxWidth="7xl"
           >
             <PropDetails prop={prop} modalType={modalType} />
           </DetailModal>

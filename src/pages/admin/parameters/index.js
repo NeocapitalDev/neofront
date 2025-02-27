@@ -6,7 +6,8 @@ import DashboardLayout from "..";
 
 
 function index() {
-    const { data, error, isLoading } = useStrapiData("challenge-relations-stages?populate=*");
+    const { data, error, isLoading } = useStrapiData("challenge-relations?populate=*");
+    console.log(data)
     return (
 
     <DashboardLayout>
