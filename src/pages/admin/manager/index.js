@@ -12,7 +12,7 @@ export default function IndexPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-2 space-y-4 bg-black min-h-screen text-white">
+      <div className="p-2 space-y-4  min-h-screen text-white">
 
         {/* Grid con las 3 tablas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

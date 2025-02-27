@@ -133,7 +133,7 @@ export function SubcategoriesManager() {
 
   function handleOpenEdit(item) {
     setEditItem({
-      docId: item.documentId, // Asumiendo que usas documentId como UID
+      docId: item.documentId, // Usamos documentId como UID
       name: item.name,
     });
     form.reset({ name: item.name });
@@ -170,14 +170,28 @@ export function SubcategoriesManager() {
   }
 
   // --------------------------------------------------
-  // 4. Render
+  // 4. Procesar datos para la tabla:
+  //    - Eliminar nombres duplicados.
+  //    - Enumerar secuencialmente (1,2,3,...) en lugar de usar el id real.
+  // --------------------------------------------------
+  const uniqueSubcats = subcats.filter(
+    (item, index, self) =>
+      index === self.findIndex((t) => t.name === item.name)
+  );
+  const tableData = uniqueSubcats.map((item, index) => ({
+    ...item,
+    id: index + 1, // Reemplaza el id de la base de datos por el número de fila
+  }));
+
+  // --------------------------------------------------
+  // 5. Render
   // --------------------------------------------------
   return (
     <div>
-      <RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} />
+      {/*<RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} />}*/}
       <ChallengeTable
         title="Challenge Subcategory"
-        data={subcats}
+        data={tableData}
         pageSize={pageSize}
         onCreate={handleOpenCreate}
         onEdit={handleOpenEdit}

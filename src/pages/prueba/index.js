@@ -11,11 +11,11 @@ import { PlusIcon } from "@heroicons/react/24/outline";
  * Wizard:
  * 1) Steps (por name; filtra internamente por step.documentId)
  * 2) Subcategories (por name; filtra internamente por subcat.documentId)
- * 3) Products (obtenidos de "relations" => subcatDoc)
+ * 3) Products (obtenidos directamente desde la subcategoría, es decir, subcat.challenge_products)
  * 4) Stages (del step => challenge_stages)
  *
- * - Si la lista está vacía => "No hay X" + icono "+" en la misma fila
- * - Si la lista NO está vacía => se listan en la misma fila y, al final, un icono "+"
+ * - Si la lista está vacía => "No hay X" + icono "+" en la misma fila.
+ * - Si la lista NO está vacía => se listan en la misma fila y, al final, un icono "+".
  * - No mostramos documentId en la UI, solo el name.
  */
 export default function StepSubcatAutoShowNoResumen() {
@@ -24,9 +24,8 @@ export default function StepSubcatAutoShowNoResumen() {
   // --- Colecciones ---
   const [steps, setSteps] = useState([]);
   const [subcats, setSubcats] = useState([]);
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]); // Si se requiere algo específico, aunque ahora se obtiene desde subcats.
   const [stages, setStages] = useState([]);
-  const [relations, setRelations] = useState([]);
 
   // --- Selecciones (internamente docId, en UI => name) ---
   const [selectedStepDoc, setSelectedStepDoc] = useState(null);
@@ -52,7 +51,7 @@ export default function StepSubcatAutoShowNoResumen() {
         if (!subRes.ok) throw new Error("Error al cargar Subcats");
         const subJson = await subRes.json();
 
-        // 3) Products
+        // 3) Products (si es necesario cargar todos por separado)
         const prodRes = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-products?populate=*`,
           { headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}` } }
@@ -68,25 +67,15 @@ export default function StepSubcatAutoShowNoResumen() {
         if (!stgRes.ok) throw new Error("Error al cargar Stages");
         const stgJson = await stgRes.json();
 
-        // 5) Relations
-        const relRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations-stages?populate=*`,
-          { headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}` } }
-        );
-        if (!relRes.ok) throw new Error("Error al cargar Relations");
-        const relJson = await relRes.json();
-
         setSteps(stepsJson.data || []);
         setSubcats(subJson.data || []);
         setProducts(prodJson.data || []);
         setStages(stgJson.data || []);
-        setRelations(relJson.data || []);
 
         console.log("Steps =>", stepsJson.data);
         console.log("Subcats =>", subJson.data);
         console.log("Products =>", prodJson.data);
         console.log("Stages =>", stgJson.data);
-        console.log("Relations =>", relJson.data);
       } catch (err) {
         console.error("loadAll error:", err);
       }
@@ -101,8 +90,8 @@ export default function StepSubcatAutoShowNoResumen() {
 
   // Manejo de click en icono "+"
   function handlePlusClick() {
-    // Redirige a /admin/relations/new
-    router.push("/admin/relations/new");
+    // Redirige a /admin/steps o la ruta correspondiente para agregar nuevos items
+    router.push("/admin/steps");
   }
 
   // ========== STEPS: { doc, name } ==========
@@ -137,17 +126,18 @@ export default function StepSubcatAutoShowNoResumen() {
     }
   }
 
-  // ========== PRODUCTS: relations => subcatDoc => relItem.challenge_products ==========
-  let productList = [];
-  let relItem = null;
+  // -----------------------------------------------
+  // 1) Definir la subcategoría seleccionada global
+  // -----------------------------------------------
+  let selectedSubcat = null;
   if (selectedSubcatDoc) {
-    relItem = relations.find((rel) => {
-      const csc = rel.challenge_subcategory;
-      return csc && csc.documentId === selectedSubcatDoc;
-    });
-    if (relItem) {
-      productList = relItem.challenge_products || [];
-    }
+    selectedSubcat = subcats.find((sc) => sc.documentId === selectedSubcatDoc);
+  }
+
+  // ========== PRODUCTS: directamente desde la Subcategory ==========
+  let productList = [];
+  if (selectedSubcat) {
+    productList = selectedSubcat.challenge_products || [];
   }
 
   return (
@@ -160,15 +150,16 @@ export default function StepSubcatAutoShowNoResumen() {
         {/* ================== 1) STEPS ================== */}
         <div className="flex items-center justify-center gap-2 flex-wrap">
           {stepOptions.length === 0 ? (
-            // Lista vacía => "No hay Steps" + icono "+" en la misma fila
             <>
               <span className="text-gray-400">No hay Steps</span>
-              <Button onClick={handlePlusClick} className="bg-red-500 hover:bg-red-400 flex items-center gap-1">
+              <Button
+                onClick={handlePlusClick}
+                className="bg-red-500 hover:bg-red-400 flex items-center gap-1"
+              >
                 <PlusIcon className="w-4 h-4" />
               </Button>
             </>
           ) : (
-            // Lista con datos => items + icono "+" al final
             <>
               {stepOptions.map((stepObj) => (
                 <button
@@ -184,7 +175,10 @@ export default function StepSubcatAutoShowNoResumen() {
                   {stepObj.name}
                 </button>
               ))}
-              <Button onClick={handlePlusClick} className="bg-red-500 hover:bg-red-400 flex items-center gap-1">
+              <Button
+                onClick={handlePlusClick}
+                className="bg-red-500 hover:bg-red-400 flex items-center gap-1"
+              >
                 <PlusIcon className="w-4 h-4" />
               </Button>
             </>
@@ -197,7 +191,10 @@ export default function StepSubcatAutoShowNoResumen() {
             {subcatOptions.length === 0 ? (
               <>
                 <span className="text-gray-400">No hay Subcategorías para este Step</span>
-                <Button onClick={handlePlusClick} className="bg-red-500 hover:bg-red-400 flex items-center gap-1">
+                <Button
+                  onClick={handlePlusClick}
+                  className="bg-red-500 hover:bg-red-400 flex items-center gap-1"
+                >
                   <PlusIcon className="w-4 h-4" />
                 </Button>
               </>
@@ -217,7 +214,10 @@ export default function StepSubcatAutoShowNoResumen() {
                     {sc.name}
                   </button>
                 ))}
-                <Button onClick={handlePlusClick} className="bg-red-500 hover:bg-red-400 flex items-center gap-1">
+                <Button
+                  onClick={handlePlusClick}
+                  className="bg-red-500 hover:bg-red-400 flex items-center gap-1"
+                >
                   <PlusIcon className="w-4 h-4" />
                 </Button>
               </>
@@ -227,40 +227,35 @@ export default function StepSubcatAutoShowNoResumen() {
 
         {/* ================== 3) PRODUCTS & STAGES ================== */}
         {selectedSubcatDoc && (
-          <div className="space-y-4 mt-4">
+          <div className="flex flex-row gap-4 mt-4">
             {/* PRODUCTS */}
-            <Card className="bg-zinc-900 border-zinc-700">
+            <Card className="bg-zinc-900 border-zinc-700 flex-1">
               <CardHeader>
                 <CardTitle className="text-yellow-400">Products Relacionados</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-2 flex-wrap">
-                  {relItem ? (
-                    relItem.challenge_products && relItem.challenge_products.length > 0 ? (
-                      <>
-                        {relItem.challenge_products.map((p) => (
-                          <div key={p.id} className="px-4 py-2 bg-zinc-800 rounded">
-                            {p.name ?? "Product sin nombre"}
-                          </div>
-                        ))}
-                        <Button onClick={handlePlusClick} className="bg-red-500 hover:bg-red-400 flex items-center gap-1">
-                          <PlusIcon className="w-4 h-4" />
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-gray-400">No hay Products en la relación</span>
-                        <Button onClick={handlePlusClick} className="bg-red-500 hover:bg-red-400 flex items-center gap-1">
-                          <PlusIcon className="w-4 h-4" />
-                        </Button>
-                      </>
-                    )
+                  {productList && productList.length > 0 ? (
+                    <>
+                      {productList.map((p) => (
+                        <div key={p.id} className="px-4 py-2 bg-zinc-800 rounded">
+                          {p.name ?? "Product sin nombre"}
+                        </div>
+                      ))}
+                      <Button
+                        onClick={handlePlusClick}
+                        className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                      >
+                        <PlusIcon className="w-4 h-4" />
+                      </Button>
+                    </>
                   ) : (
                     <>
-                      <span className="text-gray-400">
-                        No existe "challenge-relations-stage" para esta Subcat
-                      </span>
-                      <Button onClick={handlePlusClick} className="bg-red-500 hover:bg-red-400 flex items-center gap-1">
+                      <span className="text-gray-400">No hay Products en esta Subcat</span>
+                      <Button
+                        onClick={handlePlusClick}
+                        className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                      >
                         <PlusIcon className="w-4 h-4" />
                       </Button>
                     </>
@@ -270,27 +265,33 @@ export default function StepSubcatAutoShowNoResumen() {
             </Card>
 
             {/* STAGES */}
-            <Card className="bg-zinc-900 border-zinc-700">
+            <Card className="bg-zinc-900 border-zinc-700 flex-1">
               <CardHeader>
                 <CardTitle className="text-yellow-400">Stages Relacionados</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-2 flex-wrap">
-                  {stageList.length > 0 ? (
+                  {stageList && stageList.length > 0 ? (
                     <>
                       {stageList.map((sg) => (
                         <div key={sg.id} className="px-4 py-2 bg-zinc-800 rounded">
                           {sg.name ?? "Stage sin nombre"}
                         </div>
                       ))}
-                      <Button onClick={handlePlusClick} className="bg-red-500 hover:bg-red-400 flex items-center gap-1">
+                      <Button
+                        onClick={handlePlusClick}
+                        className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                      >
                         <PlusIcon className="w-4 h-4" />
                       </Button>
                     </>
                   ) : (
                     <>
                       <span className="text-gray-400">No hay Stages para este Step</span>
-                      <Button onClick={handlePlusClick} className="bg-red-500 hover:bg-red-400 flex items-center gap-1">
+                      <Button
+                        onClick={handlePlusClick}
+                        className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                      >
                         <PlusIcon className="w-4 h-4" />
                       </Button>
                     </>
@@ -300,6 +301,85 @@ export default function StepSubcatAutoShowNoResumen() {
             </Card>
           </div>
         )}
+
+        {/* OPCIONAL: Tarjeta para parámetros de la Subcategoría (si los necesitas) */}
+{selectedSubcat && (
+  <div className="mt-6">
+    <Card className="bg-zinc-900 border-zinc-700">
+      <CardHeader>
+        <CardTitle className="text-yellow-400">Parámetros de la Subcategoría</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2 text-sm text-gray-200">
+          {/* Nombre de la subcategoría (por si lo quieres mostrar) */}
+          <div>
+            <span className="font-semibold text-yellow-300">Nombre: </span>
+            {selectedSubcat.name ?? "—"}
+          </div>
+
+          {/* Ejemplo: minimumTradingDays */}
+          <div>
+            <span className="font-semibold text-yellow-300">Min Trading Days: </span>
+            {selectedSubcat.minimumTradingDays ?? "—"}
+          </div>
+
+          {/* Ejemplo: maximumDailyLoss */}
+          <div>
+            <span className="font-semibold text-yellow-300">Max Daily Loss: </span>
+            {selectedSubcat.maximumDailyLoss ?? "—"}
+          </div>
+
+          {/* Ejemplo: maximumLoss */}
+          <div>
+            <span className="font-semibold text-yellow-300">Max Loss: </span>
+            {selectedSubcat.maximumLoss ?? "—"}
+          </div>
+
+          {/* Ejemplo: profitTarget */}
+          <div>
+            <span className="font-semibold text-yellow-300">Profit Target: </span>
+            {selectedSubcat.profitTarget ?? "—"}
+          </div>
+
+          {/* Ejemplo: leverage */}
+          <div>
+            <span className="font-semibold text-yellow-300">Leverage: </span>
+            {selectedSubcat.leverage ?? "—"}
+          </div>
+
+          {/* Si broker_account es un objeto, lo mostramos así: */}
+          <div>
+            <span className="font-semibold text-yellow-300">Broker Account: </span>
+            {selectedSubcat.broker_account ? (
+              <div className="ml-4 mt-1">
+                {/* Ajusta estos campos según los que tengas en tu objeto broker_account */}
+                <div>Login: {selectedSubcat.broker_account.login}</div>
+                <div>Password: {selectedSubcat.broker_account.password}</div>
+                <div>Balance: {selectedSubcat.broker_account.balance}</div>
+                <div>Server: {selectedSubcat.broker_account.server}</div>
+                <div>Platform: {selectedSubcat.broker_account.platform}</div>
+                {/* Agrega las propiedades que necesites */}
+              </div>
+            ) : (
+              "—"
+            )}
+          </div>
+
+          {/* Agrega más campos si tu subcategoría tiene otros */}
+          <div>
+            <span className="font-semibold text-yellow-300">Fecha de creación: </span>
+            {selectedSubcat.createdAt ?? "—"}
+          </div>
+          <div>
+            <span className="font-semibold text-yellow-300">Fecha de actualización: </span>
+            {selectedSubcat.updatedAt ?? "—"}
+          </div>
+          {/* etc. */}
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+)}
       </div>
     </div>
   );
