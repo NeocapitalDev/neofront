@@ -31,7 +31,7 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 
-export function CreateStepForm() {
+export function CreateStepFormC() {
   // --- Datos desde Strapi ---
   const {
     data: subcategories,
@@ -86,100 +86,19 @@ export function CreateStepForm() {
 
   // --- Función para crear el Step y sus relaciones ---
   const createStepWithRelations = async (stepPayload) => {
-    try {
-      // Crear el challenge step
-      const stepResponse = await fetch(
-        "http://localhost:1337/api/challenge-steps",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-          },
-          body: JSON.stringify({ data: { name: stepPayload.name } }),
-        }
-      );
-      const stepResult = await stepResponse.json();
-      console.log("Challenge Step creado:", stepResult);
-      const stepId = stepResult.data.documentId;
-
-      // Crear o asociar subcategorías
-      for (const subcat of stepPayload.subcategories) {
-        if (typeof subcat.id === "string" && subcat.id.startsWith("custom")) {
-          // Crear subcategoría nueva
-          const newSubcatResponse = await fetch(
-            "http://localhost:1337/api/challenge-subcategories",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-              },
-              body: JSON.stringify({
-                data: { name: subcat.name, challenge_step: stepId },
-              }),
-            }
-          );
-          const newSubcat = await newSubcatResponse.json();
-          console.log("Subcategoría creada:", newSubcat);
-        } else {
-          // Asociar subcategoría existente
-          await fetch(
-            `http://localhost:1337/api/challenge-subcategories/${subcat.documentId}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-              },
-              body: JSON.stringify({
-                data: { challenge_step: stepId },
-              }),
-            }
-          );
-        }
-      }
-
-      // Crear o asociar stages
-      for (const stage of stepPayload.stages) {
-        if (typeof stage.id === "string" && stage.id.startsWith("custom")) {
-          // Crear stage nuevo
-          const newStageResponse = await fetch(
-            "http://localhost:1337/api/challenge-stages",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-              },
-              body: JSON.stringify({
-                data: { name: stage.name, challenge_steps: stepId },
-              }),
-            }
-          );
-          const newStage = await newStageResponse.json();
-          console.log("Stage creado:", newStage);
-        } else {
-          // Asociar stage existente
-          await fetch(
-            `http://localhost:1337/api/challenge-stages/${stage.documentId}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-              },
-              body: JSON.stringify({
-                data: { challenge_steps: stepId },
-              }),
-            }
-          );
-        }
-      }
-      console.log("Challenge Step y relaciones creados correctamente.");
-    } catch (error) {
-      console.error("Error al crear el challenge step y sus relaciones:", error);
-    }
+    // console.log("Step a crear:", json.stringify(stepPayload));
+    fetch('http://localhost:1337/api/challenge-steps/create-with-relations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+      },
+      body: JSON.stringify(
+        stepPayload)
+    })
+      .then(response => response.json())
+      .then(data => console.log('Step creado:', data))
+      .catch(error => console.error('Error al crear el step:', error));
   };
 
   // --- Manejo del submit para crear ---
@@ -231,7 +150,7 @@ export function CreateStepForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-yellow-500 text-lg">Nombre</FormLabel>
+                  <FormLabel className="text-yellow-500 text-lg">Nombrec</FormLabel>
                   <FormControl>
                     <Input
                       {...field}

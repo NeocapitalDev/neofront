@@ -6,7 +6,6 @@ export const stepFormSchema = z.object({
   subcategories: z
     .array(
       z.object({
-        id: z.any(), // si usas strings o numbers, ajusta aquí
         documentId: z.string().optional(),
         name: z.string(),
       })
@@ -15,7 +14,6 @@ export const stepFormSchema = z.object({
   stages: z
     .array(
       z.object({
-        id: z.any(),
         documentId: z.string().optional(),
         name: z.string(),
       })
