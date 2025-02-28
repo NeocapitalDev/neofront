@@ -52,7 +52,17 @@ export default function StepSubcatAutoShowNoResumen() {
         if (!stepsRes.ok) throw new Error("Error al cargar Steps");
         const stepsJson = await stepsRes.json();
         const stepsItems = stepsJson.data || [];
+
+        // Guardamos steps
         setAllSteps(stepsItems);
+
+        // Si hay al menos un Step y no se ha seleccionado ninguno, seleccionamos el primero
+        if (stepsItems.length > 0 && selectedStepDoc === null) {
+          const firstDocId = stepsItems[0].documentId;
+          if (firstDocId) {
+            setSelectedStepDoc(firstDocId);
+          }
+        }
 
         // Fetch 2: ChallengeRelation (para subcats, products, stages)
         const relRes = await fetch(
@@ -72,7 +82,11 @@ export default function StepSubcatAutoShowNoResumen() {
     }
 
     loadData();
-  }, []);
+  }, [selectedStepDoc]); 
+  // Notar que se incluye selectedStepDoc en dependencias
+  // para evitar un posible bucle; 
+  // si no deseas re-llamar en caso de cambiar selectedStepDoc, 
+  // quita esa dependencia.
 
   // Reset subcat cuando cambie Step
   useEffect(() => {
@@ -404,6 +418,5 @@ export default function StepSubcatAutoShowNoResumen() {
         </div>
       </div>
     </DashboardLayout>
-
   );
 }
