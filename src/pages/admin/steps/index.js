@@ -43,7 +43,6 @@ export default function ViewSteps() {
       )}
 
       {/* <UpdateStepFormC step={data[0]}></UpdateStepFormC> */}
-      <FetchChallengeSteps></FetchChallengeSteps>
     </DashboardLayout>
   );
 }

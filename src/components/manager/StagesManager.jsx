@@ -175,8 +175,7 @@ export function StagesManager({ pageSize }) {
   //    - Enumerar secuencialmente (1,2,3,...) en lugar de usar el id real.
   // --------------------------------------------------
   const uniqueStages = stages.filter(
-    (item, index, self) =>
-      index === self.findIndex((t) => t.name === item.name)
+    (item, index, self) => index === self.findIndex((t) => t.name === item.name)
   );
   const tableData = uniqueStages.map((item, index) => ({
     ...item,
@@ -188,7 +187,7 @@ export function StagesManager({ pageSize }) {
   // --------------------------------------------------
   return (
     <div>
-      <RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} />
+      {/* <RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} /> */}
 
       <ChallengeTable
         title="Challenge Stage"
@@ -212,13 +211,18 @@ export function StagesManager({ pageSize }) {
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 mt-3">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-3 mt-3"
+            >
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-yellow-500 text-sm">Nombre</FormLabel>
+                    <FormLabel className="text-yellow-500 text-sm">
+                      Nombre
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}

@@ -69,8 +69,12 @@ export function CreateStepFormC() {
   const [customStagesInput, setCustomStagesInput] = useState("");
 
   // Combinar subcategorías y stages existentes con las custom
-  const allSubcategories = [...subcategoriesData, ...customSubcategories];
-  const allStages = [...(stageData || []), ...customStages];
+  const allSubcategories = [...subcategoriesData, ...customSubcategories].filter(
+    (item, index, self) => self.findIndex(i => i.documentId === item.documentId) === index
+  );
+  const allStages = [...(stageData || []), ...customStages].filter(
+    (item, index, self) => self.findIndex(i => i.documentId === item.documentId) === index
+  );
   console.log("allStages", allStages);
   console.log("allSubcategories", allSubcategories);
   // 4. useForm
@@ -246,19 +250,29 @@ export function CreateStepFormC() {
                                     </div>
                                     Seleccionar Todas
                                   </CommandItem>
-                                  {allSubcategories.map((subcat) => {
+                                  {allSubcategories.map((subcat, index) => {
+                                    const keySubcat =
+                                      subcat.documentId ||
+                                      subcat.id ||
+                                      `custom-${index}`;
                                     const isSelected = field.value.some(
-                                      (item) => item.id === subcat.id
+                                      (item) =>
+                                        (item.documentId || item.id) ===
+                                        (subcat.documentId || subcat.id)
                                     );
                                     return (
                                       <CommandItem
-                                        key={subcat.id}
+                                        key={keySubcat}
+                                        value={keySubcat}
                                         onSelect={() => {
                                           const current = field.value;
                                           let newValues;
                                           if (isSelected) {
                                             newValues = current.filter(
-                                              (v) => v.id !== subcat.id
+                                              (v) =>
+                                                (v.documentId || v.id) !==
+                                                (subcat.documentId ||
+                                                  subcat.id)
                                             );
                                           } else {
                                             newValues = [...current, subcat];
@@ -396,24 +410,35 @@ export function CreateStepFormC() {
                                     </div>
                                     Seleccionar Todas
                                   </CommandItem>
-                                  {allStages.map((stage) => {
+                                  {allStages.map((stage, index) => {
+                                    // Creamos una clave única basada en documentId, id o una combinación con el índice
+                                    const keyStage =
+                                      stage.documentId ||
+                                      stage.id ||
+                                      `custom-${index}`;
+                                    // Comprobamos si el elemento está seleccionado comparando la uniqueKey almacenada
                                     const isSelected = field.value.some(
                                       (item) =>
-                                        item.documentId === stage.documentId
+                                        (item.documentId || item.id) ===
+                                        (stage.documentId || stage.id)
                                     );
                                     return (
                                       <CommandItem
-                                        key={stage.id}
+                                        key={keyStage}
+                                        value={keyStage}
                                         onSelect={() => {
                                           const current = field.value;
                                           let newValues;
                                           if (isSelected) {
+                                            // Filtramos eliminando el objeto con esa uniqueKey
                                             newValues = current.filter(
                                               (v) =>
-                                                v.documentId !==
-                                                stage.documentId
+                                                (v.documentId || v.id) !==
+                                                (stage.documentId ||
+                                                  stage.id)
                                             );
                                           } else {
+                                            // Al seleccionar, guardamos el stage junto con su uniqueKey para identificarlo luego
                                             newValues = [...current, stage];
                                           }
                                           field.onChange(newValues);

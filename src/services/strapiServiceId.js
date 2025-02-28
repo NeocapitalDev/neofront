@@ -25,7 +25,7 @@ const fetcher = async (url) => {
 
 // Función para obtener datos de Strapi (reutilizable)
 export function useStrapiData(endpoint) {
-  const { data, error } = useSWR(
+  const { data, error, mutate } = useSWR(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${endpoint}`,
     fetcher
   );
@@ -34,5 +34,6 @@ export function useStrapiData(endpoint) {
     data,
     error,
     isLoading: !error && !data,
+    refetch: mutate,
   };
 }
