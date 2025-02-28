@@ -399,7 +399,6 @@ export default function StepSubcatAutoShowNoResumen() {
                           "—"
                         )}
                       </div>
-
                       {/* Otros campos de subcat con fecha formateada */}
                       <div>
                         <span className="font-semibold text-yellow-300">Fecha de creación: </span>
