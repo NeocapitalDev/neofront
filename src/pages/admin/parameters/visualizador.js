@@ -367,7 +367,7 @@ export default function StepSubcatAutoShowNoResumen() {
                 <Card key={sg.id} className="bg-zinc-900 border-zinc-700 w-full">
                   <CardHeader>
                     <CardTitle className="text-yellow-400">
-                      Parámetros de la Subcategoría - {sg.name}
+                      {sg.name}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
