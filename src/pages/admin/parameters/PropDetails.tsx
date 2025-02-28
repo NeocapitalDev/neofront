@@ -135,11 +135,16 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+  
+    // Si el valor es una cadena vacía, asigna null
+    const newValue = value === "" ? null : value;
+  
     setEditableProp((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: newValue,
     }));
   };
+  
 
   const handleSave = async () => {
     console.log("Datos a enviar:", { data: editableProp });
@@ -201,7 +206,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                               <div>
                                 <p className="text-xs ">{editableProp.challenge_step?.name}</p>
 
-                                <Button variant="destructive" className="absolute -mt-7 ml-40" size="sm"  onClick={() => changeSubcategory(null)}>
+                                <Button variant="destructive" className="absolute -mt-7 ml-40" size="sm"  onClick={() => changeCategory(null)}>
                                   -
                                 </Button>
                               </div>
