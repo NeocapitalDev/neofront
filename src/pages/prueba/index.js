@@ -8,138 +8,165 @@ import { cn } from "@/lib/utils";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 /**
- * Wizard:
- * 1) Steps (por name; filtra internamente por step.documentId)
- * 2) Subcategories (por name; filtra internamente por subcat.documentId)
- * 3) Products (obtenidos directamente desde la subcategoría, es decir, subcat.challenge_products)
- * 4) Stages (del step => challenge_stages)
- *
- * - Si la lista está vacía => "No hay X" + icono "+" en la misma fila.
- * - Si la lista NO está vacía => se listan en la misma fila y, al final, un icono "+".
- * - No mostramos documentId en la UI, solo el name.
+ * Estructura:
+ * 1) Mostrar TODOS los Steps (de "challenge-steps")
+ * 2) Subcategorías, Products y Stages vienen de "challenge-relations" (un segundo fetch)
+ * 3) Filtramos por documentId (Step, Subcat) para Products & Stages
+ * 4) Tarjetas de parámetros POR CADA STAGE, usando grid para alineación horizontal
+ * 5) Fechas en formato dd/mm/aaaa
  */
+
+// Función para formatear la fecha en dd/mm/aaaa
+function formatDate(dateString) {
+  if (!dateString) return "—";
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
 export default function StepSubcatAutoShowNoResumen() {
   const router = useRouter();
 
   // --- Colecciones ---
-  const [steps, setSteps] = useState([]);
-  const [subcats, setSubcats] = useState([]);
-  const [products, setProducts] = useState([]); // Si se requiere algo específico, aunque ahora se obtiene desde subcats.
-  const [stages, setStages] = useState([]);
+  const [allSteps, setAllSteps] = useState([]);   // Vienen de /api/challenge-steps
+  const [relations, setRelations] = useState([]); // Vienen de /api/challenge-relations
 
-  // --- Selecciones (internamente docId, en UI => name) ---
+  // --- Selecciones ---
   const [selectedStepDoc, setSelectedStepDoc] = useState(null);
   const [selectedSubcatDoc, setSelectedSubcatDoc] = useState(null);
 
-  // --- Cargar data al montar ---
+  // ----------------------------------------------------------------
+  // 1) Cargar Steps (para mostrar TODOS) y ChallengeRelation
+  // ----------------------------------------------------------------
   useEffect(() => {
-    async function loadAll() {
+    async function loadData() {
       try {
-        // 1) Steps
+        // Fetch 1: TODOS los Steps
         const stepsRes = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-steps?populate=*`,
           { headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}` } }
         );
         if (!stepsRes.ok) throw new Error("Error al cargar Steps");
         const stepsJson = await stepsRes.json();
+        const stepsItems = stepsJson.data || [];
+        setAllSteps(stepsItems);
 
-        // 2) Subcats
-        const subRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-subcategories?populate=*`,
+        // Fetch 2: ChallengeRelation (para subcats, products, stages)
+        const relRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations?populate=*`,
           { headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}` } }
         );
-        if (!subRes.ok) throw new Error("Error al cargar Subcats");
-        const subJson = await subRes.json();
+        if (!relRes.ok) throw new Error("Error al cargar ChallengeRelation");
+        const relJson = await relRes.json();
+        const relItems = relJson.data || [];
+        setRelations(relItems);
 
-        // 3) Products (si es necesario cargar todos por separado)
-        const prodRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-products?populate=*`,
-          { headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}` } }
-        );
-        if (!prodRes.ok) throw new Error("Error al cargar Products");
-        const prodJson = await prodRes.json();
-
-        // 4) Stages
-        const stgRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-stages?populate=*`,
-          { headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}` } }
-        );
-        if (!stgRes.ok) throw new Error("Error al cargar Stages");
-        const stgJson = await stgRes.json();
-
-        setSteps(stepsJson.data || []);
-        setSubcats(subJson.data || []);
-        setProducts(prodJson.data || []);
-        setStages(stgJson.data || []);
-
-        console.log("Steps =>", stepsJson.data);
-        console.log("Subcats =>", subJson.data);
-        console.log("Products =>", prodJson.data);
-        console.log("Stages =>", stgJson.data);
-      } catch (err) {
-        console.error("loadAll error:", err);
+        console.log("Steps =>", stepsItems);
+        console.log("ChallengeRelations =>", relItems);
+      } catch (error) {
+        console.error("loadData error:", error);
       }
     }
-    loadAll();
+
+    loadData();
   }, []);
 
-  // --- Reset subcat cuando cambie Step ---
+  // Reset subcat cuando cambie Step
   useEffect(() => {
     setSelectedSubcatDoc(null);
   }, [selectedStepDoc]);
 
-  // Manejo de click en icono "+"
+  // Botón "+"
   function handlePlusClick() {
-    // Redirige a /admin/steps o la ruta correspondiente para agregar nuevos items
     router.push("/admin/steps");
   }
 
-  // ========== STEPS: { doc, name } ==========
-  const stepOptions = steps
+  // ----------------------------------------------------------------
+  // 2) Steps: { doc, name }
+  // ----------------------------------------------------------------
+  const stepOptions = allSteps
     .filter((s) => s.documentId)
     .map((s) => ({
       doc: s.documentId,
       name: s.name || "Step sin nombre",
+      id: s.id,
     }));
 
-  // ========== SUBCATS: { doc, name }, filtrada por StepDoc ==========
+  // ----------------------------------------------------------------
+  // 3) Subcategorías derivadas de ChallengeRelation y Step seleccionado
+  // ----------------------------------------------------------------
   let subcatOptions = [];
   if (selectedStepDoc) {
-    const subcatsForStep = subcats.filter((sc) => {
-      const st = sc.challenge_step;
-      return st && st.documentId === selectedStepDoc;
+    const subcatMap = new Map();
+
+    relations.forEach((rel) => {
+      const step = rel.challenge_step;
+      const subcat = rel.challenge_subcategory;
+      if (step && subcat) {
+        // Filtrar: si step.documentId === selectedStepDoc
+        if (step.documentId === selectedStepDoc) {
+          const docSubcat = subcat.documentId;
+          const nameSubcat = subcat.name || "Subcat sin nombre";
+          if (!subcatMap.has(docSubcat)) {
+            subcatMap.set(docSubcat, { doc: docSubcat, name: nameSubcat, id: subcat.id });
+          }
+        }
+      }
     });
-    subcatOptions = subcatsForStep
-      .filter((sc) => sc.documentId)
-      .map((sc) => ({
-        doc: sc.documentId,
-        name: sc.name || "Subcat sin nombre",
-      }));
+
+    subcatOptions = Array.from(subcatMap.values());
   }
 
-  // ========== STAGES: si step.challenge_stages ==========
-  let stageList = [];
-  if (selectedStepDoc) {
-    const stepObj = steps.find((st) => st.documentId === selectedStepDoc);
-    if (stepObj && stepObj.challenge_stages) {
-      stageList = stepObj.challenge_stages;
-    }
-  }
-
-  // -----------------------------------------------
-  // 1) Definir la subcategoría seleccionada global
-  // -----------------------------------------------
-  let selectedSubcat = null;
-  if (selectedSubcatDoc) {
-    selectedSubcat = subcats.find((sc) => sc.documentId === selectedSubcatDoc);
-  }
-
-  // ========== PRODUCTS: directamente desde la Subcategory ==========
+  // ----------------------------------------------------------------
+  // 4) Products & Stages derivadas de ChallengeRelation
+  // ----------------------------------------------------------------
   let productList = [];
-  if (selectedSubcat) {
-    productList = selectedSubcat.challenge_products || [];
+  let stageList = [];
+
+  // Necesitamos la subcategoría seleccionada (para los parámetros)
+  let selectedSubcat = null;
+
+  if (selectedStepDoc && selectedSubcatDoc) {
+    relations.forEach((rel) => {
+      const step = rel.challenge_step;
+      const subcat = rel.challenge_subcategory;
+      if (step && subcat) {
+        if (
+          step.documentId === selectedStepDoc &&
+          subcat.documentId === selectedSubcatDoc
+        ) {
+          // Guardamos la subcategoría para sus parámetros
+          selectedSubcat = subcat;
+
+          // PRODUCTS
+          const productsArr = rel.challenge_products || [];
+          productsArr.forEach((p) => {
+            const pDoc = p.documentId;
+            const pName = p.name || "Product sin nombre";
+            if (!productList.some((x) => x.doc === pDoc)) {
+              productList.push({ doc: pDoc, name: pName, id: p.id });
+            }
+          });
+
+          // STAGES
+          const stagesArr = rel.challenge_stages || [];
+          stagesArr.forEach((sg) => {
+            const sgDoc = sg.documentId;
+            const sgName = sg.name || "Stage sin nombre";
+            if (!stageList.some((x) => x.doc === sgDoc)) {
+              stageList.push({ doc: sgDoc, name: sgName, id: sg.id });
+            }
+          });
+        }
+      }
+    });
   }
 
+  // ----------------------------------------------------------------
+  // Render final (misma estructura)
+  // ----------------------------------------------------------------
   return (
     <div className="p-4 bg-black text-white min-h-screen">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -235,11 +262,11 @@ export default function StepSubcatAutoShowNoResumen() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-2 flex-wrap">
-                  {productList && productList.length > 0 ? (
+                  {productList.length > 0 ? (
                     <>
                       {productList.map((p) => (
                         <div key={p.id} className="px-4 py-2 bg-zinc-800 rounded">
-                          {p.name ?? "Product sin nombre"}
+                          {p.name}
                         </div>
                       ))}
                       <Button
@@ -271,11 +298,11 @@ export default function StepSubcatAutoShowNoResumen() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-2 flex-wrap">
-                  {stageList && stageList.length > 0 ? (
+                  {stageList.length > 0 ? (
                     <>
                       {stageList.map((sg) => (
                         <div key={sg.id} className="px-4 py-2 bg-zinc-800 rounded">
-                          {sg.name ?? "Stage sin nombre"}
+                          {sg.name}
                         </div>
                       ))}
                       <Button
@@ -302,84 +329,76 @@ export default function StepSubcatAutoShowNoResumen() {
           </div>
         )}
 
-        {/* OPCIONAL: Tarjeta para parámetros de la Subcategoría (si los necesitas) */}
-{selectedSubcat && (
-  <div className="mt-6">
-    <Card className="bg-zinc-900 border-zinc-700">
-      <CardHeader>
-        <CardTitle className="text-yellow-400">Parámetros de la Subcategoría</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2 text-sm text-gray-200">
-          {/* Nombre de la subcategoría (por si lo quieres mostrar) */}
-          <div>
-            <span className="font-semibold text-yellow-300">Nombre: </span>
-            {selectedSubcat.name ?? "—"}
-          </div>
+        {/* ================== 4) UNA TARJETA POR CADA STAGE PARA PARÁMETROS ================== */}
+        {selectedSubcat && stageList.length > 0 && (
+          // Usamos grid para alinear horizontalmente
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {stageList.map((sg) => (
+              <Card key={sg.id} className="bg-zinc-900 border-zinc-700 w-full">
+                <CardHeader>
+                  <CardTitle className="text-yellow-400">
+                    Parámetros de la Subcategoría - {sg.name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 text-sm text-gray-200">
+                    {/* Ejemplo: mostramos los campos de la Subcategoría */}
+                    <div>
+                      <span className="font-semibold text-yellow-300">Nombre: </span>
+                      {selectedSubcat.name ?? "—"}
+                    </div>
+                    <div>
+                      <span className="font-semibold text-yellow-300">Min Trading Days: </span>
+                      {selectedSubcat.minimumTradingDays ?? "—"}
+                    </div>
+                    <div>
+                      <span className="font-semibold text-yellow-300">Max Daily Loss: </span>
+                      {selectedSubcat.maximumDailyLoss ?? "—"}
+                    </div>
+                    <div>
+                      <span className="font-semibold text-yellow-300">Max Loss: </span>
+                      {selectedSubcat.maximumLoss ?? "—"}
+                    </div>
+                    <div>
+                      <span className="font-semibold text-yellow-300">Profit Target: </span>
+                      {selectedSubcat.profitTarget ?? "—"}
+                    </div>
+                    <div>
+                      <span className="font-semibold text-yellow-300">Leverage: </span>
+                      {selectedSubcat.leverage ?? "—"}
+                    </div>
 
-          {/* Ejemplo: minimumTradingDays */}
-          <div>
-            <span className="font-semibold text-yellow-300">Min Trading Days: </span>
-            {selectedSubcat.minimumTradingDays ?? "—"}
-          </div>
+                    {/* broker_account como objeto */}
+                    <div>
+                      <span className="font-semibold text-yellow-300">Broker Account: </span>
+                      {selectedSubcat.broker_account ? (
+                        <div className="ml-4 mt-1">
+                          <div>Login: {selectedSubcat.broker_account.login}</div>
+                          <div>Password: {selectedSubcat.broker_account.password}</div>
+                          <div>Balance: {selectedSubcat.broker_account.balance}</div>
+                          <div>Server: {selectedSubcat.broker_account.server}</div>
+                          <div>Platform: {selectedSubcat.broker_account.platform}</div>
+                        </div>
+                      ) : (
+                        "—"
+                      )}
+                    </div>
 
-          {/* Ejemplo: maximumDailyLoss */}
-          <div>
-            <span className="font-semibold text-yellow-300">Max Daily Loss: </span>
-            {selectedSubcat.maximumDailyLoss ?? "—"}
+                    {/* Otros campos de subcat con fecha formateada */}
+                    <div>
+                      <span className="font-semibold text-yellow-300">Fecha de creación: </span>
+                      {formatDate(selectedSubcat.createdAt)}
+                    </div>
+                    <div>
+                      <span className="font-semibold text-yellow-300">Fecha de actualización: </span>
+                      {formatDate(selectedSubcat.updatedAt)}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-
-          {/* Ejemplo: maximumLoss */}
-          <div>
-            <span className="font-semibold text-yellow-300">Max Loss: </span>
-            {selectedSubcat.maximumLoss ?? "—"}
-          </div>
-
-          {/* Ejemplo: profitTarget */}
-          <div>
-            <span className="font-semibold text-yellow-300">Profit Target: </span>
-            {selectedSubcat.profitTarget ?? "—"}
-          </div>
-
-          {/* Ejemplo: leverage */}
-          <div>
-            <span className="font-semibold text-yellow-300">Leverage: </span>
-            {selectedSubcat.leverage ?? "—"}
-          </div>
-
-          {/* Si broker_account es un objeto, lo mostramos así: */}
-          <div>
-            <span className="font-semibold text-yellow-300">Broker Account: </span>
-            {selectedSubcat.broker_account ? (
-              <div className="ml-4 mt-1">
-                {/* Ajusta estos campos según los que tengas en tu objeto broker_account */}
-                <div>Login: {selectedSubcat.broker_account.login}</div>
-                <div>Password: {selectedSubcat.broker_account.password}</div>
-                <div>Balance: {selectedSubcat.broker_account.balance}</div>
-                <div>Server: {selectedSubcat.broker_account.server}</div>
-                <div>Platform: {selectedSubcat.broker_account.platform}</div>
-                {/* Agrega las propiedades que necesites */}
-              </div>
-            ) : (
-              "—"
-            )}
-          </div>
-
-          {/* Agrega más campos si tu subcategoría tiene otros */}
-          <div>
-            <span className="font-semibold text-yellow-300">Fecha de creación: </span>
-            {selectedSubcat.createdAt ?? "—"}
-          </div>
-          <div>
-            <span className="font-semibold text-yellow-300">Fecha de actualización: </span>
-            {selectedSubcat.updatedAt ?? "—"}
-          </div>
-          {/* etc. */}
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-)}
+        )}
       </div>
     </div>
   );
