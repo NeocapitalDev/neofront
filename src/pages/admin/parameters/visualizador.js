@@ -82,7 +82,7 @@ export default function StepSubcatAutoShowNoResumen() {
     }
 
     loadData();
-  }, [selectedStepDoc]); 
+  }, [selectedStepDoc]);
   // Notar que se incluye selectedStepDoc en dependencias
   // para evitar un posible bucle; 
   // si no deseas re-llamar en caso de cambiar selectedStepDoc, 
@@ -142,9 +142,10 @@ export default function StepSubcatAutoShowNoResumen() {
 
   // Necesitamos la subcategoría seleccionada (para los parámetros)
   let selectedSubcat = null;
-
+  let options = {}
   if (selectedStepDoc && selectedSubcatDoc) {
     relations.forEach((rel) => {
+      console.log("rel", rel);
       const step = rel.challenge_step;
       const subcat = rel.challenge_subcategory;
       if (step && subcat) {
@@ -154,7 +155,20 @@ export default function StepSubcatAutoShowNoResumen() {
         ) {
           // Guardamos la subcategoría para sus parámetros
           selectedSubcat = subcat;
+          // Extraer parámetros del rel y guardarlos en options
+          // const parameters = rel.parameters || {};
+          options = {
+            minTradingDays: rel.minimumTradingDays,
+            maxDailyLoss: rel.maximumDailyLoss,
+            maxLoss: rel.maximumLoss,
+            profitTarget: rel.profitTarget,
+            leverage: rel.leverage,
+            brokerAccount: rel.broker_account,
+            createdAt: rel.createdAt,
+            updatedAt: rel.updatedAt,
+          };
 
+          console.log("Subcategoría seleccionada =>", selectedSubcat);
           // PRODUCTS
           const productsArr = rel.challenge_products || [];
           productsArr.forEach((p) => {
@@ -361,39 +375,39 @@ export default function StepSubcatAutoShowNoResumen() {
                       {/* Ejemplo: mostramos los campos de la Subcategoría */}
                       <div>
                         <span className="font-semibold text-yellow-300">Nombre: </span>
-                        {selectedSubcat.name ?? "—"}
+                        {options.name ?? "—"}
                       </div>
                       <div>
                         <span className="font-semibold text-yellow-300">Min Trading Days: </span>
-                        {selectedSubcat.minimumTradingDays ?? "—"}
+                        {options.minTradingDays ?? "—"}
                       </div>
                       <div>
                         <span className="font-semibold text-yellow-300">Max Daily Loss: </span>
-                        {selectedSubcat.maximumDailyLoss ?? "—"}
+                        {options.maxDailyLoss ?? "—"}
                       </div>
                       <div>
                         <span className="font-semibold text-yellow-300">Max Loss: </span>
-                        {selectedSubcat.maximumLoss ?? "—"}
+                        {options.maxLoss ?? "—"}
                       </div>
                       <div>
                         <span className="font-semibold text-yellow-300">Profit Target: </span>
-                        {selectedSubcat.profitTarget ?? "—"}
+                        {options.profitTarget ?? "—"}
                       </div>
                       <div>
                         <span className="font-semibold text-yellow-300">Leverage: </span>
-                        {selectedSubcat.leverage ?? "—"}
+                        {options.leverage ?? "—"}
                       </div>
 
                       {/* broker_account como objeto */}
                       <div>
                         <span className="font-semibold text-yellow-300">Broker Account: </span>
-                        {selectedSubcat.broker_account ? (
+                        {options.brokerAccount ? (
                           <div className="ml-4 mt-1">
-                            <div>Login: {selectedSubcat.broker_account.login}</div>
-                            <div>Password: {selectedSubcat.broker_account.password}</div>
-                            <div>Balance: {selectedSubcat.broker_account.balance}</div>
-                            <div>Server: {selectedSubcat.broker_account.server}</div>
-                            <div>Platform: {selectedSubcat.broker_account.platform}</div>
+                            <div>Login: {options.brokerAccount.login}</div>
+                            <div>Password: {options.brokerAccount.password}</div>
+                            <div>Balance: {options.brokerAccount.balance}</div>
+                            <div>Server: {options.brokerAccount.server}</div>
+                            <div>Platform: {options.brokerAccount.platform}</div>
                           </div>
                         ) : (
                           "—"
@@ -402,11 +416,11 @@ export default function StepSubcatAutoShowNoResumen() {
                       {/* Otros campos de subcat con fecha formateada */}
                       <div>
                         <span className="font-semibold text-yellow-300">Fecha de creación: </span>
-                        {formatDate(selectedSubcat.createdAt)}
+                        {formatDate(options.createdAt)}
                       </div>
                       <div>
                         <span className="font-semibold text-yellow-300">Fecha de actualización: </span>
-                        {formatDate(selectedSubcat.updatedAt)}
+                        {formatDate(options.updatedAt)}
                       </div>
                     </div>
                   </CardContent>
