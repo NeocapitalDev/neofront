@@ -20,7 +20,7 @@ export function DataTableToolbar<TData>({
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <input
-          placeholder="Nombre"
+          placeholder="Filtrar por Nombre ..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
@@ -29,7 +29,7 @@ export function DataTableToolbar<TData>({
         />
 
         <input
-          placeholder="Filtrar por Subcategoria"
+          placeholder="Filtrar por Subcategoria ..."
           value={
             (table
               .getColumn("challenge_subcategories")
@@ -37,13 +37,13 @@ export function DataTableToolbar<TData>({
           }
           onChange={(event) =>
             table
-              .getColumn("challenge_subcategories")
+              .getColumn("challenge_subcategories ...")
               ?.setFilterValue(event.target.value)
           }
           className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
         />
         <input
-          placeholder="Filtrar por stage"
+          placeholder="Filtrar por stage ..."
           value={
             (table.getColumn("challenge_stages")?.getFilterValue() as string) ??
             ""

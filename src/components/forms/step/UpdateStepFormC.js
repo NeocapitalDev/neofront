@@ -32,30 +32,27 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 
-export function UpdateStepFormC({ step }) {
+export function UpdateStepFormC({ step, onStepChange }) {
+  console.log("step recibido:", step);
   // --- Datos desde Strapi ---
   const {
     data: subcategories,
     error: subError,
     isLoading: subLoading,
   } = useStrapiData(
-    "challenge-subcategories?filters[challenge_step][$null]=true"
+    "challenge-subcategories?populate=*"
   );
   const {
-    data: stageData,
+    data: stages,
     error: stageError,
     isLoading: stageLoading,
-  } = useStrapiData("challenge-stages?filters[challenge_steps][$null]=true");
-
+  } = useStrapiData("challenge-stages?populate=*");
+  // 2. Mapeo y filtrado de datos
   const subcategoriesData = subcategories
-    ? subcategories
-      .filter(
-        (subcategory) =>
-          !subcategory.challenge_steps ||
-          subcategory.challenge_steps === "" ||
-          subcategory.challenge_steps === null
-      )
-      .map(({ id, documentId, name }) => ({ id, documentId, name }))
+    ? subcategories.map(({ id, documentId, name }) => ({ id, documentId, name }))
+    : [];
+  const stageData = stages
+    ? stages.map(({ id, documentId, name }) => ({ id, documentId, name }))
     : [];
 
   // --- Estados locales ---
@@ -67,8 +64,16 @@ export function UpdateStepFormC({ step }) {
   const [customStages, setCustomStages] = useState([]);
   const [customStagesInput, setCustomStagesInput] = useState("");
 
-  const allSubcategories = [...subcategoriesData, ...customSubcategories];
-  const allStages = [...(stageData || []), ...customStages];
+  const allSubcategories = [...subcategoriesData, ...customSubcategories].filter(
+    (item, index, self) => self.findIndex(i => i.documentId === item.documentId) === index
+  );
+  const allStages = [...(stageData || []), ...customStages].filter(
+    (item, index, self) => self.findIndex(i => i.documentId === item.documentId) === index
+  );
+  console.log("subcategoriesData", subcategoriesData);
+  console.log("stageData", stageData);
+  console.log("allSubcategories", allSubcategories);
+  console.log("allStages", allStages);
 
   // --- useForm: se inicializa con los valores del step a actualizar ---
   const form = useForm({
@@ -150,13 +155,15 @@ export function UpdateStepFormC({ step }) {
     console.log("JSON final:", data);
     try {
       const updatedStep = await updateStepWithRelations(data);
+      onStepChange(); // Actualizamos el listado de pasos
+
       // Actualizamos el formulario con los datos retornados
-      form.reset({
-        documentId: updatedStep.documentId || data.documentId,
-        name: updatedStep.name,
-        subcategories: updatedStep.challenge_subcategories || [],
-        stages: updatedStep.challenge_stages || [],
-      });
+      // form.reset({
+      //   documentId: updatedStep.documentId || data.documentId,
+      //   name: updatedStep.name,
+      //   subcategories: updatedStep.challenge_subcategories || [],
+      //   stages: updatedStep.challenge_stages || [],
+      // });
       setCustomSubcategories(updatedStep.challenge_subcategories || []);
       setCustomStages(updatedStep.challenge_stages || []);
     } catch (error) {
@@ -200,7 +207,7 @@ export function UpdateStepFormC({ step }) {
   return (
     <Card className="p-6 max-w-4xl mx-auto grid place-items-center h-[calc(100vh-100px)] border-none">
       <Form {...form}>
-        <form className="space-y-8 space-y-8 p-6 max-w-4xl mx-auto bg-black border-2 rounded-xl">
+        <form className="space-y-8 p-6 max-w-4xl mx-auto bg-black border-2 rounded-xl">
           {/* Campo Nombre */}
           <FormField
             control={form.control}
@@ -208,7 +215,7 @@ export function UpdateStepFormC({ step }) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-yellow-500 text-lg">
-                  Nombre
+                  Nombreu
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -306,6 +313,7 @@ export function UpdateStepFormC({ step }) {
                                       return (
                                         <CommandItem
                                           key={keySubcat}
+                                          value={subcat.documentId}
                                           onSelect={() => {
                                             const current = field.value;
                                             let newValues;
@@ -472,10 +480,12 @@ export function UpdateStepFormC({ step }) {
                                       Seleccionar Todas
                                     </CommandItem>
                                     {allStages.map((stage, index) => {
+                                      // Creamos una clave única basada en documentId, id o una combinación con el índice
                                       const keyStage =
                                         stage.documentId ||
                                         stage.id ||
                                         `custom-${index}`;
+                                      // Comprobamos si el elemento está seleccionado comparando la uniqueKey almacenada
                                       const isSelected = field.value.some(
                                         (item) =>
                                           (item.documentId || item.id) ===
@@ -484,10 +494,12 @@ export function UpdateStepFormC({ step }) {
                                       return (
                                         <CommandItem
                                           key={keyStage}
+                                          value={keyStage}
                                           onSelect={() => {
                                             const current = field.value;
                                             let newValues;
                                             if (isSelected) {
+                                              // Filtramos eliminando el objeto con esa uniqueKey
                                               newValues = current.filter(
                                                 (v) =>
                                                   (v.documentId || v.id) !==
@@ -495,6 +507,7 @@ export function UpdateStepFormC({ step }) {
                                                     stage.id)
                                               );
                                             } else {
+                                              // Al seleccionar, guardamos el stage junto con su uniqueKey para identificarlo luego
                                               newValues = [...current, stage];
                                             }
                                             field.onChange(newValues);
@@ -502,9 +515,7 @@ export function UpdateStepFormC({ step }) {
                                           className="text-yellow-500 hover:bg-yellow-500/10"
                                         >
                                           <div
-                                            className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected
-                                              ? "bg-yellow-500 text-black"
-                                              : "opacity-50"
+                                            className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-yellow-500 ${isSelected ? "bg-yellow-500 text-black" : "opacity-50"
                                               }`}
                                           >
                                             {isSelected && "✓"}
@@ -513,6 +524,8 @@ export function UpdateStepFormC({ step }) {
                                         </CommandItem>
                                       );
                                     })}
+
+
                                   </CommandGroup>
                                 </CommandList>
                               </Command>
