@@ -374,8 +374,8 @@ export default function StepSubcatAutoShowNoResumen() {
                     <div className="space-y-2 text-sm text-gray-200">
                       {/* Ejemplo: mostramos los campos de la Subcategoría */}
                       <div>
-                        <span className="font-semibold text-yellow-300">Nombre: </span>
-                        {options.name ?? "—"}
+                        <span className="font-semibold text-yellow-300">Sub Categoria: </span>
+                        {selectedSubcat.name ?? "—"}
                       </div>
                       <div>
                         <span className="font-semibold text-yellow-300">Min Trading Days: </span>
@@ -397,8 +397,7 @@ export default function StepSubcatAutoShowNoResumen() {
                         <span className="font-semibold text-yellow-300">Leverage: </span>
                         {options.leverage ?? "—"}
                       </div>
-
-                      {/* broker_account como objeto */}
+                      {/* broker_account como objeto 
                       <div>
                         <span className="font-semibold text-yellow-300">Broker Account: </span>
                         {options.brokerAccount ? (
@@ -412,7 +411,7 @@ export default function StepSubcatAutoShowNoResumen() {
                         ) : (
                           "—"
                         )}
-                      </div>
+                      </div>*/}
                       {/* Otros campos de subcat con fecha formateada */}
                       <div>
                         <span className="font-semibold text-yellow-300">Fecha de creación: </span>
