@@ -146,7 +146,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations-stages/${editableProp.documentId}/update-with-relations`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations/${editableProp.documentId}/update-with-relations`,
         {
           method: "PUT",
           headers: {
