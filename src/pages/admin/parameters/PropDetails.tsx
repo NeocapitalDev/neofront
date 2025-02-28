@@ -133,20 +133,25 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
 
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditableProp((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
+
+  // Si el valor es una cadena vacía, asigna null
+  const newValue = value === "" ? null : value;
+
+  setEditableProp((prev) => ({
+    ...prev,
+    [name]: newValue,
+  }));
+};
+
 
   const handleSave = async () => {
     console.log("Datos a enviar:", { data: editableProp });
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations-stages/${editableProp.documentId}/update-with-relations`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations/${editableProp.documentId}/update-with-relations`,
         {
           method: "PUT",
           headers: {
@@ -193,15 +198,14 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                 {editableProp.challenge_step && editableProp.challenge_step.name ? (
 
                   <Card key={editableProp.challenge_step?.id}>
-                    <CardContent className="p-3">
+                    <CardContent className="p-2">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs ">
                             {modalType === 2 ? (
                               <div>
-                                <p className="text-xs ">{editableProp.challenge_step?.name}</p>
+                                <span className="text-xs ">{editableProp.challenge_step?.name}</span>
 
-                                <Button variant="destructive" className="absolute -mt-7 ml-40" size="sm"  onClick={() => changeSubcategory(null)}>
+                                <Button variant="destructive" className="mx-4" size="xs"  onClick={() => changeCategory(null)}>
                                   -
                                 </Button>
                               </div>
@@ -209,7 +213,6 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                             ) : (
                               prop.challenge_step.name
                             )}
-                          </p>
                           {/* <p className="text-sm text-muted-foreground">
                         ID: {prop.challenge_step?.id}
                       </p> */}
@@ -226,15 +229,14 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                 {editableProp.challenge_subcategory && editableProp.challenge_subcategory.name ? (
 
                   <Card key={editableProp.challenge_subcategory?.id}>
-                    <CardContent className="p-3">
+                    <CardContent className="p-2">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs ">
                             {modalType === 2 ? (
                               <div>
-                                <p className="text-xs ">{editableProp.challenge_subcategory?.name}</p>
+                                <span className="text-xs ">{editableProp.challenge_subcategory?.name}</span>
 
-                                <Button variant="destructive" className="absolute -mt-7 ml-40" size="sm"  onClick={() => changeSubcategory(null)}>
+                                <Button variant="destructive" className="mx-4" size="xs"  onClick={() => changeSubcategory(null)}>
                                   -
                                 </Button>
                               </div>
@@ -242,7 +244,6 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                             ) : (
                               prop.challenge_subcategory.name
                             )}
-                          </p>
                           {/* <p className="text-sm text-muted-foreground">
                         ID: {prop.challenge_subcategory?.id}
                       </p> */}
@@ -265,7 +266,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                     <input
                       type="number"
                       name="minimumTradingDays"
-                      value={editableProp.minimumTradingDays}
+                      value={editableProp.minimumTradingDays ?? ""}
                       onChange={handleChange}
                       className={inputDarkClasses}
                     />
@@ -279,7 +280,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                     <input
                       type="number"
                       name="maximumDailyLoss"
-                      value={editableProp.maximumDailyLoss}
+                      value={editableProp.maximumDailyLoss ?? ""}
                       onChange={handleChange}
                       className={inputDarkClasses}
                     />
@@ -293,7 +294,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                     <input
                       type="number"
                       name="maximumLoss"
-                      value={editableProp.maximumLoss}
+                      value={editableProp.maximumLoss ?? ""}
                       onChange={handleChange}
                       className={inputDarkClasses}
                     />
@@ -307,7 +308,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                     <input
                       type="number"
                       name="profitTarget"
-                      value={editableProp.profitTarget}
+                      value={editableProp.profitTarget ?? ""}
                       onChange={handleChange}
                       className={inputDarkClasses}
                     />
@@ -321,7 +322,7 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                     <input
                       type="number"
                       name="leverage"
-                      value={editableProp.leverage}
+                      value={editableProp.leverage ?? ""}
                       onChange={handleChange}
                       className={inputDarkClasses}
                     />
@@ -337,74 +338,55 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
             {/* Sección de Stages */}
 
             <div className="flex-[1] mt-6">
-              <h3 className="text-sm   text-muted-foreground mb-3">
-                <Badge variant="secondary">Stages</Badge>
+              <h3 className="text-sm  text-muted-foreground mb-3">
+              <Badge className="bg-amber-200 text-black">Fases</Badge>
               </h3>
+
+
+              
               <div className="grid grid-cols-1 gap-2">
-                {editableProp.challenge_stages.map((stages, index) => (
-                  <Card key={stages.id}>
-                    <CardContent className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs ">
-                            {modalType === 2 ? (
-                              <div>
-                                <p className="text-xs  ">{stages.name}</p>
+              {editableProp.challenge_stages.map((stages, index) => (
+                <Card key={stages.id}>
+                <CardContent className="p-3 gap-1 flex items-center justify-between">
+                  <span className="text-xs">{stages.name}</span>
+                  {modalType === 2 ? (
+ <Button variant="destructive" size="xs" onClick={() => removeStage(stages.id)}>
+ -
+ </Button>
+) : (
+null)}
 
-                                <Button variant="destructive" className="absolute -mt-7 ml-12" size="sm"  onClick={() => removeStage(stages.id)}>
-                                  -
-                                </Button>
-                              </div>
-
-                            ) : (
-                              stages.name
-                            )}
-                          </p>
-                          {/* <p className="text-sm text-muted-foreground">
-                          ID: {stages.id}
-                        </p> */}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                 
+                </CardContent>
+                </Card>
+              ))}
               </div>
             </div>
 
             {/* Sección de Productos */}
 
             <div className="flex-[1] mt-6">
-              <h3 className="text-sm   text-muted-foreground mb-3">
-                <Badge variant="secondary">Productos</Badge>
+              <h3 className="text-sm  text-muted-foreground mb-3">
+              <Badge className="bg-amber-200 text-black">Productos</Badge>
               </h3>
               <div className="grid grid-cols-1 gap-2">
-                {editableProp.challenge_products.map((product, index) => (
-                  <Card key={product.id}>
-                    <CardContent className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs ">
-                            {modalType === 2 ? (
-                              <div>
-                                <p className="text-xs ">{product.name}</p>
+              {editableProp.challenge_products.map((product, index) => (
+                <Card key={product.id}>
+                <CardContent className="p-3 gap-1 flex items-center justify-between">
+                  <span className="text-xs">{product.name}</span>
 
-                                <Button variant="destructive" className="absolute -mt-7 ml-12" size="sm"  onClick={() => removeProduct(product.id)}>
-                                  -
-                                </Button>
-                              </div>
 
-                            ) : (
-                              product.name
-                            )}
-                          </p>
-                          {/* <p className="text-sm text-muted-foreground">
-                          ID: {product.id}
-                        </p> */}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                  {modalType === 2 ? (
+ <Button variant="destructive" size="xs" onClick={() => removeProduct(product.id)}>
+ -
+ </Button>
+) : (
+null)}
+
+
+                </CardContent>
+                </Card>
+              ))}
               </div>
             </div>
           </div>
@@ -436,37 +418,20 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                 {/* Sección de Productos disponibles*/}
 
                 <div className="flex-[1] mt-6">
-                  <h3 className="text-sm text-xs  text-muted-foreground mb-3">
-                    <Badge className="bg-amber-200 text-black">Productos disponibles</Badge>
+                  <h3 className="text-sm  text-muted-foreground mb-3">
+                  <Badge className="bg-amber-200 text-black">Productos disponibles</Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
-                    {productavailable?.map((product, index) => (
-                      <Card key={product.id}>
-                        <CardContent className="p-3">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-xs ">
-                                {modalType === 2 ? (
-                                  <div>
-                                    <p className="text-xs ">{product.name}</p>
-
-                                    <Button variant="default" className="absolute -mt-7 ml-10" size="sm"  onClick={() => addProduct(product)}>
-                                      +
-                                    </Button>
-                                  </div>
-
-                                ) : (
-                                  product.name
-                                )}
-                              </p>
-                              {/* <p className="text-sm text-muted-foreground">
-          ID: {product.id}
-        </p> */}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                  {productavailable?.map((product, index) => (
+                    <Card key={product.id}>
+                    <CardContent className="p-3 gap-1 flex items-center justify-between">
+                      <span className="text-xs">{product.name}</span>
+                      <Button variant="default" size="xs" onClick={() => addProduct(product)}>
+                      +
+                      </Button>
+                    </CardContent>
+                    </Card>
+                  ))}
                   </div>
                 </div>
 
@@ -493,36 +458,19 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
                 <div className="flex-[1] mt-6">
                   <h3 className="text-sm  text-muted-foreground mb-3">
-                    <Badge className="bg-amber-200 text-black">Fases disponibles</Badge>
+                  <Badge className="bg-amber-200 text-black">Fases disponibles</Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
-                    {stagesavailable?.map((stages, index) => (
-                      <Card key={stages.id}>
-                        <CardContent className="p-3">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-xs ">
-                                {modalType === 2 ? (
-                                  <div>
-                                    <p className="text-xs ">{stages.name}</p>
-
-                                    <Button variant="default" className="absolute -mt-7 ml-10" size="sm"  onClick={() => addStage(stages)}>
-                                      +
-                                    </Button>
-                                  </div>
-
-                                ) : (
-                                  stages.name
-                                )}
-                              </p>
-                              {/* <p className="text-sm text-muted-foreground">
-          ID: {product.id}
-        </p> */}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                  {stagesavailable?.map((stages, index) => (
+                    <Card key={stages.id}>
+                    <CardContent className="p-3 gap-1 flex items-center justify-between">
+                      <span className="text-xs">{stages.name}</span>
+                      <Button variant="default" size="xs" onClick={() => addStage(stages)}>
+                      +
+                      </Button>
+                    </CardContent>
+                    </Card>
+                  ))}
                   </div>
                 </div>
 
@@ -551,38 +499,19 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
 
                 <div className="flex-[1] mt-6">
                   <h3 className="text-sm  text-muted-foreground mb-3">
-                    <Badge  className="bg-amber-200 text-black">Subcategorias disponibles</Badge>
+                  <Badge className="bg-amber-200 text-black">Subcategorias disponibles</Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
-                    {subcategoriesavailable?.map((subcategory, index) => (
-                      <Card key={subcategory.id}>
-                        <CardContent className="p-3">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-xs ">
-                                {modalType === 2 ? (
-
-                                  <div>
-
-                                    <p className="text-xs ">{subcategory.name}</p>
-
-                                    <Button variant="default" className="absolute -mt-7 ml-12" size="sm" onClick={() => changeSubcategory(subcategory)}>
-                                      +
-                                    </Button>
-                                  </div>
-
-                                ) : (
-                                  subcategory.name
-                                )}
-                              </p>
-                              {/* <p className="text-sm text-muted-foreground">
-  ID: {product.id}
-</p> */}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                  {subcategoriesavailable?.map((subcategory, index) => (
+                    <Card key={subcategory.id}>
+                    <CardContent className="p-3 gap-1 flex items-center justify-between">
+                      <span className="text-xs">{subcategory.name}</span>
+                      <Button variant="default" size="xs" onClick={() => changeSubcategory(subcategory)}>
+                      +
+                      </Button>
+                    </CardContent>
+                    </Card>
+                  ))}
                   </div>
                 </div>
 
@@ -609,39 +538,20 @@ export function PropDetails({ prop, modalType }: DetailsProps) {
                 {/* Sección de Subcategorias disponibles*/}
 
                 <div className="flex-[1] mt-6">
-                  <h3 className="text-sm   text-muted-foreground mb-3">
-                    <Badge  className="bg-amber-200 text-black">Categorias disponibles</Badge>
+                  <h3 className="text-sm  text-muted-foreground mb-3">
+                  <Badge className="bg-amber-200 text-black">Categorias disponibles</Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
-                    {stepavailable?.map((step, index) => (
-                      <Card key={step.id}>
-                        <CardContent className="p-3">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-xs ">
-                                {modalType === 2 ? (
-
-                                  <div>
-
-                                    <p className="text-xs ">{step.name}</p>
-
-                                    <Button variant="default" className="absolute -mt-7 ml-12" size="sm" onClick={() => changeCategory(step)}>
-                                      +
-                                    </Button>
-                                  </div>
-
-                                ) : (
-                                  step.name
-                                )}
-                              </p>
-                              {/* <p className="text-sm text-muted-foreground">
-  ID: {product.id}
-</p> */}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                  {stepavailable?.map((step, index) => (
+                    <Card key={step.id}>
+                    <CardContent className="p-3 gap-1 flex items-center justify-between">
+                      <span className="text-xs">{step.name}</span>
+                      <Button variant="default" size="xs" onClick={() => changeCategory(step)}>
+                      +
+                      </Button>
+                    </CardContent>
+                    </Card>
+                  ))}
                   </div>
                 </div>
 
