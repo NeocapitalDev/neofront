@@ -163,16 +163,14 @@ export function PropDetails({ prop, modalType, onClose }: DetailsProps) {
 
       if (!response.ok) {
         throw new Error(`Error en la actualización: ${response.statusText}`);
+        
       }
 
       await response.json();
-      // Mostramos toast de éxito
       toast.success("Se guardó correctamente.");
 
-      // Cerramos el modal (si la prop onClose existe)
       onClose?.();
     } catch (error) {
-      // Mostramos toast de error
       toast.error("Hubo un error al guardar.");
     }
   };

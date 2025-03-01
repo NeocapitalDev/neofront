@@ -4,9 +4,29 @@ import { useStrapiData } from "../../../services/strapiService";
 import { DataTable } from "./DataTable";
 import { Columns } from "./Columns";
 import DashboardLayout from "..";
+import useSWR from "swr";
 
 function IndexPage() {
-  const { data, error, isLoading } = useStrapiData("challenge-relations?populate=*");
+  const fetcher = (url) =>
+   fetch(url, {
+     headers: {
+       Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+       "Content-Type": "application/json",
+     },
+   }).then((res) => res.json());
+
+
+
+  const { data, isLoading, error } = useSWR(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations?populate=*`,
+    fetcher
+  );
+
+  const processedData = data?.data || [];
+  
+  console.log(processedData);
+
+  // const { data, error, isLoading } = useStrapiData("challenge-relations?populate=*");
   const router = useRouter();
 
   // Función para manejar el clic en "Ver Visualizador"
@@ -32,7 +52,7 @@ function IndexPage() {
         <div className="flex flex-col gap-4">
           {isLoading && <div>Loading...</div>}
           {error && <div>Error: {error.message}</div>}
-          {data && <DataTable data={data} columns={Columns} />}
+          {data && <DataTable data={processedData} columns={Columns} />}
         </div>
       </section>
     </DashboardLayout>
