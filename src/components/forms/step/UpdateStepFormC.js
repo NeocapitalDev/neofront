@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { X, Plus } from "lucide-react";
 import { useStrapiData } from "../../../services/strapiService";
 import Skeleton from "@/components/loaders/loader";
+import { toast } from "sonner";
 
 import {
   Form,
@@ -166,9 +167,12 @@ export function UpdateStepFormC({ step, onStepChange }) {
       // });
       setCustomSubcategories(updatedStep.challenge_subcategories || []);
       setCustomStages(updatedStep.challenge_stages || []);
+      toast.success("Step actualizado correctamente.");
     } catch (error) {
       // Manejo de error: podrías mostrar una notificación al usuario
       console.error("Error en la actualización:", error);
+      toast.error("Step actualizado correctamente.");
+
     } finally {
       setIsLoading(false);
     }

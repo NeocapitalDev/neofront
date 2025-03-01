@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useStrapiData } from "../../../services/strapiService";
 import { DataTable } from "@/components/table/DataTable";
 import { getColumns, Challenge } from "@/components/table/Columns";
@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { X, Plus } from "lucide-react";
 import Skeleton from "@/components/loaders/loader";
 import { FetchChallengeSteps } from "./Nuevo";
+import { Toaster, toast } from 'sonner';
 
 
 export default function ViewSteps() {
@@ -24,12 +25,26 @@ export default function ViewSteps() {
   const handleCreate = () => {
     router.push("/admin/steps/create");
   };
+  useEffect(() => {
+    // Si existen parámetros de toast en la query, muestra el toast
+    if (router.query.toast && router.query.message) {
+      if (router.query.toast === "success") {
+        toast.success(router.query.message);
+      } else {
+        toast.error(router.query.message);
+      }
+      // Limpia los parámetros de la query para que no se vuelva a disparar el toast
+      router.replace(router.pathname, undefined, { shallow: true });
+    }
+  }, [router.query, router]);
   return (
     <DashboardLayout>
       {isLoading && <StepLoader></StepLoader>}
       {error && <div>Error: {error.message}</div>}
       {data && (
-        <div className="w-[90%] mx-auto">
+
+        <div className="w-[70%] mx-auto">
+          {/* <Toaster position="bottom-right" /> */}
           <div className="w-full flex justify-end">
             <button onClick={handleCreate} className="px-4 py-2 bg-[var(--app-primary)] text-black font-semibold rounded hover:bg-[var(--app-secondary)]">
               <p className="flex items-center justify-center gap-2">
