@@ -54,9 +54,10 @@ interface DetailsProps {
    * Se llamará automáticamente si se guarda con éxito.
    */
   onClose?: () => void;
+  actualizarDatos?: () => void;
 }
 
-export function PropDetails({ prop, modalType, onClose }: DetailsProps) {
+export function PropDetails({ prop, modalType, onClose,actualizarDatos}: DetailsProps) {
   const { data: productsData } = useStrapiData("challenge-products");
   const { data: subcategoriesData } = useStrapiData("challenge-subcategories");
   const { data: stagesdata } = useStrapiData("challenge-stages");
@@ -148,6 +149,7 @@ export function PropDetails({ prop, modalType, onClose }: DetailsProps) {
   };
 
   const handleSave = async () => {
+    const toastId = toast.loading("Guardando...");
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations/${editableProp.documentId}/update-with-relations`,
@@ -163,15 +165,15 @@ export function PropDetails({ prop, modalType, onClose }: DetailsProps) {
 
       if (!response.ok) {
         throw new Error(`Error en la actualización: ${response.statusText}`);
-        
       }
 
       await response.json();
-      toast.success("Se guardó correctamente.");
+      toast.success("Se guardó correctamente.", { id: toastId });
 
       onClose?.();
+      actualizarDatos?.();
     } catch (error) {
-      toast.error("Hubo un error al guardar.");
+      toast.error("Hubo un error al guardar.", { id: toastId });
     }
   };
 

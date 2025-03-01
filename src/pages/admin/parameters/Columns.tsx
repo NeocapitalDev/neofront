@@ -59,8 +59,7 @@ export type ChallengeRelationsStages = {
   
 };
 
-export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
-  {
+export const Columns = (actualizarDatos: () => void): ColumnDef<ChallengeRelationsStages>[] => [  {
     id: "select",
     header: ({ table }) => (
       <Checkbox
@@ -243,7 +242,7 @@ export const Columns: ColumnDef<ChallengeRelationsStages>[] = [
             title={`Details ${prop.challenge_subcategory?.name}`}
             maxWidth="7xl"
             >
-            <PropDetails prop={prop} modalType={modalType} onClose={() => setIsModalOpen(false)} />
+            <PropDetails prop={prop} modalType={modalType}  actualizarDatos={() => actualizarDatos()}  onClose={() => setIsModalOpen(false)} />
             </DetailModal>
         </>
       );

@@ -8,19 +8,26 @@ import useSWR from "swr";
 
 function IndexPage() {
   const fetcher = (url) =>
-   fetch(url, {
-     headers: {
-       Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-       "Content-Type": "application/json",
-     },
-   }).then((res) => res.json());
+    fetch(url, {
+      headers: {
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+    }).then((res) => res.json());
 
-
-
-  const { data, isLoading, error } = useSWR(
+  const { data, isLoading, error, mutate } = useSWR(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations?populate=*`,
     fetcher
   );
+
+  // Función para actualizar los datos
+  function actualizarDatos() {
+    mutate();
+    console.log("Datos actualizados");
+  }
+
+  
+
 
   const processedData = data?.data || [];
   
@@ -52,7 +59,7 @@ function IndexPage() {
         <div className="flex flex-col gap-4">
           {isLoading && <div>Loading...</div>}
           {error && <div>Error: {error.message}</div>}
-          {data && <DataTable data={processedData} columns={Columns} />}
+          {data && <DataTable data={processedData} columns={Columns(actualizarDatos)} />}
         </div>
       </section>
     </DashboardLayout>
