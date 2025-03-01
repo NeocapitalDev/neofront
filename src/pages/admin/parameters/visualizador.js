@@ -283,307 +283,304 @@ export default function StepSubcatAutoShowNoResumen() {
           )}
 
           {/* ================== 3) PRODUCTS & STAGES ================== */}
-{selectedSubcatDoc && (
-  <div
-    className={cn(
-      "mt-4",
-      stageList.length === 1
-        ? "flex flex-col items-center gap-4"
-        : "flex flex-row gap-4"
-    )}
-  >
-    {/* PRODUCTS */}
-    <Card
-      className={cn(
-        "bg-zinc-900 border-zinc-700",
-        stageList.length === 1 ? "w-full md:w-1/2" : "flex-1"
-      )}
-    >
-      <CardHeader>
-        <CardTitle className="text-yellow-400">
-          Products Relacionados
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center gap-2 flex-wrap">
-          {productList.length > 0 ? (
-            <>
-              {productList.map((p) => (
-                <div key={p.id} className="px-4 py-2 bg-zinc-800 rounded">
-                  {p.name}
-                </div>
-              ))}
-              <Button
-                onClick={handlePlusClick}
-                className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+          {selectedSubcatDoc && (
+            <div
+              className={cn(
+                "mt-4",
+                stageList.length === 1
+                  ? "flex flex-col items-center gap-4"
+                  : "flex flex-row gap-4"
+              )}
+            >
+              {/* PRODUCTS */}
+              <Card
+                className={cn(
+                  "bg-zinc-900 border-zinc-700",
+                  stageList.length === 1 ? "w-full md:w-1/2" : "flex-1"
+                )}
               >
-                <PlusIcon className="w-4 h-4" />
-              </Button>
-            </>
-          ) : (
-            <>
-              <span className="text-gray-400">
-                No hay Products en esta Subcat
-              </span>
-              <Button
-                onClick={handlePlusClick}
-                className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                <CardHeader>
+                  <CardTitle className="text-yellow-400">
+                    Products Relacionados
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {productList.length > 0 ? (
+                      <>
+                        {productList.map((p) => (
+                          <div key={p.id} className="px-4 py-2 bg-zinc-800 rounded">
+                            {p.name}
+                          </div>
+                        ))}
+                        <Button
+                          onClick={handlePlusClick}
+                          className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                        >
+                          <PlusIcon className="w-4 h-4" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-gray-400">
+                          No hay Products en esta Subcat
+                        </span>
+                        <Button
+                          onClick={handlePlusClick}
+                          className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                        >
+                          <PlusIcon className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* STAGES */}
+              <Card
+                className={cn(
+                  "bg-zinc-900 border-zinc-700",
+                  stageList.length === 1 ? "w-full md:w-1/2" : "flex-1"
+                )}
               >
-                <PlusIcon className="w-4 h-4" />
-              </Button>
-            </>
+                <CardHeader>
+                  <CardTitle className="text-yellow-400">
+                    Stages Relacionados
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {stageList.length > 0 ? (
+                      <>
+                        {stageList.map((sg) => (
+                          <div key={sg.id} className="px-4 py-2 bg-zinc-800 rounded">
+                            {sg.name}
+                          </div>
+                        ))}
+                        <Button
+                          onClick={handlePlusClick}
+                          className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                        >
+                          <PlusIcon className="w-4 h-4" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-gray-400">
+                          No hay Stages para este Step
+                        </span>
+                        <Button
+                          onClick={handlePlusClick}
+                          className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                        >
+                          <PlusIcon className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
-        </div>
-      </CardContent>
-    </Card>
 
-    {/* STAGES */}
-    <Card
-      className={cn(
-        "bg-zinc-900 border-zinc-700",
-        stageList.length === 1 ? "w-full md:w-1/2" : "flex-1"
-      )}
-    >
-      <CardHeader>
-        <CardTitle className="text-yellow-400">
-          Stages Relacionados
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center gap-2 flex-wrap">
-          {stageList.length > 0 ? (
-            <>
-              {stageList.map((sg) => (
-                <div key={sg.id} className="px-4 py-2 bg-zinc-800 rounded">
-                  {sg.name}
+          {/* ================== 4) UNA TARJETA POR CADA STAGE PARA PARÁMETROS ================== */}
+          {selectedSubcat && stageList.length > 0 && (
+            <div className="mt-6">
+              {stageList.length === 1 ? (
+                // Cuando solo hay 1 tarjeta de parámetros, centramos la tarjeta con el mismo ancho que los contenedores de Products & Stages.
+                <div className="flex justify-center">
+                  <div className="w-full md:w-1/2">
+                    <Card key={stageList[0].id} className="bg-zinc-900 border-zinc-700 w-full">
+                      <CardHeader>
+                        <CardTitle className="text-yellow-400">
+                          {stageList[0].name}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2 text-sm text-gray-200">
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Sub Categoria:{" "}
+                            </span>
+                            {selectedSubcat.name ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Min Trading Days:{" "}
+                            </span>
+                            {options.minTradingDays ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Max Daily Loss:{" "}
+                            </span>
+                            {options.maxDailyLoss ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Max Loss:{" "}
+                            </span>
+                            {options.maxLoss ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Profit Target:{" "}
+                            </span>
+                            {options.profitTarget ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Leverage:{" "}
+                            </span>
+                            {options.leverage ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Fecha de creación:{" "}
+                            </span>
+                            {formatDate(options.createdAt)}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Fecha de actualización:{" "}
+                            </span>
+                            {formatDate(options.updatedAt)}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
-              ))}
-              <Button
-                onClick={handlePlusClick}
-                className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
-              >
-                <PlusIcon className="w-4 h-4" />
-              </Button>
-            </>
-          ) : (
-            <>
-              <span className="text-gray-400">
-                No hay Stages para este Step
-              </span>
-              <Button
-                onClick={handlePlusClick}
-                className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
-              >
-                <PlusIcon className="w-4 h-4" />
-              </Button>
-            </>
+              ) : stageList.length === 2 ? (
+                // Si hay 2 tarjetas, se muestran en grid de 2 columnas.
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {stageList.map((sg) => (
+                    <Card key={sg.id} className="bg-zinc-900 border-zinc-700 w-full">
+                      <CardHeader>
+                        <CardTitle className="text-yellow-400">{sg.name}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2 text-sm text-gray-200">
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Sub Categoria:{" "}
+                            </span>
+                            {selectedSubcat.name ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Min Trading Days:{" "}
+                            </span>
+                            {options.minTradingDays ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Max Daily Loss:{" "}
+                            </span>
+                            {options.maxDailyLoss ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Max Loss:{" "}
+                            </span>
+                            {options.maxLoss ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Profit Target:{" "}
+                            </span>
+                            {options.profitTarget ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Leverage:{" "}
+                            </span>
+                            {options.leverage ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Fecha de creación:{" "}
+                            </span>
+                            {formatDate(options.createdAt)}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Fecha de actualización:{" "}
+                            </span>
+                            {formatDate(options.updatedAt)}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                // Para 3 o más tarjetas, se muestra en grid de 3 columnas en md.
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {stageList.map((sg) => (
+                    <Card key={sg.id} className="bg-zinc-900 border-zinc-700 w-full">
+                      <CardHeader>
+                        <CardTitle className="text-yellow-400">{sg.name}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2 text-sm text-gray-200">
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Sub Categoria:{" "}
+                            </span>
+                            {selectedSubcat.name ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Min Trading Days:{" "}
+                            </span>
+                            {options.minTradingDays ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Max Daily Loss:{" "}
+                            </span>
+                            {options.maxDailyLoss ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Max Loss:{" "}
+                            </span>
+                            {options.maxLoss ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Profit Target:{" "}
+                            </span>
+                            {options.profitTarget ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Leverage:{" "}
+                            </span>
+                            {options.leverage ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Fecha de creación:{" "}
+                            </span>
+                            {formatDate(options.createdAt)}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-yellow-300">
+                              Fecha de actualización:{" "}
+                            </span>
+                            {formatDate(options.updatedAt)}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-)}
-
-{/* ================== 4) UNA TARJETA POR CADA STAGE PARA PARÁMETROS ================== */}
-{selectedSubcat && stageList.length > 0 && (
-  <div className="mt-6">
-    {stageList.length === 1 ? (
-      // Cuando solo hay 1 tarjeta de parámetros, centramos la tarjeta con el mismo ancho que los contenedores de Products & Stages.
-      <div className="flex justify-center">
-        <div className="w-full md:w-1/2">
-          <Card key={stageList[0].id} className="bg-zinc-900 border-zinc-700 w-full">
-            <CardHeader>
-              <CardTitle className="text-yellow-400">
-                {stageList[0].name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm text-gray-200">
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Sub Categoria:{" "}
-                  </span>
-                  {selectedSubcat.name ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Min Trading Days:{" "}
-                  </span>
-                  {options.minTradingDays ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Max Daily Loss:{" "}
-                  </span>
-                  {options.maxDailyLoss ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Max Loss:{" "}
-                  </span>
-                  {options.maxLoss ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Profit Target:{" "}
-                  </span>
-                  {options.profitTarget ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Leverage:{" "}
-                  </span>
-                  {options.leverage ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Fecha de creación:{" "}
-                  </span>
-                  {formatDate(options.createdAt)}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Fecha de actualización:{" "}
-                  </span>
-                  {formatDate(options.updatedAt)}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    ) : stageList.length === 2 ? (
-      // Si hay 2 tarjetas, se muestran en grid de 2 columnas.
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {stageList.map((sg) => (
-          <Card key={sg.id} className="bg-zinc-900 border-zinc-700 w-full">
-            <CardHeader>
-              <CardTitle className="text-yellow-400">{sg.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm text-gray-200">
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Sub Categoria:{" "}
-                  </span>
-                  {selectedSubcat.name ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Min Trading Days:{" "}
-                  </span>
-                  {options.minTradingDays ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Max Daily Loss:{" "}
-                  </span>
-                  {options.maxDailyLoss ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Max Loss:{" "}
-                  </span>
-                  {options.maxLoss ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Profit Target:{" "}
-                  </span>
-                  {options.profitTarget ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Leverage:{" "}
-                  </span>
-                  {options.leverage ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Fecha de creación:{" "}
-                  </span>
-                  {formatDate(options.createdAt)}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Fecha de actualización:{" "}
-                  </span>
-                  {formatDate(options.updatedAt)}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    ) : (
-      // Para 3 o más tarjetas, se muestra en grid de 3 columnas en md.
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {stageList.map((sg) => (
-          <Card key={sg.id} className="bg-zinc-900 border-zinc-700 w-full">
-            <CardHeader>
-              <CardTitle className="text-yellow-400">{sg.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm text-gray-200">
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Sub Categoria:{" "}
-                  </span>
-                  {selectedSubcat.name ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Min Trading Days:{" "}
-                  </span>
-                  {options.minTradingDays ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Max Daily Loss:{" "}
-                  </span>
-                  {options.maxDailyLoss ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Max Loss:{" "}
-                  </span>
-                  {options.maxLoss ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Profit Target:{" "}
-                  </span>
-                  {options.profitTarget ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Leverage:{" "}
-                  </span>
-                  {options.leverage ?? "—"}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Fecha de creación:{" "}
-                  </span>
-                  {formatDate(options.createdAt)}
-                </div>
-                <div>
-                  <span className="font-semibold text-yellow-300">
-                    Fecha de actualización:{" "}
-                  </span>
-                  {formatDate(options.updatedAt)}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    )}
-  </div>
-)}
-
-
-
         </div>
       </div>
     </DashboardLayout>
