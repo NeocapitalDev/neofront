@@ -27,6 +27,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+// Importar toast desde sonner
+import { toast } from "sonner";
+
 // Validación
 const nameSchema = z.object({
   name: z.string().nonempty("El nombre es requerido"),
@@ -147,9 +150,11 @@ export function ProductsManager({ pageSize }) {
       if (editItem) {
         // Editar
         await updateStrapiItem(endpoint, editItem.docId, payload);
+        toast.success("Producto editado exitosamente");
       } else {
         // Crear
         await createStrapiItem(endpoint, payload);
+        toast.success("Producto creado exitosamente");
       }
       setOpenModal(false);
 
@@ -164,7 +169,7 @@ export function ProductsManager({ pageSize }) {
       );
     } catch (error) {
       console.error("Error al guardar:", error);
-      alert("Ocurrió un error al guardar. Revisa la consola.");
+      toast.error("Ocurrió un error al guardar. Revisa la consola.");
     }
   }
 

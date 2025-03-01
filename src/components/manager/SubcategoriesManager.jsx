@@ -27,6 +27,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+// Importar toast desde sonner
+import { toast } from "sonner";
+
 // Validación
 const nameSchema = z.object({
   name: z.string().nonempty("El nombre es requerido"),
@@ -148,9 +151,11 @@ export function SubcategoriesManager({ pageSize }) {
       if (editItem) {
         // Editar
         await updateStrapiItem(endpoint, editItem.docId, payload);
+        toast.success("Subcategoría editada exitosamente");
       } else {
         // Crear
         await createStrapiItem(endpoint, payload);
+        toast.success("Subcategoría creada exitosamente");
       }
       setOpenModal(false);
 
@@ -165,7 +170,7 @@ export function SubcategoriesManager({ pageSize }) {
       );
     } catch (error) {
       console.error("Error al guardar:", error);
-      alert("Ocurrió un error al guardar. Revisa la consola.");
+      toast.error("Ocurrió un error al guardar. Revisa la consola.");
     }
   }
 
