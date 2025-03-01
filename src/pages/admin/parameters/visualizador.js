@@ -375,7 +375,7 @@ export default function StepSubcatAutoShowNoResumen() {
                       {/* Ejemplo: mostramos los campos de la Subcategoría */}
                       <div>
                         <span className="font-semibold text-yellow-300">Nombre: </span>
-                        {options.name ?? "—"}
+                        {selectedSubcat.name ?? "—"}
                       </div>
                       <div>
                         <span className="font-semibold text-yellow-300">Min Trading Days: </span>

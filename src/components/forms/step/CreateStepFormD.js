@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, {
+  useState, useEffect
+} from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { stepFormSchema } from "../../../lib/schemas";
@@ -89,7 +91,7 @@ export function CreateStepFormC() {
   });
 
   // 5. Función para crear Step con sus relaciones
-  const createStepWithRelations = async (stepPayload) => {
+  const createStepWithRelations = async (stepPayload, onToast) => {
     const response = await fetch(
       "http://localhost:1337/api/challenge-steps/create-with-relations",
       {
@@ -125,11 +127,21 @@ export function CreateStepFormC() {
       setCustomSubcategories([]);
       setCustomStages([]);
 
-      // Redirección tras crear
-      router.push("/admin/steps");
+      // Redirección tras crear exitosamente
+      router.push({
+        pathname: "/admin/steps",
+        query: { toast: "success", message: "Step creado correctamente." }
+      });
+      // onToast("Step creado correctamente.", "success");
     } catch (error) {
+      // onToast("Error al crear el step. Revisa la consola.", "error");
       console.error("Error al crear el step:", error);
-      alert("Ocurrió un error al crear el step. Revisa la consola.");
+      toast.error("Error al crear el step. Revisa la consola.");
+      // router.push({
+      //   pathname: "/admin/create",
+      //   query: { toast: "error", message: "Error al crear el step. Revisa la consola." }
+      // });
+      // alert("Ocurrió un error al crear el step. Revisa la consola.");
     } finally {
       setLocalLoading(false);
     }
