@@ -27,6 +27,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+// Importar toast desde sonner
+import { toast } from "sonner";
+
 // Validación
 const nameSchema = z.object({
   name: z.string().nonempty("El nombre es requerido"),
@@ -148,9 +151,11 @@ export function StagesManager({ pageSize }) {
       if (editItem) {
         // Editar
         await updateStrapiItem(endpoint, editItem.docId, payload);
+        toast.success("Stage editado exitosamente");
       } else {
         // Crear
         await createStrapiItem(endpoint, payload);
+        toast.success("Stage creado exitosamente");
       }
       setOpenModal(false);
 
@@ -165,7 +170,7 @@ export function StagesManager({ pageSize }) {
       );
     } catch (error) {
       console.error("Error al guardar:", error);
-      alert("Ocurrió un error al guardar. Revisa la consola.");
+      toast.error("Ocurrió un error al guardar. Revisa la consola.");
     }
   }
 
@@ -175,7 +180,8 @@ export function StagesManager({ pageSize }) {
   //    - Enumerar secuencialmente (1,2,3,...) en lugar de usar el id real.
   // --------------------------------------------------
   const uniqueStages = stages.filter(
-    (item, index, self) => index === self.findIndex((t) => t.name === item.name)
+    (item, index, self) =>
+      index === self.findIndex((t) => t.name === item.name)
   );
   const tableData = uniqueStages.map((item, index) => ({
     ...item,

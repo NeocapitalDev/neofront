@@ -4,7 +4,6 @@ import type { Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "./DataTableViewOptions";
 
 interface DataTableToolbarProps<TData> {
@@ -17,19 +16,31 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2">
+    // Contenedor principal en una sola línea (sin flex-wrap)
+    <div className="flex items-center w-full space-x-2 overflow-hidden">
+      {/* 
+        Sección de inputs con flex-shrink y min-w-0 para que puedan reducir 
+        el ancho en pantallas pequeñas sin romper a otra línea 
+      */}
+      <div className="flex-1 flex items-center space-x-2 min-w-0 overflow-hidden">
         <input
           placeholder="Filtrar por Nombre ..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
-          className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
+          className="
+            flex-shrink min-w-0 w-auto max-w-[200px]
+            rounded-md border border-gray-700 bg-transparent
+            text-white placeholder-gray-500
+            px-3 py-2
+            focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)]
+            focus:border-[var(--app-primary)] transition
+          "
         />
 
         <input
-          placeholder="Filtrar por Subcategoria ..."
+          placeholder="Filtrar por Subcat ..."
           value={
             (table
               .getColumn("challenge_subcategories")
@@ -37,11 +48,19 @@ export function DataTableToolbar<TData>({
           }
           onChange={(event) =>
             table
-              .getColumn("challenge_subcategories ...")
+              .getColumn("challenge_subcategories")
               ?.setFilterValue(event.target.value)
           }
-          className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
+          className="
+            flex-shrink min-w-0 w-auto max-w-[200px]
+            rounded-md border border-gray-700 bg-transparent
+            text-white placeholder-gray-500
+            px-3 py-2
+            focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)]
+            focus:border-[var(--app-primary)] transition
+          "
         />
+
         <input
           placeholder="Filtrar por stage ..."
           value={
@@ -54,8 +73,16 @@ export function DataTableToolbar<TData>({
               .getColumn("challenge_stages")
               ?.setFilterValue(value === "" ? undefined : value);
           }}
-          className="py-2 px-4 rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition w-[150px] lg:w-[250px]"
+          className="
+            flex-shrink min-w-0 w-auto max-w-[200px]
+            rounded-md border border-gray-700 bg-transparent
+            text-white placeholder-gray-500
+            px-3 py-2
+            focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)]
+            focus:border-[var(--app-primary)] transition
+          "
         />
+
         {isFiltered && (
           <Button
             variant="ghost"
@@ -67,9 +94,11 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
+
+      {/* Opciones de vista, alineadas a la derecha */}
       <div className="z-10">
         <DataTableViewOptions table={table} />
-      </div>{" "}
+      </div>
     </div>
   );
 }
