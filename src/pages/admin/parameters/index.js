@@ -17,7 +17,7 @@ function IndexPage() {
 
   return (
     <DashboardLayout>
-      <section className="w-full h-full p-4  text-white">
+      <section className="w-full mx-auto h-full p-4 text-white">
         {/* Botón "Ver Visualizador" en la parte superior */}
         <div className="flex justify-end mb-4">
           <button

@@ -29,7 +29,7 @@ export default function ViewSteps() {
       {isLoading && <StepLoader></StepLoader>}
       {error && <div>Error: {error.message}</div>}
       {data && (
-        <div className="w-[70%] mx-auto">
+        <div className="w-[90%] mx-auto">
           <div className="w-full flex justify-end">
             <button onClick={handleCreate} className="px-4 py-2 bg-[var(--app-primary)] text-black font-semibold rounded hover:bg-[var(--app-secondary)]">
               <p className="flex items-center justify-center gap-2">
