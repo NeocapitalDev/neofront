@@ -6,7 +6,6 @@ import DashboardLayout from "..";
 import { useRouter } from "next/router";
 import { X, Plus } from "lucide-react";
 import Skeleton from "@/components/loaders/loader";
-import { FetchChallengeSteps } from "./Nuevo";
 import { Toaster, toast } from 'sonner';
 
 
