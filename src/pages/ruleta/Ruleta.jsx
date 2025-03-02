@@ -5,14 +5,11 @@ import { useStrapiData } from "src/services/strapiService";
 import { useSession } from "next-auth/react";
 
 const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
-  // 1) Obtenemos datos desde Strapi o desde la prop customOptions.
   const { data: session, status } = useSession();
-
-  console.log("Sesión actual:", session);
   const { data, error, loading } = useStrapiData(
     "provisional-products?populate=*"
   );
-  console.log("data", data);
+
   const [isSpinning, setIsSpinning] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [startAngle, setStartAngle] = useState(0);
@@ -28,11 +25,9 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
       documentId: item.documentId,
     }));
   }
-  console.log("opciones", opciones);
-  // 2) Offset para que “ángulo 0” esté en la parte superior.
+
   const angleOffset = -Math.PI / 2;
 
-  // 3) Dibuja la ruleta con el esquema de colores adecuado.
   const drawWheel = (ctx, options, currentAngle) => {
     const numOptions = options.length;
     const arcSize = (2 * Math.PI) / numOptions;
@@ -41,7 +36,7 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
     const radius = Math.min(centerX, centerY) - 20;
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.fillStyle = "#000"; // Fondo negro
+    ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     for (let i = 0; i < numOptions; i++) {
@@ -49,13 +44,12 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
       ctx.beginPath();
       ctx.moveTo(centerX, centerY);
       ctx.arc(centerX, centerY, radius, angle, angle + arcSize, false);
-      ctx.fillStyle = i % 2 === 0 ? "#F7DC6F" : "#F4D03F"; // Tonos amarillos/dorados
+      ctx.fillStyle = i % 2 === 0 ? "#F7DC6F" : "#F4D03F";
       ctx.fill();
       ctx.strokeStyle = "#333";
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Texto centrado en cada sector
       ctx.save();
       ctx.translate(centerX, centerY);
       ctx.rotate(angle + arcSize / 2);
@@ -67,24 +61,22 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
     }
   };
 
-  // 4) Calcula el ángulo final según el índice ganador.
   const calculateFinalAngle = (currentAngle, winningIndex) => {
     const numOptions = opciones.length;
     const arcSize = (2 * Math.PI) / numOptions;
-    // Se determina el ángulo objetivo para centrar el sector ganador en el puntero.
     const targetAngle =
       2 * Math.PI - (winningIndex * arcSize + arcSize / 2) - angleOffset;
     const vueltasCompletas = 3;
+
     let finalAngle = currentAngle + vueltasCompletas * 2 * Math.PI;
-    // Aseguramos que el ángulo final tenga el residuo deseado.
     while (finalAngle % (2 * Math.PI) < targetAngle) {
       finalAngle += 2 * Math.PI;
     }
+
     finalAngle = finalAngle - (finalAngle % (2 * Math.PI)) + targetAngle;
     return finalAngle;
   };
 
-  // 5) Función de giro que consulta el resultado en el backend.
   const spinWheel = async () => {
     if (isSpinning) return;
     setIsSpinning(true);
@@ -101,22 +93,16 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
           },
           body: JSON.stringify({
             usuario: session.user.email,
-            docu
+            docu: intento,
           }),
         }
       );
       if (!response.ok) {
         throw new Error("Error en la respuesta del servidor");
       }
-      // Se asume que el backend retorna el objeto ganador { name, documentId }
-      const winningOption = await response.json();
-      // Se busca el índice de la opción ganadora en el array.
-      const winningIndex = opciones.findIndex(
-        (opcion) =>
-          opcion.documentId === winningOption.documentId &&
-          opcion.name === winningOption.name
-      );
 
+      const winningOption = await response.json();
+      const winningIndex = winningOption.indice; // Asumiendo que el backend te devuelve un índice directo
       if (winningIndex === -1) {
         throw new Error("La opción ganadora no coincide con ninguna opción");
       }
@@ -150,11 +136,9 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
     } catch (err) {
       console.error(err);
       setIsSpinning(false);
-      // Aquí podrías mostrar un mensaje de error en la interfaz
     }
   };
 
-  // 6) Dibuja la ruleta al montar o cuando cambien opciones/ángulo.
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -164,6 +148,7 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
       drawWheel(ctx, opciones, startAngle);
     }
   }, [opciones, startAngle, width, height]);
+
   const handlePerder = async () => {
     try {
       const ticket = await fetch(
@@ -179,16 +164,10 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
           }),
         }
       );
-
       if (!ticket.ok) {
         throw new Error("Error en la respuesta del servidor");
       }
-
-      // Aquí convertimos la respuesta a JSON
       const responseData = await ticket.json();
-      console.log("Response data:", responseData);
-
-      // Si tu JSON contiene algo como `documentId`, podrías usarlo así:
       setIntento(responseData.data.documentId);
     } catch (error) {
       console.error("Error al manejar la respuesta:", error);
@@ -231,16 +210,16 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
                 boxShadow: "0 0 10px rgba(255,255,0,0.5)",
               }}
             />
-            {/* Puntero animado */}
             <motion.div
               initial={{ y: -10 }}
               animate={{ y: [-10, 0, -10] }}
               transition={{ repeat: Infinity, duration: 1.5 }}
               style={{
                 position: "absolute",
-                top: "0",
-                left: "50%",
+                top: "50%",
+                left: "95%",
                 transform: "translate(-50%, -50%)",
+                rotate: "-90deg",
                 width: 0,
                 height: 0,
                 borderLeft: "15px solid transparent",
@@ -266,7 +245,6 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
               }}
               onClick={handlePerder}
             >
-              {" "}
               perder
             </button>
             <motion.button
