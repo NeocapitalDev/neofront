@@ -4,7 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import DataTableColumnHeader from "./DataTableColumnHeader";
-import DetailModal from "./DetailModal";
+import DetailModal from "@/components/forms/parameters/DetailModal";
 import { Button } from "@/components/ui/button";
 import { Edit, Eye } from "lucide-react";
 import { useState } from "react";

@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouter } from "next/navigation"; // o "next/router" en Next.js 12
-import DataTable from "./DataTable";
-import Columns from "./Columns";
+import DataTable from "@/components/forms/parameters/DataTable";
+import Columns from "@/components/forms/parameters/Columns";
 import DashboardLayout from "..";
 import useSWR from "swr";
 
