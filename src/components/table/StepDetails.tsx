@@ -39,7 +39,7 @@ export function StepDetails({ step, data }: StepDetailsProps) {
   return (
     <Card className="border-0">
       <CardContent className="">
-        <UpdateStepFormC step={data} setNewData={handleEditing} />
+        <UpdateStepFormC step={data} onStepChange={handleEditing} />
       </CardContent>
     </Card>
   );
