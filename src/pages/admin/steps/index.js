@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useStrapiData } from "../../../services/strapiService";
 import { DataTable } from "@/components/table/DataTable";
-import { getColumns, Challenge } from "@/components/table/Columns";
+import { getColumns } from "@/components/table/Columns";
 import DashboardLayout from "..";
 import { useRouter } from "next/router";
 import { X, Plus } from "lucide-react";
@@ -52,11 +52,10 @@ export default function ViewSteps() {
             </button>
           </div>
           <div className="my-10"></div>
-          <DataTable data={data} columns={getColumns(Challenge)} />
+          <DataTable data={data} columns={getColumns()} />
         </div>
       )}
 
-      {/* <UpdateStepFormC step={data[0]}></UpdateStepFormC> */}
     </DashboardLayout>
   );
 }

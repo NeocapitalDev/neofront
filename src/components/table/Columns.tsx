@@ -35,9 +35,8 @@ export type Challenge = {
 };
 
 // Función que recibe el callback para edición y retorna el arreglo de columnas
-export const getColumns = (
-  onEdit: (row: Challenge) => void
-): ColumnDef<Challenge>[] => [
+export const getColumns = (): // onEdit: (row: Challenge) => void
+ColumnDef<Challenge>[] => [
   {
     id: "select",
     header: ({ table }) => (
