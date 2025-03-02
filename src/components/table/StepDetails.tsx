@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-import { UpdateStepFormC } from "@/pages/prueba3/UpdateStepFormC";
+import { UpdateStepFormC } from "@/components/forms/step/UpdateStepFormC";
 
 export interface Subcategory {
   id: string | number;
