@@ -57,7 +57,12 @@ interface DetailsProps {
   actualizarDatos?: () => void;
 }
 
-export function PropDetails({ prop, modalType, onClose,actualizarDatos}: DetailsProps) {
+export default function PropDetails({
+  prop,
+  modalType,
+  onClose,
+  actualizarDatos,
+}: DetailsProps) {
   const { data: productsData } = useStrapiData("challenge-products");
   const { data: subcategoriesData } = useStrapiData("challenge-subcategories");
   const { data: stagesdata } = useStrapiData("challenge-stages");
@@ -68,7 +73,8 @@ export function PropDetails({ prop, modalType, onClose,actualizarDatos}: Details
 
   // Productos disponibles (excluyendo los que ya están en challenge_products)
   const productavailable = productsData?.filter(
-    (product) => !editableProp.challenge_products.some((p) => p.id === product.id)
+    (product) =>
+      !editableProp.challenge_products.some((p) => p.id === product.id)
   );
 
   // Stages disponibles (excluyendo las ya seleccionadas)
@@ -379,9 +385,7 @@ export function PropDetails({ prop, modalType, onClose,actualizarDatos}: Details
             </div>
           </div>
 
-          {modalType === 2 && (
-            <Button onClick={handleSave}>Guardar</Button>
-          )}
+          {modalType === 2 && <Button onClick={handleSave}>Guardar</Button>}
         </CardContent>
       </Card>
 

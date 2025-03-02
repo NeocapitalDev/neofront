@@ -11,10 +11,21 @@ interface ModalProps {
   children: React.ReactNode;
   title?: string;
   description?: string;
-  maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"| "4xl"| "5xl"| "6xl"| "7xl"| "full";
+  maxWidth?:
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "2xl"
+    | "3xl"
+    | "4xl"
+    | "5xl"
+    | "6xl"
+    | "7xl"
+    | "full";
 }
 
-export function DetailModal({
+export default function DetailModal({
   isOpen,
   onClose,
   children,

@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "./DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil } from "lucide-react";
+import { Eye } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/router";
 
@@ -153,18 +153,6 @@ ColumnDef<Challenge>[] => [
           <Button variant="ghost" size="icon" onClick={handleRedirect}>
             <Eye className="h-4 w-4" />
           </Button>
-          {/* Botón de edición que invoca el callback recibido */}
-          {/* <Button variant="ghost" size="icon" onClick={() => onEdit(data)}>
-            <Pencil className="h-4 w-4" />
-          </Button> */}
-          {/* <DetailModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            // title={`Step Details: ${step.name}`}
-            maxWidth="2xl"
-          >
-            <StepDetails step={step} data={data} />
-          </DetailModal> */}
         </>
       );
     },

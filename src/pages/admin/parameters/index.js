@@ -1,8 +1,7 @@
 import React from "react";
 import { useRouter } from "next/navigation"; // o "next/router" en Next.js 12
-import { useStrapiData } from "../../../services/strapiService";
-import { DataTable } from "./DataTable";
-import { Columns } from "./Columns";
+import DataTable from "./DataTable";
+import Columns from "./Columns";
 import DashboardLayout from "..";
 import useSWR from "swr";
 
@@ -26,11 +25,11 @@ function IndexPage() {
     console.log("Datos actualizados");
   }
 
-  
+
 
 
   const processedData = data?.data || [];
-  
+
   console.log(processedData);
 
   // const { data, error, isLoading } = useStrapiData("challenge-relations?populate=*");

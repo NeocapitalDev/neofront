@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { ChallengeTable } from "@/components/table/ChallengeTable";
-import { RowsPerPage } from "@/components/table/RowsPerPage";
 
 // shadcn/ui
 import {
