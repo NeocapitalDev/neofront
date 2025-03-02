@@ -84,7 +84,7 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
 
     try {
       const response = await fetch(
-        "https://n8n.neocapitalfunding.com/webhook/webhook/ruleta",
+        "https://n8n.neocapitalfunding.com/webhook-test/webhook/ruleta",
         {
           method: "POST",
           headers: {
@@ -152,7 +152,7 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
   const handlePerder = async () => {
     try {
       const ticket = await fetch(
-        "https://n8n.neocapitalfunding.com/webhook/user/lose",
+        "https://n8n.neocapitalfunding.com/webhook-test/user/lose",
         {
           method: "POST",
           headers: {
