@@ -204,7 +204,7 @@ export function CreateStepFormC() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* Subcategorías Section */}
-            <div className="space-y-6">
+            <div className="space-y-6 p-4 border border-gray-700 rounded-xl">
               <FormField
                 control={form.control}
                 name="subcategories"
@@ -213,8 +213,8 @@ export function CreateStepFormC() {
                     <FormLabel className="text-yellow-500 text-lg">
                       Subcategorías
                     </FormLabel>
-                    <Card className="p-4 border border-gray-700 bg-black/50">
-                      <div className="space-y-4">
+                    <Card className="bg-black border-none">
+                      <div className="space-y-6">
                         <Popover open={openSubcat} onOpenChange={setOpenSubcat}>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -364,7 +364,7 @@ export function CreateStepFormC() {
             </div>
 
             {/* Stages Section */}
-            <div className="space-y-6">
+            <div className="space-y-6 p-4 border border-gray-700 rounded-xl">
               <FormField
                 control={form.control}
                 name="stages"
@@ -373,8 +373,8 @@ export function CreateStepFormC() {
                     <FormLabel className="text-yellow-500 text-lg">
                       Stages
                     </FormLabel>
-                    <Card className="p-4 border border-gray-700 bg-black/50">
-                      <div className="space-y-4">
+                    <Card className=" bg-black/50 border-none">
+                      <div className="space-y-6">
                         <Popover open={openStages} onOpenChange={setOpenStages}>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -474,7 +474,6 @@ export function CreateStepFormC() {
                             </Command>
                           </PopoverContent>
                         </Popover>
-
                         <div className="flex gap-2 items-center">
                           <Input
                             placeholder="Nuevo Stage"

@@ -222,7 +222,7 @@ export default function Columns(
             <DetailModal
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
-              title={`Details ${prop.challenge_subcategory?.name}`}
+              title={`Detalle -  ${prop.challenge_subcategory?.name}`}
               maxWidth="7xl"
             >
               <PropDetails

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import DashboardLayout from "..";
 import {
   Table,
@@ -90,11 +90,11 @@ const movementsData = [
 export default function MovementsTable() {
   return (
     <DashboardLayout>
-      <div className="p-6  text-white rounded-lg shadow-lg">
+      <div className="p-6 text-white rounded-lg shadow-lg">
         <h1 className="text-4xl font-bold mb-6">Movements</h1>
-        <div className="bg-gray-900 p-4 rounded-lg border border-gray-700 mt-4">
+        <div className="bg-zinc-900 p-4 rounded-lg border border-zinc-700 mt-4">
           <Table>
-            <TableHeader className="bg-gray-800 text-gray-300">
+            <TableHeader className="bg-zinc-800 text-zinc-300">
               <TableRow>
                 <TableHead>Trader Account</TableHead>
                 <TableHead>Trader Email</TableHead>
@@ -107,14 +107,22 @@ export default function MovementsTable() {
             </TableHeader>
             <TableBody>
               {movementsData.map((movement, index) => (
-                <TableRow key={index} className="border-b border-gray-700">
+                <TableRow key={index} className="border-b border-zinc-700">
                   <TableCell>{movement.account}</TableCell>
                   <TableCell>{movement.email}</TableCell>
                   <TableCell>{movement.date}</TableCell>
                   <TableCell>{movement.amount}</TableCell>
                   <TableCell>{movement.challenge}</TableCell>
-                  <TableCell className={movement.type === "Withdraw" ? "text-blue-400" : "text-green-400"}>{movement.type}</TableCell>
-                  <TableCell className={movement.status === "Rejected" ? "text-red-400" : "text-green-400"}>{movement.status}</TableCell>
+                  <TableCell className="text-zinc-300">{movement.type}</TableCell>
+                  <TableCell
+                    className={
+                      movement.status === "Rejected"
+                        ? "text-red-400"
+                        : "text-green-400"
+                    }
+                  >
+                    {movement.status}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "./DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/router";
 
@@ -151,7 +151,7 @@ ColumnDef<Challenge>[] => [
       return (
         <>
           <Button variant="ghost" size="icon" onClick={handleRedirect}>
-            <Eye className="h-4 w-4" />
+            <Pencil className="h-4 w-4" />
           </Button>
         </>
       );

@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { DataTableViewOptions } from "./DataTableViewOptions";
+import { Input } from "@/components/ui/input";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -23,24 +24,19 @@ export function DataTableToolbar<TData>({
         el ancho en pantallas pequeñas sin romper a otra línea 
       */}
       <div className="flex-1 flex items-center space-x-2 min-w-0 overflow-hidden">
-        <input
-          placeholder="Filtrar por Nombre ..."
+        <Input
+          placeholder="Nombre "
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="
-            flex-shrink min-w-0 w-auto max-w-[200px]
-            rounded-md border border-gray-700 bg-transparent
-            text-white placeholder-gray-500
-            px-3 py-2
-            focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)]
-            focus:border-[var(--app-primary)] transition
+            h-8 w-[150px] lg:w-[250px]
           "
         />
 
-        <input
-          placeholder="Filtrar por Subcat ..."
+        <Input
+          placeholder="Subcategoria "
           value={
             (table
               .getColumn("challenge_subcategories")
@@ -52,17 +48,12 @@ export function DataTableToolbar<TData>({
               ?.setFilterValue(event.target.value)
           }
           className="
-            flex-shrink min-w-0 w-auto max-w-[200px]
-            rounded-md border border-gray-700 bg-transparent
-            text-white placeholder-gray-500
-            px-3 py-2
-            focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)]
-            focus:border-[var(--app-primary)] transition
+            h-8 w-[150px] lg:w-[250px]
           "
         />
 
-        <input
-          placeholder="Filtrar por stage ..."
+        <Input
+          placeholder="Stage "
           value={
             (table.getColumn("challenge_stages")?.getFilterValue() as string) ??
             ""
@@ -74,12 +65,7 @@ export function DataTableToolbar<TData>({
               ?.setFilterValue(value === "" ? undefined : value);
           }}
           className="
-            flex-shrink min-w-0 w-auto max-w-[200px]
-            rounded-md border border-gray-700 bg-transparent
-            text-white placeholder-gray-500
-            px-3 py-2
-            focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)]
-            focus:border-[var(--app-primary)] transition
+            h-8 w-[150px] lg:w-[250px]
           "
         />
 

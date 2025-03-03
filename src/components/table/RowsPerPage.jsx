@@ -9,7 +9,7 @@ export function RowsPerPage({
 }) {
   return (
     <div className="flex items-center space-x-2">
-      <span className="text-gray-300 text-sm">Rows per page:</span>
+      <span className="text-gray-300 text-sm">Filas por página:</span>
       <select
         value={pageSize}
         onChange={(e) => onPageSizeChange(Number(e.target.value))}

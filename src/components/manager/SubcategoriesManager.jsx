@@ -179,8 +179,7 @@ export function SubcategoriesManager({ pageSize }) {
   //    - Enumerar secuencialmente (1,2,3,...) en lugar de usar el id real.
   // --------------------------------------------------
   const uniqueSubcats = subcats.filter(
-    (item, index, self) =>
-      index === self.findIndex((t) => t.name === item.name)
+    (item, index, self) => index === self.findIndex((t) => t.name === item.name)
   );
   const tableData = uniqueSubcats.map((item, index) => ({
     ...item,

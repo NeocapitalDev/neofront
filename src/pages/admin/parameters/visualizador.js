@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // o "next/router" en Next.js 12
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -31,15 +31,15 @@ export default function StepSubcatAutoShowNoResumen() {
   const router = useRouter();
 
   // --- Colecciones ---
-  const [allSteps, setAllSteps] = useState([]);   // Vienen de /api/challenge-steps
-  const [relations, setRelations] = useState([]); // Vienen de /api/challenge-relations
+  const [allSteps, setAllSteps] = useState([]);
+  const [relations, setRelations] = useState([]);
 
   // --- Selecciones ---
   const [selectedStepDoc, setSelectedStepDoc] = useState(null);
   const [selectedSubcatDoc, setSelectedSubcatDoc] = useState(null);
 
   // ----------------------------------------------------------------
-  // 1) Cargar Steps (para mostrar TODOS) y ChallengeRelation
+  // 1) Cargar Steps y ChallengeRelation
   // ----------------------------------------------------------------
   useEffect(() => {
     async function loadData() {
@@ -52,16 +52,11 @@ export default function StepSubcatAutoShowNoResumen() {
         if (!stepsRes.ok) throw new Error("Error al cargar Steps");
         const stepsJson = await stepsRes.json();
         const stepsItems = stepsJson.data || [];
-
-        // Guardamos steps
         setAllSteps(stepsItems);
 
-        // Si hay al menos un Step y no se ha seleccionado ninguno, seleccionamos el primero
         if (stepsItems.length > 0 && selectedStepDoc === null) {
           const firstDocId = stepsItems[0].documentId;
-          if (firstDocId) {
-            setSelectedStepDoc(firstDocId);
-          }
+          if (firstDocId) setSelectedStepDoc(firstDocId);
         }
 
         // Fetch 2: ChallengeRelation (para subcats, products, stages)
@@ -80,15 +75,10 @@ export default function StepSubcatAutoShowNoResumen() {
         console.error("loadData error:", error);
       }
     }
-
     loadData();
   }, [selectedStepDoc]);
-  // Notar que se incluye selectedStepDoc en dependencias
-  // para evitar un posible bucle; 
-  // si no deseas re-llamar en caso de cambiar selectedStepDoc, 
-  // quita esa dependencia.
 
-  // Reset subcat cuando cambie Step
+  // Reset subcategoría cuando cambie el Step
   useEffect(() => {
     setSelectedSubcatDoc(null);
   }, [selectedStepDoc]);
@@ -110,108 +100,88 @@ export default function StepSubcatAutoShowNoResumen() {
     }));
 
   // ----------------------------------------------------------------
-  // 3) Subcategorías derivadas de ChallengeRelation y Step seleccionado
+  // 3) Subcategorías
   // ----------------------------------------------------------------
   let subcatOptions = [];
   if (selectedStepDoc) {
     const subcatMap = new Map();
-
     relations.forEach((rel) => {
       const step = rel.challenge_step;
       const subcat = rel.challenge_subcategory;
-      if (step && subcat) {
-        // Filtrar: si step.documentId === selectedStepDoc
-        if (step.documentId === selectedStepDoc) {
-          const docSubcat = subcat.documentId;
-          const nameSubcat = subcat.name || "Subcat sin nombre";
-          if (!subcatMap.has(docSubcat)) {
-            subcatMap.set(docSubcat, { doc: docSubcat, name: nameSubcat, id: subcat.id });
-          }
+      if (step && subcat && step.documentId === selectedStepDoc) {
+        const docSubcat = subcat.documentId;
+        const nameSubcat = subcat.name || "Subcat sin nombre";
+        if (!subcatMap.has(docSubcat)) {
+          subcatMap.set(docSubcat, { doc: docSubcat, name: nameSubcat, id: subcat.id });
         }
       }
     });
-
     subcatOptions = Array.from(subcatMap.values());
   }
 
   // ----------------------------------------------------------------
-  // 4) Products & Stages derivadas de ChallengeRelation
+  // 4) Products & Stages
   // ----------------------------------------------------------------
   let productList = [];
   let stageList = [];
-
-  // Necesitamos la subcategoría seleccionada (para los parámetros)
   let selectedSubcat = null;
-  let options = {}
+  let options = {};
+
   if (selectedStepDoc && selectedSubcatDoc) {
     relations.forEach((rel) => {
-      console.log("rel", rel);
       const step = rel.challenge_step;
       const subcat = rel.challenge_subcategory;
-      if (step && subcat) {
-        if (
-          step.documentId === selectedStepDoc &&
-          subcat.documentId === selectedSubcatDoc
-        ) {
-          // Guardamos la subcategoría para sus parámetros
-          selectedSubcat = subcat;
-          // Extraer parámetros del rel y guardarlos en options
-          // const parameters = rel.parameters || {};
-          options = {
-            minTradingDays: rel.minimumTradingDays,
-            maxDailyLoss: rel.maximumDailyLoss,
-            maxLoss: rel.maximumLoss,
-            profitTarget: rel.profitTarget,
-            leverage: rel.leverage,
-            brokerAccount: rel.broker_account,
-            createdAt: rel.createdAt,
-            updatedAt: rel.updatedAt,
-          };
+      if (step && subcat && step.documentId === selectedStepDoc && subcat.documentId === selectedSubcatDoc) {
+        selectedSubcat = subcat;
+        options = {
+          minTradingDays: rel.minimumTradingDays,
+          maxDailyLoss: rel.maximumDailyLoss,
+          maxLoss: rel.maximumLoss,
+          profitTarget: rel.profitTarget,
+          leverage: rel.leverage,
+          brokerAccount: rel.broker_account,
+          createdAt: rel.createdAt,
+          updatedAt: rel.updatedAt,
+        };
 
-          console.log("Subcategoría seleccionada =>", selectedSubcat);
-          // PRODUCTS
-          const productsArr = rel.challenge_products || [];
-          productsArr.forEach((p) => {
-            const pDoc = p.documentId;
-            const pName = p.name || "Product sin nombre";
-            if (!productList.some((x) => x.doc === pDoc)) {
-              productList.push({ doc: pDoc, name: pName, id: p.id });
-            }
-          });
+        // PRODUCTS
+        const productsArr = rel.challenge_products || [];
+        productsArr.forEach((p) => {
+          const pDoc = p.documentId;
+          const pName = p.name || "Product sin nombre";
+          if (!productList.some((x) => x.doc === pDoc)) {
+            productList.push({ doc: pDoc, name: pName, id: p.id });
+          }
+        });
 
-          // STAGES
-          const stagesArr = rel.challenge_stages || [];
-          stagesArr.forEach((sg) => {
-            const sgDoc = sg.documentId;
-            const sgName = sg.name || "Stage sin nombre";
-            if (!stageList.some((x) => x.doc === sgDoc)) {
-              stageList.push({ doc: sgDoc, name: sgName, id: sg.id });
-            }
-          });
-        }
+        // STAGES
+        const stagesArr = rel.challenge_stages || [];
+        stagesArr.forEach((sg) => {
+          const sgDoc = sg.documentId;
+          const sgName = sg.name || "Stage sin nombre";
+          if (!stageList.some((x) => x.doc === sgDoc)) {
+            stageList.push({ doc: sgDoc, name: sgName, id: sg.id });
+          }
+        });
       }
     });
   }
 
-  // ----------------------------------------------------------------
-  // Render final (misma estructura)
-  // ----------------------------------------------------------------
   return (
     <DashboardLayout>
-      <div className="p-4 text-white min-h-screen">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <h2 className="text-xl font-bold text-yellow-400 text-center">
-            Step → Subcategory → Products & Stages & Parameters
-          </h2>
+      {/* Fondo general con un degradado oscuro */}
+      <div className="min-h-screen p-6 bg-gradient-to-b from-black via-zinc-900 to-black text-yellow-100">
+        <div className="max-w-7xl mx-auto space-y-8">
+          <h2 className="text-2xl font-bold text-center">Step → Subcategory → Products & Stages & Parameters</h2>
 
-          {/* ================== 1) STEPS ================== */}
-          <div className="flex items-center justify-center gap-2 flex-wrap">
+          {/* 1) STEPS */}
+          <div className="flex items-center justify-center gap-4 flex-wrap">
             {stepOptions.length === 0 ? (
               <>
                 <span className="text-gray-400">No hay Steps</span>
                 <Button
                   onClick={handlePlusClick}
-                  className="bg-red-500 hover:bg-red-400 flex items-center gap-1"
+                  className="bg-amber-500 hover:bg-amber-400 text-black px-3 py-2 rounded-lg flex items-center gap-1"
                 >
                   <PlusIcon className="w-4 h-4" />
                 </Button>
@@ -223,10 +193,10 @@ export default function StepSubcatAutoShowNoResumen() {
                     key={stepObj.doc}
                     onClick={() => setSelectedStepDoc(stepObj.doc)}
                     className={cn(
-                      "px-4 py-2 rounded-full transition",
+                      "px-4 py-2 rounded-lg transition",
                       selectedStepDoc === stepObj.doc
-                        ? "bg-yellow-400 text-black font-bold"
-                        : "bg-zinc-900 text-white hover:bg-zinc-800"
+                        ? "bg-amber-500 text-black"
+                        : "bg-zinc-800 hover:bg-zinc-700 text-yellow-100"
                     )}
                   >
                     {stepObj.name}
@@ -234,7 +204,7 @@ export default function StepSubcatAutoShowNoResumen() {
                 ))}
                 <Button
                   onClick={handlePlusClick}
-                  className="bg-red-500 hover:bg-red-400 flex items-center gap-1"
+                  className="bg-amber-500 hover:bg-amber-400 text-black px-3 py-2 rounded-lg flex items-center gap-1"
                 >
                   <PlusIcon className="w-4 h-4" />
                 </Button>
@@ -242,15 +212,15 @@ export default function StepSubcatAutoShowNoResumen() {
             )}
           </div>
 
-          {/* ================== 2) SUBCATEGORY ================== */}
+          {/* 2) SUBCATEGORY */}
           {selectedStepDoc && (
-            <div className="flex items-center justify-center gap-2 flex-wrap">
+            <div className="flex items-center justify-center gap-4 flex-wrap">
               {subcatOptions.length === 0 ? (
                 <>
                   <span className="text-gray-400">No hay Subcategorías para este Step</span>
                   <Button
                     onClick={handlePlusClick}
-                    className="bg-red-500 hover:bg-red-400 flex items-center gap-1"
+                    className="bg-amber-500 hover:bg-amber-400 text-black px-3 py-2 rounded-lg flex items-center gap-1"
                   >
                     <PlusIcon className="w-4 h-4" />
                   </Button>
@@ -262,10 +232,10 @@ export default function StepSubcatAutoShowNoResumen() {
                       key={sc.doc}
                       onClick={() => setSelectedSubcatDoc(sc.doc)}
                       className={cn(
-                        "px-4 py-2 rounded-full transition",
+                        "px-4 py-2 rounded-lg transition",
                         selectedSubcatDoc === sc.doc
-                          ? "bg-yellow-400 text-black font-bold"
-                          : "bg-zinc-900 text-white hover:bg-zinc-800"
+                          ? "bg-amber-500 text-black"
+                          : "bg-zinc-800 hover:bg-zinc-700 text-yellow-100"
                       )}
                     >
                       {sc.name}
@@ -273,7 +243,7 @@ export default function StepSubcatAutoShowNoResumen() {
                   ))}
                   <Button
                     onClick={handlePlusClick}
-                    className="bg-red-500 hover:bg-red-400 flex items-center gap-1"
+                    className="bg-amber-500 hover:bg-amber-400 text-black px-3 py-2 rounded-lg flex items-center gap-1"
                   >
                     <PlusIcon className="w-4 h-4" />
                   </Button>
@@ -282,52 +252,46 @@ export default function StepSubcatAutoShowNoResumen() {
             </div>
           )}
 
-          {/* ================== 3) PRODUCTS & STAGES ================== */}
+          {/* 3) PRODUCTS & STAGES */}
           {selectedSubcatDoc && (
             <div
               className={cn(
-                "mt-4",
+                "mt-6",
                 stageList.length === 1
-                  ? "flex flex-col items-center gap-4"
-                  : "flex flex-row gap-4"
+                  ? "flex flex-col items-center gap-6"
+                  : "flex flex-row gap-6"
               )}
             >
               {/* PRODUCTS */}
-              <Card
-                className={cn(
-                  "bg-zinc-900 border-zinc-700",
-                  stageList.length === 1 ? "w-full md:w-1/2" : "flex-1"
-                )}
-              >
+              <Card className={cn(
+                "bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100",
+                stageList.length === 1 ? "w-full md:w-1/2" : "flex-1"
+              )}>
                 <CardHeader>
-                  <CardTitle className="text-yellow-400">
-                    Products Relacionados
-                  </CardTitle>
+                  <CardTitle className="text-amber-400">Products Relacionados</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-3 flex-wrap">
                     {productList.length > 0 ? (
                       <>
                         {productList.map((p) => (
-                          <div key={p.id} className="px-4 py-2 bg-zinc-800 rounded">
+                          <div key={p.id} className="px-4 py-2 bg-zinc-800 rounded-lg">
                             {p.name}
                           </div>
                         ))}
                         <Button
                           onClick={handlePlusClick}
-                          className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                          className="bg-amber-500 hover:bg-amber-400 text-black px-2 py-1 rounded-lg flex items-center gap-1"
                         >
                           <PlusIcon className="w-4 h-4" />
                         </Button>
                       </>
                     ) : (
                       <>
-                        <span className="text-gray-400">
-                          No hay Products en esta Subcat
-                        </span>
+                        <span className="text-gray-400">No hay Products en esta Subcat</span>
                         <Button
                           onClick={handlePlusClick}
-                          className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                          className="bg-amber-500 hover:bg-amber-400 text-black px-2 py-1 rounded-lg flex items-center gap-1"
                         >
                           <PlusIcon className="w-4 h-4" />
                         </Button>
@@ -338,41 +302,35 @@ export default function StepSubcatAutoShowNoResumen() {
               </Card>
 
               {/* STAGES */}
-              <Card
-                className={cn(
-                  "bg-zinc-900 border-zinc-700",
-                  stageList.length === 1 ? "w-full md:w-1/2" : "flex-1"
-                )}
-              >
+              <Card className={cn(
+                "bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100",
+                stageList.length === 1 ? "w-full md:w-1/2" : "flex-1"
+              )}>
                 <CardHeader>
-                  <CardTitle className="text-yellow-400">
-                    Stages Relacionados
-                  </CardTitle>
+                  <CardTitle className="text-amber-400">Stages Relacionados</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-3 flex-wrap">
                     {stageList.length > 0 ? (
                       <>
                         {stageList.map((sg) => (
-                          <div key={sg.id} className="px-4 py-2 bg-zinc-800 rounded">
+                          <div key={sg.id} className="px-4 py-2 bg-zinc-800 rounded-lg">
                             {sg.name}
                           </div>
                         ))}
                         <Button
                           onClick={handlePlusClick}
-                          className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                          className="bg-amber-500 hover:bg-amber-400 text-black px-2 py-1 rounded-lg flex items-center gap-1"
                         >
                           <PlusIcon className="w-4 h-4" />
                         </Button>
                       </>
                     ) : (
                       <>
-                        <span className="text-gray-400">
-                          No hay Stages para este Step
-                        </span>
+                        <span className="text-gray-400">No hay Stages para este Step</span>
                         <Button
                           onClick={handlePlusClick}
-                          className="bg-red-500 hover:bg-red-400 flex items-center gap-1 p-1"
+                          className="bg-amber-500 hover:bg-amber-400 text-black px-2 py-1 rounded-lg flex items-center gap-1"
                         >
                           <PlusIcon className="w-4 h-4" />
                         </Button>
@@ -384,67 +342,48 @@ export default function StepSubcatAutoShowNoResumen() {
             </div>
           )}
 
-          {/* ================== 4) UNA TARJETA POR CADA STAGE PARA PARÁMETROS ================== */}
+          {/* 4) TARJETAS DE PARÁMETROS POR CADA STAGE */}
           {selectedSubcat && stageList.length > 0 && (
-            <div className="mt-6">
+            <div className="mt-8 space-y-6">
               {stageList.length === 1 ? (
-                // Cuando solo hay 1 tarjeta de parámetros, centramos la tarjeta con el mismo ancho que los contenedores de Products & Stages.
                 <div className="flex justify-center">
                   <div className="w-full md:w-1/2">
-                    <Card key={stageList[0].id} className="bg-zinc-900 border-zinc-700 w-full">
+                    <Card className="bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100 w-full">
                       <CardHeader>
-                        <CardTitle className="text-yellow-400">
-                          {stageList[0].name}
-                        </CardTitle>
+                        <CardTitle className="text-amber-400">{stageList[0].name}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="space-y-2 text-sm text-gray-200">
+                        <div className="space-y-2 text-sm">
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Sub Categoria:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Sub Categoría: </span>
                             {selectedSubcat.name ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Min Trading Days:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Min Trading Days: </span>
                             {options.minTradingDays ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Max Daily Loss:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Max Daily Loss: </span>
                             {options.maxDailyLoss ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Max Loss:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Max Loss: </span>
                             {options.maxLoss ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Profit Target:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Profit Target: </span>
                             {options.profitTarget ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Leverage:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Leverage: </span>
                             {options.leverage ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Fecha de creación:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Creado: </span>
                             {formatDate(options.createdAt)}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Fecha de actualización:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Actualizado: </span>
                             {formatDate(options.updatedAt)}
                           </div>
                         </div>
@@ -453,61 +392,47 @@ export default function StepSubcatAutoShowNoResumen() {
                   </div>
                 </div>
               ) : stageList.length === 2 ? (
-                // Si hay 2 tarjetas, se muestran en grid de 2 columnas.
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {stageList.map((sg) => (
-                    <Card key={sg.id} className="bg-zinc-900 border-zinc-700 w-full">
+                    <Card
+                      key={sg.id}
+                      className="bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100 w-full"
+                    >
                       <CardHeader>
-                        <CardTitle className="text-yellow-400">{sg.name}</CardTitle>
+                        <CardTitle className="text-amber-400">{sg.name}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="space-y-2 text-sm text-gray-200">
+                        <div className="space-y-2 text-sm">
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Sub Categoria:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Sub Categoría: </span>
                             {selectedSubcat.name ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Min Trading Days:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Min Trading Days: </span>
                             {options.minTradingDays ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Max Daily Loss:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Max Daily Loss: </span>
                             {options.maxDailyLoss ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Max Loss:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Max Loss: </span>
                             {options.maxLoss ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Profit Target:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Profit Target: </span>
                             {options.profitTarget ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Leverage:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Leverage: </span>
                             {options.leverage ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Fecha de creación:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Creado: </span>
                             {formatDate(options.createdAt)}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Fecha de actualización:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Actualizado: </span>
                             {formatDate(options.updatedAt)}
                           </div>
                         </div>
@@ -516,61 +441,47 @@ export default function StepSubcatAutoShowNoResumen() {
                   ))}
                 </div>
               ) : (
-                // Para 3 o más tarjetas, se muestra en grid de 3 columnas en md.
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {stageList.map((sg) => (
-                    <Card key={sg.id} className="bg-zinc-900 border-zinc-700 w-full">
+                    <Card
+                      key={sg.id}
+                      className="bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100 w-full"
+                    >
                       <CardHeader>
-                        <CardTitle className="text-yellow-400">{sg.name}</CardTitle>
+                        <CardTitle className="text-amber-400">{sg.name}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="space-y-2 text-sm text-gray-200">
+                        <div className="space-y-2 text-sm">
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Sub Categoria:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Sub Categoría: </span>
                             {selectedSubcat.name ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Min Trading Days:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Min Trading Days: </span>
                             {options.minTradingDays ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Max Daily Loss:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Max Daily Loss: </span>
                             {options.maxDailyLoss ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Max Loss:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Max Loss: </span>
                             {options.maxLoss ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Profit Target:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Profit Target: </span>
                             {options.profitTarget ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Leverage:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Leverage: </span>
                             {options.leverage ?? "—"}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Fecha de creación:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Creado: </span>
                             {formatDate(options.createdAt)}
                           </div>
                           <div>
-                            <span className="font-semibold text-yellow-300">
-                              Fecha de actualización:{" "}
-                            </span>
+                            <span className="font-medium text-amber-300">Actualizado: </span>
                             {formatDate(options.updatedAt)}
                           </div>
                         </div>

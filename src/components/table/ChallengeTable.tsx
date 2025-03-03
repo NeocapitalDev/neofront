@@ -1,7 +1,15 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 
 interface ChallengeItem {
   id: number;
@@ -12,7 +20,7 @@ interface ChallengeItem {
 interface ChallengeTableProps {
   title: string;
   data: ChallengeItem[];
-  pageSize: number;          // Se recibe desde el padre
+  pageSize: number;
   onCreate: () => void;
   onEdit: (item: ChallengeItem) => void;
 }
@@ -24,21 +32,20 @@ export const ChallengeTable: React.FC<ChallengeTableProps> = ({
   onCreate,
   onEdit,
 }) => {
-  // Paginación local (solo currentPage)
+  // Paginación local
   const [currentPage, setCurrentPage] = useState(1);
 
-  // totalPages calculado
   const totalPages = useMemo(() => {
     if (pageSize < 1) return 1;
     return Math.ceil(data.length / pageSize) || 1;
   }, [data, pageSize]);
 
-  // Ajustar currentPage si excede
+  // Ajuste de currentPage si supera totalPages
   if (currentPage > totalPages) {
     setCurrentPage(totalPages);
   }
 
-  // Slice de datos
+  // Calcular el slice de datos a mostrar
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const displayedData = data.slice(startIndex, endIndex);
@@ -58,88 +65,100 @@ export const ChallengeTable: React.FC<ChallengeTableProps> = ({
   }
 
   return (
-    <div className="h-[500px] flex flex-col bg-zinc-900 border border-zinc-700 rounded">
-      {/* Encabezado */}
-      <CardHeader className="pb-1">
-        <CardTitle className="text-yellow-400 flex justify-between items-center text-sm sm:text-base">
+    <div className="space-y-4">
+      {/* Toolbar con Título y botón "Crear" */}
+      <div className="flex items-center justify-between px-2">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
           {title}
+        </h2>
+        <Button
+          variant="secondary"
+          className="bg-yellow-500 text-black hover:bg-yellow-400 px-3 py-1 text-sm"
+          onClick={onCreate}
+        >
+          Crear
+        </Button>
+      </div>
+
+      {/* Contenedor de la tabla */}
+      <div className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900">
+        <Table className="rounded-md">
+          <TableHeader className="bg-zinc-200 dark:bg-zinc-800 p-2 text-center">
+            <TableRow className="text-center">
+              <TableHead className="text-center">ID</TableHead>
+              <TableHead className="text-center">Nombre</TableHead>
+              <TableHead className="text-center">Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="p-2 text-center">
+            {displayedData.length > 0 ? (
+              displayedData.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.id}</TableCell>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      className="px-2 py-1 text-xs sm:text-sm"
+                      onClick={() => onEdit(item)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={3}
+                  className="h-24 text-center text-gray-500"
+                >
+                  Sin Resultados
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Paginación */}
+      <div className="flex items-center justify-end px-2 py-1 space-x-2">
+        <span className="text-gray-500 text-xs sm:text-sm">
+          página {currentPage} de {totalPages}
+        </span>
+        <div className="flex items-center space-x-1">
           <Button
-            variant="secondary"
-            className="bg-yellow-500 text-black hover:bg-yellow-400 px-3 py-1 text-sm"
-            onClick={onCreate}
+            variant="outline"
+            className="px-2 py-1 text-xs sm:text-sm"
+            onClick={goFirstPage}
+            disabled={currentPage === 1}
           >
-            Crear
+            «
           </Button>
-        </CardTitle>
-      </CardHeader>
-
-      {/* Contenido con scroll interno */}
-      <CardContent className="flex-1 overflow-y-auto space-y-2 px-2 py-2">
-        {displayedData.length === 0 && (
-          <p className="text-gray-400 text-sm">No hay datos para {title}.</p>
-        )}
-
-        {displayedData.map((item) => (
-          <div
-            key={item.id}
-            className="flex justify-between items-center border-b border-gray-700 py-1 text-sm"
+          <Button
+            variant="outline"
+            className="px-2 py-1 text-xs sm:text-sm"
+            onClick={goPrevPage}
+            disabled={currentPage === 1}
           >
-            <span>
-              <span className="text-gray-400">ID: {item.id}</span> |{" "}
-              <span className="text-white">{item.name}</span>
-            </span>
-            <Button
-              variant="outline"
-              className="px-2 py-1 text-sm"
-              onClick={() => onEdit(item)}
-            >
-              Editar
-            </Button>
-          </div>
-        ))}
-      </CardContent>
-
-      {/* Footer de paginación (sin Rows per page, pues es global) */}
-      <div className="border-t border-gray-700 px-2 py-1 flex items-center justify-end">
-        <div className="flex items-center space-x-2">
-          <span className="text-gray-300 text-xs sm:text-sm">
-            Page {currentPage} of {totalPages}
-          </span>
-
-          <div className="flex items-center space-x-1">
-            <Button
-              variant="outline"
-              className="px-2 py-1 text-xs sm:text-sm"
-              onClick={goFirstPage}
-              disabled={currentPage === 1}
-            >
-              «
-            </Button>
-            <Button
-              variant="outline"
-              className="px-2 py-1 text-xs sm:text-sm"
-              onClick={goPrevPage}
-              disabled={currentPage === 1}
-            >
-              ‹
-            </Button>
-            <Button
-              variant="outline"
-              className="px-2 py-1 text-xs sm:text-sm"
-              onClick={goNextPage}
-              disabled={currentPage === totalPages}
-            >
-              ›
-            </Button>
-            <Button
-              variant="outline"
-              className="px-2 py-1 text-xs sm:text-sm"
-              onClick={goLastPage}
-              disabled={currentPage === totalPages}
-            >
-              »
-            </Button>
-          </div>
+            ‹
+          </Button>
+          <Button
+            variant="outline"
+            className="px-2 py-1 text-xs sm:text-sm"
+            onClick={goNextPage}
+            disabled={currentPage === totalPages}
+          >
+            ›
+          </Button>
+          <Button
+            variant="outline"
+            className="px-2 py-1 text-xs sm:text-sm"
+            onClick={goLastPage}
+            disabled={currentPage === totalPages}
+          >
+            »
+          </Button>
         </div>
       </div>
     </div>

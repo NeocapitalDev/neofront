@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { toast } from "sonner"; // <-- Importación de sonner
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -49,10 +49,6 @@ export interface ChallengeRelationsStages {
 interface DetailsProps {
   prop: ChallengeRelationsStages;
   modalType: number; // 0 for view, 1 for edit, 2 for create
-  /**
-   * (Opcional) Función para cerrar el modal.
-   * Se llamará automáticamente si se guarda con éxito.
-   */
   onClose?: () => void;
   actualizarDatos?: () => void;
 }
@@ -68,32 +64,26 @@ export default function PropDetails({
   const { data: stagesdata } = useStrapiData("challenge-stages");
   const { data: stepsdata } = useStrapiData("challenge-steps");
 
-  // Estado local basado en 'prop' para manipular seleccionados
+  // Estado local basado en 'prop' para manipular los elementos seleccionados
   const [editableProp, setEditableProp] = useState(prop);
 
-  // Productos disponibles (excluyendo los que ya están en challenge_products)
+  // --- Filtrado de ítems disponibles ---
   const productavailable = productsData?.filter(
     (product) =>
       !editableProp.challenge_products.some((p) => p.id === product.id)
   );
-
-  // Stages disponibles (excluyendo las ya seleccionadas)
   const stagesavailable = stagesdata?.filter(
     (stage) => !editableProp.challenge_stages.some((p) => p.id === stage.id)
   );
-
-  // Steps disponibles (excluyendo la ya seleccionada)
   const stepavailable =
     stepsdata?.filter((step) => step.id !== editableProp.challenge_step?.id) ||
     [];
-
-  // Subcategorías disponibles (excluyendo la ya seleccionada)
   const subcategoriesavailable =
     subcategoriesData?.filter(
       (subcategory) => subcategory.id !== editableProp.challenge_subcategory?.id
     ) || [];
 
-  // Función para agregar un producto
+  // --- Handlers para agregar/quitar/actualizar ---
   const addProduct = (product: Challenge_products) => {
     setEditableProp((prev) => ({
       ...prev,
@@ -101,7 +91,6 @@ export default function PropDetails({
     }));
   };
 
-  // Función para quitar un producto
   const removeProduct = (productId: string | number) => {
     setEditableProp((prev) => ({
       ...prev,
@@ -111,7 +100,6 @@ export default function PropDetails({
     }));
   };
 
-  // Función para cambiar la subcategoría
   const changeSubcategory = (subcategory: Challenge_subcategory | null) => {
     setEditableProp((prev) => ({
       ...prev,
@@ -119,7 +107,6 @@ export default function PropDetails({
     }));
   };
 
-  // Función para agregar stage
   const addStage = (stage: Challenge_stages) => {
     setEditableProp((prev) => ({
       ...prev,
@@ -127,7 +114,6 @@ export default function PropDetails({
     }));
   };
 
-  // Función para quitar un stage
   const removeStage = (stageId: string | number) => {
     setEditableProp((prev) => ({
       ...prev,
@@ -135,7 +121,6 @@ export default function PropDetails({
     }));
   };
 
-  // Función para cambiar la categoría (step)
   const changeCategory = (category: Challenge_step | null) => {
     setEditableProp((prev) => ({
       ...prev,
@@ -145,15 +130,14 @@ export default function PropDetails({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // Si el valor es una cadena vacía, asigna null
     const newValue = value === "" ? null : value;
-
     setEditableProp((prev) => ({
       ...prev,
       [name]: newValue,
     }));
   };
 
+  // --- Guardar cambios ---
   const handleSave = async () => {
     const toastId = toast.loading("Guardando...");
     try {
@@ -183,168 +167,184 @@ export default function PropDetails({
     }
   };
 
+  // Clases para inputs oscuros y minimalistas
   const inputDarkClasses =
-    "dark:bg-zinc-900 dark:text-white dark:border-gray-600 p-1 rounded w-full";
+    "bg-zinc-800 text-yellow-100 border-none focus:ring-0 focus:outline-none p-2 rounded w-full";
 
+  // --- Render principal ---
   return (
-    <div className="flex gap-4 justify-center">
-      <Card>
-        <CardContent className="space-y-6 w-full">
-          <div className="flex gap-2">
-            {/* Sección de Subcategoria y Step */}
-            <div className="flex-[2] my-6">
-              <h3 className="text-sm text-muted-foreground mb-3">
-                <Badge>Categoria</Badge>
-              </h3>
-              <div className="grid grid-cols-1 gap-2">
-                {editableProp.challenge_step?.name ? (
-                  <Card key={editableProp.challenge_step.id}>
-                    <CardContent className="p-2">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          {modalType === 2 ? (
-                            <div>
-                              <span className="text-xs">
-                                {editableProp.challenge_step.name}
-                              </span>
-                              <Button
-                                variant="destructive"
-                                className="mx-4"
-                                size="xs"
-                                onClick={() => changeCategory(null)}
-                              >
-                                -
-                              </Button>
-                            </div>
-                          ) : (
-                            prop.challenge_step.name
-                          )}
-                        </div>
-                      </div>
+    <div className="bg-gradient-to-b from-black via-zinc-900 to-black h-max p-6 text-yellow-100">
+      {/* Si NO es modalType=2, mostramos un layout sencillo */}
+      {modalType !== 2 ? (
+        <div className="space-y-6">
+          <Card className="bg-zinc-900 shadow-md rounded-lg text-yellow-100">
+            <CardContent className="space-y-6 w-full p-6">
+              {/* 
+              Vista/Edición (modalType !== 2)
+              Aquí mostramos la información asignada sin el bloque de "disponibles".
+            */}
+              <div className="flex gap-4 flex-wrap">
+                {/* Sección de Categoría, Subcategoría y Parámetros */}
+                <div className="flex-[2] min-w-[280px]">
+                  <h3 className="text-sm text-muted-foreground mb-3">
+                    <Badge>Categoria</Badge>
+                  </h3>
+                  <div className="grid grid-cols-1 gap-2 mb-4">
+                    {prop.challenge_step?.name && (
+                      <Card>
+                        <CardContent className="p-2 flex items-center justify-between">
+                          <span className="text-xs">
+                            {prop.challenge_step.name}
+                          </span>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+
+                  <h3 className="text-sm text-muted-foreground mb-3">
+                    <Badge>Subcategoria</Badge>
+                  </h3>
+                  <div className="grid grid-cols-1 gap-2 mb-4">
+                    {prop.challenge_subcategory?.name && (
+                      <Card>
+                        <CardContent className="p-2 flex items-center justify-between">
+                          <span className="text-xs">
+                            {prop.challenge_subcategory.name}
+                          </span>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+
+                  {/* Parámetros */}
+                  <CardHeader className="px-0">
+                    <CardTitle className="text-amber-400">
+                      Parámetros y condiciones
+                    </CardTitle>
+                    <div className="space-y-1 mt-2 text-sm">
+                      <CardDescription>
+                        Días mínimos de trading: {prop.minimumTradingDays}
+                      </CardDescription>
+                      <CardDescription>
+                        Pérdida diaria máxima: {prop.maximumDailyLoss}
+                      </CardDescription>
+                      <CardDescription>
+                        Pérdida máxima: {prop.maximumLoss}
+                      </CardDescription>
+                      <CardDescription>
+                        Objetivo de ganancia: {prop.profitTarget}
+                      </CardDescription>
+                      <CardDescription>
+                        Apalancamiento: {prop.leverage}
+                      </CardDescription>
+                    </div>
+                  </CardHeader>
+                </div>
+
+                {/* Sección de Fases */}
+                <div className="flex-1 min-w-[200px]">
+                  <h3 className="text-sm text-muted-foreground mb-3">
+                    <Badge className="bg-amber-200 text-black">Fases</Badge>
+                  </h3>
+                  <div className="grid grid-cols-1 gap-2">
+                    {prop.challenge_stages.map((stage) => (
+                      <Card key={stage.id}>
+                        <CardContent className="p-2 flex items-center justify-between">
+                          <span className="text-xs">{stage.name}</span>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sección de Productos */}
+                <div className="flex-1 min-w-[200px]">
+                  <h3 className="text-sm text-muted-foreground mb-3">
+                    <Badge className="bg-amber-200 text-black">Productos</Badge>
+                  </h3>
+                  <div className="grid grid-cols-1 gap-2">
+                    {prop.challenge_products.map((product) => (
+                      <Card key={product.id}>
+                        <CardContent className="p-2 flex items-center justify-between">
+                          <span className="text-xs">{product.name}</span>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        // Si ES modalType=2, distribuimos en 2 columnas para ver asignados (izq.) y disponibles (der.)
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          {/* Columna Izquierda: Datos asignados + Parámetros + Guardar */}
+          <Card className="bg-zinc-900 shadow-md rounded-lg text-yellow-100">
+            <CardContent className="space-y-6 w-full p-6">
+              {/* CATEGORÍA */}
+              <div className="mb-4">
+                <h3 className="text-sm mb-2">
+                  <Badge className="bg-amber-300 text-black">Categoría</Badge>
+                </h3>
+                {editableProp.challenge_step?.name && (
+                  <Card className="bg-zinc-800 rounded-lg shadow-sm">
+                    <CardContent className="p-2 flex items-center justify-between">
+                      <span className="text-xs">
+                        {editableProp.challenge_step.name}
+                      </span>
+                      {/* Botón para quitar */}
+                      <Button
+                        variant="destructive"
+                        size="xs"
+                        onClick={() => changeCategory(null)}
+                      >
+                        -
+                      </Button>
                     </CardContent>
                   </Card>
-                ) : null}
+                )}
               </div>
 
-              <h3 className="text-sm text-muted-foreground mb-3">
-                <Badge>Subcategoria</Badge>
-              </h3>
-              <div className="grid grid-cols-1 gap-2">
-                {editableProp.challenge_subcategory?.name ? (
-                  <Card key={editableProp.challenge_subcategory.id}>
-                    <CardContent className="p-2">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          {modalType === 2 ? (
-                            <div>
-                              <span className="text-xs">
-                                {editableProp.challenge_subcategory.name}
-                              </span>
-                              <Button
-                                variant="destructive"
-                                className="mx-4"
-                                size="xs"
-                                onClick={() => changeSubcategory(null)}
-                              >
-                                -
-                              </Button>
-                            </div>
-                          ) : (
-                            prop.challenge_subcategory.name
-                          )}
-                        </div>
-                      </div>
+              {/* SUBCATEGORÍA */}
+              <div className="mb-4">
+                <h3 className="text-sm mb-2">
+                  <Badge className="bg-amber-300 text-black">
+                    Subcategoría
+                  </Badge>
+                </h3>
+                {editableProp.challenge_subcategory?.name && (
+                  <Card className="bg-zinc-800 rounded-lg shadow-sm">
+                    <CardContent className="p-2 flex items-center justify-between">
+                      <span className="text-xs">
+                        {editableProp.challenge_subcategory.name}
+                      </span>
+                      {/* Botón para quitar */}
+                      <Button
+                        variant="destructive"
+                        size="xs"
+                        onClick={() => changeSubcategory(null)}
+                      >
+                        -
+                      </Button>
                     </CardContent>
                   </Card>
-                ) : null}
+                )}
               </div>
 
-              <CardHeader>
-                <CardTitle>Parámetros y condiciones</CardTitle>
-                <CardDescription>
-                  Días mínimos de trading:{" "}
-                  {modalType === 2 ? (
-                    <input
-                      type="number"
-                      name="minimumTradingDays"
-                      value={editableProp.minimumTradingDays ?? ""}
-                      onChange={handleChange}
-                      className={inputDarkClasses}
-                    />
-                  ) : (
-                    prop.minimumTradingDays
-                  )}
-                </CardDescription>
-                <CardDescription>
-                  Pérdida diaria máxima:{" "}
-                  {modalType === 2 ? (
-                    <input
-                      type="number"
-                      name="maximumDailyLoss"
-                      value={editableProp.maximumDailyLoss ?? ""}
-                      onChange={handleChange}
-                      className={inputDarkClasses}
-                    />
-                  ) : (
-                    prop.maximumDailyLoss
-                  )}
-                </CardDescription>
-                <CardDescription>
-                  Pérdida máxima:{" "}
-                  {modalType === 2 ? (
-                    <input
-                      type="number"
-                      name="maximumLoss"
-                      value={editableProp.maximumLoss ?? ""}
-                      onChange={handleChange}
-                      className={inputDarkClasses}
-                    />
-                  ) : (
-                    prop.maximumLoss
-                  )}
-                </CardDescription>
-                <CardDescription>
-                  Objetivo de ganancia:{" "}
-                  {modalType === 2 ? (
-                    <input
-                      type="number"
-                      name="profitTarget"
-                      value={editableProp.profitTarget ?? ""}
-                      onChange={handleChange}
-                      className={inputDarkClasses}
-                    />
-                  ) : (
-                    prop.profitTarget
-                  )}
-                </CardDescription>
-                <CardDescription>
-                  Apalancamiento:{" "}
-                  {modalType === 2 ? (
-                    <input
-                      type="number"
-                      name="leverage"
-                      value={editableProp.leverage ?? ""}
-                      onChange={handleChange}
-                      className={inputDarkClasses}
-                    />
-                  ) : (
-                    prop.leverage
-                  )}
-                </CardDescription>
-              </CardHeader>
-            </div>
-
-            {/* Sección de Stages */}
-            <div className="flex-[1] mt-6">
-              <h3 className="text-sm text-muted-foreground mb-3">
-                <Badge className="bg-amber-200 text-black">Fases</Badge>
-              </h3>
-              <div className="grid grid-cols-1 gap-2">
-                {editableProp.challenge_stages.map((stage) => (
-                  <Card key={stage.id}>
-                    <CardContent className="p-3 gap-1 flex items-center justify-between">
-                      <span className="text-xs">{stage.name}</span>
-                      {modalType === 2 ? (
+              {/* FASES */}
+              <div className="mb-4">
+                <h3 className="text-sm mb-2">
+                  <Badge className="bg-amber-300 text-black">Fases</Badge>
+                </h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {editableProp.challenge_stages.map((stage) => (
+                    <Card
+                      key={stage.id}
+                      className="bg-zinc-800 rounded-lg shadow-sm"
+                    >
+                      <CardContent className="p-2 flex items-center justify-between">
+                        <span className="text-xs">{stage.name}</span>
                         <Button
                           variant="destructive"
                           size="xs"
@@ -352,24 +352,25 @@ export default function PropDetails({
                         >
                           -
                         </Button>
-                      ) : null}
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Sección de Productos */}
-            <div className="flex-[1] mt-6">
-              <h3 className="text-sm text-muted-foreground mb-3">
-                <Badge className="bg-amber-200 text-black">Productos</Badge>
-              </h3>
-              <div className="grid grid-cols-1 gap-2">
-                {editableProp.challenge_products.map((product) => (
-                  <Card key={product.id}>
-                    <CardContent className="p-3 gap-1 flex items-center justify-between">
-                      <span className="text-xs">{product.name}</span>
-                      {modalType === 2 ? (
+              {/* PRODUCTOS */}
+              <div className="mb-4">
+                <h3 className="text-sm mb-2">
+                  <Badge className="bg-amber-300 text-black">Productos</Badge>
+                </h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {editableProp.challenge_products.map((product) => (
+                    <Card
+                      key={product.id}
+                      className="bg-zinc-800 rounded-lg shadow-sm"
+                    >
+                      <CardContent className="p-2 flex items-center justify-between">
+                        <span className="text-xs">{product.name}</span>
                         <Button
                           variant="destructive"
                           size="xs"
@@ -377,144 +378,207 @@ export default function PropDetails({
                         >
                           -
                         </Button>
-                      ) : null}
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
-            </div>
+
+              {/* PARÁMETROS */}
+              <CardHeader className="px-0">
+                <CardTitle className="text-amber-400">
+                  Parámetros y condiciones
+                </CardTitle>
+                <div className="space-y-2 mt-2 text-sm">
+                  <CardDescription>
+                    Días mínimos de trading:
+                    <input
+                      type="number"
+                      name="minimumTradingDays"
+                      value={editableProp.minimumTradingDays ?? ""}
+                      onChange={handleChange}
+                      className={inputDarkClasses + " mt-1"}
+                    />
+                  </CardDescription>
+                  <CardDescription>
+                    Pérdida diaria máxima:
+                    <input
+                      type="number"
+                      name="maximumDailyLoss"
+                      value={editableProp.maximumDailyLoss ?? ""}
+                      onChange={handleChange}
+                      className={inputDarkClasses + " mt-1"}
+                    />
+                  </CardDescription>
+                  <CardDescription>
+                    Pérdida máxima:
+                    <input
+                      type="number"
+                      name="maximumLoss"
+                      value={editableProp.maximumLoss ?? ""}
+                      onChange={handleChange}
+                      className={inputDarkClasses + " mt-1"}
+                    />
+                  </CardDescription>
+                  <CardDescription>
+                    Objetivo de ganancia:
+                    <input
+                      type="number"
+                      name="profitTarget"
+                      value={editableProp.profitTarget ?? ""}
+                      onChange={handleChange}
+                      className={inputDarkClasses + " mt-1"}
+                    />
+                  </CardDescription>
+                  <CardDescription>
+                    Apalancamiento:
+                    <input
+                      type="number"
+                      name="leverage"
+                      value={editableProp.leverage ?? ""}
+                      onChange={handleChange}
+                      className={inputDarkClasses + " mt-1"}
+                    />
+                  </CardDescription>
+                </div>
+              </CardHeader>
+
+              {/* BOTÓN GUARDAR */}
+              <Button
+                onClick={handleSave}
+                className="bg-amber-500 hover:bg-amber-400 text-black rounded-lg"
+              >
+                Guardar
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Columna Derecha: Items disponibles para asignar */}
+          <div className="space-y-6">
+            {/* Productos disponibles */}
+            <Card className="bg-zinc-900 shadow-md rounded-lg text-yellow-100">
+              <CardContent className="p-4 space-y-4">
+                <h3 className="text-sm">
+                  <Badge className="bg-amber-300 text-black">
+                    Productos disponibles
+                  </Badge>
+                </h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {productavailable?.map((product) => (
+                    <Card
+                      key={product.id}
+                      className="bg-zinc-800 rounded-lg shadow-sm"
+                    >
+                      <CardContent className="p-2 flex items-center justify-between">
+                        <span className="text-xs">{product.name}</span>
+                        <Button
+                          variant="default"
+                          size="xs"
+                          onClick={() => addProduct(product)}
+                          className="bg-amber-500 hover:bg-amber-400 text-black"
+                        >
+                          +
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Fases disponibles */}
+            <Card className="bg-zinc-900 shadow-md rounded-lg text-yellow-100">
+              <CardContent className="p-4 space-y-4">
+                <h3 className="text-sm">
+                  <Badge className="bg-amber-300 text-black">
+                    Fases disponibles
+                  </Badge>
+                </h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {stagesavailable?.map((stage) => (
+                    <Card
+                      key={stage.id}
+                      className="bg-zinc-800 rounded-lg shadow-sm"
+                    >
+                      <CardContent className="p-2 flex items-center justify-between">
+                        <span className="text-xs">{stage.name}</span>
+                        <Button
+                          variant="default"
+                          size="xs"
+                          onClick={() => addStage(stage)}
+                          className="bg-amber-500 hover:bg-amber-400 text-black"
+                        >
+                          +
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Subcategorías disponibles */}
+            <Card className="bg-zinc-900 shadow-md rounded-lg text-yellow-100">
+              <CardContent className="p-4 space-y-4">
+                <h3 className="text-sm">
+                  <Badge className="bg-amber-300 text-black">
+                    Subcategorías disponibles
+                  </Badge>
+                </h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {subcategoriesavailable?.map((subcategory) => (
+                    <Card
+                      key={subcategory.id}
+                      className="bg-zinc-800 rounded-lg shadow-sm"
+                    >
+                      <CardContent className="p-2 flex items-center justify-between">
+                        <span className="text-xs">{subcategory.name}</span>
+                        <Button
+                          variant="default"
+                          size="xs"
+                          onClick={() => changeSubcategory(subcategory)}
+                          className="bg-amber-500 hover:bg-amber-400 text-black"
+                        >
+                          +
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Categorías disponibles (Steps) */}
+            <Card className="bg-zinc-900 shadow-md rounded-lg text-yellow-100">
+              <CardContent className="p-4 space-y-4">
+                <h3 className="text-sm">
+                  <Badge className="bg-amber-300 text-black">
+                    Categorías disponibles
+                  </Badge>
+                </h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {stepavailable?.map((step) => (
+                    <Card
+                      key={step.id}
+                      className="bg-zinc-800 rounded-lg shadow-sm"
+                    >
+                      <CardContent className="p-2 flex items-center justify-between">
+                        <span className="text-xs">{step.name}</span>
+                        <Button
+                          variant="default"
+                          size="xs"
+                          onClick={() => changeCategory(step)}
+                          className="bg-amber-500 hover:bg-amber-400 text-black"
+                        >
+                          +
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
-
-          {modalType === 2 && <Button onClick={handleSave}>Guardar</Button>}
-        </CardContent>
-      </Card>
-
-      {/* Sección que aparece sólo en modalType=2 para editar/agregar */}
-      {modalType === 2 && (
-        <div className="flex gap-2">
-          {/* Card de Productos disponibles */}
-          <Card>
-            <CardContent className="space-y-6">
-              <div className="flex gap-2">
-                <div className="flex-[1] mt-6">
-                  <h3 className="text-sm text-muted-foreground mb-3">
-                    <Badge className="bg-amber-200 text-black">
-                      Productos disponibles
-                    </Badge>
-                  </h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    {productavailable?.map((product) => (
-                      <Card key={product.id}>
-                        <CardContent className="p-3 gap-1 flex items-center justify-between">
-                          <span className="text-xs">{product.name}</span>
-                          <Button
-                            variant="default"
-                            size="xs"
-                            onClick={() => addProduct(product)}
-                          >
-                            +
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Card de Stages disponibles */}
-          <Card>
-            <CardContent className="space-y-6">
-              <div className="flex gap-2">
-                <div className="flex-[1] mt-6">
-                  <h3 className="text-sm text-muted-foreground mb-3">
-                    <Badge className="bg-amber-200 text-black">
-                      Fases disponibles
-                    </Badge>
-                  </h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    {stagesavailable?.map((stage) => (
-                      <Card key={stage.id}>
-                        <CardContent className="p-3 gap-1 flex items-center justify-between">
-                          <span className="text-xs">{stage.name}</span>
-                          <Button
-                            variant="default"
-                            size="xs"
-                            onClick={() => addStage(stage)}
-                          >
-                            +
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Card de Subcategorías disponibles */}
-          <Card>
-            <CardContent className="space-y-6">
-              <div className="flex gap-2">
-                <div className="flex-[1] mt-6">
-                  <h3 className="text-sm text-muted-foreground mb-3">
-                    <Badge className="bg-amber-200 text-black">
-                      Subcategorías disponibles
-                    </Badge>
-                  </h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    {subcategoriesavailable?.map((subcategory) => (
-                      <Card key={subcategory.id}>
-                        <CardContent className="p-3 gap-1 flex items-center justify-between">
-                          <span className="text-xs">{subcategory.name}</span>
-                          <Button
-                            variant="default"
-                            size="xs"
-                            onClick={() => changeSubcategory(subcategory)}
-                          >
-                            +
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Card de Steps disponibles */}
-          <Card>
-            <CardContent className="space-y-6">
-              <div className="flex gap-2">
-                <div className="flex-[1] mt-6">
-                  <h3 className="text-sm text-muted-foreground mb-3">
-                    <Badge className="bg-amber-200 text-black">
-                      Categorias disponibles
-                    </Badge>
-                  </h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    {stepavailable?.map((step) => (
-                      <Card key={step.id}>
-                        <CardContent className="p-3 gap-1 flex items-center justify-between">
-                          <span className="text-xs">{step.name}</span>
-                          <Button
-                            variant="default"
-                            size="xs"
-                            onClick={() => changeCategory(step)}
-                          >
-                            +
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       )}
     </div>
