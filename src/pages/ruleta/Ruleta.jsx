@@ -112,7 +112,7 @@ export default function RuletaSorteo({
           },
           body: JSON.stringify({
             usuario: session?.user?.email,
-            docu: intento,
+            documentId: intento,
           }),
         }
       );
