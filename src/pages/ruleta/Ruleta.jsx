@@ -4,8 +4,12 @@ import { motion } from "framer-motion";
 import { useStrapiData } from "src/services/strapiService";
 import { useSession } from "next-auth/react";
 
-const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
-  const { data: session, status } = useSession();
+export default function RuletaSorteo({
+  customOptions,
+  width = 300,
+  height = 300,
+}) {
+  const { data: session } = useSession();
   const { data, error, loading } = useStrapiData(
     "provisional-products?populate=*"
   );
@@ -16,8 +20,9 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
   const canvasRef = useRef(null);
   const [intento, setIntento] = useState("");
 
+  // Si no vienen opciones personalizadas, usar las del endpoint
   let opciones = [];
-  if (customOptions && customOptions.length > 0) {
+  if (customOptions?.length > 0) {
     opciones = customOptions;
   } else if (data) {
     opciones = data.map((item) => ({
@@ -26,8 +31,10 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
     }));
   }
 
-  const angleOffset = -Math.PI / 2;
+  // Puntero a la derecha => 0 rad = derecha en el canvas
+  const angleOffset = 0;
 
+  // Dibuja la ruleta
   const drawWheel = (ctx, options, currentAngle) => {
     const numOptions = options.length;
     const arcSize = (2 * Math.PI) / numOptions;
@@ -40,6 +47,7 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     for (let i = 0; i < numOptions; i++) {
+      // Cada sector se dibuja con base en currentAngle + i*arcSize
       const angle = angleOffset + currentAngle + i * arcSize;
       ctx.beginPath();
       ctx.moveTo(centerX, centerY);
@@ -50,6 +58,7 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
       ctx.lineWidth = 2;
       ctx.stroke();
 
+      // Texto en cada sector
       ctx.save();
       ctx.translate(centerX, centerY);
       ctx.rotate(angle + arcSize / 2);
@@ -61,30 +70,40 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
     }
   };
 
+  // Calcula el ángulo final para que winningIndex quede en 0 rad (a la derecha)
   const calculateFinalAngle = (currentAngle, winningIndex) => {
     const numOptions = opciones.length;
     const arcSize = (2 * Math.PI) / numOptions;
-    const targetAngle =
-      2 * Math.PI - (winningIndex * arcSize + arcSize / 2) - angleOffset;
-    const vueltasCompletas = 3;
+    // El centro del sector ganador es winningIndex * arcSize + (arcSize/2).
+    const sectorCenter = winningIndex * arcSize + arcSize / 2;
 
-    let finalAngle = currentAngle + vueltasCompletas * 2 * Math.PI;
-    while (finalAngle % (2 * Math.PI) < targetAngle) {
-      finalAngle += 2 * Math.PI;
-    }
+    // Queremos que finalAngle + sectorCenter = 0 (mod 2π)
+    // => finalAngle = -sectorCenter (mod 2π)
+    // Además, sumamos vueltas completas para un giro más vistoso (ej: 3 vueltas).
+    const extraSpins = 3 * 2 * Math.PI;
 
-    finalAngle = finalAngle - (finalAngle % (2 * Math.PI)) + targetAngle;
-    return finalAngle;
+    // Normalizamos el currentAngle a [0, 2π).
+    const currentMod =
+      ((currentAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+    // Delta que necesitamos para alinear el sector con el puntero
+    let delta = -sectorCenter - currentMod;
+    // Ajustamos delta para que esté en [0, 2π)
+    delta = ((delta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+    return currentAngle + extraSpins + delta;
   };
 
+  // Acción de girar la ruleta
   const spinWheel = async () => {
     if (isSpinning) return;
     setIsSpinning(true);
     setSelectedOption(null);
 
     try {
+      // Aquí llamas a tu backend para obtener el índice ganador
       const response = await fetch(
-        "https://n8n.neocapitalfunding.com/webhook-test/webhook/ruleta",
+        "https://n8n.neocapitalfunding.com/webhook/webhook/ruleta",
         {
           method: "POST",
           headers: {
@@ -92,7 +111,7 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
             Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
           },
           body: JSON.stringify({
-            usuario: session.user.email,
+            usuario: session?.user?.email,
             docu: intento,
           }),
         }
@@ -102,9 +121,10 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
       }
 
       const winningOption = await response.json();
-      const winningIndex = winningOption.indice; // Asumiendo que el backend te devuelve un índice directo
-      if (winningIndex === -1) {
-        throw new Error("La opción ganadora no coincide con ninguna opción");
+      console.log(winningOption);
+      const winningIndex = winningOption.indice; // Número devuelto por tu backend
+      if (winningIndex < 0 || winningIndex >= opciones.length) {
+        throw new Error("El índice ganador está fuera de rango");
       }
 
       const finalAngle = calculateFinalAngle(startAngle, winningIndex);
@@ -115,6 +135,7 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
       const animate = (currentTime) => {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
+        // Curva de desaceleración
         const easeOut = 1 - Math.pow(1 - progress, 3);
         const currentAngle =
           initialAngle + easeOut * (finalAngle - initialAngle);
@@ -139,6 +160,7 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
     }
   };
 
+  // Dibuja la ruleta inicialmente y en cada cambio de ángulo
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -149,10 +171,11 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
     }
   }, [opciones, startAngle, width, height]);
 
+  // Ejemplo de función "perder"
   const handlePerder = async () => {
     try {
       const ticket = await fetch(
-        "https://n8n.neocapitalfunding.com/webhook-test/user/lose",
+        "https://n8n.neocapitalfunding.com/webhook/user/lose",
         {
           method: "POST",
           headers: {
@@ -160,7 +183,7 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
             Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
           },
           body: JSON.stringify({
-            usuario: session.user.email,
+            usuario: session?.user?.email,
           }),
         }
       );
@@ -168,6 +191,7 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
         throw new Error("Error en la respuesta del servidor");
       }
       const responseData = await ticket.json();
+      console.log(responseData);
       setIntento(responseData.data.documentId);
     } catch (error) {
       console.error("Error al manejar la respuesta:", error);
@@ -191,16 +215,13 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
         margin: "auto",
       }}
     >
-      {!customOptions && loading && (
-        <p style={{ color: "#fff" }}>Cargando...</p>
-      )}
-      {!customOptions && error && (
-        <p style={{ color: "#fff" }}>Ocurrió un error al cargar los datos</p>
-      )}
+      {loading && <p style={{ color: "#fff" }}>Cargando...</p>}
+      {error && <p style={{ color: "#fff" }}>Error al cargar datos</p>}
       {opciones.length === 0 ? (
         <p style={{ color: "#fff" }}>No hay opciones disponibles</p>
       ) : (
         <>
+          {/* Canvas con la ruleta */}
           <div style={{ position: "relative", width, height }}>
             <canvas
               ref={canvasRef}
@@ -210,24 +231,27 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
                 boxShadow: "0 0 10px rgba(255,255,0,0.5)",
               }}
             />
+            {/* Puntero en el lado derecho, apuntando hacia la izquierda */}
             <motion.div
-              initial={{ y: -10 }}
-              animate={{ y: [-10, 0, -10] }}
+              initial={{ x: 10 }}
+              animate={{ x: [10, 0, 10] }}
               transition={{ repeat: Infinity, duration: 1.5 }}
               style={{
                 position: "absolute",
                 top: "50%",
                 left: "95%",
-                transform: "translate(-50%, -50%)",
-                rotate: "-90deg",
+                transform: "translate(50%, -50%)",
+                rotate: "180deg",
                 width: 0,
                 height: 0,
-                borderLeft: "15px solid transparent",
-                borderRight: "15px solid transparent",
-                borderBottom: "25px solid #FFEB3B",
+                borderTop: "15px solid transparent",
+                borderBottom: "15px solid transparent",
+                borderLeft: "25px solid #FFEB3B",
               }}
             />
           </div>
+
+          {/* Botones */}
           <div className="flex justify-center gap-4 items-center">
             <button
               style={{
@@ -247,6 +271,7 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
             >
               perder
             </button>
+
             <motion.button
               onClick={spinWheel}
               disabled={isSpinning}
@@ -269,6 +294,8 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
               {isSpinning ? "Girando..." : "Girar"}
             </motion.button>
           </div>
+
+          {/* Resultado final */}
           {selectedOption && !isSpinning && (
             <p
               style={{
@@ -285,6 +312,4 @@ const RuletaSorteo = ({ customOptions, width = 300, height = 300 }) => {
       )}
     </motion.div>
   );
-};
-
-export default RuletaSorteo;
+}
