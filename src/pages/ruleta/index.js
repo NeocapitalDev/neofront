@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import RuletaSorteo from "./Ruleta";
+import RuletaSorteo from "@/components/roullete/roullete";
 import DashboardLayout from "../admin";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
