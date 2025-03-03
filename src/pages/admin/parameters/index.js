@@ -25,9 +25,6 @@ function IndexPage() {
     console.log("Datos actualizados");
   }
 
-
-
-
   const processedData = data?.data || [];
 
   console.log(processedData);
