@@ -8,7 +8,7 @@ const FooterInfo = () => {
                 <div className="font-bold text-md mb-4 border-b pb-1 border-gray-300 dark:border-zinc-600">
                     {FooterNav.map((item, index) => (
                         <span key={index}>
-                            <a href={item.href} className="text-zinc-600 hover:underline dark:text-white">
+                            <a href={item.href} target="_blank" className="text-zinc-600 hover:underline dark:text-white">
                                 {item.name}
                             </a>
                             {index < FooterNav.length - 1 && <span> &nbsp; | &nbsp; </span>}

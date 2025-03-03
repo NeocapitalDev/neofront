@@ -55,7 +55,7 @@ const NotificationsPage = () => {
                                         href={notification.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="block text-center bg-[var(--app-primary)] text-black font-semibold py-2 px-4 rounded hover:bg-[var(--app-secondary)] transition"
+                                        className="inline-flex items-center justify-center bg-[var(--app-primary)] text-black font-medium py-2 px-4 rounded-lg hover:bg-[var(--app-secondary)] transition w-full"
                                     >
                                         Ver más
                                     </a>

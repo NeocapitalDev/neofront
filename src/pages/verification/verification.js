@@ -78,7 +78,7 @@ const VeriffComponent = ({ isVerified }) => {
             Cuenta Verificada
           </h2>
           <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
-            ✅ Tu cuenta ha sido verificada correctamente. Ahora puedes continuar con las operaciones sin restricciones y
+            Tu cuenta ha sido verificada correctamente. Ahora puedes continuar con las operaciones sin restricciones y
             acceder a todas las funcionalidades disponibles en la plataforma.
           </p>
         </div>

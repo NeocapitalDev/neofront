@@ -54,7 +54,7 @@ export default function Navbar() {
                 {/* Menú móvil y logo */}
                 <div className="flex items-center gap-x-4">
                   <div className="lg:hidden">
-                    <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-zinc-900 p-2 text-white hover:bg-zinc-800 hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--app-secondary)] focus:ring-offset-2">
+                    <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-zinc-900 p-2 text-white hover:bg-zinc-800 hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:ring-offset-2">
                       <span className="sr-only">Abrir menú principal</span>
                       {open ? (
                         <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -91,7 +91,7 @@ export default function Navbar() {
 
                     {/* Foto de perfil y menú */}
                     <Menu as="div" className="relative">
-                      <Menu.Button className="flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[var(--app-secondary)] focus:ring-offset-2">
+                      <Menu.Button className="flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:ring-offset-2">
                         <span className="sr-only">Abrir menú de usuario</span>
                         <LogoGravatar email={session.user.email} size={40} />
                       </Menu.Button>

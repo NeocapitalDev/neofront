@@ -65,7 +65,7 @@ export default function SignUp() {
   };
 
   const handleSubmit = async (e) => {
-    alert(formData.phone);
+    // alert(formData.phone);
 
     e.preventDefault();
     try {

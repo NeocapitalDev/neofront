@@ -368,7 +368,7 @@ const ProfilePage = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
           <button
             type="submit"
-            className="px-4 py-2 bg-[var(--app-primary)] text-black font-semibold rounded hover:bg-[var(--app-secondary)]"
+            className="inline-flex items-center justify-center bg-[var(--app-primary)] text-black font-medium py-2 px-4 rounded-lg hover:bg-[var(--app-secondary)] transition w-full"
             disabled={loading || isVerified}
           >
             {loading ? "Guardando..." : "Guardar"}

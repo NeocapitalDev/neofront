@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { navigation } from './links'; // Importar desde links.js
-import PrincipalButton from './principalButton';
+import { principalButton } from './links';
 
 export default function Sidebar() {
     const router = useRouter();
@@ -13,7 +13,11 @@ export default function Sidebar() {
         >
             <div className="p-4 border-b border-gray-200 dark:border-zinc-700">
                 {/* Aquí se utiliza el nuevo componente con los props correspondientes */}
-                <PrincipalButton />
+                <Link href={principalButton[0].href} passHref>
+                    <button className="bg-[var(--app-primary)] rounded-md text-black font-semibold px-4 py-3 w-full hover:bg-[var(--app-secondary)] transition duration-200">
+                        {principalButton[0].name}
+                    </button>
+                </Link>
 
                 <p className="text-black dark:text-white font-semibold text-lg mt-8">
                     Menú principal
@@ -27,7 +31,7 @@ export default function Sidebar() {
                         key={id}
                         className={`w-full flex items-center py-7 px-6 font-semibold transition duration-200 last:rounded-b-md relative 
             ${router.pathname === href
-                                ? 'bg-gradient-to-r from-amber-50 via-white to-transparent border-l-4 border-[var(--app-secondary)] dark:bg-gradient-to-r dark:from-amber-800 dark:via-zinc-800 dark:to-transparent dark:border-l-4 dark:border-[var(--app-secondary)]'
+                                ? 'bg-gradient-to-r from-amber-50 via-white to-transparent border-l-4 border-[var(--app-primary)] dark:bg-gradient-to-r dark:from-amber-800 dark:via-zinc-800 dark:to-transparent dark:border-l-4 dark:border-[var(--app-primary)]'
                                 : 'hover:bg-zinc-300 dark:hover:bg-zinc-700'
                             }`}
                     >
@@ -42,13 +46,13 @@ export default function Sidebar() {
                         ></div>
                         <Icon
                             className={`h-7 w-7 mr-4 z-10 ${router.pathname === href
-                                ? 'text-[var(--app-secondary)] dark:text-[var(--app-primary)]'
+                                ? 'text-[var(--app-primary)] dark:text-[var(--app-primary)]'
                                 : 'text-gray-700 dark:text-gray-300'
                                 }`}
                         />
                         <p
                             className={`text-md z-10 font-medium ${router.pathname === href
-                                ? 'text-[var(--app-secondary)] dark:text-[var(--app-primary)]'
+                                ? 'text-[var(--app-primary)] dark:text-[var(--app-primary)]'
                                 : 'text-gray-700 dark:text-white'
                                 }`}
                         >
