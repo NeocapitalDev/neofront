@@ -58,7 +58,7 @@ export default function ReviewOrder() {
       localStorage.setItem('orderData', JSON.stringify(orderData));
       
       // Redirigir a la página de pago
-      router.push('/start-challenge/payment');
+      router.push(`https://neocapitalfunding.com/checkout/?add-to-cart=9773&quantity=1`);
     }
   };
 
