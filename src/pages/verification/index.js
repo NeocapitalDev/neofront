@@ -131,7 +131,7 @@ const SocialsPage = () => {
                                 <p className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">
                                     2. Firma de contrato
                                 </p>
-                                <div className="flex flex-col p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+                                <div className="flex flex-col p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                                     <div className="h-64 overflow-y-auto border p-4 rounded-lg bg-gray-100 dark:bg-zinc-900">
                                         <p className="text-sm text-zinc-900 dark:text-white whitespace-pre-line">
                                             {/* 📌 Sección de términos y condiciones */}

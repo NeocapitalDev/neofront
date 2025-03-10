@@ -93,7 +93,6 @@ export default function RuletaSorteo({
 
     return currentAngle + extraSpins + delta;
   };
-
   // Acción de girar la ruleta
   const spinWheel = async () => {
     if (isSpinning) return;
@@ -226,16 +225,32 @@ export default function RuletaSorteo({
             <canvas
               ref={canvasRef}
               style={{
-                border: "5px solid #555",
+                border: "10px solid #F57F17",
                 borderRadius: "50%",
-                boxShadow: "0 0 10px rgba(255,255,0,0.5)",
+                boxShadow:
+                  "0 0 20px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 235, 59, 0.4), inset 0 0 15px rgba(255, 235, 59, 0.3)",
+                transition: "box-shadow 0.3s ease, transform 0.3s ease",
+                // transform: isSpinning ? "scale(1.03)" : "scale(1)",
               }}
             />
             {/* Puntero en el lado derecho, apuntando hacia la izquierda */}
             <motion.div
               initial={{ x: 10 }}
-              animate={{ x: [10, 0, 10] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
+              animate={{
+                x: [10, 0, 10],
+                filter: isSpinning
+                  ? [
+                      "drop-shadow(0 0 5px #FFEB3B)",
+                      "drop-shadow(0 0 15px #FFEB3B)",
+                      "drop-shadow(0 0 5px #FFEB3B)",
+                    ]
+                  : "drop-shadow(0 0 8px #FFEB3B)",
+              }}
+              transition={{
+                repeat: Infinity,
+                duration: isSpinning ? 0.3 : 1.5,
+                ease: isSpinning ? "easeInOut" : "easeInOut",
+              }}
               style={{
                 position: "absolute",
                 top: "50%",
@@ -244,9 +259,12 @@ export default function RuletaSorteo({
                 rotate: "180deg",
                 width: 0,
                 height: 0,
-                borderTop: "15px solid transparent",
-                borderBottom: "15px solid transparent",
-                borderLeft: "25px solid #FFEB3B",
+                borderTop: "20px solid transparent",
+                borderBottom: "20px solid transparent",
+                borderLeft: "30px solid #FFD600",
+                zIndex: 10,
+                backgroundImage:
+                  "linear-gradient(135deg, #FFD600 0%, #FFC107 100%)",
               }}
             />
           </div>

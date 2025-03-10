@@ -8,15 +8,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Gift } from 'lucide-react'
-import RuletaSorteo from "@/components/roullete/roullete";
+import RuletaSorteo from "@/components/roullete/Roullete3";
 
 export default function ModalRoullete() {
   return (
     <Dialog>
-      <DialogTrigger className="p-3 bg-black text-yellow-500 rounded-full hover:bg-yellow-500 hover:text-black transition-colors">
+      <DialogTrigger className="p-3 bg-black text-[var(--app-primary)] rounded-full hover:bg-[var(--app-primary)] hover:text-black transition-colors">
         <Gift size={64} />
       </DialogTrigger>
-      <DialogContent className="bg-black text-yellow-500 p-6 rounded-lg border-2 border-yellow-500 shadow-lg">
+      <DialogContent className="bg-black text-[var(--app-secondary)] p-3 rounded-lg border-2 border-[var(--app-secondary)] shadow-lg">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-center">
             Ruleton

@@ -30,7 +30,7 @@ const OrdersPage = () => {
             </Layout>
         );
     }
-    
+
     const orders = data?.orders || [];
 
     return (
@@ -45,10 +45,11 @@ const OrdersPage = () => {
             </div>
 
             <div className="mt-6 p-4 overflow-x-auto dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-                <Table>
-                    <TableHeader>
+                <Table className="">
+                    <TableHeader className="">
                         <TableRow>
-                            <TableHead>Challenge</TableHead>
+                            <TableHead>Challenge
+                            </TableHead>
                             <TableHead>Fecha</TableHead>
                             <TableHead>Monto</TableHead>
                             <TableHead className="w-[100px]">Orden ID</TableHead>
@@ -82,7 +83,7 @@ const OrdersPage = () => {
                     </TableBody>
                 </Table>
             </div>
-            
+
         </Layout>
     );
 };
