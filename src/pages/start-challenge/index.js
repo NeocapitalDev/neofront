@@ -1,109 +1,184 @@
-import Layout from "../../components/layout/dashboard";
-import { useState } from "react";
-import { UserIcon } from "@heroicons/react/24/outline";
-import { useSession } from "next-auth/react";
+import { useStrapiData } from '../../services/strapiService';
+import { useState, useEffect } from 'react';
 
-const CHALLENGE_OPTIONS = [
-    { balance: "5,000", price: "$44", link: "https://neocapitalfunding.com/desafio-neo-5k/" },
-    { balance: "10,000", price: "$79", link: "https://neocapitalfunding.com/desafio-neo-10k/" },
-    { balance: "25,000", price: "$179", link: "https://neocapitalfunding.com/desafio-neo-25k/" },
-    { balance: "50,000", price: "$299", link: "https://neocapitalfunding.com/desafio-neo-50k/" },
-    { balance: "100,000", price: "$499", link: "https://neocapitalfunding.com/desafio-neo-100k/" }
-];
+const ChallengeRelations = () => {
+    const { data: relations, error, isLoading } = useStrapiData('challenge-relations?populate=*');
 
-const PLATFORMS = ["MT4"];
+    // Estados para manejar las selecciones
+    const [selectedStep, setSelectedStep] = useState(null);
+    const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
-const StartChallenge = () => {
-    const { data: session } = useSession();
-    const email = session?.user?.email || "";
-    const firstName = session?.firstName || "";
-    const lastName = session?.lastName || "";
+    // Procesar los datos para obtener steps únicos y sus relaciones
+    const stepsData = relations
+        ? [...new Set(relations.map(relation => relation.challenge_step.name))].map(stepName => ({
+              step: stepName,
+              relations: relations.filter(relation => relation.challenge_step.name === stepName),
+          }))
+        : [];
 
-    const [selectedBalance, setSelectedBalance] = useState(CHALLENGE_OPTIONS[0].balance);
-    const [selectedPlatform, setSelectedPlatform] = useState("MT4");
-    const [termsAccepted, setTermsAccepted] = useState(false);
-    const [refundPolicyAccepted, setRefundPolicyAccepted] = useState(false);
+    // Seleccionar el primer step, subcategoría y producto por defecto al cargar los datos
+    useEffect(() => {
+        if (stepsData.length > 0 && selectedStep === null) {
+            const firstStep = stepsData[0].step;
+            setSelectedStep(firstStep);
 
-    const isButtonDisabled = !termsAccepted || !refundPolicyAccepted;
-    const selectedChallenge = CHALLENGE_OPTIONS.find(ch => ch.balance === selectedBalance) || CHALLENGE_OPTIONS[0];
-    const challengeLink = `${selectedChallenge.link}?billing_email=${encodeURIComponent(email)}&billing_first_name=${encodeURIComponent(firstName)}&billing_last_name=${encodeURIComponent(lastName)}`;
+            // Seleccionar la primera subcategoría del primer step
+            const firstStepRelations = stepsData[0].relations;
+            if (firstStepRelations.length > 0) {
+                setSelectedSubcategory(firstStepRelations[0].challenge_subcategory.name);
+
+                // Seleccionar el primer producto (si existe) de la primera relación
+                const firstRelationProducts = firstStepRelations[0].challenge_products;
+                if (firstRelationProducts.length > 0) {
+                    setSelectedProduct(firstRelationProducts[0].name);
+                }
+            }
+        }
+    }, [stepsData]); // Solo depende de stepsData para ejecutarse una vez al cargar los datos
+
+    if (isLoading) return <p>Loading...</p>;
+    if (error) return <p>Error: {error.message}</p>;
+
+    // Función para manejar el clic en un step
+    const handleStepClick = (step) => {
+        setSelectedStep(step);
+        // Si cambiamos de step, verificamos si la subcategoría/producto seleccionados son válidos
+        const stepRelations = stepsData.find(item => item.step === step).relations;
+        if (stepRelations.length > 0) {
+            const validSubcategories = stepRelations.map(r => r.challenge_subcategory.name);
+            if (!validSubcategories.includes(selectedSubcategory)) {
+                setSelectedSubcategory(stepRelations[0].challenge_subcategory.name);
+
+                const firstRelationProducts = stepRelations[0].challenge_products;
+                if (firstRelationProducts.length > 0) {
+                    setSelectedProduct(firstRelationProducts[0].name);
+                } else {
+                    setSelectedProduct(null);
+                }
+            }
+        } else {
+            setSelectedSubcategory(null);
+            setSelectedProduct(null);
+        }
+    };
+
+    // Función para manejar el clic en una subcategory
+    const handleSubcategoryClick = (subcategory) => {
+        setSelectedSubcategory(subcategory);
+        // Al cambiar la subcategoría, seleccionamos el primer producto de la relación asociada (si existe)
+        const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
+        const relation = stepRelations.find(r => r.challenge_subcategory.name === subcategory);
+        if (relation && relation.challenge_products.length > 0) {
+            setSelectedProduct(relation.challenge_products[0].name);
+        } else {
+            setSelectedProduct(null);
+        }
+    };
+
+    // Función para manejar el clic en un producto
+    const handleProductClick = (product) => {
+        setSelectedProduct(product);
+    };
 
     return (
-        <Layout>
-            <div className="p-6 dark:bg-zinc-800 bg-white shadow-lg rounded-lg dark:text-white">
-                <div className="flex items-center space-x-2">
-                    <UserIcon className="w-6 h-6 text-gray-600 dark:text-gray-200" />
-                    <h1 className="text-xl font-semibold">Configure su producto</h1>
-                </div>
-            </div>
-
-            <div className="p-6 mt-5 dark:bg-zinc-800 bg-white shadow-lg rounded-lg dark:text-white">
-                {/* Balance de la Cuenta */}
-                <div className="mb-6">
-                    <h3 className="text-sm font-medium mb-2">Balance de Cuenta</h3>
-                    <div className="grid grid-cols-3 gap-2">
-                        {CHALLENGE_OPTIONS.map(({ balance }) => (
-                            <button
-                                key={balance}
-                                onClick={() => setSelectedBalance(balance)}
-                                className={`px-4 py-3 rounded-md shadow-md transition-colors ${selectedBalance === balance ? "bg-[var(--app-secondary)] text-black" : "bg-zinc-700 text-white"}`}
-                            >
-                                {balance} USD
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Tipo de Plataforma */}
-                <div className="mb-6">
-                    <h3 className="text-sm font-medium mb-2">Plataforma</h3>
-                    <div className="flex gap-2">
-                        {PLATFORMS.map((platform) => (
-                            <button
-                                key={platform}
-                                onClick={() => setSelectedPlatform(platform)}
-                                className={`px-4 py-3 rounded-md shadow-md transition-colors ${selectedPlatform === platform ? "bg-[var(--app-secondary)] text-black" : "bg-zinc-700 text-white"}`}
-                            >
-                                {platform}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Términos y Pago */}
-                <div className="mb-6 space-y-2">
-                    {[{
-                        label: "Términos y Condiciones",
-                        state: termsAccepted,
-                        setter: setTermsAccepted
-                    }, {
-                        label: "Política de Cancelación y Reembolso",
-                        state: refundPolicyAccepted,
-                        setter: setRefundPolicyAccepted
-                    }].map(({ label, state, setter }, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                            <input type="checkbox" className="rounded-md" checked={state} onChange={() => setter(!state)} />
-                            <span>
-                                Declaro que he leído y estoy de acuerdo con <span className="text-[var(--app-secondary)]">{label}</span>
-                            </span>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Precio y Botón de Pago */}
-                <div className="text-center">
-                    <p className="text-xl py-5 font-semibold text-green-400">{selectedChallenge.price}</p>
-                    <a
-                        href={challengeLink}
-                        className={`mt-9 bg-[var(--app-secondary)] text-black px-6 py-3 rounded-md w-full font-semibold block text-center transition-opacity ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : "hover:bg-[var(--app-primary)]"}`}
-                        onClick={(e) => isButtonDisabled && e.preventDefault()}
+        <div>
+            <h1 className="text-2xl font-bold mb-4">Challenge Steps</h1>
+            <div className="flex flex-wrap gap-3 mb-6">
+                {stepsData.map((item, index) => (
+                    <button
+                        key={index}
+                        onClick={() => handleStepClick(item.step)}
+                        className="focus:outline-none"
                     >
-                        Confirmar y Proceder al Pago
-                    </a>
-                </div>
+                        <div
+                            className={`p-4 rounded-lg shadow-md text-center min-w-[120px] transition-transform duration-100 ${
+                                selectedStep === item.step
+                                    ? 'bg-blue-500 text-white scale-95'
+                                    : 'bg-gray-100 hover:scale-95'
+                            }`}
+                        >
+                            {item.step}
+                        </div>
+                    </button>
+                ))}
             </div>
-        </Layout>
+
+            {/* Mostrar subcategorías y productos si hay un step seleccionado */}
+            {selectedStep && stepsData.length > 0 && (
+                <div>
+                    {/* Subcategorías */}
+                    <h2 className="text-xl font-semibold mb-3">
+                        Subcategories for {selectedStep}
+                    </h2>
+                    <div className="flex flex-wrap gap-3 mb-6">
+                        {stepsData
+                            .find(item => item.step === selectedStep)
+                            .relations.map((relation, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handleSubcategoryClick(relation.challenge_subcategory.name)}
+                                    className="focus:outline-none"
+                                >
+                                    <div
+                                        className={`p-4 rounded-lg shadow-md text-center min-w-[120px] transition-transform duration-100 ${
+                                            selectedSubcategory === relation.challenge_subcategory.name
+                                                ? 'bg-blue-500 text-white scale-95'
+                                                : 'bg-gray-100 hover:scale-95'
+                                        }`}
+                                    >
+                                        {relation.challenge_subcategory.name}
+                                    </div>
+                                </button>
+                            ))}
+                    </div>
+
+                    {/* Productos */}
+                    {selectedSubcategory && (
+                        <>
+                            <h2 className="text-xl font-semibold mb-3">
+                                Products for {selectedSubcategory}
+                            </h2>
+                            <div className="flex flex-wrap gap-3">
+                                {(() => {
+                                    const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
+                                    const selectedRelation = stepRelations.find(
+                                        r => r.challenge_subcategory.name === selectedSubcategory
+                                    );
+
+                                    if (selectedRelation && selectedRelation.challenge_products.length > 0) {
+                                        return selectedRelation.challenge_products.map((product, productIndex) => (
+                                            <button
+                                                key={`${selectedRelation.id}-${productIndex}`}
+                                                onClick={() => handleProductClick(product.name)}
+                                                className="focus:outline-none"
+                                            >
+                                                <div
+                                                    className={`p-4 rounded-lg shadow-md text-center min-w-[120px] transition-transform duration-100 ${
+                                                        selectedProduct === product.name
+                                                            ? 'bg-blue-500 text-white scale-95'
+                                                            : 'bg-gray-100 hover:scale-95'
+                                                    }`}
+                                                >
+                                                    {product.name}
+                                                </div>
+                                            </button>
+                                        ));
+                                    } else {
+                                        return (
+                                            <p className="text-gray-500">
+                                                No products available for this subcategory
+                                            </p>
+                                        );
+                                    }
+                                })()}
+                            </div>
+                        </>
+                    )}
+                </div>
+            )}
+        </div>
     );
 };
 
-export default StartChallenge;
+export default ChallengeRelations;
