@@ -7,7 +7,7 @@ const ChallengeRelations = () => {
     // Estados para manejar las selecciones
     const [selectedStep, setSelectedStep] = useState(null);
     const [selectedSubcategory, setSelectedSubcategory] = useState(null);
-    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [selectedProduct, setSelectedProduct] = useState(null); // Almacenamos el objeto completo del producto
 
     // Procesar los datos para obtener steps únicos y sus relaciones
     const stepsData = relations
@@ -17,7 +17,7 @@ const ChallengeRelations = () => {
           }))
         : [];
 
-    // Seleccionar el primer step, subcategoría y producto por defecto al cargar los datos
+    // Seleccionar el primer step, subcategoría y producto ACTIVO por defecto al cargar los datos
     useEffect(() => {
         if (stepsData.length > 0 && selectedStep === null) {
             const firstStep = stepsData[0].step;
@@ -28,14 +28,15 @@ const ChallengeRelations = () => {
             if (firstStepRelations.length > 0) {
                 setSelectedSubcategory(firstStepRelations[0].challenge_subcategory.name);
 
-                // Seleccionar el primer producto (si existe) de la primera relación
+                // Seleccionar el primer producto ACTIVO (si existe) de la primera relación
                 const firstRelationProducts = firstStepRelations[0].challenge_products;
-                if (firstRelationProducts.length > 0) {
-                    setSelectedProduct(firstRelationProducts[0].name);
+                const firstActiveProduct = firstRelationProducts.find(product => product.isActive !== false);
+                if (firstActiveProduct) {
+                    setSelectedProduct(firstActiveProduct); // Almacenamos el objeto completo
                 }
             }
         }
-    }, [stepsData]); // Solo depende de stepsData para ejecutarse una vez al cargar los datos
+    }, [stepsData]);
 
     if (isLoading) return <p>Loading...</p>;
     if (error) return <p>Error: {error.message}</p>;
@@ -51,8 +52,9 @@ const ChallengeRelations = () => {
                 setSelectedSubcategory(stepRelations[0].challenge_subcategory.name);
 
                 const firstRelationProducts = stepRelations[0].challenge_products;
-                if (firstRelationProducts.length > 0) {
-                    setSelectedProduct(firstRelationProducts[0].name);
+                const firstActiveProduct = firstRelationProducts.find(product => product.isActive !== false);
+                if (firstActiveProduct) {
+                    setSelectedProduct(firstActiveProduct); // Almacenamos el objeto completo
                 } else {
                     setSelectedProduct(null);
                 }
@@ -66,11 +68,16 @@ const ChallengeRelations = () => {
     // Función para manejar el clic en una subcategory
     const handleSubcategoryClick = (subcategory) => {
         setSelectedSubcategory(subcategory);
-        // Al cambiar la subcategoría, seleccionamos el primer producto de la relación asociada (si existe)
+        // Al cambiar la subcategoría, seleccionamos el primer producto ACTIVO de la relación asociada (si existe)
         const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
         const relation = stepRelations.find(r => r.challenge_subcategory.name === subcategory);
         if (relation && relation.challenge_products.length > 0) {
-            setSelectedProduct(relation.challenge_products[0].name);
+            const firstActiveProduct = relation.challenge_products.find(product => product.isActive !== false);
+            if (firstActiveProduct) {
+                setSelectedProduct(firstActiveProduct); // Almacenamos el objeto completo
+            } else {
+                setSelectedProduct(null);
+            }
         } else {
             setSelectedProduct(null);
         }
@@ -78,7 +85,10 @@ const ChallengeRelations = () => {
 
     // Función para manejar el clic en un producto
     const handleProductClick = (product) => {
-        setSelectedProduct(product);
+        // Solo permitimos seleccionar si isActive no es false
+        if (product.isActive !== false) {
+            setSelectedProduct(product); // Almacenamos el objeto completo del producto
+        }
     };
 
     return (
@@ -139,7 +149,7 @@ const ChallengeRelations = () => {
                             <h2 className="text-xl font-semibold mb-3">
                                 Products for {selectedSubcategory}
                             </h2>
-                            <div className="flex flex-wrap gap-3">
+                            <div className="flex flex-wrap gap-3 mb-6">
                                 {(() => {
                                     const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
                                     const selectedRelation = stepRelations.find(
@@ -148,21 +158,19 @@ const ChallengeRelations = () => {
 
                                     if (selectedRelation && selectedRelation.challenge_products.length > 0) {
                                         return selectedRelation.challenge_products.map((product, productIndex) => (
-                                            <button
+                                            <div
                                                 key={`${selectedRelation.id}-${productIndex}`}
-                                                onClick={() => handleProductClick(product.name)}
-                                                className="focus:outline-none"
+                                                className={`p-4 rounded-lg shadow-md text-center min-w-[120px] transition-transform duration-100 ${
+                                                    product.isActive !== false
+                                                        ? selectedProduct && selectedProduct.name === product.name
+                                                            ? 'bg-blue-500 text-white scale-95 cursor-pointer'
+                                                            : 'bg-gray-100 hover:scale-95 cursor-pointer'
+                                                        : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                                                }`}
+                                                onClick={() => product.isActive !== false && handleProductClick(product)} // Solo clickable si isActive no es false
                                             >
-                                                <div
-                                                    className={`p-4 rounded-lg shadow-md text-center min-w-[120px] transition-transform duration-100 ${
-                                                        selectedProduct === product.name
-                                                            ? 'bg-blue-500 text-white scale-95'
-                                                            : 'bg-gray-100 hover:scale-95'
-                                                    }`}
-                                                >
-                                                    {product.name}
-                                                </div>
-                                            </button>
+                                                {product.name}
+                                            </div>
                                         ));
                                     } else {
                                         return (
@@ -175,6 +183,18 @@ const ChallengeRelations = () => {
                             </div>
                         </>
                     )}
+                </div>
+            )}
+
+            {/* Mostrar el precio del producto seleccionado en un div grande al final */}
+            {selectedProduct && (
+                <div className="mt-6 p-6 bg-green-100 rounded-lg shadow-md text-center">
+                    <h3 className="text-xl font-semibold mb-2">
+                        Selected Product: {selectedProduct.name}
+                    </h3>
+                    <p className="text-2xl font-bold text-green-700">
+                        Price: ${selectedProduct.precio ? selectedProduct.precio : 'N/A'}
+                    </p>
                 </div>
             )}
         </div>
