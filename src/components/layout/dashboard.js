@@ -2,6 +2,7 @@ import Navbar from "../structure/navbar";
 import FooterInfo from "../structure/footer";
 import Sidebar from '../structure/sidebar';
 import Breadcrumb from "../Breadcrumb";
+import ModalRoullete from '@/components/roullete/ModalRoullete';
 
 export default function Layout({ children }) {
     return (
@@ -24,9 +25,10 @@ export default function Layout({ children }) {
                         </div>
                     </div>
                 </div>
-
-
-
+                <div style={{ position: 'fixed', bottom: '10px', right: '10px', zIndex: 1000 }} className='flex flex-col gap-4'>
+                    <ModalRoullete />
+                    {/* <ChatwootWidget /> */}
+                </div>
             </main>
         </div>
     );

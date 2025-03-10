@@ -54,13 +54,16 @@ export default function ReviewOrder() {
         timestamp: new Date().toISOString()
       };
       
-      // Guardar en localStorage para la siguiente página
       localStorage.setItem('orderData', JSON.stringify(orderData));
+      
+      // Elimina el producto del localStorage para evitar duplicar en futuras visitas
+      localStorage.removeItem('selectedProduct');
       
       // Redirigir a la página de pago
       router.push(`https://neocapitalfunding.com/checkout/?add-to-cart=9773&quantity=1`);
     }
   };
+  
 
   // Función para aplicar el cupón (simulada)
   const applyCoupon = () => {
