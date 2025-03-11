@@ -91,7 +91,7 @@ const ChallengeRelations = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (selectedProduct && termsAccepted && cancellationAccepted) {
-      console.log('Producto seleccionado:', selectedProduct);
+      //console.log('Producto seleccionado:', selectedProduct);
       // Aquí puedes agregar la lógica para continuar con el formulario
     }
   };
@@ -99,7 +99,7 @@ const ChallengeRelations = () => {
   // Función para aplicar el cupón (placeholder)
   const applyCoupon = () => {
     if (couponCode) {
-      console.log('Cupón aplicado:', couponCode);
+      //console.log('Cupón aplicado:', couponCode);
       // Aquí puedes agregar la lógica para aplicar el cupón
     }
   };
