@@ -21,10 +21,8 @@ export default function ModalRoullete() {
       <DialogContent className="bg-black text-[var(--app-secondary)] p-3 rounded-lg border-2 border-[var(--app-secondary)] shadow-lg">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-center">
-            Ruleton
           </DialogTitle>
           <DialogDescription className="mt-2">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. At aliquid illo, tempora dignissimos temporibus natus dolor libero non similique odit amet accusamus, laborum, tempore provident harum mollitia tenetur! Modi, rerum!
           </DialogDescription>
         </DialogHeader>
 

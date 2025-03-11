@@ -57,8 +57,8 @@ export function CreateStepFormC() {
   const stageData = stages
     ? stages.map(({ id, documentId, name }) => ({ id, documentId, name }))
     : [];
-  console.log("stageData", stageData);
-  console.log("subcategoriesData", subcategoriesData);
+  // console.log("stageData", stageData);
+  // console.log("subcategoriesData", subcategoriesData);
   // 3. Estados locales para la creación
   const [openSubcat, setOpenSubcat] = useState(false);
   const [openStages, setOpenStages] = useState(false);
@@ -77,8 +77,8 @@ export function CreateStepFormC() {
   const allStages = [...(stageData || []), ...customStages].filter(
     (item, index, self) => self.findIndex(i => i.documentId === item.documentId) === index
   );
-  console.log("allStages", allStages);
-  console.log("allSubcategories", allSubcategories);
+  // console.log("allStages", allStages);
+  // console.log("allSubcategories", allSubcategories);
   // 4. useForm
   const form = useForm({
     resolver: zodResolver(stepFormSchema),
@@ -119,7 +119,7 @@ export function CreateStepFormC() {
     try {
       // Asegurar que no exista documentId (lo generará Strapi)
       data.documentId = "";
-      console.log("JSON final:", data);
+      // console.log("JSON final:", data);
 
       await createStepWithRelations(data);
       // Limpieza

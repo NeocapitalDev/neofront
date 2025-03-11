@@ -48,7 +48,7 @@ export function CreateStepFormC() {
     error: stageError,
     isLoading: stageLoading,
   } = useStrapiData("challenge-stages?filters[challenge_steps][$null]=true");
-  console.log("stageData", stages);
+  // console.log("stageData", stages);
   // 2. Mapeo y filtrado de datos
   const subcategoriesData = subcategories
     ? subcategories
@@ -64,7 +64,7 @@ export function CreateStepFormC() {
     ? stages.map(({ id, documentId, name }) => ({ id, documentId, name }))
     : [];
 
-  console.log("subcategoriesData", subcategoriesData);
+  // console.log("subcategoriesData", subcategoriesData);
   // 3. Estados locales para la creación
   const [openSubcat, setOpenSubcat] = useState(false);
   const [openStages, setOpenStages] = useState(false);
@@ -79,8 +79,8 @@ export function CreateStepFormC() {
   // Combinar subcategorías y stages existentes con las custom
   const allSubcategories = [...subcategoriesData, ...customSubcategories];
   const allStages = [...(stageData || []), ...customStages];
-  console.log("allStages", allStages);
-  console.log("allSubcategories", allSubcategories);
+  // console.log("allStages", allStages);
+  // console.log("allSubcategories", allSubcategories);
   // 4. useForm
   const form = useForm({
     resolver: zodResolver(stepFormSchema),
@@ -121,7 +121,7 @@ export function CreateStepFormC() {
     try {
       // Asegurar que no exista documentId (lo generará Strapi)
       data.documentId = "";
-      console.log("JSON final:", data);
+      // console.log("JSON final:", data);
 
       await createStepWithRelations(data);
       // Limpieza

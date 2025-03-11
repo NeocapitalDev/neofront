@@ -25,7 +25,7 @@ export function AppSidebar({ ...props }) {
 
   // Efecto para actualizar el estado cuando session esté disponible
   React.useEffect(() => {
-    console.log("Sesión actual:", session);
+    // console.log("Sesión actual:", session);
 
     if (session) {
       const avatarUrl = `https://www.gravatar.com/avatar/${md5(session.user.email.trim().toLowerCase())}?s=40&d=retro`;

@@ -18,7 +18,7 @@ export default function ForgotPassword() {
   const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
   const router = useRouter();
   const handleCaptcha = (token) => {
-    console.log("Token del CAPTCHA:", token);  // Verificar el token
+    // console.log("Token del CAPTCHA:", token);  // Verificar el token
     setCaptchaToken(token);  // Guardar el token del CAPTCHA
   };
   const handleSubmit = async (e) => {

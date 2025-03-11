@@ -120,7 +120,7 @@ export default function RuletaSorteo({
       }
 
       const winningOption = await response.json();
-      console.log(winningOption);
+      // console.log(winningOption);
       const winningIndex = winningOption.indice; // Número devuelto por tu backend
       if (winningIndex < 0 || winningIndex >= opciones.length) {
         throw new Error("El índice ganador está fuera de rango");

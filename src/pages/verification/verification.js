@@ -29,7 +29,7 @@ const VeriffComponent = ({ isVerified }) => {
             if (err) {
               console.error("Error en Veriff:", err);
             } else {
-              console.log("Sesión iniciada:", response);
+              // console.log("Sesión iniciada:", response);
               createVeriffFrame({ url: response.verification.url });
             }
           },

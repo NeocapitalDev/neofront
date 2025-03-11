@@ -13,10 +13,10 @@ export default function RuletaSorteo({
   onClose, // Added onClose prop for the Exit button
 }) {
   // Hooks y estados
-  console.log("documentId", documentId);
+  // console.log("documentId", documentId);
   const { data: session } = useSession();
   const { data, error, loading } = useStrapiData("rewards");
-  console.log("document" + data);
+  // console.log("document" + data);
   const [isSpinning, setIsSpinning] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [startAngle, setStartAngle] = useState(0);
@@ -423,7 +423,7 @@ export default function RuletaSorteo({
       );
       if (!response.ok) throw new Error("Error en la respuesta del servidor");
       const winningOption = await response.json();
-      console.log(winningOption);
+      // console.log(winningOption);
 
       // Check if the response contains an error about used ticket
       if (winningOption.error && winningOption.error === "ticket usado") {

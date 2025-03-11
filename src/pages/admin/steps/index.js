@@ -11,7 +11,7 @@ import { Toaster, toast } from 'sonner';
 
 export default function ViewSteps() {
   const { data, error, isLoading } = useStrapiData("challenge-steps/get-all-data");
-  console.log("steps", data);
+  // console.log("steps", data);
   // const data = stepsData.data;
   // console.log("data", data);
 

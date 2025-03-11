@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/command";
 
 export function UpdateStepFormC({ step, onStepChange }) {
-  console.log("step recibido:", step);
+  // console.log("step recibido:", step);
   // --- Datos desde Strapi ---
   const {
     data: subcategories,
@@ -71,10 +71,10 @@ export function UpdateStepFormC({ step, onStepChange }) {
   const allStages = [...(stageData || []), ...customStages].filter(
     (item, index, self) => self.findIndex(i => i.documentId === item.documentId) === index
   );
-  console.log("subcategoriesData", subcategoriesData);
-  console.log("stageData", stageData);
-  console.log("allSubcategories", allSubcategories);
-  console.log("allStages", allStages);
+  // console.log("subcategoriesData", subcategoriesData);
+  // console.log("stageData", stageData);
+  // console.log("allSubcategories", allSubcategories);
+  // console.log("allStages", allStages);
 
   // --- useForm: se inicializa con los valores del step a actualizar ---
   const form = useForm({
@@ -128,7 +128,7 @@ export function UpdateStepFormC({ step, onStepChange }) {
 
   // --- Función para actualizar el Step y sus relaciones ---
   const updateStepWithRelations = async (stepPayload) => {
-    console.log("Payload recibido:", stepPayload);
+    // console.log("Payload recibido:", stepPayload);
     try {
       const response = await fetch(
         `http://localhost:1337/api/challenge-steps/${stepPayload.documentId}/update-with-relations`,
@@ -142,7 +142,7 @@ export function UpdateStepFormC({ step, onStepChange }) {
         }
       );
       const data = await response.json();
-      console.log("Step actualizado:", data);
+      // console.log("Step actualizado:", data);
       return data; // Se asume que el endpoint retorna el objeto actualizado
     } catch (error) {
       console.error("Error al actualizar el step:", error);
@@ -153,7 +153,7 @@ export function UpdateStepFormC({ step, onStepChange }) {
   // --- Manejo del submit para actualizar ---
   const handleUpdateSubmit = form.handleSubmit(async (data) => {
     setIsLoading(true);
-    console.log("JSON final:", data);
+    // console.log("JSON final:", data);
     try {
       const updatedStep = await updateStepWithRelations(data);
       onStepChange(); // Actualizamos el listado de pasos
