@@ -7,7 +7,7 @@ import classNames from 'classnames';
 
 const ChallengeRelations = () => {
   const { data: relations, error, isLoading } = useStrapiData('challenge-relations?populate=*');
-  const { data: allproducts, error: allproductserror, isLoading: allproductsisLoading } = useStrapiData('challenge-products?populate=*');
+  const { data: allproducts, error: allproductserror, isLoading: allproductsisLoading } = useStrapiData('challenge-products');
 
   // Estados para manejar las selecciones, cupón y términos
   const [selectedStep, setSelectedStep] = useState(null);
@@ -229,74 +229,86 @@ const ChallengeRelations = () => {
               </section>
             )}
 
-            {/* Productos Section */}
-            {selectedRelationId && (
-              <section className="bg-zinc-900 rounded-lg p-5 shadow-md border border-zinc-800">
-                <div className="flex items-center mb-3">
-                  <h3 className="text-amber-400 font-medium">Productos</h3>
-                  <div className="relative ml-2 group">
-                    <InformationCircleIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-300" />
-                    <div className="absolute z-10 invisible group-hover:visible bg-zinc-800 text-xs text-zinc-200 p-2 rounded-md w-48 top-full left-0 mt-1">
-                      Selecciona el producto que deseas adquirir
-                    </div>
-                  </div>
-                </div>
-                <p className="text-zinc-400 mb-4 text-sm">
-                  Elige el producto para{" "}
-                  {stepsData
-                    .find(item => item.step === selectedStep)
-                    .relations.find(r => r.id === selectedRelationId)
-                    ?.challenge_subcategory.name}.
-                </p>
+{selectedRelationId && (
+  <section className="bg-zinc-900 rounded-lg p-5 shadow-md border border-zinc-800">
+    <div className="flex items-center mb-3">
+      <h3 className="text-amber-400 font-medium">Productos</h3>
+      <div className="relative ml-2 group">
+        <InformationCircleIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-300" />
+        <div className="absolute z-10 invisible group-hover:visible bg-zinc-800 text-xs text-zinc-200 p-2 rounded-md w-48 top-full left-0 mt-1">
+          Selecciona el producto que deseas adquirir
+        </div>
+      </div>
+    </div>
+    <p className="text-zinc-400 mb-4 text-sm">
+      Elige el producto para{" "}
+      {stepsData
+        .find(item => item.step === selectedStep)
+        .relations.find(r => r.id === selectedRelationId)
+        ?.challenge_subcategory.name}.
+    </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {(() => {
-                    const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
-                    const selectedRelation = stepRelations.find(r => r.id === selectedRelationId);
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+      {(() => {
+        const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
+        const selectedRelation = stepRelations.find(r => r.id === selectedRelationId);
 
-                    if (selectedRelation && selectedRelation.challenge_products.length > 0) {
-                      return selectedRelation.challenge_products.map((product, productIndex) => (
-                        <div key={`${selectedRelation.id}-${productIndex}`} className="relative">
-                          <input
-                            type="radio"
-                            id={`product-${selectedRelation.id}-${productIndex}`}
-                            name="product"
-                            checked={selectedProduct && selectedProduct.name === product.name}
-                            onChange={() => handleProductClick(product)}
-                            className="sr-only"
-                          />
-                          <label
-                            htmlFor={`product-${selectedRelation.id}-${productIndex}`}
-                            className={classNames(
-                              "block p-4 rounded-lg border cursor-pointer transition-all",
-                              selectedProduct && selectedProduct.name === product.name
-                                ? "bg-zinc-800 border-amber-500 text-white"
-                                : "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
-                            )}
-                          >
-                            <span className="block font-medium">{product.name}</span>
-                            {product.isPremium && (
-                              <span className="inline-block bg-amber-500 text-black text-xs px-2 py-1 rounded mt-2 font-semibold">
-                                Premium
-                              </span>
-                            )}
-                            {selectedProduct && selectedProduct.name === product.name && (
-                              <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-amber-500" />
-                            )}
-                          </label>
-                        </div>
-                      ));
-                    } else {
-                      return (
-                        <p className="text-zinc-500 col-span-3">
-                          No hay productos disponibles para esta subcategoría
-                        </p>
-                      );
-                    }
-                  })()}
-                </div>
-              </section>
-            )}
+        // Obtener los nombres de los productos de la relación seleccionada
+        const relationProductNames = selectedRelation?.challenge_products.map(p => p.name) || [];
+
+        // Si hay productos en allproducts
+        if (allproducts && allproducts.length > 0) {
+          return allproducts.map((product, productIndex) => {
+            // Verificar si el producto está en la relación seleccionada
+            const isInRelation = relationProductNames.includes(product.name);
+
+            return (
+              <div key={`allproduct-${productIndex}`} className="relative">
+                <input
+                  type="radio"
+                  id={`allproduct-${productIndex}`}
+                  name="product"
+                  checked={selectedProduct && selectedProduct.name === product.name}
+                  onChange={() => handleProductClick(product)}
+                  className="sr-only"
+                  disabled={!isInRelation} // Deshabilitar si no está en la relación
+                />
+                <label
+                  htmlFor={`allproduct-${productIndex}`}
+                  className={classNames(
+                    "block p-4 rounded-lg border cursor-pointer transition-all",
+                    selectedProduct && selectedProduct.name === product.name
+                      ? "bg-zinc-800 border-amber-500 text-white"
+                      : isInRelation
+                      ? "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+
+                      : "bg-gray-900/20 border-gray-700 text-gray-500 opacity-50"
+                  )}
+                >
+                  <span className="block font-medium">{product.name}</span>
+                  {product.isPremium && (
+                    <span className="inline-block bg-amber-500 text-black text-xs px-2 py-1 rounded mt-2 font-semibold">
+                      Premium
+                    </span>
+                  )}
+                  {selectedProduct && selectedProduct.name === product.name && (
+                    <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-amber-500" />
+                  )}
+                </label>
+              </div>
+            );
+          });
+        } else {
+          return (
+            <p className="text-zinc-500 col-span-3">
+              No hay productos disponibles
+            </p>
+          );
+        }
+      })()}
+    </div>
+  </section>
+)}
           </div>
 
           {/* Columna derecha - Resumen del producto */}
