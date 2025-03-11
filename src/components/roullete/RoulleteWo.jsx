@@ -8,26 +8,30 @@ export default function RuletaSorteo({
   customOptions,
   width = 300,
   height = 300,
-  centerImage = null, // Nueva prop para la imagen central
+  centerImage = null, // Prop para la imagen central
+  documentId,
+  onClose, // Added onClose prop for the Exit button
 }) {
   // Hooks y estados
+  console.log("documentId", documentId);
   const { data: session } = useSession();
-  const { data, error, loading } = useStrapiData(
-    "provisional-products?populate=*"
-  );
+  const { data, error, loading } = useStrapiData("rewards");
+  console.log("document" + data);
   const [isSpinning, setIsSpinning] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [startAngle, setStartAngle] = useState(0);
   const canvasRef = useRef(null);
-  const [intento, setIntento] = useState("");
   const [centerImageLoaded, setCenterImageLoaded] = useState(false);
   const centerImageRef = useRef(null);
+  const [hasSpun, setHasSpun] = useState(false); // New state to track if wheel has been spun successfully
+  const [ticketError, setTicketError] = useState("");
 
   // Refs para controlar la animación
   const animationRef = useRef(null);
   const celebrationRef = useRef(null);
   const currentAngleRef = useRef(startAngle);
   const winningIndexRef = useRef(null);
+  const codigoRef = useRef(null);
 
   // Opciones: si vienen personalizadas, se usan; de lo contrario se obtienen del endpoint
   let opciones = [];
@@ -35,13 +39,13 @@ export default function RuletaSorteo({
     opciones = customOptions;
   } else if (data) {
     opciones = data.map((item) => ({
-      name: item.precio,
+      name: String(item.procentaje),
       documentId: item.documentId,
     }));
   }
 
-  // Constante: El puntero se asume a 0 rad (derecha)
-  const angleOffset = 0;
+  // Constante: El puntero ahora está en la parte inferior (π/2 rad o 90 grados)
+  const angleOffset = Math.PI / 2; // 90 grados en radianes
 
   // ---------------------------
   // Funciones de CÁLCULO y EASING
@@ -60,8 +64,8 @@ export default function RuletaSorteo({
     // Centro del sector ganador
     const sectorCenter = winningIndex * arcSize + arcSize / 2;
     const normalizedCurrent = normalizeAngle(currentAngle);
-    // Se busca que: normalize(finalAngle + sectorCenter) = 0 => finalAngle = -sectorCenter (mod 2π)
-    let delta = normalizeAngle(-sectorCenter - normalizedCurrent);
+    // Se busca que: normalize(finalAngle + sectorCenter) = angleOffset => finalAngle = angleOffset - sectorCenter (mod 2π)
+    let delta = normalizeAngle(angleOffset - sectorCenter - normalizedCurrent);
     // Añadimos vueltas extras para efecto visual (por ejemplo, 5 vueltas completas)
     const extraSpins = 5 * 2 * Math.PI;
     return currentAngle + extraSpins + delta;
@@ -136,7 +140,7 @@ export default function RuletaSorteo({
 
     // Dibujar cada sector de la ruleta
     for (let i = 0; i < numOptions; i++) {
-      const angle = angleOffset + currentAngle + i * arcSize;
+      const angle = currentAngle + i * arcSize;
       const nextAngle = angle + arcSize;
       const colorSet = colors[i % colors.length];
 
@@ -188,7 +192,7 @@ export default function RuletaSorteo({
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Texto del sector
+      // Texto del sector (rotado para mejor legibilidad)
       ctx.save();
       ctx.translate(centerX, centerY);
       ctx.rotate(angle + arcSize / 2);
@@ -212,7 +216,7 @@ export default function RuletaSorteo({
 
     // Si hay una imagen cargada, la dibujamos
     if (centerImageLoaded && centerImageRef.current) {
-      // Dibuja un círculo blanco como fondo para la imagen
+      // Dibuja un círculo como fondo para la imagen
       ctx.beginPath();
       ctx.arc(centerX, centerY, centerRadius, 0, 2 * Math.PI);
       ctx.fillStyle = "#000";
@@ -312,8 +316,7 @@ export default function RuletaSorteo({
     const radius = Math.min(centerX, centerY) - 20;
     const numOptions = opciones.length;
     const arcSize = (2 * Math.PI) / numOptions;
-    const winAngle =
-      angleOffset + currentAngleRef.current + winningIndex * arcSize;
+    const winAngle = currentAngleRef.current + winningIndex * arcSize;
     const midWinAngle = winAngle + arcSize / 2;
     for (let i = 0; i < 4; i++) {
       const particleAngle = midWinAngle + (Math.random() - 0.5) * arcSize * 0.7;
@@ -340,6 +343,7 @@ export default function RuletaSorteo({
     if (count <= 0) {
       setIsSpinning(false);
       setSelectedOption(opciones[winningIndexRef.current]);
+      setHasSpun(true); // Set hasSpun to true when celebration is complete
       celebrationRef.current = null;
       return;
     }
@@ -387,7 +391,7 @@ export default function RuletaSorteo({
   // Función de ANIMACIÓN del giro
   // ---------------------------
   const spinWheel = async () => {
-    if (isSpinning) return;
+    if (isSpinning || hasSpun) return; // Check if wheel has already been spun successfully
     setIsSpinning(true);
     setSelectedOption(null);
 
@@ -404,7 +408,7 @@ export default function RuletaSorteo({
     try {
       // Solicita al backend el índice ganador
       const response = await fetch(
-        "https://n8n.neocapitalfunding.com/webhook/webhook/ruleta",
+        "https://n8n.neocapitalfunding.com/webhook-test/roullete",
         {
           method: "POST",
           headers: {
@@ -412,13 +416,23 @@ export default function RuletaSorteo({
             Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
           },
           body: JSON.stringify({
-            usuario: session?.user?.email,
-            documentId: intento,
+            // usuario: session?.user?.email,
+            documentId: documentId,
           }),
         }
       );
       if (!response.ok) throw new Error("Error en la respuesta del servidor");
       const winningOption = await response.json();
+      console.log(winningOption);
+
+      // Check if the response contains an error about used ticket
+      if (winningOption.error && winningOption.error === "ticket usado") {
+        setTicketError("Este ticket ya ha sido utilizado");
+        setIsSpinning(false);
+        setHasSpun(true); // Disable spin button
+        return;
+      }
+
       const winningIndex = winningOption.indice;
 
       if (winningIndex < 0 || winningIndex >= opciones.length) {
@@ -427,6 +441,7 @@ export default function RuletaSorteo({
 
       // Guardamos el índice ganador en el ref para usarlo en la celebración
       winningIndexRef.current = winningIndex;
+      codigoRef.current = winningOption.cupon;
 
       // Precalcula el ángulo final para alinear el sector ganador
       const initialAngle = startAngle;
@@ -495,36 +510,17 @@ export default function RuletaSorteo({
       console.error(err);
       setIsSpinning(false);
 
+      // Check if the error is related to the ticket being used
+      if (err.message && err.message.includes("ticket usado")) {
+        setTicketError("Este ticket ya ha sido utilizado");
+        setHasSpun(true); // Disable spin button
+      } else {
+        setTicketError("Ha ocurrido un error al procesar tu solicitud");
+      }
+
       // Limpiar referencias de animación en caso de error
       animationRef.current = null;
       celebrationRef.current = null;
-    }
-  };
-
-  // ---------------------------
-  // Función para simular "perder"
-  // ---------------------------
-  const handlePerder = async () => {
-    try {
-      const ticket = await fetch(
-        "https://n8n.neocapitalfunding.com/webhook/user/lose",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-          },
-          body: JSON.stringify({
-            usuario: session?.user?.email,
-          }),
-        }
-      );
-      if (!ticket.ok) throw new Error("Error en la respuesta del servidor");
-      const responseData = await ticket.json();
-      console.log(responseData);
-      setIntento(responseData.data.documentId);
-    } catch (error) {
-      console.error("Error al manejar la respuesta:", error);
     }
   };
 
@@ -581,7 +577,14 @@ export default function RuletaSorteo({
         <p style={{ color: "#fff" }}>No hay opciones disponibles</p>
       ) : (
         <>
-          <div style={{ position: "relative", width, height }}>
+          <div
+            style={{
+              position: "relative",
+              width,
+              height,
+              marginBottom: "40px",
+            }}
+          >
             <canvas
               ref={canvasRef}
               style={{
@@ -593,96 +596,122 @@ export default function RuletaSorteo({
                 transform: isSpinning ? "scale(1.03)" : "scale(1)",
               }}
             />
+            {/* Flecha indicadora posicionada en la parte inferior central */}
             <motion.div
-              initial={{ x: 10 }}
+              initial={{ y: -5 }}
               animate={{
-                x: [10, 0, 10],
-                filter: isSpinning
-                  ? [
-                      "drop-shadow(0 0 5px #FFEB3B)",
-                      "drop-shadow(0 0 15px #FFEB3B)",
-                      "drop-shadow(0 0 5px #FFEB3B)",
-                    ]
-                  : "drop-shadow(0 0 8px #FFEB3B)",
+                y: [-5, 5, -5],
               }}
               transition={{
                 repeat: Infinity,
-                duration: isSpinning ? 0.3 : 1.5,
+                duration: 1.5,
                 ease: "easeInOut",
               }}
               style={{
                 position: "absolute",
-                top: "50%",
-                left: "95%",
-                transform: "translate(50%, -50%)",
-                rotate: "-90deg",
+                bottom: "-45px",
+                left: "38%",
+                transform: "translateX(-50%)",
                 width: 100,
                 height: 10,
-                // borderTop: "20px solid transparent",
-                // borderBottom: "20px solid transparent",
-                // borderLeft: "30px solid #FFD600",
                 zIndex: 10,
-                // backgroundImage:
-                //   "linear-gradient(135deg, #FFD600 0%, #FFC107 100%)",
               }}
             >
               <img src="/images/icon-dark.png" alt="" />
             </motion.div>
           </div>
-          <br />
-          <div className="flex justify-center gap-4 items-center">
-            <button
+
+          {/* Resultado del giro mostrado debajo de la flecha */}
+          {selectedOption && !isSpinning && (
+            <>
+              <div className="my-20"></div>
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  fontSize: "20px",
+                  marginTop: "10px",
+                  marginBottom: "20px",
+                  color: "#FFEB3B",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
+                ¡Ganaste un descuento de: {selectedOption.name}% !
+                <br />
+                Código: {codigoRef.current}
+              </motion.p>
+            </>
+          )}
+
+          {/* Error message for used ticket */}
+          {ticketError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                fontSize: "18px",
+                marginTop: "10px",
+                marginBottom: "20px",
+                backgroundColor: "rgba(244, 67, 54, 0.2)",
+                padding: "15px",
+                borderRadius: "8px",
+                border: "1px solid #F44336",
+                color: "#F44336",
+                fontWeight: "bold",
+                textAlign: "center",
+                width: "90%",
+              }}
+            >
+              ⚠️ {ticketError}
+            </motion.div>
+          )}
+
+          <div className="flex justify-center gap-4 items-center mt-20">
+            <motion.button
+              onClick={onClose}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               style={{
                 marginTop: "20px",
                 padding: "12px 30px",
-                background: "#FFEB3B",
-                color: "#000",
+                background: "#F44336", // Red color for exit button
+                color: "#fff", // White text
                 fontSize: "16px",
                 fontWeight: "bold",
                 border: "none",
                 borderRadius: "30px",
                 cursor: "pointer",
                 transition: "background 0.3s, transform 0.3s",
-                boxShadow: "0 4px 8px rgba(255,235,59,0.6)",
+                boxShadow: "0 4px 8px rgba(244,67,54,0.6)",
               }}
-              onClick={handlePerder}
             >
-              perder
-            </button>
+              Salir
+            </motion.button>
             <motion.button
               onClick={spinWheel}
-              disabled={isSpinning}
-              whileHover={!isSpinning ? { scale: 1.05 } : {}}
-              whileTap={!isSpinning ? { scale: 0.95 } : {}}
+              disabled={isSpinning || hasSpun} // Disable if spinning or has already spun
+              whileHover={!isSpinning && !hasSpun ? { scale: 1.05 } : {}}
+              whileTap={!isSpinning && !hasSpun ? { scale: 0.95 } : {}}
               style={{
                 marginTop: "20px",
                 padding: "12px 30px",
-                background: isSpinning ? "#777" : "#FFEB3B",
+                background: isSpinning || hasSpun ? "#777" : "#FFEB3B", // Gray if disabled
                 color: "#000",
                 fontSize: "16px",
                 fontWeight: "bold",
                 border: "none",
                 borderRadius: "30px",
-                cursor: isSpinning ? "not-allowed" : "pointer",
+                cursor: isSpinning || hasSpun ? "not-allowed" : "pointer",
                 transition: "background 0.3s, transform 0.3s",
                 boxShadow: "0 4px 8px rgba(255,235,59,0.6)",
               }}
             >
-              {isSpinning ? "Girando..." : "Girar"}
+              {isSpinning ? "Girando..." : hasSpun ? "Ya Girado" : "Girar"}
             </motion.button>
           </div>
-          {selectedOption && !isSpinning && (
-            <p
-              style={{
-                fontSize: "20px",
-                marginTop: "25px",
-                color: "#FFEB3B",
-                fontWeight: "bold",
-              }}
-            >
-              Resultado: {selectedOption.name}
-            </p>
-          )}
         </>
       )}
     </motion.div>

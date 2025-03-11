@@ -8,7 +8,7 @@ export default function RuletaSorteo({
   customOptions,
   width = 300,
   height = 300,
-  centerImage = null, // Nueva prop para la imagen central
+  centerImage = null, // Prop para la imagen central
 }) {
   // Hooks y estados
   const { data: session } = useSession();
@@ -40,8 +40,8 @@ export default function RuletaSorteo({
     }));
   }
 
-  // Constante: El puntero se asume a 0 rad (derecha)
-  const angleOffset = 0;
+  // Constante: El puntero ahora está en la parte inferior (π/2 rad o 90 grados)
+  const angleOffset = Math.PI / 2; // 90 grados en radianes
 
   // ---------------------------
   // Funciones de CÁLCULO y EASING
@@ -60,8 +60,8 @@ export default function RuletaSorteo({
     // Centro del sector ganador
     const sectorCenter = winningIndex * arcSize + arcSize / 2;
     const normalizedCurrent = normalizeAngle(currentAngle);
-    // Se busca que: normalize(finalAngle + sectorCenter) = 0 => finalAngle = -sectorCenter (mod 2π)
-    let delta = normalizeAngle(-sectorCenter - normalizedCurrent);
+    // Se busca que: normalize(finalAngle + sectorCenter) = angleOffset => finalAngle = angleOffset - sectorCenter (mod 2π)
+    let delta = normalizeAngle(angleOffset - sectorCenter - normalizedCurrent);
     // Añadimos vueltas extras para efecto visual (por ejemplo, 5 vueltas completas)
     const extraSpins = 5 * 2 * Math.PI;
     return currentAngle + extraSpins + delta;
@@ -136,7 +136,7 @@ export default function RuletaSorteo({
 
     // Dibujar cada sector de la ruleta
     for (let i = 0; i < numOptions; i++) {
-      const angle = angleOffset + currentAngle + i * arcSize;
+      const angle = currentAngle + i * arcSize;
       const nextAngle = angle + arcSize;
       const colorSet = colors[i % colors.length];
 
@@ -188,7 +188,7 @@ export default function RuletaSorteo({
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Texto del sector
+      // Texto del sector (rotado para mejor legibilidad)
       ctx.save();
       ctx.translate(centerX, centerY);
       ctx.rotate(angle + arcSize / 2);
@@ -212,7 +212,7 @@ export default function RuletaSorteo({
 
     // Si hay una imagen cargada, la dibujamos
     if (centerImageLoaded && centerImageRef.current) {
-      // Dibuja un círculo blanco como fondo para la imagen
+      // Dibuja un círculo como fondo para la imagen
       ctx.beginPath();
       ctx.arc(centerX, centerY, centerRadius, 0, 2 * Math.PI);
       ctx.fillStyle = "#000";
@@ -312,8 +312,7 @@ export default function RuletaSorteo({
     const radius = Math.min(centerX, centerY) - 20;
     const numOptions = opciones.length;
     const arcSize = (2 * Math.PI) / numOptions;
-    const winAngle =
-      angleOffset + currentAngleRef.current + winningIndex * arcSize;
+    const winAngle = currentAngleRef.current + winningIndex * arcSize;
     const midWinAngle = winAngle + arcSize / 2;
     for (let i = 0; i < 4; i++) {
       const particleAngle = midWinAngle + (Math.random() - 0.5) * arcSize * 0.7;
@@ -581,7 +580,14 @@ export default function RuletaSorteo({
         <p style={{ color: "#fff" }}>No hay opciones disponibles</p>
       ) : (
         <>
-          <div style={{ position: "relative", width, height }}>
+          <div
+            style={{
+              position: "relative",
+              width,
+              height,
+              marginBottom: "40px",
+            }}
+          >
             <canvas
               ref={canvasRef}
               style={{
@@ -593,44 +599,64 @@ export default function RuletaSorteo({
                 transform: isSpinning ? "scale(1.03)" : "scale(1)",
               }}
             />
+            {/* Flecha indicadora posicionada en la parte inferior central */}
             <motion.div
-              initial={{ x: 10 }}
+              initial={{ y: -5 }}
               animate={{
-                x: [10, 0, 10],
-                filter: isSpinning
-                  ? [
-                      "drop-shadow(0 0 5px #FFEB3B)",
-                      "drop-shadow(0 0 15px #FFEB3B)",
-                      "drop-shadow(0 0 5px #FFEB3B)",
-                    ]
-                  : "drop-shadow(0 0 8px #FFEB3B)",
+                y: [-5, 5, -5],
+                // filter: isSpinning
+                //   ? [
+                //       "drop-shadow(0 0 5px #FFEB3B)",
+                //       "drop-shadow(0 0 15px #FFEB3B)",
+                //       "drop-shadow(0 0 5px #FFEB3B)",
+                //     ]
+                //   : "drop-shadow(0 0 8px #FFEB3B)",
               }}
               transition={{
                 repeat: Infinity,
-                duration: isSpinning ? 0.3 : 1.5,
+                duration: 1.5,
                 ease: "easeInOut",
               }}
               style={{
                 position: "absolute",
-                top: "50%",
-                left: "95%",
-                transform: "translate(50%, -50%)",
-                rotate: "-90deg",
+                bottom: "-45px",
+                left: "38%",
+                transform: "translateX(-50%)",
                 width: 100,
                 height: 10,
-                // borderTop: "20px solid transparent",
-                // borderBottom: "20px solid transparent",
-                // borderLeft: "30px solid #FFD600",
+                // borderLeft: "15px solid transparent",
+                // borderRight: "15px solid transparent",
+                // borderBottom: "25px solid #FFD600",
                 zIndex: 10,
-                // backgroundImage:
-                //   "linear-gradient(135deg, #FFD600 0%, #FFC107 100%)",
               }}
             >
               <img src="/images/icon-dark.png" alt="" />
             </motion.div>
           </div>
-          <br />
-          <div className="flex justify-center gap-4 items-center">
+
+          {/* Resultado del giro mostrado debajo de la flecha */}
+          {selectedOption && !isSpinning && (
+            <>
+              <div className="my-20"></div>
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  fontSize: "20px",
+                  marginTop: "10px",
+                  marginBottom: "20px",
+                  color: "#FFEB3B",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
+                ¡Ganaste: {selectedOption.name}!
+              </motion.p>
+            </>
+          )}
+
+          <div className="flex justify-center gap-4 items-center mt-20">
             <button
               style={{
                 marginTop: "20px",
@@ -671,18 +697,6 @@ export default function RuletaSorteo({
               {isSpinning ? "Girando..." : "Girar"}
             </motion.button>
           </div>
-          {selectedOption && !isSpinning && (
-            <p
-              style={{
-                fontSize: "20px",
-                marginTop: "25px",
-                color: "#FFEB3B",
-                fontWeight: "bold",
-              }}
-            >
-              Resultado: {selectedOption.name}
-            </p>
-          )}
         </>
       )}
     </motion.div>

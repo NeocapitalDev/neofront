@@ -8,9 +8,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Gift } from 'lucide-react'
-import RuletaSorteo from "@/components/roullete/Roullete3";
+import RuletaSorteo from "@/components/roullete/RoulleteWo";
+import TicketsList from './TicketsList';
 
 export default function ModalRoullete() {
+
   return (
     <Dialog>
       <DialogTrigger className="p-3 bg-black text-[var(--app-primary)] rounded-full hover:bg-[var(--app-primary)] hover:text-black transition-colors">
@@ -25,7 +27,9 @@ export default function ModalRoullete() {
             Lorem ipsum dolor sit amet consectetur adipisicing elit. At aliquid illo, tempora dignissimos temporibus natus dolor libero non similique odit amet accusamus, laborum, tempore provident harum mollitia tenetur! Modi, rerum!
           </DialogDescription>
         </DialogHeader>
-        <RuletaSorteo />
+
+        <TicketsList> </TicketsList>
+        {/* <RuletaSorteo /> */}
       </DialogContent>
     </Dialog>
   )
