@@ -408,7 +408,7 @@ export default function RuletaSorteo({
     try {
       // Solicita al backend el índice ganador
       const response = await fetch(
-        "https://n8n.neocapitalfunding.com/webhook-test/roullete",
+        "https://n8n.neocapitalfunding.com/webhook/roullete",
         {
           method: "POST",
           headers: {
@@ -564,8 +564,8 @@ export default function RuletaSorteo({
         flexDirection: "column",
         alignItems: "center",
         background: "#000",
-        padding: "30px",
-        borderRadius: "10px",
+        padding: "10px",
+        // borderRadius: "10px",
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.8)",
         maxWidth: "400px",
         margin: "auto",
@@ -583,12 +583,15 @@ export default function RuletaSorteo({
               width,
               height,
               marginBottom: "40px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
             <canvas
               ref={canvasRef}
               style={{
-                border: "10px solid #F57F17",
+                border: "5px solid #F57F17",
                 borderRadius: "50%",
                 boxShadow:
                   "0 0 20px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 235, 59, 0.4), inset 0 0 15px rgba(255, 235, 59, 0.3)",
@@ -610,7 +613,7 @@ export default function RuletaSorteo({
               style={{
                 position: "absolute",
                 bottom: "-45px",
-                left: "38%",
+                left: "34%",
                 transform: "translateX(-50%)",
                 width: 100,
                 height: 10,
@@ -620,11 +623,12 @@ export default function RuletaSorteo({
               <img src="/images/icon-dark.png" alt="" />
             </motion.div>
           </div>
+          <div className="my-10"></div>
 
           {/* Resultado del giro mostrado debajo de la flecha */}
           {selectedOption && !isSpinning && (
             <>
-              <div className="my-20"></div>
+              {/* <div className="my-10"></div> */}
               <motion.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -647,49 +651,31 @@ export default function RuletaSorteo({
 
           {/* Error message for used ticket */}
           {ticketError && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                fontSize: "18px",
-                marginTop: "10px",
-                marginBottom: "20px",
-                backgroundColor: "rgba(244, 67, 54, 0.2)",
-                padding: "15px",
-                borderRadius: "8px",
-                border: "1px solid #F44336",
-                color: "#F44336",
-                fontWeight: "bold",
-                textAlign: "center",
-                width: "90%",
-              }}
-            >
-              ⚠️ {ticketError}
-            </motion.div>
+            <>
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  fontSize: "18px",
+                  marginTop: "10px",
+                  marginBottom: "20px",
+                  backgroundColor: "rgba(244, 67, 54, 0.2)",
+                  padding: "15px",
+                  borderRadius: "8px",
+                  border: "1px solid #F44336",
+                  color: "#F44336",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  width: "90%",
+                }}
+              >
+                ⚠️ {ticketError}
+              </motion.div>
+            </>
           )}
 
-          <div className="flex justify-center gap-4 items-center mt-20">
-            <motion.button
-              onClick={onClose}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              style={{
-                marginTop: "20px",
-                padding: "12px 30px",
-                background: "#F44336", // Red color for exit button
-                color: "#fff", // White text
-                fontSize: "16px",
-                fontWeight: "bold",
-                border: "none",
-                borderRadius: "30px",
-                cursor: "pointer",
-                transition: "background 0.3s, transform 0.3s",
-                boxShadow: "0 4px 8px rgba(244,67,54,0.6)",
-              }}
-            >
-              Salir
-            </motion.button>
+          <div className="flex justify-center gap-4 items-center">
             <motion.button
               onClick={spinWheel}
               disabled={isSpinning || hasSpun} // Disable if spinning or has already spun

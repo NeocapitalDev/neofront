@@ -14,7 +14,7 @@ import TicketsList from './TicketsList';
 export default function ModalRoullete() {
 
   return (
-    <Dialog>
+    <Dialog className="">
       <DialogTrigger className="p-3 bg-black text-[var(--app-primary)] rounded-full hover:bg-[var(--app-primary)] hover:text-black transition-colors">
         <Gift size={64} />
       </DialogTrigger>

@@ -29,7 +29,7 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center card-border bg-gray-900 p-6 gap-4 w-full mx-auto border border-yellow-600 rounded-lg">
+    <div className="flex flex-col md:flex-row md:items-center card bg-black/95 py-2 px-3 gap-4 w-full mx-auto border border-yellow-600 rounded-lg">
       {/* Left side icon */}
       <div className="w-full md:w-auto justify-center md:justify-start md:flex hidden">
         <div className="p-3 rounded-full bg-gray-800">
@@ -82,7 +82,7 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
             onClick={() => onOpenRoulette(ticket)}
             className="w-full sm:w-auto hover:shadow-lg transition-shadow duration-300 border border-yellow-600 bg-yellow-500 text-black px-6 py-2 rounded-lg text-base font-semibold shadow-md flex items-center justify-center space-x-2"
           >
-            <span>Obtener Premio</span>
+            <span>Girar</span>
           </button>
         ) : (
           // If ticket has prize, show prize info
@@ -94,7 +94,7 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
           ) : (
             // If ticket is used and has no prize
             <span className="w-full sm:w-auto text-center text-base font-semibold bg-red-600 text-white px-6 py-2 rounded-lg">
-              Ticket usado
+              Usado
             </span>
           )
         )}
@@ -132,10 +132,10 @@ export default function TicketCards() {
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-        <div className="bg-gray-900 border border-yellow-600 rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-auto">
+      <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 w-full">
+        <div className="bg-black border border-[var(--app-primary)] rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-auto flex flex-col justify-center ">
           <div className="flex justify-between items-start mb-4">
-            <h3 className="text-xl font-bold text-yellow-400">Ruleta de Premios</h3>
+            <h3 className="text-xl font-bold text-yellow-400">Ruleta Ganadora</h3>
             <button
               onClick={onClose}
               className="text-yellow-500 hover:text-yellow-300"
@@ -179,7 +179,9 @@ export default function TicketCards() {
       {/* Modal with Roulette */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         {selectedTicket && (
-          <RuletaSorteo documentId={selectedTicket.documentId} />
+          <div className=''>
+            <RuletaSorteo documentId={selectedTicket.documentId} />
+          </div>
         )}
       </Modal>
     </div>
