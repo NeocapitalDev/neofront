@@ -7,6 +7,7 @@ import classNames from 'classnames';
 
 const ChallengeRelations = () => {
   const { data: relations, error, isLoading } = useStrapiData('challenge-relations?populate=*');
+  const { data: allproducts, error: allproductserror, isLoading: allproductsisLoading } = useStrapiData('challenge-products?populate=*');
 
   // Estados para manejar las selecciones, cupón y términos
   const [selectedStep, setSelectedStep] = useState(null);
@@ -25,7 +26,7 @@ const ChallengeRelations = () => {
       }))
     : [];
 
-  // Seleccionar el primer step, relación y producto ACTIVO por defecto al cargar los datos
+  // Seleccionar el primer step, relación y producto por defecto al cargar los datos
   useEffect(() => {
     if (stepsData.length > 0 && selectedStep === null) {
       const firstStep = stepsData[0].step;
@@ -37,16 +38,16 @@ const ChallengeRelations = () => {
         setSelectedRelation(firstStepRelations[0]); // Guardar la relación seleccionada
 
         const firstRelationProducts = firstStepRelations[0].challenge_products;
-        const firstActiveProduct = firstRelationProducts.find(product => product.isActive !== false);
-        if (firstActiveProduct) {
-          setSelectedProduct(firstActiveProduct);
+        if (firstRelationProducts.length > 0) {
+          setSelectedProduct(firstRelationProducts[0]); // Selecciona el primer producto sin importar su estado
         }
       }
     }
   }, [stepsData]);
 
-  if (isLoading) return <p className="text-white">Loading...</p>;
+  if (isLoading || allproductsisLoading) return <p className="text-white">Loading...</p>;
   if (error) return <p className="text-red-500">Error: {error.message}</p>;
+  if (allproductserror) return <p className="text-red-500">Error: {allproductserror.message}</p>;
 
   // Función para manejar el clic en un step
   const handleStepClick = (step) => {
@@ -61,9 +62,8 @@ const ChallengeRelations = () => {
       setSelectedRelation(stepRelations[0]);
 
       const firstRelationProducts = stepRelations[0].challenge_products;
-      const firstActiveProduct = firstRelationProducts.find(product => product.isActive !== false);
-      if (firstActiveProduct) {
-        setSelectedProduct(firstActiveProduct);
+      if (firstRelationProducts.length > 0) {
+        setSelectedProduct(firstRelationProducts[0]); // Selecciona el primer producto
       }
     }
   };
@@ -76,12 +76,7 @@ const ChallengeRelations = () => {
     setSelectedRelation(relation);
 
     if (relation && relation.challenge_products.length > 0) {
-      const firstActiveProduct = relation.challenge_products.find(product => product.isActive !== false);
-      if (firstActiveProduct) {
-        setSelectedProduct(firstActiveProduct);
-      } else {
-        setSelectedProduct(null);
-      }
+      setSelectedProduct(relation.challenge_products[0]); // Selecciona el primer producto
     } else {
       setSelectedProduct(null);
     }
@@ -89,9 +84,7 @@ const ChallengeRelations = () => {
 
   // Función para manejar el clic en un producto
   const handleProductClick = (product) => {
-    if (product.isActive !== false) {
-      setSelectedProduct(product);
-    }
+    setSelectedProduct(product); // Permite seleccionar cualquier producto
   };
 
   // Función para manejar el envío del formulario
@@ -113,7 +106,7 @@ const ChallengeRelations = () => {
 
   const handleContinue = () => {
     if (selectedProduct && termsAccepted && cancellationAccepted) {
-      const woocommerceId = selectedProduct.WoocomerceId;
+      const woocommerceId = selectedProduct.WoocomerceId || 'default-id'; // Asegura que haya un ID por defecto si no existe
       window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1`;
     }
   };
@@ -268,7 +261,6 @@ const ChallengeRelations = () => {
                             type="radio"
                             id={`product-${selectedRelation.id}-${productIndex}`}
                             name="product"
-                            disabled={product.isActive === false}
                             checked={selectedProduct && selectedProduct.name === product.name}
                             onChange={() => handleProductClick(product)}
                             className="sr-only"
@@ -277,9 +269,7 @@ const ChallengeRelations = () => {
                             htmlFor={`product-${selectedRelation.id}-${productIndex}`}
                             className={classNames(
                               "block p-4 rounded-lg border cursor-pointer transition-all",
-                              product.isActive === false
-                                ? "bg-zinc-800 border-zinc-700 text-zinc-600 opacity-50 cursor-not-allowed"
-                                : selectedProduct && selectedProduct.name === product.name
+                              selectedProduct && selectedProduct.name === product.name
                                 ? "bg-zinc-800 border-amber-500 text-white"
                                 : "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
                             )}
@@ -331,7 +321,7 @@ const ChallengeRelations = () => {
 
                 {selectedProduct && (
                   <>
-                    {selectedProduct && selectedRelation && (
+                    {selectedRelation && (
                       <div className="bg-zinc-900 p-5 shadow-md border-zinc-800">
                         <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                           {/* Columna izquierda - Características */}
