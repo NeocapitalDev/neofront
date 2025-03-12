@@ -13,7 +13,7 @@ export default function UpdateStep() {
   const { data, error, isLoading, refetch } = useStrapiData(
     documentid ? `challenge-steps/${documentid}/get-all-data` : null
   );
-  console.log("data", data);
+  // console.log("data", data);
   // Callback que se pasa al formulario para refrescar la data
   const handleActive = () => {
     console.log("active");

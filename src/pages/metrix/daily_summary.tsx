@@ -42,7 +42,7 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ accountId }) => {
 
       const historyStorage = connection.historyStorage;
       const orders = historyStorage.historyOrders.slice(-5);
-      console.log("Órdenes obtenidas:", orders);
+      // console.log("Órdenes obtenidas:", orders);
       setHistoricalOrders(orders);
     } catch (err) {
       console.error("Error obteniendo órdenes:", err);

@@ -134,14 +134,20 @@ export default function TicketCards() {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 w-full">
         <div className="bg-black border border-[var(--app-primary)] rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-auto flex flex-col justify-center ">
-          <div className="flex justify-between items-start mb-4">
-            <h3 className="text-xl font-bold text-yellow-400">Ruleta Ganadora</h3>
+          <div className='flex justify-end'>
             <button
               onClick={onClose}
               className="text-yellow-500 hover:text-yellow-300"
             >
               ✕
             </button>
+          </div>
+          <div className="flex flex-col justify-center items-center mb-4">
+            <h3 className="text-2xl font-bold text-[--app-secondary] text-center">Ruleta Ganadora</h3>
+            <div className='text-center mb-4 text-[var(--app-primary)]'>
+              {/* <h1 className='text-xl font-bold text-center'>Ruleta Ganadora</h1> */}
+              <p>¡Prueba tu suerte ahora!</p>
+            </div>
           </div>
           {children}
         </div>

@@ -134,7 +134,7 @@ ColumnDef<Challenge>[] => [
     header: "Acciones",
     cell: ({ row }) => {
       const data = row.original;
-      console.log("Data", data);
+      // console.log("Data", data);
       const step = {
         name: data.name,
         subcategories: data.challenge_subcategories,
@@ -145,7 +145,7 @@ ColumnDef<Challenge>[] => [
       const router = useRouter();
 
       const handleRedirect = () => {
-        console.log("Redirecting to", `/admin/steps/${data.documentId}`);
+        // console.log("Redirecting to", `/admin/steps/${data.documentId}`);
         router.push(`/admin/steps/${data.documentId}`);
       };
       return (

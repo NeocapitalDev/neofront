@@ -41,7 +41,7 @@ export default function ChallengesTable() {
     : null,
     ([url, token]) => fetcher(url, token)
   );
-  console.log(data);
+  // console.log(data);
   const [search, setSearch] = useState("");
   const [resultFilter, setResultFilter] = useState(""); // "Aprobado" o "No Aprobado"
   const [phaseFilter, setPhaseFilter] = useState(""); // "1", "2", "3"

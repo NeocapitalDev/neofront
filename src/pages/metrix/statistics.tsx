@@ -15,7 +15,7 @@ interface MetricsData {
 }
 
 export default function Component({ data = {} as MetricsData }) {
-    console.log(data);
+    // console.log(data);
 
     const metrics = [
         { label: "Capital:", value: `$${(data.equity ?? 0).toFixed(2)}` },

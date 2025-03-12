@@ -521,7 +521,7 @@ export default function RuletaSorteo({
       }
 
       const winningOption = await response.json();
-      console.log(winningOption);
+      // console.log(winningOption);
 
       const winIndex = winningOption.indice;
       setWinningIndex(winIndex);
@@ -632,7 +632,7 @@ export default function RuletaSorteo({
       }
 
       const responseData = await ticket.json();
-      console.log(responseData);
+      // console.log(responseData);
       setIntento(responseData.data.documentId);
     } catch (error) {
       console.error("Error al manejar la respuesta:", error);
