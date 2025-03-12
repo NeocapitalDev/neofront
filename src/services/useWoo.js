@@ -10,7 +10,7 @@ const createWooCommerceApi = (url, consumerKey, consumerSecret, version = 'wc/v3
     console.error('Error: Credenciales de WooCommerce no proporcionadas (consumerKey o consumerSecret)');
   }
 
-  console.log(`Creando API con URL: ${url}, Key: ${consumerKey ? '✓ presente' : '❌ falta'}, Secret: ${consumerSecret ? '✓ presente' : '❌ falta'}`);
+  // console.log(`Creando API con URL: ${url}, Key: ${consumerKey ? '✓ presente' : '❌ falta'}, Secret: ${consumerSecret ? '✓ presente' : '❌ falta'}`);
 
   return new WooCommerceRestApi({
     url,
@@ -61,7 +61,7 @@ const wooFetcher = async ([endpoint, config]) => {
       config.version || 'wc/v3'
     );
 
-    console.log(`Fetching WooCommerce endpoint: ${endpoint}`);
+    // console.log(`Fetching WooCommerce endpoint: ${endpoint}`);
 
     // Asegurarse de que el endpoint no comienza con '/' (la biblioteca lo añade)
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
@@ -73,7 +73,7 @@ const wooFetcher = async ([endpoint, config]) => {
       throw new Error('Respuesta vacía de WooCommerce');
     }
 
-    console.log(`WooCommerce respuesta recibida:`, typeof response.data, Array.isArray(response.data) ? `Array con ${response.data.length} elementos` : 'Objeto');
+    // console.log(`WooCommerce respuesta recibida:`, typeof response.data, Array.isArray(response.data) ? `Array con ${response.data.length} elementos` : 'Objeto');
     return response.data;
   } catch (error) {
     // Mejor manejo de errores específicos de WooCommerce

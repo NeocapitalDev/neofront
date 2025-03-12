@@ -21,9 +21,9 @@ const ChallengeRelations = () => {
   // Procesar los datos para obtener steps únicos y sus relaciones
   const stepsData = relations
     ? [...new Set(relations.map(relation => relation.challenge_step.name))].map(stepName => ({
-        step: stepName,
-        relations: relations.filter(relation => relation.challenge_step.name === stepName),
-      }))
+      step: stepName,
+      relations: relations.filter(relation => relation.challenge_step.name === stepName),
+    }))
     : [];
 
   // Seleccionar el primer step, relación y producto por defecto al cargar los datos
@@ -108,7 +108,20 @@ const ChallengeRelations = () => {
     if (selectedProduct && termsAccepted && cancellationAccepted) {
       const woocommerceId = selectedProduct.WoocomerceId || 'default-id'; // Asegura que haya un ID por defecto si no existe
       window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1`;
-    }
+      //   const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/purcharse`, {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify({
+      //       product: selectedProduct,
+      //       coupon: couponCode,
+      //       termsAccepted,
+      //       cancellationAccepted,
+      //     }),
+      //   })
+      // }
+    };
   };
 
   return (
@@ -117,12 +130,12 @@ const ChallengeRelations = () => {
       <header>
         <section className="container mx-auto px-4 py-3 flex items-center">
           <Link href="/">
-            <Image src="/images/logo-dark.png" alt="Neocapital logo" width={236} height={60} className="h-10 w-auto" />
+            <Image src="/images/logo-dark.png" alt="Neocapital logo" width={300} height={40} className="h-9 w-auto" />
           </Link>
         </section>
         <section className="bg-zinc-900 border-b border-zinc-800">
           <div className="container mx-auto px-4 py-4">
-            <h2 className="text-2xl font-bold text-amber-400">Compra tu producto</h2>
+            <h2 className="text-lg font-bold text-amber-400">Compra tu producto</h2>
           </div>
         </section>
       </header>
@@ -229,86 +242,86 @@ const ChallengeRelations = () => {
               </section>
             )}
 
-{selectedRelationId && (
-  <section className="bg-zinc-900 rounded-lg p-5 shadow-md border border-zinc-800">
-    <div className="flex items-center mb-3">
-      <h3 className="text-amber-400 font-medium">Productos</h3>
-      <div className="relative ml-2 group">
-        <InformationCircleIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-300" />
-        <div className="absolute z-10 invisible group-hover:visible bg-zinc-800 text-xs text-zinc-200 p-2 rounded-md w-48 top-full left-0 mt-1">
-          Selecciona el producto que deseas adquirir
-        </div>
-      </div>
-    </div>
-    <p className="text-zinc-400 mb-4 text-sm">
-      Elige el producto para{" "}
-      {stepsData
-        .find(item => item.step === selectedStep)
-        .relations.find(r => r.id === selectedRelationId)
-        ?.challenge_subcategory.name}.
-    </p>
+            {selectedRelationId && (
+              <section className="bg-zinc-900 rounded-lg p-5 shadow-md border border-zinc-800">
+                <div className="flex items-center mb-3">
+                  <h3 className="text-amber-400 font-medium">Productos</h3>
+                  <div className="relative ml-2 group">
+                    <InformationCircleIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-300" />
+                    <div className="absolute z-10 invisible group-hover:visible bg-zinc-800 text-xs text-zinc-200 p-2 rounded-md w-48 top-full left-0 mt-1">
+                      Selecciona el producto que deseas adquirir
+                    </div>
+                  </div>
+                </div>
+                <p className="text-zinc-400 mb-4 text-sm">
+                  Elige el producto para{" "}
+                  {stepsData
+                    .find(item => item.step === selectedStep)
+                    .relations.find(r => r.id === selectedRelationId)
+                    ?.challenge_subcategory.name}.
+                </p>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-      {(() => {
-        const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
-        const selectedRelation = stepRelations.find(r => r.id === selectedRelationId);
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {(() => {
+                    const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
+                    const selectedRelation = stepRelations.find(r => r.id === selectedRelationId);
 
-        // Obtener los nombres de los productos de la relación seleccionada
-        const relationProductNames = selectedRelation?.challenge_products.map(p => p.name) || [];
+                    // Obtener los nombres de los productos de la relación seleccionada
+                    const relationProductNames = selectedRelation?.challenge_products.map(p => p.name) || [];
 
-        // Si hay productos en allproducts
-        if (allproducts && allproducts.length > 0) {
-          return allproducts.map((product, productIndex) => {
-            // Verificar si el producto está en la relación seleccionada
-            const isInRelation = relationProductNames.includes(product.name);
+                    // Si hay productos en allproducts
+                    if (allproducts && allproducts.length > 0) {
+                      return allproducts.map((product, productIndex) => {
+                        // Verificar si el producto está en la relación seleccionada
+                        const isInRelation = relationProductNames.includes(product.name);
 
-            return (
-              <div key={`allproduct-${productIndex}`} className="relative">
-                <input
-                  type="radio"
-                  id={`allproduct-${productIndex}`}
-                  name="product"
-                  checked={selectedProduct && selectedProduct.name === product.name}
-                  onChange={() => handleProductClick(product)}
-                  className="sr-only"
-                  disabled={!isInRelation} // Deshabilitar si no está en la relación
-                />
-                <label
-                  htmlFor={`allproduct-${productIndex}`}
-                  className={classNames(
-                    "block p-4 rounded-lg border cursor-pointer transition-all",
-                    selectedProduct && selectedProduct.name === product.name
-                      ? "bg-zinc-800 border-amber-500 text-white"
-                      : isInRelation
-                      ? "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+                        return (
+                          <div key={`allproduct-${productIndex}`} className="relative">
+                            <input
+                              type="radio"
+                              id={`allproduct-${productIndex}`}
+                              name="product"
+                              checked={selectedProduct && selectedProduct.name === product.name}
+                              onChange={() => handleProductClick(product)}
+                              className="sr-only"
+                              disabled={!isInRelation} // Deshabilitar si no está en la relación
+                            />
+                            <label
+                              htmlFor={`allproduct-${productIndex}`}
+                              className={classNames(
+                                "block p-4 rounded-lg border cursor-pointer transition-all",
+                                selectedProduct && selectedProduct.name === product.name
+                                  ? "bg-zinc-800 border-amber-500 text-white"
+                                  : isInRelation
+                                    ? "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
 
-                      : "bg-gray-900/20 border-gray-700 text-gray-500 opacity-50"
-                  )}
-                >
-                  <span className="block font-medium">{product.name}</span>
-                  {product.isPremium && (
-                    <span className="inline-block bg-amber-500 text-black text-xs px-2 py-1 rounded mt-2 font-semibold">
-                      Premium
-                    </span>
-                  )}
-                  {selectedProduct && selectedProduct.name === product.name && (
-                    <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-amber-500" />
-                  )}
-                </label>
-              </div>
-            );
-          });
-        } else {
-          return (
-            <p className="text-zinc-500 col-span-3">
-              No hay productos disponibles
-            </p>
-          );
-        }
-      })()}
-    </div>
-  </section>
-)}
+                                    : "bg-gray-900/20 border-gray-700 text-gray-500 opacity-50"
+                              )}
+                            >
+                              <span className="block font-medium">{product.name}</span>
+                              {product.isPremium && (
+                                <span className="inline-block bg-amber-500 text-black text-xs px-2 py-1 rounded mt-2 font-semibold">
+                                  Premium
+                                </span>
+                              )}
+                              {selectedProduct && selectedProduct.name === product.name && (
+                                <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-amber-500" />
+                              )}
+                            </label>
+                          </div>
+                        );
+                      });
+                    } else {
+                      return (
+                        <p className="text-zinc-500 col-span-3">
+                          No hay productos disponibles
+                        </p>
+                      );
+                    }
+                  })()}
+                </div>
+              </section>
+            )}
           </div>
 
           {/* Columna derecha - Resumen del producto */}
@@ -387,11 +400,10 @@ const ChallengeRelations = () => {
                                   type="button"
                                   disabled={!couponCode}
                                   onClick={applyCoupon}
-                                  className={`uppercase px-4 py-2 rounded-r-md font-medium text-sm ${
-                                    couponCode
-                                      ? "bg-amber-500 text-black hover:bg-amber-600 transition-colors"
-                                      : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
-                                  }`}
+                                  className={`uppercase px-4 py-2 rounded-r-md font-medium text-sm ${couponCode
+                                    ? "bg-amber-500 text-black hover:bg-amber-600 transition-colors"
+                                    : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
+                                    }`}
                                 >
                                   Aplicar
                                 </button>
@@ -468,11 +480,10 @@ const ChallengeRelations = () => {
                         onClick={handleContinue}
                         type="submit"
                         disabled={!selectedProduct || !termsAccepted || !cancellationAccepted}
-                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${
-                          selectedProduct && termsAccepted && cancellationAccepted
-                            ? "bg-amber-500 hover:bg-amber-600 text-black font-bold"
-                            : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
-                        }`}
+                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct && termsAccepted && cancellationAccepted
+                          ? "bg-amber-500 hover:bg-amber-600 text-black font-bold"
+                          : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
+                          }`}
                       >
                         <span className="uppercase">Continuar</span>
                         <ChevronRightIcon className="h-5 w-5 ml-2" />

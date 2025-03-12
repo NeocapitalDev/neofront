@@ -219,7 +219,7 @@ export function UpdateStepFormC({ step, onStepChange }) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-yellow-500 text-lg">
-                  Nombreu
+                  Nombre
                 </FormLabel>
                 <FormControl>
                   <Input
