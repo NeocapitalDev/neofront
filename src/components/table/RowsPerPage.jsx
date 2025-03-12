@@ -5,7 +5,7 @@ import React from "react";
 export function RowsPerPage({
   pageSize,
   onPageSizeChange,
-  options = [10, 25, 50],
+  options = [5,10, 25, 50],
 }) {
   return (
     <div className="flex items-center space-x-2">
