@@ -105,6 +105,19 @@ const ChallengeRelations = () => {
   };
 
   const handleContinue = () => {
+
+    //buscar las variaciones del producto seleccionado : 
+    const {
+      data: products,
+      error: productsError,
+      isLoading: productsLoading
+    } = useWooCommerce(`products/${selectedProduct?.WoocomerceId}/variations?per_page=100`);
+    // buscar el producto que coincida con la subcategoria y el step seleccionado
+
+    // de cada variacion , extraer el step y subcategoria y comparar a ver si coinciden con los seleccionados
+    // si coinciden , seleccionar el producto y continuar con el proceso de compra
+    // si no coinciden , mostrar un mensaje de error y no permitir continuar con la compra
+
     if (selectedProduct && termsAccepted && cancellationAccepted) {
       const woocommerceId = selectedProduct.WoocomerceId || 'default-id'; // Asegura que haya un ID por defecto si no existe
       window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1`;

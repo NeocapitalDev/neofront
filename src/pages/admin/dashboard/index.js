@@ -117,7 +117,7 @@ export default function Index() {
     data: products,
     error: productsError,
     isLoading: productsLoading
-  } = useWooCommerce('products/10553/variations?per_page=100');
+  } = useWooCommerce('products/10576/variations?per_page=100');
   console.log("productos: ", products)
   // 3. Obtener retos según el timeframe
   const {
