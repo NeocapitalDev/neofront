@@ -423,7 +423,7 @@ const ChallengeRelations = () => {
                 Elige el producto para{" "}
                 {stepsData
                   .find(item => item.step === selectedStep)
-                  .relations.find(r => r.id === selectedRelationId)
+                  ?.relations.find(r => r.id === selectedRelationId)
                   ?.challenge_subcategory.name}.
               </p>
 

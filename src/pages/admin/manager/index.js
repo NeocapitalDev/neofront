@@ -10,7 +10,7 @@ import DashboardLayout from "..";
 
 export default function IndexPage() {
   // Estado para el tamaño de página, compartido entre las tres tablas
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(5);
 
   return (
     <DashboardLayout>

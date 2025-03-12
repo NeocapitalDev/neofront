@@ -31,9 +31,14 @@ import {
 import { toast } from "sonner";
 
 // Validación
-const nameSchema = z.object({
+const productSchema = z.object({
   name: z.string().nonempty("El nombre es requerido"),
+  precio: z.coerce.number({
+    required_error: "El precio es requerido",
+    invalid_type_error: "El precio debe ser un número",
+  }).min(0, "El precio debe ser mayor o igual a 0"),
 });
+
 
 export function ProductsManager({ pageSize }) {
   // Estado
@@ -43,9 +48,10 @@ export function ProductsManager({ pageSize }) {
 
   // Form
   const form = useForm({
-    resolver: zodResolver(nameSchema),
-    defaultValues: { name: "" },
+    resolver: zodResolver(productSchema),
+    defaultValues: { name: "", precio: 0 },
   });
+
 
   // --------------------------------------------------
   // 1. Helpers para consumir Strapi
@@ -115,6 +121,7 @@ export function ProductsManager({ pageSize }) {
             id: item.id,
             documentId: item.documentId,
             name: item.name,
+            precio: item.precio, // Asegúrate de que el API incluya este campo
           }))
         );
       } catch (error) {
@@ -124,12 +131,13 @@ export function ProductsManager({ pageSize }) {
     loadProducts();
   }, []);
 
+
   // --------------------------------------------------
   // 3. Crear / Editar
   // --------------------------------------------------
   function handleOpenCreate() {
     setEditItem(null);
-    form.reset({ name: "" });
+    form.reset({ name: "", precio: 0 });
     setOpenModal(true);
   }
 
@@ -137,13 +145,17 @@ export function ProductsManager({ pageSize }) {
     setEditItem({
       docId: item.documentId,
       name: item.name,
+      precio: item.precio,
     });
-    form.reset({ name: item.name });
+    form.reset({ name: item.name, precio: item.precio });
     setOpenModal(true);
   }
 
   async function onSubmit(formValues) {
-    const payload = { name: formValues.name };
+    const payload = {
+      name: formValues.name,
+      precio: formValues.precio,
+    };
     const endpoint = "challenge-products";
 
     try {
@@ -165,6 +177,7 @@ export function ProductsManager({ pageSize }) {
           id: item.id,
           documentId: item.documentId,
           name: item.name,
+          precio: item.precio,
         }))
       );
     } catch (error) {
@@ -172,6 +185,7 @@ export function ProductsManager({ pageSize }) {
       toast.error("Ocurrió un error al guardar. Revisa la consola.");
     }
   }
+
 
   // --------------------------------------------------
   // 4. Procesar datos para la tabla:
@@ -184,7 +198,9 @@ export function ProductsManager({ pageSize }) {
   const tableData = uniqueProducts.map((item, index) => ({
     ...item,
     id: index + 1,
+    precio: item.precio,
   }));
+
 
   // --------------------------------------------------
   // 5. Render
@@ -198,6 +214,7 @@ export function ProductsManager({ pageSize }) {
         pageSize={pageSize}
         onCreate={handleOpenCreate}
         onEdit={handleOpenEdit}
+        showPrice={true} // o simplemente showPrice
       />
 
       <Dialog open={openModal} onOpenChange={setOpenModal}>
@@ -208,28 +225,43 @@ export function ProductsManager({ pageSize }) {
             </DialogTitle>
             <DialogDescription className="text-xs sm:text-sm md:text-base">
               {editItem
-                ? "Modifica el nombre y confirma para guardar cambios."
-                : "Ingresa el nombre para crear un nuevo registro."}
+                ? "Modifica el nombre y el precio y confirma para guardar cambios."
+                : "Ingresa el nombre y el precio para crear un nuevo registro."}
             </DialogDescription>
           </DialogHeader>
 
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-3 mt-3"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 mt-3">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-yellow-500 text-sm">
-                      Nombre
-                    </FormLabel>
+                    <FormLabel className="text-yellow-500 text-sm">Nombre</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Nombre"
+                        className="bg-transparent border border-gray-700 text-white text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Campo para el precio */}
+              <FormField
+                control={form.control}
+                name="precio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-yellow-500 text-sm">Precio</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Precio"
+                        type="number"
                         className="bg-transparent border border-gray-700 text-white text-sm"
                       />
                     </FormControl>
@@ -260,4 +292,5 @@ export function ProductsManager({ pageSize }) {
       </Dialog>
     </div>
   );
+
 }
