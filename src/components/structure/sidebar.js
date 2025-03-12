@@ -14,7 +14,7 @@ export default function Sidebar() {
             <div className="p-4 border-b border-gray-200 dark:border-zinc-700">
                 {/* Aquí se utiliza el nuevo componente con los props correspondientes */}
                 <Link href={principalButton[0].href} passHref>
-                    <button className="bg-[var(--app-primary)] rounded-md text-black font-semibold px-4 py-3 w-full hover:bg-[var(--app-secondary)] transition duration-200">
+                    <button className="bg-[var(--app-primary)] rounded-md text-white font-semibold px-4 py-3 w-full hover:bg-[var(--app-secondary)] transition duration-200">
                         {principalButton[0].name}
                     </button>
                 </Link>
