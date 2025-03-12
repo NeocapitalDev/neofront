@@ -1,3 +1,4 @@
+/* src/services/useWoo.js */
 import useSWR from 'swr';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 

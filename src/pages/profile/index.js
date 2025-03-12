@@ -139,65 +139,51 @@ const ProfilePage = () => {
     return <Layout>Error al cargar los datos: {fetchError.message}</Layout>;
   }
 
-  // Convertir isVerified a booleano para evitar errores
   const isVerified = !!data?.isVerified;
-
-  // Asegurar que challenges sea un array antes de aplicar .some()
   const hasPhase3Challenge = Array.isArray(data?.challenges) &&
     data.challenges.some(challenge => challenge.phase === 3);
 
-
-  // Debugging: Verificar valores en consola
-  //console.log("isVerified:", isVerified);
-  //console.log("hasPhase3Challenge:", hasPhase3Challenge);
-  //console.log("data?.challenges:", data?.challenges);
-
-  //console.log("Challenges details:", data.challenges.map(challenge => ({
-  //  id: challenge.id,
-  //  documentId: challenge.documentId,
-  // phase: challenge.phase, // Verificar si existe la propiedad phase
-  //  fullChallenge: challenge // Inspeccionar el objeto completo
-  //})));
-
   return (
     <Layout>
-      <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+      {/* Cabecera de perfil */}
+      <div className="p-4 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <UserIcon className="w-6 h-6 text-gray-600 dark:text-gray-200" />
-            <h1 className="text-xl font-semibold">Perfil</h1>
+            <UserIcon className="w-5 h-5 text-gray-600 dark:text-gray-200" />
+            <h1 className="text-lg font-semibold">Perfil</h1>
           </div>
         </div>
       </div>
 
-      <div className="mt-6">
-        <p className="text-lg font-semibold mb-4">Información de Cuenta</p>
+      <div className="mt-4">
+        <p className="text-base font-semibold mb-3">Información de Cuenta</p>
       </div>
 
-      <div className="flex flex-col items-center p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+      {/* Contenedor de información */}
+      <div className="flex flex-col items-center p-5 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <LogoGravatar
           email={session.user.email || "usuario@example.com"}
-          className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4"
+          className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-3"
         />
-        <h1 className="text-3xl font-bold dark:text-white text-slate-700 mb-2">
+        <h1 className="text-2xl font-bold dark:text-white text-slate-700 mb-2">
           {session.firstName || "Username no disponible"}
         </h1>
-        <p className="dark:text-white text-gray-400 text-sm mb-8">
+        <p className="dark:text-white text-gray-400 text-sm mb-6">
           Fecha de creación:{" "}
           {data.createdAt
             ? new Date(data.createdAt).toLocaleDateString()
             : "No disponible"}
         </p>
 
-        <div className="w-full space-y-6 bg-gray-100 p-6 rounded-lg dark:bg-zinc-800">
+        <div className="w-full space-y-4 bg-gray-100 p-5 rounded-lg dark:bg-zinc-800">
           <div className="flex flex-col md:flex-row items-center">
             <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <label className="text-base font-semibold text-black dark:text-white">
+              <label className="text-sm font-semibold text-black dark:text-white">
                 Email
               </label>
             </div>
             <div className="w-full md:w-3/4">
-              <p className="text-gray-700 dark:text-white">
+              <p className="text-gray-700 dark:text-white text-sm">
                 {data.email || "Correo no disponible"}
               </p>
             </div>
@@ -205,25 +191,24 @@ const ProfilePage = () => {
 
           <div className="flex flex-col md:flex-row items-center">
             <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <label className="text-base font-semibold text-black dark:text-white">
+              <label className="text-sm font-semibold text-black dark:text-white">
                 Cuenta verificada
               </label>
             </div>
 
             <div className="w-full md:w-3/4 flex items-center space-x-2">
               {isVerified ? (
-                <CheckCircleIcon className="w-6 h-6 text-green-500" />
+                <CheckCircleIcon className="w-5 h-5 text-green-500" />
               ) : (
-                <XCircleIcon className="w-6 h-6 text-red-500" />
+                <XCircleIcon className="w-5 h-5 text-red-500" />
               )}
-              <p className="text-gray-700 dark:text-white">
+              <p className="text-gray-700 dark:text-white text-sm">
                 {isVerified ? "Verificado" : "No verificado"}
               </p>
             </div>
           </div>
         </div>
       </div>
-
 
       {/*Formulario del perfil */}
       <form onSubmit={handleSubmit} className="mt-5 space-y-6 p-6 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
@@ -375,7 +360,6 @@ const ProfilePage = () => {
           </button>
         </div>
       </form>
-
     </Layout>
   );
 };

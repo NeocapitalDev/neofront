@@ -113,7 +113,7 @@ export default function ResetPassword() {
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={passwordConfirmation}
-                onChange={(e) => setPasswordConfirmation(e.target.value)}
+                onChange={(e) => setpasswordConfirmation(e.target.value)}
                 minLength={6}
                 required
                 className="w-full rounded-md border border-gray-700 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none focus:ring-2 focus:ring-[var(--app-primary)] focus:border-[var(--app-primary)] transition"
