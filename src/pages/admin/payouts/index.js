@@ -68,7 +68,8 @@ const PayoutsPage = () => {
           <label className="mr-4">
             <strong>Estado:</strong>{" "}
             <select
-              className="bg-slate-600"
+              //className="bg-slate-600"
+              className=" max-w-sm py-1  bg-white dark:bg-zinc-800 text-zinc-700 rounded-md dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
@@ -84,7 +85,8 @@ const PayoutsPage = () => {
           <label className="mr-4">
             <strong>Fecha desde:</strong>{" "}
             <input
-              className="bg-slate-600"
+              //className="bg-slate-600"
+              className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
               type="date"
               value={startDate}
               onChange={(e) => {
@@ -96,7 +98,8 @@ const PayoutsPage = () => {
           <label className="mr-4">
             <strong>Fecha hasta:</strong>{" "}
             <input
-              className="bg-slate-600"
+              //className="bg-slate-600"
+              className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
               type="date"
               value={endDate}
               onChange={(e) => {
