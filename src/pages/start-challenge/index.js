@@ -4,6 +4,60 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { CheckIcon, ChevronRightIcon, InformationCircleIcon, TicketIcon } from '@heroicons/react/20/solid';
 import classNames from 'classnames';
+import useSWR from 'swr';
+import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
+
+// Helper function to create a WooCommerce API instance
+const createWooCommerceApi = (url, consumerKey, consumerSecret, version = 'wc/v3') => {
+  if (!url) throw new Error('URL no proporcionada para WooCommerce API');
+  if (!consumerKey || !consumerSecret) {
+    throw new Error('Credenciales de WooCommerce no proporcionadas (consumerKey o consumerSecret)');
+  }
+
+  return new WooCommerceRestApi({
+    url,
+    consumerKey,
+    consumerSecret,
+    version,
+    timeout: 10000,
+  });
+};
+
+// Fetcher function for WooCommerce API
+const wooFetcher = async ([endpoint, config]) => {
+  try {
+    const url = config.url || process.env.NEXT_PUBLIC_WOOCOMMERCE_URL || process.env.NEXT_PUBLIC_WP_URL;
+    const consumerKey = config.consumerKey ||
+      process.env.NEXT_PUBLIC_WOOCOMMERCE_CONSUMER_KEY ||
+      process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
+    const consumerSecret = config.consumerSecret ||
+      process.env.NEXT_PUBLIC_WOOCOMMERCE_CONSUMER_SECRET ||
+      process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET;
+
+    if (!url) throw new Error('URL de WordPress no configurada');
+    if (!consumerKey || !consumerSecret) {
+      throw new Error('Credenciales de WooCommerce no configuradas (consumer key/secret)');
+    }
+
+    const api = createWooCommerceApi(url, consumerKey, consumerSecret, config.version || 'wc/v3');
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+
+    const response = await api.get(cleanEndpoint, config.params || {});
+    if (!response || !response.data) {
+      throw new Error('Respuesta vacía de WooCommerce');
+    }
+
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(`Error de WooCommerce API: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+    } else if (error.request) {
+      throw new Error('Timeout o error de conexión con la API de WooCommerce');
+    } else {
+      throw new Error(`Error en la solicitud a WooCommerce: ${error.message}`);
+    }
+  }
+};
 
 const ChallengeRelations = () => {
   const { data: relations, error, isLoading } = useStrapiData('challenge-relations?populate=*');
@@ -13,7 +67,7 @@ const ChallengeRelations = () => {
   const [selectedStep, setSelectedStep] = useState(null);
   const [selectedRelationId, setSelectedRelationId] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedRelation, setSelectedRelation] = useState(null); // Para manejar las características de la relación
+  const [selectedRelation, setSelectedRelation] = useState(null);
   const [couponCode, setCouponCode] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [cancellationAccepted, setCancellationAccepted] = useState(false);
@@ -21,9 +75,9 @@ const ChallengeRelations = () => {
   // Procesar los datos para obtener steps únicos y sus relaciones
   const stepsData = relations
     ? [...new Set(relations.map(relation => relation.challenge_step.name))].map(stepName => ({
-      step: stepName,
-      relations: relations.filter(relation => relation.challenge_step.name === stepName),
-    }))
+        step: stepName,
+        relations: relations.filter(relation => relation.challenge_step.name === stepName),
+      }))
     : [];
 
   // Seleccionar el primer step, relación y producto por defecto al cargar los datos
@@ -35,15 +89,53 @@ const ChallengeRelations = () => {
       const firstStepRelations = stepsData[0].relations;
       if (firstStepRelations.length > 0) {
         setSelectedRelationId(firstStepRelations[0].id);
-        setSelectedRelation(firstStepRelations[0]); // Guardar la relación seleccionada
+        setSelectedRelation(firstStepRelations[0]);
 
         const firstRelationProducts = firstStepRelations[0].challenge_products;
         if (firstRelationProducts.length > 0) {
-          setSelectedProduct(firstRelationProducts[0]); // Selecciona el primer producto sin importar su estado
+          setSelectedProduct(firstRelationProducts[0]);
         }
       }
     }
   }, [stepsData]);
+
+  // WooCommerce variations fetching logic
+  console.log("Selected Product:", selectedProduct);
+
+  // Set the endpoint only if selectedProduct and WoocomerceId are valid (fixed typo)
+  const endpoint = selectedProduct && selectedProduct.WoocomerceId
+    ? `products/${selectedProduct.WoocomerceId}/variations?per_page=100`
+    : null;
+
+  // Check for credentials
+  const consumerKey = process.env.NEXT_PUBLIC_WOOCOMMERCE_CONSUMER_KEY ||
+    process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
+  const hasCredentials = !!consumerKey;
+  const shouldFetch = endpoint && hasCredentials;
+
+  // Use useSWR unconditionally to fetch variations
+  const {
+    data: productsvariations,
+    error: productsErrorvariations,
+    isLoading: productsLoadingvariations,
+  } = useSWR(
+    shouldFetch ? [endpoint, {}] : null,
+    wooFetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60000,
+    }
+  );
+
+  console.log("Productos variaciones:", productsvariations);
+
+  // Find the matching variation based on selectedStep and selectedRelation.challenge_subcategory.name
+  const matchingVariation = productsvariations?.find(variation =>
+    variation.attributes.some(attr => attr.name === "step" && attr.option.toLowerCase() === selectedStep?.toLowerCase()) &&
+    variation.attributes.some(attr => attr.name === "subcategory" && attr.option.toLowerCase() === selectedRelation?.challenge_subcategory.name.toLowerCase())
+  );
+
+  console.log("Matching Variation:", matchingVariation);
 
   if (isLoading || allproductsisLoading) return <p className="text-white">Loading...</p>;
   if (error) return <p className="text-red-500">Error: {error.message}</p>;
@@ -63,7 +155,7 @@ const ChallengeRelations = () => {
 
       const firstRelationProducts = stepRelations[0].challenge_products;
       if (firstRelationProducts.length > 0) {
-        setSelectedProduct(firstRelationProducts[0]); // Selecciona el primer producto
+        setSelectedProduct(firstRelationProducts[0]);
       }
     }
   };
@@ -76,7 +168,7 @@ const ChallengeRelations = () => {
     setSelectedRelation(relation);
 
     if (relation && relation.challenge_products.length > 0) {
-      setSelectedProduct(relation.challenge_products[0]); // Selecciona el primer producto
+      setSelectedProduct(relation.challenge_products[0]);
     } else {
       setSelectedProduct(null);
     }
@@ -84,57 +176,31 @@ const ChallengeRelations = () => {
 
   // Función para manejar el clic en un producto
   const handleProductClick = (product) => {
-    setSelectedProduct(product); // Permite seleccionar cualquier producto
+    setSelectedProduct(product);
   };
 
   // Función para manejar el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
     if (selectedProduct && termsAccepted && cancellationAccepted) {
-      //console.log('Producto seleccionado:', selectedProduct);
-      // Aquí puedes agregar la lógica para continuar con el formulario
+      console.log('Producto seleccionado:', selectedProduct);
+      console.log('Variación seleccionada:', matchingVariation);
     }
   };
 
-  // Función para aplicar el cupón (placeholder)
+  // Función para aplicar el cupón
   const applyCoupon = () => {
     if (couponCode) {
-      //console.log('Cupón aplicado:', couponCode);
-      // Aquí puedes agregar la lógica para aplicar el cupón
+      console.log('Cupón aplicado:', couponCode);
     }
   };
 
+  // Use the matching variation's ID for checkout
   const handleContinue = () => {
-
-    //buscar las variaciones del producto seleccionado : 
-    const {
-      data: products,
-      error: productsError,
-      isLoading: productsLoading
-    } = useWooCommerce(`products/${selectedProduct?.WoocomerceId}/variations?per_page=100`);
-    // buscar el producto que coincida con la subcategoria y el step seleccionado
-
-    // de cada variacion , extraer el step y subcategoria y comparar a ver si coinciden con los seleccionados
-    // si coinciden , seleccionar el producto y continuar con el proceso de compra
-    // si no coinciden , mostrar un mensaje de error y no permitir continuar con la compra
-
     if (selectedProduct && termsAccepted && cancellationAccepted) {
-      const woocommerceId = selectedProduct.WoocomerceId || 'default-id'; // Asegura que haya un ID por defecto si no existe
-      window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1`;
-      //   const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/purcharse`, {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //       product: selectedProduct,
-      //       coupon: couponCode,
-      //       termsAccepted,
-      //       cancellationAccepted,
-      //     }),
-      //   })
-      // }
-    };
+      const checkoutId = matchingVariation?.id || selectedProduct.WoocomerceId || 'default-id';
+      window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${checkoutId}&quantity=1`;
+    }
   };
 
   return (
@@ -244,7 +310,7 @@ const ChallengeRelations = () => {
                               : "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
                           )}
                         >
-                          <span className="block font-medium">{relation.challenge_subcategory.name}</span>
+                          <span className="block font-medium">{relation.challenge_subcategory?.name}</span>
                           {selectedRelationId === relation.id && (
                             <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-amber-500" />
                           )}
@@ -271,21 +337,17 @@ const ChallengeRelations = () => {
                   {stepsData
                     .find(item => item.step === selectedStep)
                     .relations.find(r => r.id === selectedRelationId)
-                    ?.challenge_subcategory.name}.
+                    ?.challenge_subcategory?.name}.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {(() => {
                     const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
                     const selectedRelation = stepRelations.find(r => r.id === selectedRelationId);
-
-                    // Obtener los nombres de los productos de la relación seleccionada
                     const relationProductNames = selectedRelation?.challenge_products.map(p => p.name) || [];
 
-                    // Si hay productos en allproducts
                     if (allproducts && allproducts.length > 0) {
                       return allproducts.map((product, productIndex) => {
-                        // Verificar si el producto está en la relación seleccionada
                         const isInRelation = relationProductNames.includes(product.name);
 
                         return (
@@ -297,7 +359,7 @@ const ChallengeRelations = () => {
                               checked={selectedProduct && selectedProduct.name === product.name}
                               onChange={() => handleProductClick(product)}
                               className="sr-only"
-                              disabled={!isInRelation} // Deshabilitar si no está en la relación
+                              disabled={!isInRelation}
                             />
                             <label
                               htmlFor={`allproduct-${productIndex}`}
@@ -306,9 +368,8 @@ const ChallengeRelations = () => {
                                 selectedProduct && selectedProduct.name === product.name
                                   ? "bg-zinc-800 border-amber-500 text-white"
                                   : isInRelation
-                                    ? "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
-
-                                    : "bg-gray-900/20 border-gray-700 text-gray-500 opacity-50"
+                                  ? "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+                                  : "bg-gray-900/20 border-gray-700 text-gray-500 opacity-50"
                               )}
                             >
                               <span className="block font-medium">{product.name}</span>
@@ -362,7 +423,6 @@ const ChallengeRelations = () => {
                     {selectedRelation && (
                       <div className="bg-zinc-900 p-5 shadow-md border-zinc-800">
                         <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                          {/* Columna izquierda - Características */}
                           <div>
                             <section>
                               <h3 className="text-lg font-medium text-amber-400 mb-4">Características:</h3>
@@ -396,9 +456,7 @@ const ChallengeRelations = () => {
                             </section>
                           </div>
 
-                          {/* Columna derecha - Cupón y Pricing */}
                           <div className="space-y-6">
-                            {/* Coupon section */}
                             <section>
                               <span className="block text-amber-400 font-medium mb-3">Ingresa tu cupón</span>
                               <div className="flex">
@@ -416,7 +474,7 @@ const ChallengeRelations = () => {
                                   className={`uppercase px-4 py-2 rounded-r-md font-medium text-sm ${couponCode
                                     ? "bg-amber-500 text-black hover:bg-amber-600 transition-colors"
                                     : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
-                                    }`}
+                                  }`}
                                 >
                                   Aplicar
                                 </button>
@@ -425,15 +483,12 @@ const ChallengeRelations = () => {
 
                             <div className="h-px bg-zinc-800"></div>
 
-                            {/* Pricing section */}
                             <section>
                               <h4 className="text-zinc-300 font-medium mb-4">Subtotal</h4>
-
                               <div className="flex justify-between mb-2 text-zinc-300">
                                 <span>{selectedProduct.name}</span>
-                                <span>${selectedProduct.precio || "N/A"}</span>
+                                <span>${matchingVariation?.price || "N/A"}</span>
                               </div>
-
                               <div className="flex justify-between mb-2 text-zinc-400">
                                 <div className="flex items-center">
                                   <span>Cupón</span>
@@ -441,14 +496,11 @@ const ChallengeRelations = () => {
                                 </div>
                                 <span>-$0.00</span>
                               </div>
-
                               <div className="h-px bg-zinc-800 my-4"></div>
-
                               <div className="flex justify-between items-center mb-1">
                                 <span className="text-zinc-300">Total</span>
-                                <p className="text-2xl font-semibold text-amber-400">${selectedProduct.precio || "N/A"}</p>
+                                <p className="text-2xl font-semibold text-amber-400">${matchingVariation?.price || "N/A"}</p>
                               </div>
-
                               <p className="text-xs text-zinc-500 text-right">*Precio no incluye tarifa de servicio de pago.</p>
                             </section>
                           </div>
@@ -456,7 +508,6 @@ const ChallengeRelations = () => {
                       </div>
                     )}
 
-                    {/* Terms and conditions */}
                     <section className="p-5 space-y-4">
                       <div className="flex items-start">
                         <input
@@ -496,7 +547,7 @@ const ChallengeRelations = () => {
                         className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct && termsAccepted && cancellationAccepted
                           ? "bg-amber-500 hover:bg-amber-600 text-black font-bold"
                           : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
-                          }`}
+                        }`}
                       >
                         <span className="uppercase">Continuar</span>
                         <ChevronRightIcon className="h-5 w-5 ml-2" />
