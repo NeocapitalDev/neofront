@@ -489,7 +489,10 @@ const ChallengeRelations = () => {
                             </section>
                           </div>
 
+                          
                           <div className="space-y-6">
+                            
+                            {/*
                             <section>
                               <span className="block text-amber-400 font-medium mb-3">Ingresa tu cupón</span>
                               <div className="flex">
@@ -513,6 +516,7 @@ const ChallengeRelations = () => {
                                 </button>
                               </div>
                             </section>
+                            */}
 
                             <div className="h-px bg-zinc-800"></div>
 
@@ -522,6 +526,7 @@ const ChallengeRelations = () => {
                                 <span>{selectedProduct.name}</span>
                                 <span>${matchingVariation?.price || "N/A"}</span>
                               </div>
+                              {/*
                               <div className="flex justify-between mb-2 text-zinc-400">
                                 <div className="flex items-center">
                                   <span>Cupón</span>
@@ -529,6 +534,7 @@ const ChallengeRelations = () => {
                                 </div>
                                 <span>-$0.00</span>
                               </div>
+                              */}
                               <div className="h-px bg-zinc-800 my-4"></div>
                               <div className="flex justify-between items-center mb-1">
                                 <span className="text-zinc-300">Total</span>
