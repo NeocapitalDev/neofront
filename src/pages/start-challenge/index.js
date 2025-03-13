@@ -4,11 +4,19 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { CheckIcon, ChevronRightIcon, InformationCircleIcon, TicketIcon } from '@heroicons/react/20/solid';
 import classNames from 'classnames';
+import { useSession } from "next-auth/react";
+import { useStrapiData as strapiJWT } from 'src/services/strapiServiceJWT';
 
 const ChallengeRelations = () => {
+  console.log('ChallengeRelations');
   const { data: relations, error, isLoading } = useStrapiData('challenge-relations?populate=*');
+  console.log('relations', relations);
   const { data: allproducts, error: allproductserror, isLoading: allproductsisLoading } = useStrapiData('challenge-products');
 
+  const { data: session, status } = useSession();
+  console.log('session', session);
+  const { data: user, status: statusUser } = strapiJWT('users/me', session?.jwt || '');
+  console.log('user', user);
   // Estados para manejar las selecciones, cupón y términos
   const [selectedStep, setSelectedStep] = useState(null);
   const [selectedRelationId, setSelectedRelationId] = useState(null);
@@ -73,6 +81,7 @@ const ChallengeRelations = () => {
     setSelectedRelationId(relationId);
     const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
     const relation = stepRelations.find(r => r.id === relationId);
+    console.log('Relación seleccionada:', relation);
     setSelectedRelation(relation);
 
     if (relation && relation.challenge_products.length > 0) {
@@ -105,22 +114,9 @@ const ChallengeRelations = () => {
   };
 
   const handleContinue = () => {
-
-    //buscar las variaciones del producto seleccionado : 
-    const {
-      data: products,
-      error: productsError,
-      isLoading: productsLoading
-    } = useWooCommerce(`products/${selectedProduct?.WoocomerceId}/variations?per_page=100`);
-    // buscar el producto que coincida con la subcategoria y el step seleccionado
-
-    // de cada variacion , extraer el step y subcategoria y comparar a ver si coinciden con los seleccionados
-    // si coinciden , seleccionar el producto y continuar con el proceso de compra
-    // si no coinciden , mostrar un mensaje de error y no permitir continuar con la compra
-
     if (selectedProduct && termsAccepted && cancellationAccepted) {
       const woocommerceId = selectedProduct.WoocomerceId || 'default-id'; // Asegura que haya un ID por defecto si no existe
-      window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1`;
+      window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1&document_id=${selectedRelation.documentId}&user_id=${user.documentId}`;
       //   const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/purcharse`, {
       //     method: 'POST',
       //     headers: {
