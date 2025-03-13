@@ -1,3 +1,4 @@
+/* src/pages/profile/profile.js */
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 

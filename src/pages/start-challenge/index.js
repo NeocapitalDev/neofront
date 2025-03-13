@@ -1,3 +1,4 @@
+/* src/pages/start-challenge/index.js */
 import { useStrapiData } from '../../services/strapiService';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -8,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { useStrapiData as strapiJWT } from 'src/services/strapiServiceJWT';
 import useSWR from 'swr';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
+import Loader from '../../components/loaders/loader';
 
 // Helper function to create a WooCommerce API instance
 const createWooCommerceApi = (url, consumerKey, consumerSecret, version = 'wc/v3') => {
@@ -145,7 +147,16 @@ const ChallengeRelations = () => {
 
   console.log("Matching Variation:", matchingVariation);
 
-  if (isLoading || allproductsisLoading) return <p className="text-white">Loading...</p>;
+
+  {/*if (isLoading || allproductsisLoading) return <p className="text-white">Loading...</p>;*/}
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }  
+
   if (error) return <p className="text-red-500">Error: {error.message}</p>;
   if (allproductserror) return <p className="text-red-500">Error: {allproductserror.message}</p>;
 

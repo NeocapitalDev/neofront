@@ -1,3 +1,4 @@
+/* src/pages/profile/index.js */
 import { useSession } from 'next-auth/react';
 import Layout from '../../components/layout/dashboard';
 import Loader from '../../components/loaders/loader';
