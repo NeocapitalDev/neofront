@@ -60,34 +60,38 @@ const Metrix = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!challengeData?.data?.broker_account?.idMeta || !challengeData?.data?.challengeId) return;
-
+  
+      // Imprime en la consola los valores que se usarán para construir la URL
+      console.log("Broker Account idMeta:", challengeData.data.broker_account.idMeta);
+      console.log("Challenge id:", challengeData.data.challengeId);
+      
+      const url = `https://risk-management-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${challengeData.data.broker_account.idMeta}/trackers/${challengeData.data.challengeId}/statistics`;
+      console.log("URL construida:", url);
+  
       const token = process.env.NEXT_PUBLIC_TOKEN_META_API;
       try {
-        const response = await fetch(
-          `https://risk-management-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${challengeData.data.broker_account.idMeta}/trackers/${challengeData.data.challengeId}/statistics`,
-          {
-            method: "GET",
-            headers: {
-              "auth-token": `${token}`,
-              "api-version": 1,
-            },
-          }
-        );
-
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "auth-token": `${token}`,
+            "api-version": 1,
+          },
+        });
+  
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
+  
         const result = await response.json();
-        console.log(result)
         setApiResult(result);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     fetchData();
   }, [challengeData]);
+  
 
   if (isLoading || isMetricsLoading) {
     return (
