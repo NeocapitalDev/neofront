@@ -176,9 +176,10 @@ export default function Index() {
                                                     {/* Modifica ligeramente la condición para asegurar la comparación de cadenas */}
                                                     {isVerified && String(challenge.phase) === "3" && challenge.result === "approved" && (
                                                         <BilleteraCripto
-                                                        balance={balances[challenge.broker_account?.idMeta] || "0"}
+                                                        balance={balances[challenge.id] || "0"}
+                                                        brokerBalance={challenge.broker_account?.balance || "0"} // Pasar el balance inicial del broker
                                                         userId={data?.id}
-                                                        challengeId={challenge.documentId} // Pasamos el documentId como challengeId
+                                                        challengeId={challenge.documentId}
                                                     />
                                                     )}
                                                 </div>

@@ -10,15 +10,34 @@ const WITHDRAW_STATES = {
     CANCELLED: 'cancelado'
 };
 
-export default function BilleteraCripto({ balance = "0", userId, challengeId }) {
+export default function BilleteraCripto({ balance = "0", userId, challengeId, brokerBalance = "0" }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [withdrawAmount, setWithdrawAmount] = useState("");
     const [usdtWalletAddress, setUsdtWalletAddress] = useState("");
     const [requestStatus, setRequestStatus] = useState("idle"); // idle, requesting, completed
     const [withdrawState, setWithdrawState] = useState(null);
+    const [apiResult, setApiResult] = useState(null);
+    const [isLoadingData, setIsLoadingData] = useState(false);
 
     // Asegurando que balance es tratado como string en caso de ser undefined o número
     const safeBalance = String(balance || "0");
+    const safeBrokerBalance = String(brokerBalance || "0");
+
+    // Efecto para calcular la diferencia entre balances (lo que se puede retirar)
+    useEffect(() => {
+        try {
+            // Calcular la diferencia entre el balance actual y el balance inicial del broker
+            const currentBalance = parseFloat(safeBalance);
+            const initialBalance = parseFloat(safeBrokerBalance);
+            
+            // Solo permitir retiros cuando hay una ganancia (balance actual > balance inicial)
+            const difference = Math.max(0, currentBalance - initialBalance);
+            setWithdrawAmount(difference.toFixed(2));
+        } catch (error) {
+            console.error("Error al calcular el monto de retiro:", error);
+            setWithdrawAmount("0.00");
+        }
+    }, [safeBalance, safeBrokerBalance]);
 
     // Verificar el estado actual de la solicitud en la base de datos
     useEffect(() => {
@@ -53,6 +72,45 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
         }
     };
 
+    // Obtener datos actualizados de la API de estadísticas
+    const fetchStatisticsData = async (metaId) => {
+        if (!metaId || !challengeId) return;
+
+        setIsLoadingData(true);
+        try {
+            const token = process.env.NEXT_PUBLIC_TOKEN_META_API;
+            const response = await fetch(
+                `https://risk-management-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${metaId}/trackers/${challengeId}/statistics`,
+                {
+                    method: "GET",
+                    headers: {
+                        "auth-token": `${token}`,
+                        "api-version": 1,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            setApiResult(result);
+            
+            // Si hay un balance en el resultado, actualizar el withdrawAmount
+            if (result && typeof result.balance === 'number') {
+                const currentBalance = result.balance;
+                const initialBalance = parseFloat(safeBrokerBalance);
+                const difference = Math.max(0, currentBalance - initialBalance);
+                setWithdrawAmount(difference.toFixed(2));
+            }
+        } catch (error) {
+            console.error("Error fetching statistics data:", error);
+        } finally {
+            setIsLoadingData(false);
+        }
+    };
+
     const openModal = () => {
         // Verificar nuevamente el estado antes de abrir el modal
         checkWithdrawStatus().then(() => {
@@ -74,7 +132,6 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
 
     const closeModal = () => {
         setIsModalOpen(false);
-        setWithdrawAmount("");
         setUsdtWalletAddress("");
         setRequestStatus("idle");
     };
@@ -85,8 +142,8 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
 
         try {
             // Validaciones básicas
-            if (parseFloat(withdrawAmount) > parseFloat(safeBalance)) {
-                alert("No tienes suficientes fondos para realizar este retiro.");
+            if (parseFloat(withdrawAmount) <= 0) {
+                alert("No tienes fondos disponibles para retirar en este momento.");
                 return;
             }
 
@@ -103,13 +160,6 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
             // Cambiar estado a "requesting" para mostrar animación de carga
             setRequestStatus("requesting");
 
-            // Obtener la URL del webhook de n8n desde la variable de entorno
-            // const webhookUrl = process.env.NEXT_PUBLIC_N8N_CHALLENGE_RETIRO;
-            // console.log("URL del webhook:", webhookUrl);
-            // if (!webhookUrl) {
-            //     throw new Error("URL del webhook no configurada");
-            // }
-
             // Preparar datos para enviar al webhook
             const requestData = {
                 amount: withdrawAmount,
@@ -120,8 +170,6 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
                 timestamp: new Date().toISOString()
             };
             console.log("Enviando solicitud a n8n:", requestData);
-
-            // console.log("Enviando solicitud a n8n:", webhookUrl, requestData);
 
             // PASO CLAVE: Enviar la solicitud al webhook de n8n
             const response = await axios.post("https://n8n.neocapitalfunding.com/webhook-test/withdrawal", requestData);
@@ -190,6 +238,9 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
         }
     };
 
+    // Determinar si el botón debe estar deshabilitado
+    const isWithdrawDisabled = parseFloat(withdrawAmount) <= 0;
+
     const buttonStyle = getButtonStyle();
 
     return (
@@ -198,8 +249,9 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
             <div className="relative">
                 <button
                     onClick={openModal}
-                    className={`flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md ${buttonStyle.bgClass} border-gray-300 dark:border-zinc-500`}
+                    className={`flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md ${buttonStyle.bgClass} border-gray-300 dark:border-zinc-500 ${isWithdrawDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                     title={buttonStyle.tooltipText}
+                    disabled={isWithdrawDisabled}
                 >
                     <CreditCardIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
                     <span className="text-xs lg:text-sm dark:text-zinc-200">
@@ -229,13 +281,11 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
                                             step="0.01"
                                             min="0"
                                             value={withdrawAmount}
-                                            onChange={(e) => setWithdrawAmount(e.target.value)}
-                                            placeholder="Ingresa monto"
-                                            required
-                                            className="w-full px-3 py-2 border rounded-md dark:bg-zinc-700 dark:border-zinc-600 dark:text-white"
+                                            readOnly
+                                            className="w-full px-3 py-2 border rounded-md bg-gray-100 dark:bg-zinc-600 dark:border-zinc-600 dark:text-white"
                                         />
                                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                                            Balance disponible: ${safeBalance}
+                                            Monto calculado como la diferencia entre el balance actual (${safeBalance}) y el balance inicial (${safeBrokerBalance}).
                                         </p>
                                     </div>
 
@@ -263,7 +313,7 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
                                         <button
                                             type="submit"
                                             className="px-4 py-2 bg-[var(--app-primary)] hover:bg-[var(--app-secondary)] text-black rounded-md"
-                                            disabled={!withdrawAmount || !usdtWalletAddress.trim()}
+                                            disabled={parseFloat(withdrawAmount) <= 0 || !usdtWalletAddress.trim()}
                                         >
                                             Solicitar
                                         </button>
