@@ -1,3 +1,4 @@
+/* src/pages/dashboard/UserPanel.js */
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -10,7 +11,6 @@ import MetaApi, { MetaStats } from 'metaapi.cloud-sdk';
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import NeoChallengeCard from './neoCard';
-
 
 const fetcher = async (url, token) => {
     const response = await fetch(url, {
@@ -32,6 +32,7 @@ export default function Index() {
     );
 
     const [balances, setBalances] = useState({});
+    const [isLoadingBalances, setIsLoadingBalances] = useState(true);
     const [visibility, setVisibility] = useState(() => {
         if (typeof window !== "undefined") {
             return JSON.parse(localStorage.getItem("visibility") || "{}");
@@ -42,6 +43,7 @@ export default function Index() {
     useEffect(() => {
         if (data?.challenges) {
             const fetchBalances = async () => {
+                setIsLoadingBalances(true);
                 const metaStats = new MetaStats(process.env.NEXT_PUBLIC_TOKEN_META_API);
                 const newBalances = {};
 
@@ -49,15 +51,17 @@ export default function Index() {
                     if (challenge.broker_account?.idMeta) {
                         try {
                             const metrics = await metaStats.getMetrics(challenge.broker_account.idMeta);
-                            newBalances[challenge.broker_account.idMeta] = metrics.balance;
+                            newBalances[challenge.id] = metrics.balance;
                         } catch (error) {
                             console.error(`Error obteniendo el balance para ${challenge.broker_account.idMeta}:`, error);
-                            // Usar el balance inicial en lugar de "Error"
-                            newBalances[challenge.broker_account.idMeta] = challenge.broker_account.balance || "No disponible";
+                            newBalances[challenge.id] = challenge.broker_account.balance || "No disponible";
                         }
+                    } else {
+                        newBalances[challenge.id] = "No asignado";
                     }
                 }
                 setBalances(newBalances);
+                setIsLoadingBalances(false);
             };
 
             fetchBalances();
@@ -78,7 +82,6 @@ export default function Index() {
 
     return (
         <div>
-            {/* Mostrar la tarjeta NeoChallengeCard solo cuando no haya desafíos activos */}
             {data?.challenges?.length === 0 && <NeoChallengeCard />}
 
             {["3", "2", "1"].map(key => {
@@ -107,9 +110,15 @@ export default function Index() {
                             challenges.map((challenge, index) => {
                                 const isVisible = visibility[challenge.id] ?? true;
 
-                                let balance = balances[challenge.balance] ?? "Cargando...";
-                                if (challenge.broker_account?.idMeta) {
-                                    balance = balances[challenge.broker_account.idMeta] ?? balance;
+                                let balanceDisplay;
+                                if (challenge.result === "init") {
+                                    balanceDisplay = "Por iniciar";
+                                } else if (!challenge.broker_account) {
+                                    balanceDisplay = "No asignado";
+                                } else if (isLoadingBalances) {
+                                    balanceDisplay = "Cargando...";
+                                } else {
+                                    balanceDisplay = balances[challenge.id] ?? "No disponible";
                                 }
 
                                 return (
@@ -125,21 +134,22 @@ export default function Index() {
                                             <>
                                                 <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
                                                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Balance:{" "}
-                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                            {balance === "Cargando..." ? balance : `$${balance}`}
+                                                        Balance: <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                            {typeof balanceDisplay === "number" ? `$${balanceDisplay}` : balanceDisplay}
                                                         </span>
                                                     </p>
-
                                                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Fin:{" "}
-                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                        Inicio: <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                            {challenge.startDate ? new Date(challenge.startDate).toLocaleDateString() : "-"}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                        Fin: <span className="font-bold text-slate-800 dark:text-slate-200">
                                                             {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "-"}
                                                         </span>
                                                     </p>
                                                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Resultado:{" "}
-                                                        <span className={`font-bold ${{
+                                                        Resultado: <span className={`font-bold ${{
                                                             progress: 'text-[var(--app-primary)]',
                                                             disapproved: 'text-red-500',
                                                             approved: 'text-green-500'
@@ -156,7 +166,6 @@ export default function Index() {
                                                 </div>
 
                                                 <div className="mt-4 flex space-x-4">
-                                                    
                                                     <Link href={`/metrix2/${challenge.documentId}`}>
                                                         <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
                                                             <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
@@ -169,7 +178,6 @@ export default function Index() {
 
                                         <ButtonInit documentId={challenge.documentId} result={challenge.result} phase={challenge.phase} />
 
-                                        {/* Botón de visibilidad abajo */}
                                         <div className="mt-4 flex items-center justify-end">
                                             <div className="flex items-center space-x-2">
                                                 <Switch
@@ -180,7 +188,6 @@ export default function Index() {
                                                 <Label htmlFor={`visible-mode-${index}`}>Visible</Label>
                                             </div>
                                         </div>
-
                                     </div>
                                 );
                             })
