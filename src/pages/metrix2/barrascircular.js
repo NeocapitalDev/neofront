@@ -51,8 +51,8 @@ const CircularProgress = ({ percentage, size = 100, strokeWidth = 10, color = "g
 const Dashboard = () => {
   const data = {
     target: { value: 10000, current: 6305, percentage: 63, color: "green" },
-    maxDrawdown: { value: 15100, current: 6000, percentage: 40, color: "yellow" },
-    maxDailyLoss: { value: 5050, current: 1900, percentage: 38, color: "yellow" },
+    maxDrawdown: { value: 15100, current: 6000, percentage: 40, color: "orange" },
+    maxDailyLoss: { value: 5050, current: 1900, percentage: 38, color: "orange" },
   };
 
   return (
