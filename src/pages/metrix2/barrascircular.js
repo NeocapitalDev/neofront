@@ -51,8 +51,8 @@ const CircularProgress = ({ percentage, size = 100, strokeWidth = 10, color = "g
 const Dashboard = () => {
   const data = {
     target: { value: 10000, current: 6305, percentage: 63, color: "green" },
-    maxDrawdown: { value: 15100, current: 6000, percentage: 40, color: "red" },
-    maxDailyLoss: { value: 5050, current: 1900, percentage: 38, color: "red" },
+    maxDrawdown: { value: 15100, current: 6000, percentage: 40, color: "yellow" },
+    maxDailyLoss: { value: 5050, current: 1900, percentage: 38, color: "yellow" },
   };
 
   return (
@@ -60,7 +60,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {Object.keys(data).map((key) => {
           const item = data[key];
-          const textColorClass = item.color === "green" ? "text-green-500" : "text-red-500";
+          const textColorClass = item.color === "green" ? "text-green-500" : "text-yellow-500";
           return (
             <div key={key} className="flex gap-4">
               <CircularProgress percentage={item.percentage} color={item.color} />

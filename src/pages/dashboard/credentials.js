@@ -1,3 +1,4 @@
+/* src/pages/dashboard/credentials.js */
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, ClipboardDocumentIcon, PencilIcon, KeyIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
