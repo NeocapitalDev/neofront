@@ -4,7 +4,8 @@ import Layout from '../../components/layout/dashboard';
 import Loader from '../../components/loaders/loader';
 import { useStrapiData } from '../../services/strapiServiceJWT';
 import { useState, useEffect } from "react";
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ChevronUpIcon, ChartBarIcon} from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 export default function Historial() {
     const { data: session } = useSession();
@@ -18,6 +19,16 @@ export default function Historial() {
     const [endDate, setEndDate] = useState("");
     const [filteredGroups, setFilteredGroups] = useState({});
     const [expandedGroups, setExpandedGroups] = useState({});
+
+    // Definir colores para los estados
+    const statusColors = {
+        approved: 'text-green-500',
+        disapproved: 'text-red-500',
+        progress: 'text-yellow-500',
+        init: 'text-blue-500',
+        withdrawal: 'text-purple-500',
+        retry: 'text-orange-500',
+    };
 
     // Filtrar y agrupar challenges
     useEffect(() => {
@@ -155,8 +166,16 @@ export default function Historial() {
                                     <div className="mt-4">
                                         {challenges.map((challenge, index) => (
                                             <div key={index} className="p-2 bg-white dark:bg-zinc-800 rounded mb-2">
-                                                <p>Fase {challenge.phase} - Resultado: {challenge.result}</p>
+                                                <p>
+                                                    Fase {challenge.phase} - Resultado: <span className={statusColors[challenge.result] || 'text-gray-500'}>{challenge.result}</span>
+                                                </p>
                                                 <p>Inicio: {new Date(challenge.startDate).toLocaleDateString()} - Fin: {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "En curso"}</p>
+                                                <Link href={challenge.result === 'progress' ? `/metrix2/${challenge.documentId}` : `/historial/${challenge.documentId}`}>
+                                                    <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
+                                                        <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+                                                        <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
+                                                    </button>
+                                                </Link>
                                             </div>
                                         ))}
                                     </div>

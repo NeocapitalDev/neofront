@@ -81,9 +81,13 @@ export default function Index() {
     const isVerified = data?.isVerified;
     const toggleVisibility = (id) => setVisibility((prev) => ({ ...prev, [id]: !prev[id] }));
 
-    // Agrupar challenges por parentId
-    const groupedChallenges = data?.challenges?.reduce((acc, challenge) => {
-        // Si no hay parentId, usar su propio documentId como clave
+    // Filtrar challenges que están "en curso" o "por iniciar"
+    const activeChallenges = data?.challenges?.filter(challenge => 
+        challenge.result === "init" || challenge.result === "progress"
+    ) || [];
+
+    // Agrupar los challenges filtrados por parentId
+    const groupedChallenges = activeChallenges.reduce((acc, challenge) => {
         const key = challenge.parentId || challenge.documentId;
         if (!acc[key]) {
             acc[key] = [];
@@ -92,11 +96,11 @@ export default function Index() {
         // Ordenar por phase dentro del grupo
         acc[key].sort((a, b) => a.phase - b.phase);
         return acc;
-    }, {}) || {};
+    }, {});
 
     return (
         <div>
-            {data?.challenges?.length === 0 && <NeoChallengeCard />}
+            {activeChallenges.length === 0 && <NeoChallengeCard />}
 
             {Object.entries(groupedChallenges).length > 0 ? (
                 Object.entries(groupedChallenges).map(([parentId, challenges]) => (
@@ -173,7 +177,7 @@ export default function Index() {
                                                 {isVerified && String(challenge.phase) === "3" && challenge.result === "approved" && (
                                                     <BilleteraCripto
                                                         balance={balances[challenge.id] || "0"}
-                                                        brokerBalance={challenge.broker_account?.balance || "0"} // Pasar el balance inicial del broker
+                                                        brokerBalance={challenge.broker_account?.balance || "0"}
                                                         userId={data?.id}
                                                         challengeId={challenge.documentId}
                                                     />
