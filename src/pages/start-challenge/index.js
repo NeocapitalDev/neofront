@@ -1,11 +1,15 @@
+/* src/pages/start-challenge/index.js */
 import { useStrapiData } from '../../services/strapiService';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CheckIcon, ChevronRightIcon, InformationCircleIcon, TicketIcon } from '@heroicons/react/20/solid';
 import classNames from 'classnames';
+import { useSession } from "next-auth/react";
+import { useStrapiData as strapiJWT } from 'src/services/strapiServiceJWT';
 import useSWR from 'swr';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
+import Loader from '../../components/loaders/loader';
 
 // Helper function to create a WooCommerce API instance
 const createWooCommerceApi = (url, consumerKey, consumerSecret, version = 'wc/v3') => {
@@ -60,9 +64,15 @@ const wooFetcher = async ([endpoint, config]) => {
 };
 
 const ChallengeRelations = () => {
+  console.log('ChallengeRelations');
   const { data: relations, error, isLoading } = useStrapiData('challenge-relations?populate=*');
+  console.log('relations', relations);
   const { data: allproducts, error: allproductserror, isLoading: allproductsisLoading } = useStrapiData('challenge-products');
 
+  const { data: session, status } = useSession();
+  console.log('session', session);
+  const { data: user, status: statusUser } = strapiJWT('users/me', session?.jwt || '');
+  console.log('user', user);
   // Estados para manejar las selecciones, cupón y términos
   const [selectedStep, setSelectedStep] = useState(null);
   const [selectedRelationId, setSelectedRelationId] = useState(null);
@@ -137,7 +147,16 @@ const ChallengeRelations = () => {
 
   console.log("Matching Variation:", matchingVariation);
 
-  if (isLoading || allproductsisLoading) return <p className="text-white">Loading...</p>;
+
+  {/*if (isLoading || allproductsisLoading) return <p className="text-white">Loading...</p>;*/}
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }  
+
   if (error) return <p className="text-red-500">Error: {error.message}</p>;
   if (allproductserror) return <p className="text-red-500">Error: {allproductserror.message}</p>;
 
@@ -165,6 +184,7 @@ const ChallengeRelations = () => {
     setSelectedRelationId(relationId);
     const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
     const relation = stepRelations.find(r => r.id === relationId);
+    console.log('Relación seleccionada:', relation);
     setSelectedRelation(relation);
 
     if (relation && relation.challenge_products.length > 0) {
@@ -198,9 +218,22 @@ const ChallengeRelations = () => {
   // Use the matching variation's ID for checkout
   const handleContinue = () => {
     if (selectedProduct && termsAccepted && cancellationAccepted) {
-      const checkoutId = matchingVariation?.id || selectedProduct.WoocomerceId || 'default-id';
-      window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${checkoutId}&quantity=1`;
-    }
+      const woocommerceId = selectedProduct.WoocomerceId || 'default-id'; // Asegura que haya un ID por defecto si no existe
+      window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1&document_id=${selectedRelation.documentId}&user_id=${user.documentId}`;
+      //   const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/purcharse`, {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify({
+      //       product: selectedProduct,
+      //       coupon: couponCode,
+      //       termsAccepted,
+      //       cancellationAccepted,
+      //     }),
+      //   })
+      // }
+    };
   };
 
   return (
@@ -456,7 +489,10 @@ const ChallengeRelations = () => {
                             </section>
                           </div>
 
+                          
                           <div className="space-y-6">
+                            
+                            {/*
                             <section>
                               <span className="block text-amber-400 font-medium mb-3">Ingresa tu cupón</span>
                               <div className="flex">
@@ -480,6 +516,7 @@ const ChallengeRelations = () => {
                                 </button>
                               </div>
                             </section>
+                            */}
 
                             <div className="h-px bg-zinc-800"></div>
 
@@ -489,6 +526,7 @@ const ChallengeRelations = () => {
                                 <span>{selectedProduct.name}</span>
                                 <span>${matchingVariation?.price || "N/A"}</span>
                               </div>
+                              {/*
                               <div className="flex justify-between mb-2 text-zinc-400">
                                 <div className="flex items-center">
                                   <span>Cupón</span>
@@ -496,6 +534,7 @@ const ChallengeRelations = () => {
                                 </div>
                                 <span>-$0.00</span>
                               </div>
+                              */}
                               <div className="h-px bg-zinc-800 my-4"></div>
                               <div className="flex justify-between items-center mb-1">
                                 <span className="text-zinc-300">Total</span>
