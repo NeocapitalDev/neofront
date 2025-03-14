@@ -1,3 +1,4 @@
+// src/pages/billing/index.js
 import { useSession } from 'next-auth/react'; // Importamos el hook de sesión
 import Layout from '../../components/layout/dashboard';
 import Loader from '../../components/loaders/loader';

@@ -1,4 +1,4 @@
-// pages/socials.js
+// src/pages/social/index.js
 import Layout from '../../components/layout/dashboard';
 import Loader from '../../components/loaders/loader';
 import { useStrapiData } from '../../services/strapiService';

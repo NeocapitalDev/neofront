@@ -1,3 +1,4 @@
+/* src/pages/dashboard/index.js*/
 import Layout from '../../components/layout/dashboard';
 
 import UserPanel from './UserPanel';
@@ -11,4 +12,3 @@ export default function Index() {
     </Layout>
   );
 };
-

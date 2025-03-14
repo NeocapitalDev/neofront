@@ -81,129 +81,126 @@ export default function Index() {
     const isVerified = data?.isVerified;
     const toggleVisibility = (id) => setVisibility((prev) => ({ ...prev, [id]: !prev[id] }));
 
+    // Agrupar challenges por parentId
+    const groupedChallenges = data?.challenges?.reduce((acc, challenge) => {
+        // Si no hay parentId, usar su propio documentId como clave
+        const key = challenge.parentId || challenge.documentId;
+        if (!acc[key]) {
+            acc[key] = [];
+        }
+        acc[key].push(challenge);
+        // Ordenar por phase dentro del grupo
+        acc[key].sort((a, b) => a.phase - b.phase);
+        return acc;
+    }, {}) || {};
+
     return (
         <div>
             {data?.challenges?.length === 0 && <NeoChallengeCard />}
 
-            {["3", "2", "1"].map(key => {
-                const challenges = data?.challenges?.filter(challenge => challenge.phase == key) || [];
-                if (challenges.length === 0) return null;
-
-                return (
-                    <div key={key}>
+            {Object.entries(groupedChallenges).length > 0 ? (
+                Object.entries(groupedChallenges).map(([parentId, challenges]) => (
+                    <div key={parentId} className="mb-8">
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
-                            {key === "3" ? "Fase Neotrader" : key === "2" ? "Fase Practicante" : "Fase Estudiante"}
+                            Grupo: {parentId} ({challenges.length} {challenges.length === 1 ? 'fase' : 'fases'})
                         </h2>
 
-                        {key === "3" && !isVerified ? (
-                            <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg shadow-md mb-6">
-                                <div className="flex items-center gap-3">
-                                    <BellIcon className="h-7 w-7 text-[var(--app-primary)] dark:text-[var(--app-primary)]" />
-                                    <p className="text-base font-medium text-amber-800 dark:text-[var(--app-primary)]">
-                                        Verifica tu cuenta para acceder a la fase <strong>Neotrader</strong>.
+                        {challenges.map((challenge, index) => {
+                            const isVisible = visibility[challenge.id] ?? true;
+
+                            let balanceDisplay;
+                            if (challenge.result === "init") {
+                                balanceDisplay = "Por iniciar";
+                            } else if (!challenge.broker_account) {
+                                balanceDisplay = "No asignado";
+                            } else if (isLoadingBalances) {
+                                balanceDisplay = "Cargando...";
+                            } else {
+                                balanceDisplay = balances[challenge.id] ?? "No disponible";
+                            }
+
+                            return (
+                                <div
+                                    key={index}
+                                    className="relative p-6 mb-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black"
+                                >
+                                    <p className="text-sm font-bold text-zinc-800 mb-2 dark:text-zinc-200">
+                                        Fase {challenge.phase} - Login: {challenge.broker_account?.login || "-"}
                                     </p>
-                                </div>
-                                <Link href="/verification" className="block mt-4 px-5 py-2.5 text-center bg-[var(--app-primary)] hover:bg-[var(--app-secondary)] text-black font-semibold rounded-lg shadow-md text-base transition">
-                                    Verificar ahora
-                                </Link>
-                            </div>
-                        ) : (
-                            challenges.map((challenge, index) => {
-                                const isVisible = visibility[challenge.id] ?? true;
 
-                                let balanceDisplay;
-                                if (challenge.result === "init") {
-                                    balanceDisplay = "Por iniciar";
-                                } else if (!challenge.broker_account) {
-                                    balanceDisplay = "No asignado";
-                                } else if (isLoadingBalances) {
-                                    balanceDisplay = "Cargando...";
-                                } else {
-                                    balanceDisplay = balances[challenge.id] ?? "No disponible";
-                                }
+                                    {isVisible && (
+                                        <>
+                                            <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
+                                                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                    Balance: <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                        {typeof balanceDisplay === "number" ? `$${balanceDisplay}` : balanceDisplay}
+                                                    </span>
+                                                </p>
+                                                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                    Inicio: <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                        {challenge.startDate ? new Date(challenge.startDate).toLocaleDateString() : "-"}
+                                                    </span>
+                                                </p>
+                                                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                    Fin: <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                        {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "-"}
+                                                    </span>
+                                                </p>
+                                                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                    Resultado: <span className={`font-bold ${{
+                                                        progress: 'text-[var(--app-primary)]',
+                                                        disapproved: 'text-red-500',
+                                                        approved: 'text-green-500'
+                                                    }[challenge.result] || 'text-slate-800 dark:text-slate-200'}`}>
+                                                        {{
+                                                            init: 'Por iniciar',
+                                                            progress: 'En curso',
+                                                            disapproved: 'Desaprobado',
+                                                            approved: 'Aprobado',
+                                                            retry: 'Repetir'
+                                                        }[challenge.result] || challenge.result}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                            <div className="mt-4 flex space-x-4">
+                                                <Link href={`/metrix2/${challenge.documentId}`}>
+                                                    <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
+                                                        <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+                                                        <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
+                                                    </button>
+                                                </Link>
 
-                                return (
-                                    <div
-                                        key={index}
-                                        className="relative p-6 mb-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black"
-                                    >
-                                        <p className="text-sm font-bold text-zinc-800 mb-2 dark:text-zinc-200">
-                                            Login: {challenge.broker_account?.login || "-"}
-                                        </p>
-
-                                        {isVisible && (
-                                            <>
-                                                <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
-                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Balance: <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                            {typeof balanceDisplay === "number" ? `$${balanceDisplay}` : balanceDisplay}
-                                                        </span>
-                                                    </p>
-                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Inicio: <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                            {challenge.startDate ? new Date(challenge.startDate).toLocaleDateString() : "-"}
-                                                        </span>
-                                                    </p>
-                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Fin: <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                            {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "-"}
-                                                        </span>
-                                                    </p>
-                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Resultado: <span className={`font-bold ${{
-                                                            progress: 'text-[var(--app-primary)]',
-                                                            disapproved: 'text-red-500',
-                                                            approved: 'text-green-500'
-                                                        }[challenge.result] || 'text-slate-800 dark:text-slate-200'}`}>
-                                                            {{
-                                                                init: 'Por iniciar',
-                                                                progress: 'En curso',
-                                                                disapproved: 'Desaprobado',
-                                                                approved: 'Aprobado',
-                                                                retry: 'Repetir'
-                                                            }[challenge.result] || challenge.result}
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                                <div className="mt-4 flex space-x-4">
-                                                    <Link href={`/metrix2/${challenge.documentId}`}>
-                                                        <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
-                                                            <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                                                            <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
-                                                        </button>
-                                                    </Link>
-
-                                                    {/* Modifica ligeramente la condición para asegurar la comparación de cadenas */}
-                                                    {isVerified && String(challenge.phase) === "3" && challenge.result === "approved" && (
-                                                        <BilleteraCripto
+                                                {isVerified && String(challenge.phase) === "3" && challenge.result === "approved" && (
+                                                    <BilleteraCripto
                                                         balance={balances[challenge.broker_account?.idMeta] || "0"}
                                                         userId={data?.id}
-                                                        challengeId={challenge.documentId} // Pasamos el documentId como challengeId
+                                                        challengeId={challenge.documentId}
                                                     />
-                                                    )}
-                                                </div>
-                                            </>
-                                        )}
-
-                                        <ButtonInit documentId={challenge.documentId} result={challenge.result} phase={challenge.phase} />
-
-                                        <div className="mt-4 flex items-center justify-end">
-                                            <div className="flex items-center space-x-2">
-                                                <Switch
-                                                    id={`visible-mode-${index}`}
-                                                    checked={isVisible}
-                                                    onCheckedChange={() => toggleVisibility(challenge.id)}
-                                                />
-                                                <Label htmlFor={`visible-mode-${index}`}>Visible</Label>
+                                                )}
                                             </div>
+                                        </>
+                                    )}
+
+                                    <ButtonInit documentId={challenge.documentId} result={challenge.result} phase={challenge.phase} />
+
+                                    <div className="mt-4 flex items-center justify-end">
+                                        <div className="flex items-center space-x-2">
+                                            <Switch
+                                                id={`visible-mode-${challenge.id}-${index}`}
+                                                checked={isVisible}
+                                                onCheckedChange={() => toggleVisibility(challenge.id)}
+                                            />
+                                            <Label htmlFor={`visible-mode-${challenge.id}-${index}`}>Visible</Label>
                                         </div>
                                     </div>
-                                );
-                            })
-                        )}
+                                </div>
+                            );
+                        })}
                     </div>
-                );
-            })}
+                ))
+            ) : (
+                <p className="text-center text-gray-500 dark:text-gray-400">No hay challenges disponibles.</p>
+            )}
         </div>
     );
 }
