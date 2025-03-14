@@ -2,7 +2,7 @@
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { ChartBarIcon, BellIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon, BellIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 import Loader from '../../components/loaders/loader';
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -11,6 +11,7 @@ import MetaApi, { MetaStats } from 'metaapi.cloud-sdk';
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import NeoChallengeCard from './neoCard';
+import BilleteraCripto from '../../components/wallet/crypto-wallet';
 
 const fetcher = async (url, token) => {
     const response = await fetch(url, {
@@ -164,7 +165,6 @@ export default function Index() {
                                                         </span>
                                                     </p>
                                                 </div>
-
                                                 <div className="mt-4 flex space-x-4">
                                                     <Link href={`/metrix2/${challenge.documentId}`}>
                                                         <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
@@ -172,6 +172,15 @@ export default function Index() {
                                                             <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
                                                         </button>
                                                     </Link>
+
+                                                    {/* Modifica ligeramente la condición para asegurar la comparación de cadenas */}
+                                                    {isVerified && String(challenge.phase) === "3" && challenge.result === "approved" && (
+                                                        <BilleteraCripto
+                                                        balance={balances[challenge.broker_account?.idMeta] || "0"}
+                                                        userId={data?.id}
+                                                        challengeId={challenge.documentId} // Pasamos el documentId como challengeId
+                                                    />
+                                                    )}
                                                 </div>
                                             </>
                                         )}
