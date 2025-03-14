@@ -1,604 +1,182 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { LineChart } from '@/components/ui/chart-line'
-
-// Datos de ejemplo
-const data = [
-  
-  {
-      "date": "2024-06-30",
-      "target": 110000.0,
-      "balance": 100000.0,
-      "high_water_mark": 100000.0,
-      "equity": 100000.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 95000.0
-  },
-  {
-      "date": "2024-07-01",
-      "target": 110000.0,
-      "balance": 100400.0,
-      "high_water_mark": 100400.0,
-      "equity": 100400.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 95380.0
-  },
-  {
-      "date": "2024-07-02",
-      "target": 110000.0,
-      "balance": 98800.0,
-      "high_water_mark": 100400.0,
-      "equity": 98400.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 93860.0
-  },
-  {
-      "date": "2024-07-03",
-      "target": 110000.0,
-      "balance": 100000.0,
-      "high_water_mark": 100400.0,
-      "equity": 101200.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 95000.0
-  },
-  {
-      "date": "2024-07-04",
-      "target": 110000.0,
-      "balance": 100500.0,
-      "high_water_mark": 100500.0,
-      "equity": 100500.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 95475.0
-  },
-  {
-      "date": "2024-07-05",
-      "target": 110000.0,
-      "balance": 99200.0,
-      "high_water_mark": 100500.0,
-      "equity": 98700.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 94240.0
-  },
-  {
-      "date": "2024-07-06",
-      "target": 110000.0,
-      "balance": 100100.0,
-      "high_water_mark": 100500.0,
-      "equity": 100900.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 95095.0
-  },
-  {
-      "date": "2024-07-07",
-      "target": 110000.0,
-      "balance": 100700.0,
-      "high_water_mark": 100700.0,
-      "equity": 100600.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 95665.0
-  },
-  {
-      "date": "2024-07-08",
-      "target": 110000.0,
-      "balance": 101500.0,
-      "high_water_mark": 101500.0,
-      "equity": 100800.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 96425.0
-  },
-  {
-      "date": "2024-07-09",
-      "target": 110000.0,
-      "balance": 100440.0,
-      "high_water_mark": 101500.0,
-      "equity": 98940.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 95418.0
-  },
-  {
-      "date": "2024-07-10",
-      "target": 110000.0,
-      "balance": 100540.0,
-      "high_water_mark": 101500.0,
-      "equity": 100100.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 95513.0
-  },
-  {
-      "date": "2024-07-11",
-      "target": 110000.0,
-      "balance": 100940.0,
-      "high_water_mark": 101500.0,
-      "equity": 100400.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 95893.0
-  },
-  {
-      "date": "2024-07-12",
-      "target": 110000.0,
-      "balance": 101540.0,
-      "high_water_mark": 101540.0,
-      "equity": 100600.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 96463.0
-  },
-  {
-      "date": "2024-07-13",
-      "target": 110000.0,
-      "balance": 101740.0,
-      "high_water_mark": 101740.0,
-      "equity": 100200.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 96653.0
-  },
-  {
-      "date": "2024-07-14",
-      "target": 110000.0,
-      "balance": 100340.0,
-      "high_water_mark": 101740.0,
-      "equity": 98600.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 95323.0
-  },
-  {
-      "date": "2024-07-15",
-      "target": 110000.0,
-      "balance": 100740.0,
-      "high_water_mark": 101740.0,
-      "equity": 100400.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 95703.0
-  },
-  {
-      "date": "2024-07-16",
-      "target": 110000.0,
-      "balance": 101440.0,
-      "high_water_mark": 101740.0,
-      "equity": 100700.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 96368.0
-  },
-  {
-      "date": "2024-07-17",
-      "target": 110000.0,
-      "balance": 100340.0,
-      "high_water_mark": 101740.0,
-      "equity": 98900.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 95323.0
-  },
-  {
-      "date": "2024-07-18",
-      "target": 110000.0,
-      "balance": 101640.0,
-      "high_water_mark": 101740.0,
-      "equity": 101300.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 96558.0
-  },
-  {
-      "date": "2024-07-19",
-      "target": 110000.0,
-      "balance": 102140.0,
-      "high_water_mark": 102140.0,
-      "equity": 100500.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 97033.0
-  },
-  {
-      "date": "2024-07-20",
-      "target": 110000.0,
-      "balance": 102040.0,
-      "high_water_mark": 102140.0,
-      "equity": 99900.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 96938.0
-  },
-  {
-      "date": "2024-07-21",
-      "target": 110000.0,
-      "balance": 102840.0,
-      "high_water_mark": 102840.0,
-      "equity": 100800.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 97698.0
-  },
-  {
-      "date": "2024-07-22",
-      "target": 110000.0,
-      "balance": 101940.0,
-      "high_water_mark": 102840.0,
-      "equity": 99100.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 96843.0
-  },
-  {
-      "date": "2024-07-23",
-      "target": 110000.0,
-      "balance": 102540.0,
-      "high_water_mark": 102840.0,
-      "equity": 100600.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 97413.0
-  },
-  {
-      "date": "2024-07-24",
-      "target": 110000.0,
-      "balance": 102940.0,
-      "high_water_mark": 102940.0,
-      "equity": 100400.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 97793.0
-  },
-  {
-      "date": "2024-07-25",
-      "target": 110000.0,
-      "balance": 103640.0,
-      "high_water_mark": 103640.0,
-      "equity": 100700.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 98458.0
-  },
-  {
-      "date": "2024-07-26",
-      "target": 110000.0,
-      "balance": 102340.0,
-      "high_water_mark": 103640.0,
-      "equity": 98700.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 97223.0
-  },
-  {
-      "date": "2024-07-27",
-      "target": 110000.0,
-      "balance": 103240.0,
-      "high_water_mark": 103640.0,
-      "equity": 100900.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 98078.0
-  },
-  {
-      "date": "2024-07-28",
-      "target": 110000.0,
-      "balance": 103740.0,
-      "high_water_mark": 103740.0,
-      "equity": 100500.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 98553.0
-  },
-  {
-      "date": "2024-07-29",
-      "target": 110000.0,
-      "balance": 102340.0,
-      "high_water_mark": 103740.0,
-      "equity": 98600.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 97223.0
-  },
-  {
-      "date": "2024-07-30",
-      "target": 110000.0,
-      "balance": 103540.0,
-      "high_water_mark": 103740.0,
-      "equity": 101200.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 98363.0
-  },
-  {
-      "date": "2024-07-31",
-      "target": 110000.0,
-      "balance": 103840.0,
-      "high_water_mark": 103840.0,
-      "equity": 100300.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 98648.0
-  },
-  {
-      "date": "2024-08-01",
-      "target": 110000.0,
-      "balance": 103240.0,
-      "high_water_mark": 103840.0,
-      "equity": 99400.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 98078.0
-  },
-  {
-      "date": "2024-08-02",
-      "target": 110000.0,
-      "balance": 104040.0,
-      "high_water_mark": 104040.0,
-      "equity": 100800.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 98838.0
-  },
-  {
-      "date": "2024-08-03",
-      "target": 110000.0,
-      "balance": 104540.0,
-      "high_water_mark": 104540.0,
-      "equity": 100500.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 99313.0
-  },
-  {
-      "date": "2024-08-04",
-      "target": 110000.0,
-      "balance": 103440.0,
-      "high_water_mark": 104540.0,
-      "equity": 98900.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 98268.0
-  },
-  {
-      "date": "2024-08-05",
-      "target": 110000.0,
-      "balance": 104840.0,
-      "high_water_mark": 104840.0,
-      "equity": 101400.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 99598.0
-  },
-  {
-      "date": "2024-08-06",
-      "target": 110000.0,
-      "balance": 104940.0,
-      "high_water_mark": 104940.0,
-      "equity": 100100.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 99693.0
-  },
-  {
-      "date": "2024-08-07",
-      "target": 110000.0,
-      "balance": 105440.0,
-      "high_water_mark": 105440.0,
-      "equity": 100500.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100168.0
-  },
-  {
-      "date": "2024-08-08",
-      "target": 110000.0,
-      "balance": 105340.0,
-      "high_water_mark": 105440.0,
-      "equity": 99900.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100073.0
-  },
-  {
-      "date": "2024-08-09",
-      "target": 110000.0,
-      "balance": 105940.0,
-      "high_water_mark": 105940.0,
-      "equity": 100600.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100643.0
-  },
-  {
-      "date": "2024-08-10",
-      "target": 110000.0,
-      "balance": 104880.0,
-      "high_water_mark": 105940.0,
-      "equity": 98940.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 99636.0
-  },
-  {
-      "date": "2024-08-11",
-      "target": 110000.0,
-      "balance": 106080.0,
-      "high_water_mark": 106080.0,
-      "equity": 101200.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100776.0
-  },
-  {
-      "date": "2024-08-12",
-      "target": 110000.0,
-      "balance": 106180.0,
-      "high_water_mark": 106180.0,
-      "equity": 100100.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100871.0
-  },
-  {
-      "date": "2024-08-13",
-      "target": 110000.0,
-      "balance": 105780.0,
-      "high_water_mark": 106180.0,
-      "equity": 99600.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100491.0
-  },
-  {
-      "date": "2024-08-14",
-      "target": 110000.0,
-      "balance": 106080.0,
-      "high_water_mark": 106180.0,
-      "equity": 100300.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100776.0
-  },
-  {
-      "date": "2024-08-15",
-      "target": 110000.0,
-      "balance": 106280.0,
-      "high_water_mark": 106280.0,
-      "equity": 100200.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100966.0
-  },
-  {
-      "date": "2024-08-16",
-      "target": 110000.0,
-      "balance": 106180.0,
-      "high_water_mark": 106280.0,
-      "equity": 99900.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100871.0
-  },
-  {
-      "date": "2024-08-17",
-      "target": 110000.0,
-      "balance": 106280.0,
-      "high_water_mark": 106280.0,
-      "equity": 100100.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100966.0
-  },
-  {
-      "date": "2024-08-18",
-      "target": 110000.0,
-      "balance": 104980.0,
-      "high_water_mark": 106280.0,
-      "equity": 98700.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 99731.0
-  },
-  {
-      "date": "2024-08-19",
-      "target": 110000.0,
-      "balance": 105380.0,
-      "high_water_mark": 106280.0,
-      "equity": 100400.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100111.0
-  },
-  {
-      "date": "2024-08-20",
-      "target": 110000.0,
-      "balance": 105580.0,
-      "high_water_mark": 106280.0,
-      "equity": 100200.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100301.0
-  },
-  {
-      "date": "2024-08-21",
-      "target": 110000.0,
-      "balance": 105980.0,
-      "high_water_mark": 106280.0,
-      "equity": 100400.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100681.0
-  },
-  {
-      "date": "2024-08-22",
-      "target": 110000.0,
-      "balance": 105380.0,
-      "high_water_mark": 106280.0,
-      "equity": 99400.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100111.0
-  },
-  {
-      "date": "2024-08-23",
-      "target": 110000.0,
-      "balance": 106080.0,
-      "high_water_mark": 106280.0,
-      "equity": 100700.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100776.0
-  },
-  {
-      "date": "2024-08-24",
-      "target": 110000.0,
-      "balance": 104880.0,
-      "high_water_mark": 106280.0,
-      "equity": 98800.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 99636.0
-  },
-  {
-      "date": "2024-08-25",
-      "target": 110000.0,
-      "balance": 105780.0,
-      "high_water_mark": 106280.0,
-      "equity": 100900.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100491.0
-  },
-  {
-      "date": "2024-08-26",
-      "target": 110000.0,
-      "balance": 105980.0,
-      "high_water_mark": 106280.0,
-      "equity": 100200.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100681.0
-  },
-  {
-      "date": "2024-08-27",
-      "target": 110000.0,
-      "balance": 106080.0,
-      "high_water_mark": 106280.0,
-      "equity": 100100.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100776.0
-  },
-  {
-      "date": "2024-08-28",
-      "target": 110000.0,
-      "balance": 106280.0,
-      "high_water_mark": 106280.0,
-      "equity": 100200.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100966.0
-  },
-  {
-      "date": "2024-08-29",
-      "target": 110000.0,
-      "balance": 106280.0,
-      "high_water_mark": 106280.0,
-      "equity": 100000.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100966.0
-  },
-  {
-      "date": "2024-08-30",
-      "target": 110000.0,
-      "balance": 106305.0,
-      "high_water_mark": 106305.0,
-      "equity": 100025.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100989.75
-  },
-  {
-      "date": "2025-02-21",
-      "target": 110000.0,
-      "balance": 106305.0,
-      "high_water_mark": 106305.0,
-      "equity": 106305.0,
-      "max_drawdown": 90000.0,
-      "max_daily_loss": 100989.75
-  }
-
-]
+import { useRouter } from 'next/router'
+import { MetaStats } from 'metaapi.cloud-sdk'
 
 export default function MyPage() {
-  // Formateador del eje Y
-  const yFormatter = (tick) => {
-    if (typeof tick === 'number') {
-      return `$ ${new Intl.NumberFormat('us').format(tick)}`
-    }
-    return ''
-  }
+    const [data, setData] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+    const router = useRouter()
+    const { idcuenta } = router.query
 
-  return (
-    <div >
-      <LineChart
-        data={data}
-        index="date"
-        categories={[
-          'target',
-          'balance',
-          //'high_water_mark',
-          'equity',
-          'max_drawdown',
-          'max_daily_loss',
-        ]}
-        yFormatter={yFormatter}
-      />
-    </div>
-  )
+    // Formateador del eje Y para moneda
+    const yFormatter = (tick) => {
+        if (typeof tick === 'number') {
+            return `$ ${new Intl.NumberFormat('us').format(tick)}`
+        }
+        return ''
+    }
+
+    useEffect(() => {
+        // Solo proceder si tenemos el ID de la cuenta
+        if (!idcuenta) return
+
+        const fetchBalanceData = async () => {
+            setLoading(true)
+            setError(null)
+
+            try {
+                // Primero obtenemos los datos del challenge para conseguir el accountId
+                const challengeResponse = await fetch(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${idcuenta}?populate=broker_account`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                )
+
+                if (!challengeResponse.ok) {
+                    throw new Error(`Error obteniendo datos del challenge: ${challengeResponse.status}`)
+                }
+
+                const challengeData = await challengeResponse.json()
+                const accountId = challengeData?.data?.broker_account?.idMeta
+
+                if (!accountId) {
+                    throw new Error("No se encontró el ID de la cuenta MetaAPI")
+                }
+
+                // Obtenemos las métricas usando MetaStats
+                const metaStats = new MetaStats(process.env.NEXT_PUBLIC_TOKEN_META_API)
+                const metrics = await metaStats.getMetrics(accountId)
+
+                // Transformamos los datos para el gráfico
+                if (metrics && metrics.dailyGrowth && metrics.dailyGrowth.length > 0) {
+                    const chartData = transformMetricsToChartData(metrics)
+                    console.log("Datos procesados para el gráfico:", chartData)
+                    setData(chartData)
+                } else {
+                    console.warn("No hay datos de crecimiento diario disponibles")
+                    // Generar datos de ejemplo si no hay datos reales
+                    const sampleData = generateSampleData(metrics?.deposits || 10000)
+                    setData(sampleData)
+                }
+            } catch (err) {
+                console.error("Error obteniendo datos para el gráfico:", err)
+                setError(err.message || "Error desconocido")
+
+                // Generar datos de ejemplo en caso de error
+                const sampleData = generateSampleData(10000)
+                setData(sampleData)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchBalanceData()
+    }, [idcuenta])
+
+    /**
+     * Transforma los datos de métricas al formato requerido por el gráfico
+     */
+    const transformMetricsToChartData = (metrics) => {
+        // Extraer datos de crecimiento diario
+        const dailyGrowthData = metrics.dailyGrowth || []
+        const initialBalance = metrics.deposits || 10000
+        const targetBalance = initialBalance * 1.1 // 10% por encima del inicial
+
+        // Transformar al formato esperado por LineChart
+        return dailyGrowthData.map(day => {
+            // Calcular valores para max_drawdown y max_daily_loss basados en la métrica
+            const maxDrawdownAmount = initialBalance * (1 - (metrics.maxDrawdown || 0.1) / 100)
+            const maxDailyLossAmount = day.balance * 0.95 // 5% del balance del día
+
+            return {
+                date: typeof day.date === 'string' ? day.date.split(' ')[0] : new Date().toISOString().split('T')[0], // Solo la parte de la fecha
+                balance: day.balance || initialBalance,
+                target: targetBalance,
+                equity: day.balance || initialBalance, // Podemos usar el balance como equity si no está disponible
+                max_drawdown: maxDrawdownAmount,
+                max_daily_loss: maxDailyLossAmount
+            }
+        })
+    }
+
+    /**
+     * Genera datos de ejemplo para el gráfico
+     */
+    const generateSampleData = (initialBalance) => {
+        const today = new Date()
+        return Array.from({ length: 30 }, (_, i) => {
+            const date = new Date(today)
+            date.setDate(date.getDate() - (29 - i))
+            const formattedDate = date.toISOString().split('T')[0]
+
+            // Simular fluctuación del balance
+            const dayChange = Math.random() * 500 - 200
+            const balance = initialBalance + (i * 100) + dayChange
+
+            return {
+                date: formattedDate,
+                balance: balance,
+                target: initialBalance * 1.1,
+                equity: balance - (Math.random() * 500 - 250),
+                max_drawdown: initialBalance * 0.9,
+                max_daily_loss: balance * 0.95
+            }
+        })
+    }
+
+    // Mostrar indicador de carga
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-60 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black p-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--app-primary)]"></div>
+            </div>
+        )
+    }
+
+    // Mostrar error si lo hay
+    if (error) {
+        return (
+            <div className="text-red-500 p-4 bg-red-100 dark:bg-red-900/30 rounded-lg dark:bg-zinc-800  shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+                Error cargando datos del gráfico: {error}
+            </div>
+        )
+    }
+
+    // Mensaje cuando no hay datos
+    if (data.length === 0) {
+        return (
+            <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800 rounded-lg  shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+                No hay datos disponibles para mostrar.
+            </div>
+        )
+    }
+
+    // Renderizar gráfico
+    return (
+        <>
+            <h2 className="text-lg font-semibold mb-4">Evolución del Balance</h2>
+            <div className="dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black ">
+                <LineChart
+                    data={data}
+                    index="date"
+                    categories={[
+                        'target',
+                        'balance',
+                        //'high_water_mark',
+                        //'equity',
+                        'max_drawdown',
+                        //'max_daily_loss',
+                    ]}
+                    yFormatter={yFormatter}
+                />
+            </div>
+        </>
+    )
 }

@@ -31,7 +31,7 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId, br
             const initialBalance = parseFloat(safeBrokerBalance);
             
             // Solo permitir retiros cuando hay una ganancia (balance actual > balance inicial)
-            const difference = Math.max(0, currentBalance - initialBalance);
+            const difference = Math.max(currentBalance - initialBalance);
             setWithdrawAmount(difference.toFixed(2));
         } catch (error) {
             console.error("Error al calcular el monto de retiro:", error);
