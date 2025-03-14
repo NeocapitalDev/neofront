@@ -5,9 +5,9 @@ import axios from 'axios';
 
 // Estados posibles para la solicitud de retiro desde la base de datos
 const WITHDRAW_STATES = {
-  PROCESS: 'proceso',
-  PAID: 'pagado',
-  CANCELLED: 'cancelado'
+    PROCESS: 'proceso',
+    PAID: 'pagado',
+    CANCELLED: 'cancelado'
 };
 
 export default function BilleteraCripto({ balance = "0", userId, challengeId }) {
@@ -16,29 +16,31 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
     const [usdtWalletAddress, setUsdtWalletAddress] = useState("");
     const [requestStatus, setRequestStatus] = useState("idle"); // idle, requesting, completed
     const [withdrawState, setWithdrawState] = useState(null);
-    
+
     // Asegurando que balance es tratado como string en caso de ser undefined o número
     const safeBalance = String(balance || "0");
-    
+
     // Verificar el estado actual de la solicitud en la base de datos
     useEffect(() => {
         checkWithdrawStatus();
-        
+
         // Verificar periódicamente el estado
         const interval = setInterval(checkWithdrawStatus, 30000); // Cada 30 segundos
-        
+
         return () => clearInterval(interval);
     }, []);
-    
+
     // Función para consultar el estado actual de la solicitud en la base de datos
     const checkWithdrawStatus = async () => {
         try {
             // Consultar el endpoint para obtener el estado actual
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/withdraws?filters[userId]=${userId}&filters[challengeId]=${challengeId}`, {                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/withdraws?populate[challenge][populate]=user&filters[challenge][documentId][$eq]=${challengeId}&filters[challenge][user][documentId][$eq]=${userId}`, {
+                headers: {
+                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`
                 }
             });
-            
+
             // Si hay datos y tiene un estado, actualizar el estado local
             if (response.data && response.data.estado !== undefined) {
                 setWithdrawState(response.data);
@@ -61,7 +63,7 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
                     [WITHDRAW_STATES.PAID]: "Su retiro fue exitoso.",
                     [WITHDRAW_STATES.CANCELLED]: "Su solicitud fue cancelada."
                 };
-                
+
                 alert(statusMessages[withdrawState.estado] || "Ya tiene una solicitud de retiro activa.");
             } else {
                 // Si no hay solicitud activa, abrir el modal
@@ -80,7 +82,7 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
     // Esta función se ejecuta cuando se hace clic en el botón "Solicitar" dentro del modal
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         try {
             // Validaciones básicas
             if (parseFloat(withdrawAmount) > parseFloat(safeBalance)) {
@@ -97,16 +99,17 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
                 alert("No se pudo obtener la información del desafío.");
                 return;
             }
-            
+
             // Cambiar estado a "requesting" para mostrar animación de carga
             setRequestStatus("requesting");
-            
+
             // Obtener la URL del webhook de n8n desde la variable de entorno
-            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CHALLENGE_RETIRO;
-            if (!webhookUrl) {
-                throw new Error("URL del webhook no configurada");
-            }
-            
+            // const webhookUrl = process.env.NEXT_PUBLIC_N8N_CHALLENGE_RETIRO;
+            // console.log("URL del webhook:", webhookUrl);
+            // if (!webhookUrl) {
+            //     throw new Error("URL del webhook no configurada");
+            // }
+
             // Preparar datos para enviar al webhook
             const requestData = {
                 amount: withdrawAmount,
@@ -116,22 +119,24 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
                 challenge_id: challengeId,  // Enviamos el challengeId al webhook
                 timestamp: new Date().toISOString()
             };
-            
-            console.log("Enviando solicitud a n8n:", webhookUrl, requestData);
-            
+            console.log("Enviando solicitud a n8n:", requestData);
+
+            // console.log("Enviando solicitud a n8n:", webhookUrl, requestData);
+
             // PASO CLAVE: Enviar la solicitud al webhook de n8n
-            const response = await axios.post(webhookUrl, requestData);
-            
+            const response = await axios.post("https://n8n.neocapitalfunding.com/webhook-test/withdrawal", requestData);
+            console.log("Respuesta :", response);
+
             console.log("Respuesta del webhook:", response.data);
-            
+
             if (response.status >= 200 && response.status < 300) {
                 // El webhook se activó correctamente
                 setRequestStatus("completed");
-                
+
                 // Mostrar mensaje de éxito
                 setTimeout(() => {
                     closeModal();
-                    
+
                     // Verificar el estado actualizado después de enviar la solicitud
                     checkWithdrawStatus();
                 }, 3000);
@@ -155,7 +160,7 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
                 tooltipText: "Solicitar un retiro de fondos"
             };
         }
-        
+
         // Según el estado actual de la base de datos
         switch (withdrawState.estado) {
             case WITHDRAW_STATES.PROCESS:
@@ -191,7 +196,7 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
         <>
             {/* Botón de Retirar con tooltip */}
             <div className="relative">
-                <button 
+                <button
                     onClick={openModal}
                     className={`flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md ${buttonStyle.bgClass} border-gray-300 dark:border-zinc-500`}
                     title={buttonStyle.tooltipText}
@@ -213,7 +218,7 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
                                 ✕
                             </button>
                         </div>
-                        
+
                         <div className="p-4">
                             {requestStatus === "idle" ? (
                                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -233,7 +238,7 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
                                             Balance disponible: ${safeBalance}
                                         </p>
                                     </div>
-                                    
+
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">Wallet USDT TRC20</label>
                                         <input
@@ -245,9 +250,9 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
                                             className="w-full px-3 py-2 border rounded-md dark:bg-zinc-700 dark:border-zinc-600 dark:text-white"
                                         />
                                     </div>
-                                    
+
                                     <div className="flex justify-end space-x-2 pt-4">
-                                        <button 
+                                        <button
                                             type="button"
                                             onClick={closeModal}
                                             className="px-4 py-2 border rounded-md dark:border-zinc-600 dark:text-white"
@@ -255,8 +260,8 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId }) 
                                             Cancelar
                                         </button>
                                         {/* Este botón activa el webhook de n8n */}
-                                        <button 
-                                            type="submit" 
+                                        <button
+                                            type="submit"
                                             className="px-4 py-2 bg-[var(--app-primary)] hover:bg-[var(--app-secondary)] text-black rounded-md"
                                             disabled={!withdrawAmount || !usdtWalletAddress.trim()}
                                         >
