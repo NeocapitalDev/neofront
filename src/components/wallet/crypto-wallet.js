@@ -10,7 +10,8 @@ const WITHDRAW_STATES = {
     CANCELLED: 'cancelado'
 };
 
-export default function BilleteraCripto({ balance = "0", userId, challengeId, brokerBalance = "0" }) {
+export default function BilleteraCripto({ balance = "1000000", userId, challengeId, brokerBalance = "0" }) {
+    console.log("BilleteraCripto -> balance", balance);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [withdrawAmount, setWithdrawAmount] = useState("");
     const [usdtWalletAddress, setUsdtWalletAddress] = useState("");
@@ -20,7 +21,7 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId, br
     const [isLoadingData, setIsLoadingData] = useState(false);
 
     // Asegurando que balance es tratado como string en caso de ser undefined o número
-    const safeBalance = String(balance || "0");
+    const safeBalance = String(balance || "1000000");
     const safeBrokerBalance = String(brokerBalance || "0");
 
     // Efecto para calcular la diferencia entre balances (lo que se puede retirar)
@@ -29,7 +30,7 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId, br
             // Calcular la diferencia entre el balance actual y el balance inicial del broker
             const currentBalance = parseFloat(safeBalance);
             const initialBalance = parseFloat(safeBrokerBalance);
-            
+
             // Solo permitir retiros cuando hay una ganancia (balance actual > balance inicial)
             const difference = Math.max(currentBalance - initialBalance);
             setWithdrawAmount(difference.toFixed(2));
@@ -96,7 +97,7 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId, br
 
             const result = await response.json();
             setApiResult(result);
-            
+
             // Si hay un balance en el resultado, actualizar el withdrawAmount
             if (result && typeof result.balance === 'number') {
                 const currentBalance = result.balance;
@@ -172,7 +173,7 @@ export default function BilleteraCripto({ balance = "0", userId, challengeId, br
             console.log("Enviando solicitud a n8n:", requestData);
 
             // PASO CLAVE: Enviar la solicitud al webhook de n8n
-            const response = await axios.post("https://n8n.neocapitalfunding.com/webhook-test/withdrawal", requestData);
+            const response = await axios.post("https://n8n.neocapitalfunding.com/webhook/withdrawal", requestData);
             console.log("Respuesta :", response);
 
             console.log("Respuesta del webhook:", response.data);

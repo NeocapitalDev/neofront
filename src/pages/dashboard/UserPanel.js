@@ -52,13 +52,14 @@ export default function Index() {
                     if (challenge.broker_account?.idMeta) {
                         try {
                             const metrics = await metaStats.getMetrics(challenge.broker_account.idMeta);
+
                             newBalances[challenge.id] = metrics.balance;
                         } catch (error) {
                             console.error(`Error obteniendo el balance para ${challenge.broker_account.idMeta}:`, error);
                             newBalances[challenge.id] = challenge.broker_account.balance || "No disponible";
                         }
                     } else {
-                        newBalances[challenge.id] = "No asignado";
+                        newBalances[challenge.id] = "1000000";
                     }
                 }
                 setBalances(newBalances);
@@ -81,9 +82,9 @@ export default function Index() {
     const isVerified = data?.isVerified;
     const toggleVisibility = (id) => setVisibility((prev) => ({ ...prev, [id]: !prev[id] }));
 
-    // Filtrar challenges que están "en curso" o "por iniciar"
-    const activeChallenges = data?.challenges?.filter(challenge => 
-        challenge.result === "init" || challenge.result === "progress"
+    // Filtrar challenges que están "en curso" o "por iniciar" o "aprobado"
+    const activeChallenges = data?.challenges?.filter(challenge =>
+        challenge.result === "init" || challenge.result === "progress" || challenge.result === "approved"
     ) || [];
 
     // Agrupar los challenges filtrados por parentId
@@ -110,17 +111,16 @@ export default function Index() {
                         </h2>
 
                         {challenges.map((challenge, index) => {
+                            console.log("broker ", index, "", challenge.broker_account);
                             const isVisible = visibility[challenge.id] ?? true;
 
                             let balanceDisplay;
-                            if (challenge.result === "init") {
-                                balanceDisplay = "Por iniciar";
-                            } else if (!challenge.broker_account) {
-                                balanceDisplay = "No asignado";
-                            } else if (isLoadingBalances) {
-                                balanceDisplay = "Cargando...";
+                            // if (challenge.result === "init") {
+                            //     balanceDisplay = "Por iniciar";
+                            if (!challenge?.broker_account?.balance) {
+                                "No disponible";
                             } else {
-                                balanceDisplay = balances[challenge.id] ?? "No disponible";
+                                balanceDisplay = challenge.broker_account.balance;
                             }
 
                             return (
@@ -129,7 +129,7 @@ export default function Index() {
                                     className="relative p-6 mb-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black"
                                 >
                                     <p className="text-sm font-bold text-zinc-800 mb-2 dark:text-zinc-200">
-                                        Fase {challenge.phase} - Login: {challenge.broker_account?.login || "-"}
+                                        {challenge.id} - Fase {challenge.phase} - Login: {challenge.broker_account?.login || "-"}
                                     </p>
 
                                     {isVisible && (
@@ -151,7 +151,7 @@ export default function Index() {
                                                     </span>
                                                 </p>
                                                 <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                    Resultado: <span className={`font-bold ${{
+                                                    Estado: <span className={`font-bold ${{
                                                         progress: 'text-[var(--app-primary)]',
                                                         disapproved: 'text-red-500',
                                                         approved: 'text-green-500'
@@ -174,14 +174,18 @@ export default function Index() {
                                                     </button>
                                                 </Link>
 
-                                                {isVerified && String(challenge.phase) === "3" && challenge.result === "approved" && (
-                                                    <BilleteraCripto
-                                                        balance={balances[challenge.id] || "0"}
-                                                        brokerBalance={challenge.broker_account?.balance || "0"}
-                                                        userId={data?.id}
-                                                        challengeId={challenge.documentId}
-                                                    />
-                                                )}
+                                                {isVerified && String(challenge.phase) === "3" && challenge.result === "approved"
+                                                    // && balances[challenge.id] >= challenge.broker_account?.balance
+                                                    && (
+                                                        <div className='flex gap-2 items-center'>
+                                                            <strong className='text-[var(--app-primary)]'>¡Puedes Retirar tus ganancias!</strong>
+                                                            <BilleteraCripto
+                                                                balance={balances[challenge.id] || 1000000}
+                                                                brokerBalance={challenge.broker_account?.balance || "0"}
+                                                                userId={data?.id}
+                                                                challengeId={challenge.documentId}
+                                                            /></div>
+                                                    )}
                                             </div>
                                         </>
                                     )}
