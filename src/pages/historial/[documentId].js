@@ -21,6 +21,7 @@ const HistorialMetrix = () => {
   const router = useRouter();
   const { documentId } = router.query;
   const [metadataStats, setMetadataStats] = useState(null);
+  const [debugMode, setDebugMode] = useState(false); // Estado para activar/desactivar modo depuración
 
   // Obtener los datos del challenge, incluyendo el campo metadata
   const { data: challengeData, error, isLoading } = useSWR(
@@ -33,7 +34,55 @@ const HistorialMetrix = () => {
   // Cuando los datos del challenge se cargan, extraer los datos de metadata
   useEffect(() => {
     if (challengeData?.data?.metadata) {
-      setMetadataStats(challengeData.data.metadata);
+      // Función para verificar si un objeto tiene propiedades relevantes de trading
+      const hasTradeProps = (obj) => {
+        const relevantProps = ['balance', 'trades', 'profit', 'equity', 'deposits', 'dailyGrowth'];
+        return relevantProps.some(prop => prop in obj);
+      };
+
+      // Primero comprobar si tiene la estructura anidada (metadata.data.metadata)
+      if (challengeData.data.metadata.data && challengeData.data.metadata.data.metadata) {
+        if (hasTradeProps(challengeData.data.metadata.data.metadata)) {
+          // Estructura anidada con datos de trading válidos
+          setMetadataStats(challengeData.data.metadata.data.metadata);
+          return;
+        }
+      }
+      
+      // Comprobar si la estructura directa tiene propiedades válidas
+      if (hasTradeProps(challengeData.data.metadata)) {
+        // Estructura plana con datos válidos
+        setMetadataStats(challengeData.data.metadata);
+        return;
+      }
+
+      // Si llegamos aquí, intentar buscar los datos en cualquier otro nivel
+      const searchMetadata = (obj, depth = 0) => {
+        // Limitar la profundidad de búsqueda para evitar bucles infinitos
+        if (depth > 5 || typeof obj !== 'object' || obj === null) return null;
+        
+        // Comprobar si el objeto actual tiene propiedades relevantes
+        if (hasTradeProps(obj)) return obj;
+        
+        // Buscar recursivamente en todas las propiedades que son objetos
+        for (const key in obj) {
+          if (typeof obj[key] === 'object' && obj[key] !== null) {
+            const result = searchMetadata(obj[key], depth + 1);
+            if (result) return result;
+          }
+        }
+        
+        return null;
+      };
+
+      // Buscar los datos en cualquier nivel del objeto
+      const foundMetadata = searchMetadata(challengeData.data.metadata);
+      if (foundMetadata) {
+        setMetadataStats(foundMetadata);
+      } else {
+        console.warn('No se encontraron datos de trading válidos en el objeto metadata');
+        setMetadataStats(null);
+      }
     }
   }, [challengeData]);
 
@@ -268,20 +317,38 @@ const HistorialMetrix = () => {
       )}
 
       {/* Información completa en formato JSON */}
-      {/*
       <div className="mt-6">
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Datos completos</h2>
-          <button 
-            onClick={() => {
-              const el = document.getElementById('metadata-json');
-              el.style.display = el.style.display === 'none' ? 'block' : 'none';
-            }}
-            className="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 rounded text-sm"
-          >
-            Mostrar/Ocultar
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setDebugMode(!debugMode)}
+              className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
+            >
+              {debugMode ? "Ocultar Debug" : "Modo Debug"}
+            </button>
+            <button 
+              onClick={() => {
+                const el = document.getElementById('metadata-json');
+                el.style.display = el.style.display === 'none' ? 'block' : 'none';
+              }}
+              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 rounded text-sm"
+            >
+              Mostrar/Ocultar
+            </button>
+          </div>
         </div>
+        
+        {/* Modo depuración - muestra la estructura de datos completa */}
+        {debugMode && (
+          <div className="mt-4">
+            <h3 className="text-md font-semibold mb-2">Datos originales (estructura completa)</h3>
+            <pre className="bg-gray-800 text-yellow-400 p-4 rounded-lg overflow-auto text-sm mt-2">
+              {JSON.stringify(challengeData?.data, null, 2)}
+            </pre>
+          </div>
+        )}
+        
         <pre 
           id="metadata-json"
           className="bg-black text-white p-4 rounded-lg overflow-auto text-sm mt-2"
@@ -290,7 +357,6 @@ const HistorialMetrix = () => {
           {JSON.stringify(metadataStats, null, 2)}
         </pre>
       </div>
-      */}
     </Layout>
   );
 };
