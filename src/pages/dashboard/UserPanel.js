@@ -2,7 +2,7 @@
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { ChartBarIcon, BellIcon, CreditCardIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon } from '@heroicons/react/24/outline';
 import Loader from '../../components/loaders/loader';
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -25,9 +25,13 @@ export default function Index() {
     const { data: session } = useSession();
     const router = useRouter();
 
+    // Cambiamos la URL para incluir 'withdraw' en el populate
     const { data, error, isLoading } = useSWR(
         session?.jwt
-            ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate]=broker_account`, session.jwt]
+            ? [
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate][broker_account]=*&populate[challenges][populate][withdraw]=*`,
+                session.jwt
+            ]
             : null,
         ([url, token]) => fetcher(url, token)
     );
@@ -82,9 +86,35 @@ export default function Index() {
     const toggleVisibility = (id) => setVisibility((prev) => ({ ...prev, [id]: !prev[id] }));
 
     // Filtrar challenges que están "en curso" o "por iniciar"
-    const activeChallenges = data?.challenges?.filter(challenge => 
-        challenge.result === "init" || challenge.result === "progress"
-    ) || [];
+    const activeChallenges = data?.challenges
+        ?.map((challenge) => {
+            console.log('Full Challenge Object:', JSON.stringify(challenge, null, 2));
+            console.log('Challenge Withdraw:', challenge.withdraw);
+            console.log('Challenge Details:', {
+                documentId: challenge.documentId,
+                phase: challenge.phase,
+                result: challenge.result,
+                hasWithdraw: !!challenge.withdraw,
+                withdrawDetails: challenge.withdraw
+            });
+            return challenge;
+        })
+        .filter((challenge) => {
+            // Siempre mostrar challenges en init o progress
+            if (challenge.result === "init" || challenge.result === "progress") {
+                return true;
+            }
+
+            // Para challenges en phase 3
+            if (challenge.phase === 3) {
+                // Mostrar si está aprobado y NO tiene retiro
+                return challenge.result === "approved" && !challenge.withdraw;
+            }
+
+            return false;
+        }) || [];
+
+    console.log('Active Challenges:', activeChallenges);
 
     // Agrupar los challenges filtrados por parentId
     const groupedChallenges = activeChallenges.reduce((acc, challenge) => {
@@ -136,33 +166,42 @@ export default function Index() {
                                         <>
                                             <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
                                                 <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                    Balance: <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                    Balance:{" "}
+                                                    <span className="font-bold text-slate-800 dark:text-slate-200">
                                                         {typeof balanceDisplay === "number" ? `$${balanceDisplay}` : balanceDisplay}
                                                     </span>
                                                 </p>
                                                 <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                    Inicio: <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                    Inicio:{" "}
+                                                    <span className="font-bold text-slate-800 dark:text-slate-200">
                                                         {challenge.startDate ? new Date(challenge.startDate).toLocaleDateString() : "-"}
                                                     </span>
                                                 </p>
                                                 <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                    Fin: <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                    Fin:{" "}
+                                                    <span className="font-bold text-slate-800 dark:text-slate-200">
                                                         {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "-"}
                                                     </span>
                                                 </p>
                                                 <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                    Resultado: <span className={`font-bold ${{
-                                                        progress: 'text-[var(--app-primary)]',
-                                                        disapproved: 'text-red-500',
-                                                        approved: 'text-green-500'
-                                                    }[challenge.result] || 'text-slate-800 dark:text-slate-200'}`}>
-                                                        {{
-                                                            init: 'Por iniciar',
-                                                            progress: 'En curso',
-                                                            disapproved: 'Desaprobado',
-                                                            approved: 'Aprobado',
-                                                            retry: 'Repetir'
-                                                        }[challenge.result] || challenge.result}
+                                                    Resultado:{" "}
+                                                    <span
+                                                        className={`font-bold ${{
+                                                                progress: "text-[var(--app-primary)]",
+                                                                disapproved: "text-red-500",
+                                                                approved: "text-green-500",
+                                                            }[challenge.result] || "text-slate-800 dark:text-slate-200"
+                                                            }`}
+                                                    >
+                                                        {
+                                                            {
+                                                                init: "Por iniciar",
+                                                                progress: "En curso",
+                                                                disapproved: "Desaprobado",
+                                                                approved: "Aprobado",
+                                                                retry: "Repetir",
+                                                            }[challenge.result] || challenge.result
+                                                        }
                                                     </span>
                                                 </p>
                                             </div>
