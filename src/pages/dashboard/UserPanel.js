@@ -187,10 +187,10 @@ export default function Index() {
                                                     Resultado:{" "}
                                                     <span
                                                         className={`font-bold ${{
-                                                                progress: "text-[var(--app-primary)]",
-                                                                disapproved: "text-red-500",
-                                                                approved: "text-green-500",
-                                                            }[challenge.result] || "text-slate-800 dark:text-slate-200"
+                                                            progress: "text-[var(--app-primary)]",
+                                                            disapproved: "text-red-500",
+                                                            approved: "text-green-500",
+                                                        }[challenge.result] || "text-slate-800 dark:text-slate-200"
                                                             }`}
                                                     >
                                                         {

@@ -233,7 +233,7 @@ const ChallengeRelations = () => {
   // Use the matching variation's ID for checkout
   const handleContinue = () => {
     if (selectedProduct && termsAccepted && cancellationAccepted) {
-      const woocommerceId = selectedProduct.WoocomerceId || 'default-id'; // Asegura que haya un ID por defecto si no existe
+      const woocommerceId = matchingVariation.id || selectedProduct.woocommerceId; // Asegura que haya un ID por defecto si no existe
       window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1&document_id=${selectedRelation.documentId}&user_id=${user.documentId}`;
       //   const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/purcharse`, {
       //     method: 'POST',
