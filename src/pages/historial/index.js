@@ -170,12 +170,15 @@ export default function Historial() {
                                                     Fase {challenge.phase} - Resultado: <span className={statusColors[challenge.result] || 'text-gray-500'}>{challenge.result}</span>
                                                 </p>
                                                 <p>Inicio: {new Date(challenge.startDate).toLocaleDateString()} - Fin: {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "En curso"}</p>
-                                                <Link href={challenge.result === 'progress' ? `/metrix2/${challenge.documentId}` : `/historial/${challenge.documentId}`}>
-                                                    <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
-                                                        <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                                                        <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
-                                                    </button>
-                                                </Link>
+                                                <div class="mt-4 flex space-x-4">
+                                                    <Link href={challenge.result === 'progress' ? `/metrix2/${challenge.documentId}` : `/historial/${challenge.documentId}`}>
+                                                        <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
+                                                            <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+                                                            <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
+                                                        </button>
+                                                    </Link>
+                                                </div>
+                                                
                                             </div>
                                         ))}
                                     </div>

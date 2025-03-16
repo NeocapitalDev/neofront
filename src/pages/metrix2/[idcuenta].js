@@ -1,3 +1,4 @@
+// src/pages/metrix2/[idcuenta].js
 import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/router";

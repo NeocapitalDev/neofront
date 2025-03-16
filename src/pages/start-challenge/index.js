@@ -85,9 +85,9 @@ const ChallengeRelations = () => {
   // Procesar los datos para obtener steps únicos y sus relaciones
   const stepsData = relations
     ? [...new Set(relations.map(relation => relation.challenge_step.name))].map(stepName => ({
-        step: stepName,
-        relations: relations.filter(relation => relation.challenge_step.name === stepName),
-      }))
+      step: stepName,
+      relations: relations.filter(relation => relation.challenge_step.name === stepName),
+    }))
     : [];
 
   // Seleccionar el primer step, relación y producto por defecto al cargar los datos
@@ -148,14 +148,14 @@ const ChallengeRelations = () => {
   console.log("Matching Variation:", matchingVariation);
 
 
-  {/*if (isLoading || allproductsisLoading) return <p className="text-white">Loading...</p>;*/}
+  {/*if (isLoading || allproductsisLoading) return <p className="text-white">Loading...</p>;*/ }
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <Loader />
       </div>
     );
-  }  
+  }
 
   if (error) return <p className="text-red-500">Error: {error.message}</p>;
   if (allproductserror) return <p className="text-red-500">Error: {allproductserror.message}</p>;
@@ -163,17 +163,22 @@ const ChallengeRelations = () => {
   // Función para manejar el clic en un step
   const handleStepClick = (step) => {
     setSelectedStep(step);
-    setSelectedRelationId(null);
-    setSelectedProduct(null);
-    setSelectedRelation(null);
 
     const stepRelations = stepsData.find(item => item.step === step).relations;
     if (stepRelations.length > 0) {
       setSelectedRelationId(stepRelations[0].id);
       setSelectedRelation(stepRelations[0]);
 
+      // Check if the current product exists in the new relation
+      const currentProductName = selectedProduct?.name;
       const firstRelationProducts = stepRelations[0].challenge_products;
-      if (firstRelationProducts.length > 0) {
+
+      if (currentProductName && firstRelationProducts.some(product => product.name === currentProductName)) {
+        // If the current product exists in the new relation, keep it selected
+        const existingProduct = firstRelationProducts.find(product => product.name === currentProductName);
+        setSelectedProduct(existingProduct);
+      } else if (firstRelationProducts.length > 0) {
+        // Otherwise, select the first product
         setSelectedProduct(firstRelationProducts[0]);
       }
     }
@@ -187,8 +192,18 @@ const ChallengeRelations = () => {
     console.log('Relación seleccionada:', relation);
     setSelectedRelation(relation);
 
+    // Check if the current product exists in the new relation
+    const currentProductName = selectedProduct?.name;
+
     if (relation && relation.challenge_products.length > 0) {
-      setSelectedProduct(relation.challenge_products[0]);
+      if (currentProductName && relation.challenge_products.some(product => product.name === currentProductName)) {
+        // If the current product exists in the new relation, keep it selected
+        const existingProduct = relation.challenge_products.find(product => product.name === currentProductName);
+        setSelectedProduct(existingProduct);
+      } else {
+        // Otherwise, select the first product
+        setSelectedProduct(relation.challenge_products[0]);
+      }
     } else {
       setSelectedProduct(null);
     }
@@ -218,7 +233,7 @@ const ChallengeRelations = () => {
   // Use the matching variation's ID for checkout
   const handleContinue = () => {
     if (selectedProduct && termsAccepted && cancellationAccepted) {
-      const woocommerceId = selectedProduct.WoocomerceId || 'default-id'; // Asegura que haya un ID por defecto si no existe
+      const woocommerceId = matchingVariation.id || selectedProduct.woocommerceId; // Asegura que haya un ID por defecto si no existe
       window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1&document_id=${selectedRelation.documentId}&user_id=${user.documentId}`;
       //   const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/purcharse`, {
       //     method: 'POST',
@@ -401,8 +416,8 @@ const ChallengeRelations = () => {
                                 selectedProduct && selectedProduct.name === product.name
                                   ? "bg-zinc-800 border-amber-500 text-white"
                                   : isInRelation
-                                  ? "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
-                                  : "bg-gray-900/20 border-gray-700 text-gray-500 opacity-50"
+                                    ? "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+                                    : "bg-gray-900/20 border-gray-700 text-gray-500 opacity-50"
                               )}
                             >
                               <span className="block font-medium">{product.name}</span>
@@ -489,9 +504,9 @@ const ChallengeRelations = () => {
                             </section>
                           </div>
 
-                          
+
                           <div className="space-y-6">
-                            
+
                             {/*
                             <section>
                               <span className="block text-amber-400 font-medium mb-3">Ingresa tu cupón</span>
@@ -586,7 +601,7 @@ const ChallengeRelations = () => {
                         className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct && termsAccepted && cancellationAccepted
                           ? "bg-amber-500 hover:bg-amber-600 text-black font-bold"
                           : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
-                        }`}
+                          }`}
                       >
                         <span className="uppercase">Continuar</span>
                         <ChevronRightIcon className="h-5 w-5 ml-2" />

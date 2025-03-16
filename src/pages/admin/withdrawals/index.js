@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import useSWR from "swr";
+import { useStrapiData } from "src/services/strapiService";
 import {
   useReactTable,
   getCoreRowModel,
@@ -17,38 +16,48 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 import DashboardLayout from "..";
 
-const challengeColumns = [
+const withdrawColumns = [
   { accessorKey: "id", header: "ID" },
-  // { accessorKey: "login", header: "Login" },
-  { accessorKey: "startDate", header: "Fecha de Inicio" },
-  { accessorKey: "endDate", header: "Fecha de Fin" },
+  { accessorKey: "documentId", header: "Document ID" },
+  { accessorKey: "wallet", header: "Wallet" },
+  { accessorKey: "amount", header: "Monto" },
+  { accessorKey: "estado", header: "Estado" },
+  { accessorKey: "createdAt", header: "Fecha de Creación" },
+  { accessorKey: "username", header: "Usuario" },
+  { accessorKey: "challengeId", header: "ID del Challenge" },
+  { accessorKey: "action", header: "Acciones" },
+  // { accessorKey: "challengeDocumentId", header: "Document ID del Challenge" },
 ];
 
-const fetcher = (url, token) =>
-  fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }).then((res) => res.json());
+export default function WithdrawsTable() {
+  const { data, error, isLoading } = useStrapiData("withdraws?populate[challenge][populate]=user");
 
-export default function ChallengesTable() {
-  const { data: session } = useSession();
-  const { data, error, isLoading } = useSWR(
-    session?.jwt
-    ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges?filters[phase][$eq]=3&filters[result][$eq]=approved`, session.jwt]
-    : null,
-    ([url, token]) => fetcher(url, token)
-  );
-  // console.log(data);
-  const [search, setSearch] = useState("");
-  const [resultFilter, setResultFilter] = useState(""); // "Aprobado" o "No Aprobado"
-  const [phaseFilter, setPhaseFilter] = useState(""); // "1", "2", "3"
+  // Estados para filtros
   const [startDateFilter, setStartDateFilter] = useState("");
   const [endDateFilter, setEndDateFilter] = useState("");
+  const [estadoFilter, setEstadoFilter] = useState("");
+
+  // Estados para el modal de rechazo
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [selectedWithdrawal, setSelectedWithdrawal] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
     return date.toLocaleDateString("es-ES", {
       year: "numeric",
@@ -57,47 +66,144 @@ export default function ChallengesTable() {
     });
   };
 
-  const filteredData = useMemo(() => {
-    if (!data || !data.data) return [];
+  const handleAccept = async (documentId) => {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`https://n8n.neocapitalfunding.com/webhook-test/withdraw-status`, {
+        method: "POST",
+        body: JSON.stringify({
+          documentId: documentId,
+          status: "pagado"
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
 
-    return data.data.filter((challenge) => {
-      // const matchesSearch = challenge.login 
-      // ? challenge.login.toLowerCase().includes(search.toLowerCase()) 
-      // : false;
-          const matchesResult =
-        resultFilter && challenge.result
-          ? challenge.result.toLowerCase() === resultFilter.toLowerCase()
-          : true;
-      const matchesPhase = phaseFilter ? String(challenge.phase) === phaseFilter : true;
-      const matchesDateRange =
-        (!startDateFilter || new Date(challenge.startDate) >= new Date(startDateFilter)) &&
-        (!endDateFilter || new Date(challenge.endDate) <= new Date(endDateFilter));
-        return matchesResult && matchesPhase && matchesDateRange;
+      if (response.ok) {
+        toast.success("Retiro completado");
+        // Force page reload after successful withdrawal acceptance
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000); // Delay of 1 second to allow the toast to be visible
+      } else {
+        throw new Error("Error en la respuesta del servidor");
+      }
+    } catch (error) {
+      toast.error("Error, no se pudo completar el retiro");
+      console.error("Error al aceptar la solicitud de retiro:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-      // return matchesSearch && matchesResult && matchesPhase && matchesDateRange;
+  const openRejectModal = (withdrawal) => {
+    setSelectedWithdrawal(withdrawal);
+    setRejectionReason("");
+    setIsRejectModalOpen(true);
+  };
+
+  const handleReject = async () => {
+    if (!selectedWithdrawal || !rejectionReason.trim()) {
+      toast.error("Error");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`https://n8n.neocapitalfunding.com/webhook-test/withdraw-status`, {
+        method: "POST",
+        body: JSON.stringify({
+          documentId: selectedWithdrawal.documentId,
+          status: "rechazado",
+          reason: rejectionReason
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
+
+      if (response.ok) {
+        toast.success("Retiro rechazado y notificado al usuario.");
+        setIsRejectModalOpen(false);
+      } else {
+        throw new Error("Error en la respuesta del servidor");
+      }
+    } catch (error) {
+      toast.error("Ha ocurrido un error al rechazar la solicitud de retiro.");
+      console.error("Error al rechazar la solicitud de retiro:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Procesar los datos para obtener una estructura plana para la tabla
+  const processedData = useMemo(() => {
+    if (!data) return [];
+
+    return data.map(item => {
+      // Manejar ambas posibles estructuras de datos (directa o con atributos)
+      const withdraw = item.attributes || item;
+      const challenge = withdraw.challenge?.data?.attributes || withdraw.challenge;
+      const user = challenge?.user?.data?.attributes || challenge?.user;
+
+      return {
+        id: item.id,
+        documentId: withdraw.documentId,
+        wallet: withdraw.wallet,
+        amount: withdraw.amount,
+        estado: withdraw.estado,
+        createdAt: withdraw.createdAt,
+        // Extraer datos de usuario y reto a una estructura plana
+        username: user?.username || "N/A",
+        email: user?.email || "N/A",
+        challengeId: challenge?.id || "N/A",
+        challengeDocumentId: challenge?.documentId || "N/A"
+      };
     });
-  }, [data, search, resultFilter, phaseFilter, startDateFilter, endDateFilter]);
+  }, [data]);
+
+  const filteredData = useMemo(() => {
+    if (!processedData.length) return [];
+
+    return processedData.filter((item) => {
+      const matchesEstado = estadoFilter ? item.estado === estadoFilter : true;
+
+      // Solo aplicar filtros de fecha si son fechas válidas
+      const validStartDate = item.startDate !== "N/A";
+      const validEndDate = item.endDate !== "N/A";
+
+      const matchesDateRange =
+        (!startDateFilter || !validStartDate || new Date(item.startDate) >= new Date(startDateFilter)) &&
+        (!endDateFilter || !validEndDate || new Date(item.endDate) <= new Date(endDateFilter));
+
+      return matchesEstado && matchesDateRange;
+    });
+  }, [processedData, estadoFilter, startDateFilter, endDateFilter]);
 
   const table = useReactTable({
     data: filteredData,
-    columns: challengeColumns,
+    columns: withdrawColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
-
 
   return (
     <DashboardLayout>
       <div className="p-6 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 rounded-lg shadow-lg">
         {/* Barra de búsqueda y filtros */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-2">
-          {/* Filtro por login */}
-          {/* <Input
-            placeholder="Login..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+          {/* Filtro por estado */}
+          <select
+            value={estadoFilter}
+            onChange={(e) => setEstadoFilter(e.target.value)}
             className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
-          /> */}
+          >
+            <option value="">Todos los estados</option>
+            <option value="proceso">En Proceso</option>
+            <option value="pagado">Pagado</option>
+            <option value="rechazado">Rechazado</option>
+          </select>
 
           {/* Filtro por fecha de inicio */}
           <Input
@@ -121,7 +227,7 @@ export default function ChallengesTable() {
           <Table>
             <TableHeader className="bg-zinc-200 dark:bg-zinc-800">
               <TableRow>
-                {challengeColumns.map((column) => (
+                {withdrawColumns.map((column) => (
                   <TableHead key={column.accessorKey} className="text-zinc-900 dark:text-zinc-200 border-b border-zinc-300 dark:border-zinc-700">
                     {column.header}
                   </TableHead>
@@ -129,18 +235,71 @@ export default function ChallengesTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredData.length > 0 ? (
-                filteredData.map((challenge, index) => (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={withdrawColumns.length} className="text-center text-zinc-500 py-6">
+                    Cargando datos...
+                  </TableCell>
+                </TableRow>
+              ) : error ? (
+                <TableRow>
+                  <TableCell colSpan={withdrawColumns.length} className="text-center text-zinc-500 py-6">
+                    Error al cargar los datos: {error.message}
+                  </TableCell>
+                </TableRow>
+              ) : filteredData.length > 0 ? (
+                filteredData.map((item, index) => (
                   <TableRow key={index} className="border-b border-zinc-300 dark:border-zinc-700">
-                    <TableCell>{challenge.id}</TableCell>
-                    {/* <TableCell>{challenge.login}</TableCell> */}
-                    <TableCell>{formatDate(challenge.startDate) ?? "N/A"}</TableCell>
-                    <TableCell>{formatDate(challenge.endDate) ?? "N/A"}</TableCell>
+                    <TableCell>{item.id}</TableCell>
+                    <TableCell>{item.documentId}</TableCell>
+                    <TableCell>{item.wallet}</TableCell>
+                    <TableCell>{item.amount}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${item.estado === "completado"
+                        ? "bg-green-100 text-green-800"
+                        : item.estado === "rechazado"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-yellow-100 text-yellow-800"
+                        }`}>
+                        {item.estado}
+                      </span>
+                    </TableCell>
+                    <TableCell>{formatDate(item.createdAt)}</TableCell>
+                    <TableCell>{item.username}</TableCell>
+                    <TableCell>{item.challengeId}</TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          variant="success"
+                          disabled={item.estado !== "proceso" || isSubmitting}
+                          onClick={() => handleAccept(item.documentId)}
+                          className={`px-3 py-1 text-xs font-medium rounded-md text-white ${item.estado !== "proceso" || isSubmitting
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-green-600 hover:bg-green-700"
+                            } transition-colors`}
+                        >
+                          Completar
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          disabled={item.estado !== "proceso" || isSubmitting}
+                          onClick={() => openRejectModal(item)}
+                          className={`px-3 py-1 text-xs font-medium rounded-md text-white ${item.estado !== "proceso" || isSubmitting
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-red-600 hover:bg-red-700"
+                            } transition-colors`}
+                        >
+                          Rechazar
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={challengeColumns.length} className="text-center text-zinc-500 py-6">
+                  <TableCell colSpan={withdrawColumns.length} className="text-center text-zinc-500 py-6">
                     No se encontraron resultados.
                   </TableCell>
                 </TableRow>
@@ -149,10 +308,44 @@ export default function ChallengesTable() {
           </Table>
         </div>
       </div>
+
+      {/* Modal de rechazo */}
+      <Dialog open={isRejectModalOpen} onOpenChange={setIsRejectModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Rechazar Solicitud de Retiro</DialogTitle>
+            <DialogDescription>
+              Por favor, proporcione una razón para rechazar esta solicitud. Esta información será compartida con el usuario.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Textarea
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Escriba la razón del rechazo"
+              className="min-h-24"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsRejectModalOpen(false)}
+              disabled={isSubmitting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleReject}
+              disabled={!rejectionReason.trim() || isSubmitting}
+            >
+              {isSubmitting ? "Procesando..." : "Confirmar Rechazo"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
-
-
-
-
