@@ -9,9 +9,8 @@ import CredencialesModal from "../dashboard/credentials";
 import Link from "next/link";
 import { MetaStats } from 'metaapi.cloud-sdk';
 import MyPage from "./grafico";
-import  CircularProgress  from 'src/pages/metrix2/barrascircular'
-
-
+import CircularProgress from 'src/pages/metrix2/barrascircular';
+import RelatedChallenges from "../../components/challenges/RelatedChallenges";
 
 const fetcher = (url) =>
   fetch(url, {
@@ -104,7 +103,6 @@ const Metrix = () => {
 
   return (
     <Layout>
-
       <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
         Account Metrix {challengeData?.data?.broker_account?.login || "Sin nombre"}
@@ -157,7 +155,6 @@ const Metrix = () => {
           </div>
 
           <div className="mt-6">
-
             <h2 className="text-lg font-semibold">Challenge Stats</h2>
             {apiResult ? (
               <pre className="bg-black text-white p-4 rounded-lg overflow-auto text-sm">
@@ -168,7 +165,10 @@ const Metrix = () => {
             )}
           </div>
 
-
+          {/* Componente para mostrar los challenges relacionados */}
+          {challengeData?.data && (
+            <RelatedChallenges currentChallenge={challengeData.data} />
+          )}
         </>
       )}
 
