@@ -1,3 +1,4 @@
+// src/pages/historial/CircularProgressMetadata.js
 import { useState, useEffect } from "react";
 
 // Componente individual de CircularProgress

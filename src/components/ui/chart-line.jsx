@@ -11,9 +11,8 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js'
+import zoomPlugin from 'chartjs-plugin-zoom'
 
-// Importamos el plugin de zoom de manera dinámica
-// para evitar "window is not defined" en SSR
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -25,46 +24,38 @@ ChartJS.register(
 )
 
 export function LineChart({ data, index, categories, yFormatter }) {
-  // 1) Registrar chartjs-plugin-zoom dentro de useEffect, solo en el cliente
   useEffect(() => {
-    import('chartjs-plugin-zoom').then((zoomModule) => {
-      ChartJS.register(zoomModule.default)
-    })
+    ChartJS.register(zoomPlugin)
   }, [])
 
-  // 2) Definimos colores y estilo (punteado o no) para cada categoría
+  // Definimos colores y estilos para cada categoría
+  // Añadimos pointRadius y pointHoverRadius
   const lineStyles = {
-    target: {
-      color: '#10B981', // Verde
-      dash: [],
-    },
     balance: {
-      color: '#3B82F6', // Azul
+      color: '#3B82F6', 
       dash: [],
-    },
-    high_water_mark: {
-      color: '#FBBF24', // Amarillo
-      dash: [],
-    },
-    equity: {
-      color: '#3B82F6', // Azul punteado
-      dash: [5, 5],
+      pointRadius: 0,       // Si quieres ver círculos en balance, pon 3
+      pointHoverRadius: 6,
     },
     max_drawdown: {
-      color: '#F87171', // Rojo
+      color: '#F87171', 
       dash: [5, 5],
+      pointRadius: 3,       // Círculos SIEMPRE visibles en la línea horizontal
+      pointHoverRadius: 6,
     },
-    max_daily_loss: {
-      color: '#F87171', // Rojo punteado
+    profit_target: {
+      color: '#10B981',
       dash: [],
+      pointRadius: 3,       // Círculos SIEMPRE visibles en la línea horizontal
+      pointHoverRadius: 6,
     },
   }
 
-  // 3) Construimos los datasets para Chart.js
+  // Construimos datasets para Chart.js
   const chartData = {
     labels: data.map((item) => item[index]),
     datasets: categories.map((cat) => {
-      const style = lineStyles[cat] || { color: '#FFF', dash: [] }
+      const style = lineStyles[cat] || { color: '#FFF', dash: [], pointRadius: 0, pointHoverRadius: 5 }
       return {
         label: cat,
         data: data.map((item) => item[cat]),
@@ -72,19 +63,39 @@ export function LineChart({ data, index, categories, yFormatter }) {
         backgroundColor: 'transparent',
         borderDash: style.dash,
         borderWidth: 2,
-        // Ocultamos puntos y solo aparecen en hover:
-        pointRadius: 0,
-        pointHoverRadius: 5,
+        pointRadius: style.pointRadius,         // <--- USAMOS LO DEFINIDO EN lineStyles
+        pointHoverRadius: style.pointHoverRadius,
       }
     }),
   }
 
-  // 4) Opciones de Chart.js (fondo negro, tooltip, zoom, etc.)
+  // Calculamos min y max para incluir valores horizontales
+  let allValues = []
+  data.forEach((row) => {
+    categories.forEach((cat) => {
+      const val = row[cat]
+      if (typeof val === 'number') {
+        allValues.push(val)
+      }
+    })
+  })
+
+  if (allValues.length === 0) {
+    allValues = [0, 100]
+  }
+  const minVal = Math.min(...allValues)
+  const maxVal = Math.max(...allValues)
+  const paddingFactor = 0.05 
+  const range = maxVal - minVal
+  const suggestedMin = minVal - range * paddingFactor
+  const suggestedMax = maxVal + range * paddingFactor
+
+  // Opciones de Chart.js
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     layout: {
-      padding: 5, // más espacio interno
+      padding: 5,
     },
     interaction: {
       mode: 'index',
@@ -92,7 +103,7 @@ export function LineChart({ data, index, categories, yFormatter }) {
     },
     plugins: {
       legend: {
-        display: false, // Ocultamos la leyenda nativa (usamos la personalizada)
+        display: false,
       },
       tooltip: {
         backgroundColor: '#333',
@@ -101,15 +112,10 @@ export function LineChart({ data, index, categories, yFormatter }) {
         borderColor: '#FFF',
         borderWidth: 1,
       },
-      // Configuración del plugin de zoom
       zoom: {
         zoom: {
-          wheel: {
-            enabled: true,
-          },
-          pinch: {
-            enabled: true,
-          },
+          wheel: { enabled: true },
+          pinch: { enabled: true },
           mode: 'x',
         },
         pan: {
@@ -118,25 +124,20 @@ export function LineChart({ data, index, categories, yFormatter }) {
         },
         limits: {
           x: {
-            // Mantener min y max originales de la data
             min: 'original',
             max: 'original',
-            // minRange define la distancia mínima entre min y max
-            // es decir, cuánto puedes acercar como máximo
             minRange: 2,
           },
         },
       },
-      
     },
     scales: {
       x: {
-        // Ocultamos las etiquetas de la fecha
-        ticks: {
-          display: false,
-        },
+        ticks: { display: false },
       },
       y: {
+        suggestedMin,
+        suggestedMax,
         grid: {
           color: 'rgba(255, 255, 255, 0.2)',
         },
@@ -148,15 +149,13 @@ export function LineChart({ data, index, categories, yFormatter }) {
     },
   }
 
-  // 5) Render del componente
   return (
     <div style={{ backgroundColor: '#000', padding: '1rem', borderRadius: '8px' }}>
-      {/* Contenedor para el gráfico */}
       <div style={{ width: '100%', height: '60vh' }}>
         <Line data={chartData} options={options} />
       </div>
 
-      {/* Leyenda personalizada debajo */}
+      {/* Leyenda personalizada */}
       <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
         <ul
           style={{
@@ -164,11 +163,11 @@ export function LineChart({ data, index, categories, yFormatter }) {
             gap: '1rem',
             alignItems: 'center',
             flexWrap: 'wrap',
-            fontSize: '0.85rem', // Ajusta el tamaño de fuente a tu gusto
+            fontSize: '0.85rem',
           }}
         >
           {categories.map((cat) => {
-            const style = lineStyles[cat] || { color: '#FFF', dash: [] }
+            const style = lineStyles[cat] || { color: '#FFF', dash: [], pointRadius: 0 }
             const borderStyle = style.dash.length
               ? `2px dashed ${style.color}`
               : `2px solid ${style.color}`
@@ -192,7 +191,6 @@ export function LineChart({ data, index, categories, yFormatter }) {
           })}
         </ul>
       </div>
-
     </div>
   )
 }
