@@ -13,6 +13,8 @@ import { MetaStats } from 'metaapi.cloud-sdk';
 import MyPage from "./grafico";           // Gráfica
 import Dashboard from "src/pages/metrix2/barrascircular"; // Barras circulares
 
+import RelatedChallenges from "../../components/challenges/RelatedChallenges";
+
 /**
  * Fetcher genérico para SWR
  */
@@ -243,6 +245,10 @@ const Metrix = () => {
           profitTargetAbsolute={profitTargetAbsolute} // target en valor monetario (sumado)
         />
       </div>
+      {/* Componente para mostrar los challenges relacionados */}
+      {challengeData?.data && (
+            <RelatedChallenges currentChallenge={challengeData.data} />
+      )}
     </Layout>
   );
 };
