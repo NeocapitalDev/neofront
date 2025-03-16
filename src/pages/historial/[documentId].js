@@ -9,6 +9,7 @@ import CredencialesModal from "../dashboard/credentials";
 import Link from "next/link";
 import CircularProgressMetadata from "./CircularProgressMetadata";
 import ChartMetadata from "./ChartMetadata";
+import RelatedChallenges from "../../components/challenges/RelatedChallenges";
 
 const fetcher = (url) =>
   fetch(url, {
@@ -135,6 +136,11 @@ const HistorialMetrix = () => {
             </div>
           </div>
         </div>
+        
+        {/* Fases relacionadas */}
+        {challengeData?.data && (
+          <RelatedChallenges currentChallenge={challengeData.data} />
+        )}
         
         <div className="flex flex-col items-center justify-center py-10 mt-6 text-center">
           <div className="p-8 bg-white dark:bg-zinc-800 rounded-lg shadow-lg w-full">
@@ -315,6 +321,11 @@ const HistorialMetrix = () => {
             ))}
           </div>
         </div>
+      )}
+
+      {/* Fases relacionadas */}
+      {challengeData?.data && (
+        <RelatedChallenges currentChallenge={challengeData.data} />
       )}
 
       {/* Información completa en formato JSON */}
