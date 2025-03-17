@@ -30,7 +30,7 @@ export default function Component({ data }) {
     chartData.wonTradesPercent === 0 && chartData.lostTradesPercent === 0;
 
   return (
-    <div className="mt-6 w-full   md:max-w-2/3 lg:max-w-2/3 justify-start items-start">
+    <div className="mt-6 w-full max-w-full md:max-w-2/3 lg:max-w-2/3 justify-start items-start">
       <h2 className="text-lg font-semibold">Win/Loss Rates</h2>
       <Card className="flex flex-col mt-4 pt-4">
         <CardContent className="flex flex-col items-center">
@@ -57,7 +57,7 @@ export default function Component({ data }) {
                 {/* Porcentaje de Losses */}
                 {chartData.lostTradesPercent > 0 && (
                   <div
-                    className={`absolute top-0 h-full w-full bg-red-600 text-xs font-medium text-center text-red-100 flex items-center justify-center ${
+                    className={`absolute top-0 h-full bg-red-600 text-xs font-medium text-center text-red-100 flex items-center justify-center ${
                       chartData.lostTradesPercent === 100 ? "rounded-md" : "rounded-r-md"
                     }`}
                     style={{
