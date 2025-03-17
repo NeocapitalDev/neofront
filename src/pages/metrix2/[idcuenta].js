@@ -8,10 +8,13 @@ import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outl
 import CredencialesModal from "../dashboard/credentials";
 import Link from "next/link";
 import { MetaStats } from 'metaapi.cloud-sdk';
+import WinLoss from "./winloss";
+import Statistics from './statistics';
 
 // Ajusta la ruta de estos imports a donde tengas tus componentes
 import MyPage from "./grafico";           // Gráfica
 import Dashboard from "src/pages/metrix2/barrascircular"; // Barras circulares
+import Objetivos from "./objetivos";
 
 /**
  * Fetcher genérico para SWR
@@ -62,6 +65,7 @@ const Metrix = () => {
       try {
         const metrics = await metaStats.getMetrics(idMeta);
         setMetricsData(metrics);
+        console.log("Métricas de MetaStats:", metrics);
       } catch (err) {
         setMetricsError(err);
       } finally {
@@ -118,7 +122,7 @@ const Metrix = () => {
     if (!challengeData?.data) return;
 
     // Balance inicial del broker
-    const brokerInitialBalance = challengeData.data.broker_account?.balance ;
+    const brokerInitialBalance = challengeData.data.broker_account?.balance;
     console.log("Balance inicial del broker_account:", brokerInitialBalance);
 
     const fetchRelation = async () => {
@@ -143,7 +147,7 @@ const Metrix = () => {
 
         // ddPercent = item.maxDrawdown (porcentaje)
         // profitTargetPercent = item.profitTarget (porcentaje)
-        const ddP = item.maxDrawdown ;
+        const ddP = item.maxDrawdown;
         const ptP = item.profitTarget;
 
         console.log("maxDrawdown (porcentaje):", ddP, " - profitTarget:", ptP);
@@ -154,6 +158,7 @@ const Metrix = () => {
         //    Ej: ddP=10 y balance=10000 => 10000 - 1000 => 9000
         const ddAbsolute = brokerInitialBalance - (ddP / 100) * brokerInitialBalance;
         console.log("maxDrawdown en valor monetario (resta):", ddAbsolute);
+
         setMaxDrawdownAbsolute(ddAbsolute);
 
         // 2) Calcular profitTargetAbsolute en valor monetario (suma)
@@ -164,6 +169,7 @@ const Metrix = () => {
 
       } catch (err) {
         console.error("Error consultando Strapi (ChallengeRelation):", err);
+
       }
     };
 
@@ -195,7 +201,7 @@ const Metrix = () => {
   }
 
   // Tomar el brokerInitialBalance para pasárselo a Dashboard
-  const brokerInitialBalance = challengeData?.data?.broker_account?.balance ;
+  const brokerInitialBalance = challengeData?.data?.broker_account?.balance;
 
   return (
     <Layout>
@@ -238,11 +244,61 @@ const Metrix = () => {
       {/* Gráfica de líneas */}
       <div className="mt-6">
         <MyPage
-          statisticsData={apiResult}            // data del equity-chart
-          maxDrawdownAbsolute={maxDrawdownAbsolute} // drawdown en valor monetario (restado)
+          statisticsData={apiResult}
+          maxDrawdownAbsolute={maxDrawdownAbsolute}
           profitTargetAbsolute={profitTargetAbsolute} // target en valor monetario (sumado)
         />
       </div>
+
+      {/* Componente de WinLoss */}
+      <WinLoss data={metricsData || {}} />
+
+      <div className="mt-6">
+        <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
+        <Objetivos
+          data={{
+            tradeDayCount: 5, // Número ficticio de días de trading
+            maxDailyDrawdown: 500.00, // Pérdida diaria máxima ficticia en dólares
+            maxAbsoluteDrawdown: 1000.00, // Pérdida absoluta máxima ficticia en dólares
+            maxRelativeProfit: 1500.00, // Ganancia relativa máxima ficticia en dólares
+          }}
+          initBalance={challengeData?.data?.broker_account?.balance}
+          pase={challengeData?.data?.phase}
+        />
+      </div>
+
+      {/* Estadísticas */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="w-full md:w-1/1 rounded-lg">
+          <h2 className="text-lg font-bold mb-4 pt-5">Estadísticas</h2>
+          <Statistics
+            data={{
+              ...metricsData,
+              phase: challengeData?.data?.phase || "Desconocida",
+              brokerInitialBalance: brokerInitialBalance // Pasar el balance inicial
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="bg-black text-white p-6 rounded-lg shadow-lg my-6">
+        <h2 className="text-xl font-bold mb-4">Datos en Bruto para Comparación</h2>
+
+        <div className="mb-6">
+          <h3 className="font-semibold text-blue-400 mb-2">MetricsData</h3>
+          <pre className="bg-zinc-900 p-4 rounded-lg whitespace-pre-wrap overflow-auto max-h-96 text-xs">
+            {JSON.stringify(metricsData, null, 2)}
+          </pre>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-green-400 mb-2">EquityChartData</h3>
+          <pre className="bg-zinc-900 p-4 rounded-lg whitespace-pre-wrap overflow-auto max-h-96 text-xs">
+            {JSON.stringify(apiResult, null, 2)}
+          </pre>
+        </div>
+      </div>
+
     </Layout>
   );
 };
