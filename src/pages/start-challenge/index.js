@@ -470,28 +470,38 @@ const ChallengeRelations = () => {
                               <ul className="space-y-3">
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>leverage:</span>
+                                  <span>Leverage:</span>
                                   <strong className="ml-auto">{selectedRelation.leverage || "N/A"} %</strong>
                                 </li>
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>maximumDailyLoss:</span>
-                                  <strong className="ml-auto">{selectedRelation.maximumDailyLoss || "N/A"} días</strong>
+                                  <span>Maximum Daily Loss:</span>
+                                  <strong className="ml-auto">{selectedRelation.maximumDailyLoss || "N/A"} %</strong>
                                 </li>
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>maximumLoss:</span>
+                                  <span>Maximum Loss:</span>
                                   <strong className="ml-auto">{selectedRelation.maximumLoss || "N/A"} %</strong>
                                 </li>
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>minimumTradingDays:</span>
+                                  <span>Minimum Trading Days:</span>
                                   <strong className="ml-auto">{selectedRelation.minimumTradingDays || "N/A"} días</strong>
                                 </li>
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>profitTarget:</span>
+                                  <span>Profit Target:</span>
                                   <strong className="ml-auto">{selectedRelation.profitTarget || "N/A"} %</strong>
+                                </li>
+                                <li className="flex items-center text-zinc-300">
+                                  <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
+                                  <span>Maximum Total Loss:</span>
+                                  <strong className="ml-auto">{selectedRelation.maximumTotalLoss || "N/A"} %</strong>
+                                </li>
+                                <li className="flex items-center text-zinc-300">
+                                  <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
+                                  <span>Maximum Loss Per Trade:</span>
+                                  <strong className="ml-auto">{selectedRelation.maximumLossPerTrade || "N/A"} %</strong>
                                 </li>
                               </ul>
                             </section>
