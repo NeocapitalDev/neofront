@@ -5,12 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { CheckIcon, ChevronRightIcon, InformationCircleIcon, TicketIcon } from '@heroicons/react/20/solid';
 import classNames from 'classnames';
-import { useSession } from "next-auth/react";
 import { useStrapiData as strapiJWT } from 'src/services/strapiServiceJWT';
 import useSWR from 'swr';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import Loader from '../../components/loaders/loader';
-
+import { useSession, signIn } from "next-auth/react";
 // Helper function to create a WooCommerce API instance
 const createWooCommerceApi = (url, consumerKey, consumerSecret, version = 'wc/v3') => {
   if (!url) throw new Error('URL no proporcionada para WooCommerce API');
@@ -232,25 +231,19 @@ const ChallengeRelations = () => {
 
   // Use the matching variation's ID for checkout
   const handleContinue = () => {
-    if (selectedProduct && termsAccepted && cancellationAccepted) {
-      const woocommerceId = matchingVariation.id || selectedProduct.woocommerceId; // Asegura que haya un ID por defecto si no existe
-      window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1&document_id=${selectedRelation.documentId}&user_id=${user.documentId}`;
-      //   const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/purcharse`, {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //       product: selectedProduct,
-      //       coupon: couponCode,
-      //       termsAccepted,
-      //       cancellationAccepted,
-      //     }),
-      //   })
-      // }
-    };
-  };
+    if (!session) {
+      // Redireccionar al login con la URL actual como callback
+      signIn(undefined, {
+        callbackUrl: window.location.href
+      });
+      return; // Detener la ejecución aquí
+    }
 
+    if (selectedProduct && termsAccepted && cancellationAccepted) {
+      const woocommerceId = matchingVariation?.id || selectedProduct.woocommerceId; // Asegura que haya un ID por defecto si no existe
+      window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1&document_id=${selectedRelation.documentId}&user_id=${user.documentId}`;
+    }
+  };
   return (
     <div className="min-h-screen bg-black">
       {/* Header */}
@@ -477,28 +470,38 @@ const ChallengeRelations = () => {
                               <ul className="space-y-3">
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>leverage:</span>
+                                  <span>Leverage:</span>
                                   <strong className="ml-auto">{selectedRelation.leverage || "N/A"} %</strong>
                                 </li>
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>maximumDailyLoss:</span>
-                                  <strong className="ml-auto">{selectedRelation.maximumDailyLoss || "N/A"} días</strong>
+                                  <span>Maximum Daily Loss:</span>
+                                  <strong className="ml-auto">{selectedRelation.maximumDailyLoss || "N/A"} %</strong>
                                 </li>
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>maximumLoss:</span>
+                                  <span>Maximum Loss:</span>
                                   <strong className="ml-auto">{selectedRelation.maximumLoss || "N/A"} %</strong>
                                 </li>
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>minimumTradingDays:</span>
+                                  <span>Minimum Trading Days:</span>
                                   <strong className="ml-auto">{selectedRelation.minimumTradingDays || "N/A"} días</strong>
                                 </li>
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>profitTarget:</span>
+                                  <span>Profit Target:</span>
                                   <strong className="ml-auto">{selectedRelation.profitTarget || "N/A"} %</strong>
+                                </li>
+                                <li className="flex items-center text-zinc-300">
+                                  <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
+                                  <span>Maximum Total Loss:</span>
+                                  <strong className="ml-auto">{selectedRelation.maximumTotalLoss || "N/A"} %</strong>
+                                </li>
+                                <li className="flex items-center text-zinc-300">
+                                  <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
+                                  <span>Maximum Loss Per Trade:</span>
+                                  <strong className="ml-auto">{selectedRelation.maximumLossPerTrade || "N/A"} %</strong>
                                 </li>
                               </ul>
                             </section>

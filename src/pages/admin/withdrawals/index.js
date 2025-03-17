@@ -69,7 +69,7 @@ export default function WithdrawsTable() {
   const handleAccept = async (documentId) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch(`https://n8n.neocapitalfunding.com/webhook-test/withdraw-status`, {
+      const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/withdraw-status`, {
         method: "POST",
         body: JSON.stringify({
           documentId: documentId,
@@ -111,7 +111,7 @@ export default function WithdrawsTable() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`https://n8n.neocapitalfunding.com/webhook-test/withdraw-status`, {
+      const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/withdraw-status`, {
         method: "POST",
         body: JSON.stringify({
           documentId: selectedWithdrawal.documentId,

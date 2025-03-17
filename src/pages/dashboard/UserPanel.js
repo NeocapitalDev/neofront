@@ -23,6 +23,7 @@ const fetcher = async (url, token) => {
 
 export default function Index() {
     const { data: session } = useSession();
+    console.log('Session:', session);
     const router = useRouter();
 
     // Cambiamos la URL para incluir 'withdraw' en el populate
@@ -102,6 +103,9 @@ export default function Index() {
         })
         .filter((challenge) => {
             // Siempre mostrar challenges en init o progress
+            if(challenge.isactive === false) {
+                return false;
+            }
             if (challenge.result === "init" || challenge.result === "progress") {
                 return true;
             }
@@ -205,17 +209,18 @@ export default function Index() {
                                                     </span>
                                                 </p>
                                             </div>
-                                            <div className="mt-4 flex space-x-4">
+                                            <div className="mt-4 flex space-x-4 items-center">
                                                 <Link href={`/metrix2/${challenge.documentId}`}>
                                                     <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
                                                         <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
                                                         <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
                                                     </button>
                                                 </Link>
-
-                                                {isVerified && String(challenge.phase) === "3" && challenge.result === "approved"
-                                                    // && balances[challenge.id] >= challenge.broker_account?.balance
-                                                    && (
+                                                {!isVerified && challenge.phase === 3 &&
+                                                    challenge.result === "approved" && (<p className='font-light text-gray-300'>Debes estar verificado para retirar tus ganancias, ve al apartado de verificación.</p>)}
+                                                {isVerified &&
+                                                    challenge.phase === 3 &&
+                                                    challenge.result === "approved" && (
                                                         <div className='flex gap-2 items-center'>
                                                             <strong className='text-[var(--app-primary)]'>¡Puedes Retirar tus ganancias!</strong>
                                                             <BilleteraCripto
@@ -223,7 +228,8 @@ export default function Index() {
                                                                 brokerBalance={challenge.broker_account?.balance || "0"}
                                                                 userId={data?.id}
                                                                 challengeId={challenge.documentId}
-                                                            /></div>
+                                                            />
+                                                        </div>
                                                     )}
                                             </div>
                                         </>

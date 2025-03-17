@@ -5,13 +5,13 @@ export default withAuth(
   function middleware(req) {
     const { pathname } = req.nextUrl;
     const token = req.nextauth?.token;
-    
+
 
     // Obtiene el rol del usuario desde el token
     const userRole = token?.roleName;
     if (!userRole === null) {
       return NextResponse.redirect(new URL("/login", req.url));
-    }    
+    }
     // Si el usuario intenta acceder a /admin y es admin, redirigir a /admin/users
     if (pathname === "/admin" && userRole === "Webmaster") {
       return NextResponse.redirect(new URL("/admin/users", req.url));
@@ -46,7 +46,9 @@ export const config = {
     "/support",
     "/social",
     "/trial",
-    "/admin/:path*", 
+    "/admin/:path*",
+    "/start-challenge",
     "/",
+
   ],
 };

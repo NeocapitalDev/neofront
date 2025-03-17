@@ -1,3 +1,4 @@
+// src/pages/historial/ChartMetadata.js
 import React, { useEffect, useState } from 'react';
 import { LineChart } from '@/components/ui/chart-line';
 
