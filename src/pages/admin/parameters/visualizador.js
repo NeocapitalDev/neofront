@@ -140,6 +140,8 @@ export default function StepSubcatAutoShowNoResumen() {
           profitTarget: rel.profitTarget,
           leverage: rel.leverage,
           brokerAccount: rel.broker_account,
+          maximumTotalLoss: rel.maximumTotalLoss,
+          maximumLossPerTrade: rel.maximumLossPerTrade,
           createdAt: rel.createdAt,
           updatedAt: rel.updatedAt,
         };
@@ -379,6 +381,14 @@ export default function StepSubcatAutoShowNoResumen() {
                             {options.leverage ?? "—"}
                           </div>
                           <div>
+                            <span className="font-medium text-amber-300">Maximum Total Loss: </span>
+                            {options.maximumTotalLoss ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-medium text-amber-300">Maximum Loss Per Trade: </span>
+                            {options.maximumLossPerTrade ?? "—"}
+                          </div>
+                          <div>
                             <span className="font-medium text-amber-300">Creado: </span>
                             {formatDate(options.createdAt)}
                           </div>
@@ -428,6 +438,14 @@ export default function StepSubcatAutoShowNoResumen() {
                             {options.leverage ?? "—"}
                           </div>
                           <div>
+                            <span className="font-medium text-amber-300">Maximum Total Loss: </span>
+                            {options.maximumTotalLoss ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-medium text-amber-300">Maximum Loss Per Trade: </span>
+                            {options.maximumLossPerTrade ?? "—"}
+                          </div>
+                          <div>
                             <span className="font-medium text-amber-300">Creado: </span>
                             {formatDate(options.createdAt)}
                           </div>
@@ -475,6 +493,14 @@ export default function StepSubcatAutoShowNoResumen() {
                           <div>
                             <span className="font-medium text-amber-300">Leverage: </span>
                             {options.leverage ?? "—"}
+                          </div>
+                          <div>
+                            <span className="font-medium text-amber-300">Maximum Total Loss: </span>
+                            {options.maximumTotalLoss ?? "—"}  {/* Nuevo campo */}
+                          </div>
+                          <div>
+                            <span className="font-medium text-amber-300">Maximum Loss Per Trade: </span>
+                            {options.maximumLossPerTrade ?? "—"}  {/* Nuevo campo */}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Creado: </span>
