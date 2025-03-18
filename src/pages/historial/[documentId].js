@@ -7,8 +7,12 @@ import Loader from "../../components/loaders/loader";
 import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import CredencialesModal from "../dashboard/credentials";
 import Link from "next/link";
+
+// Componentes importados
 import CircularProgressMetadata from "./CircularProgressMetadata";
 import ChartMetadata from "./ChartMetadata";
+import WinLossHistorical from "./WinLossHistorical";
+import StatisticsHistorical from "./StatisticsHistorical";
 import RelatedChallenges from "../../components/challenges/RelatedChallenges";
 
 const fetcher = (url) =>
@@ -23,7 +27,7 @@ const HistorialMetrix = () => {
   const router = useRouter();
   const { documentId } = router.query;
   const [metadataStats, setMetadataStats] = useState(null);
-  const [debugMode, setDebugMode] = useState(false); // Estado para activar/desactivar modo depuración
+  const [debugMode, setDebugMode] = useState(false);
 
   // Obtener los datos del challenge, incluyendo el campo metadata
   const { data: challengeData, error, isLoading } = useSWR(
@@ -57,8 +61,15 @@ const HistorialMetrix = () => {
         setMetadataStats(challengeData.data.metadata);
         return;
       }
+      
+      // Si llegamos aquí, intentamos buscar los datos en cualquier nivel
+      // Si hay metaId y metrics, probablemente es el formato correcto
+      if (challengeData.data.metadata.metaId && challengeData.data.metadata.metrics) {
+        setMetadataStats(challengeData.data.metadata.metrics);
+        return;
+      }
 
-      // Si llegamos aquí, intentar buscar los datos en cualquier otro nivel
+      // Buscar recursivamente en cualquier nivel
       const searchMetadata = (obj, depth = 0) => {
         // Limitar la profundidad de búsqueda para evitar bucles infinitos
         if (depth > 5 || typeof obj !== 'object' || obj === null) return null;
@@ -198,94 +209,23 @@ const HistorialMetrix = () => {
       {/* Componentes de visualización usando los datos de metadata */}
       <CircularProgressMetadata metadata={metadataStats} />
       <ChartMetadata metadata={metadataStats} />
-
-      {/* Información detallada */}
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold">Resumen de trading</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
-            <h3 className="text-md font-semibold mb-2">Estadísticas generales</h3>
-            <ul className="space-y-2">
-              <li className="flex justify-between">
-                <span>Balance inicial:</span>
-                <span className="font-medium">${metadataStats.deposits?.toFixed(2)}</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Balance actual:</span>
-                <span className="font-medium">${metadataStats.balance?.toFixed(2)}</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Margen libre:</span>
-                <span className="font-medium">${metadataStats.freeMargin?.toFixed(2)}</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Ganancia/Pérdida:</span>
-                <span className={`font-medium ${metadataStats.profit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  ${metadataStats.profit?.toFixed(2)}
-                </span>
-              </li>
-              <li className="flex justify-between">
-                <span>Ganancia porcentual:</span>
-                <span className={`font-medium ${metadataStats.gain >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {metadataStats.gain?.toFixed(2)}%
-                </span>
-              </li>
-              <li className="flex justify-between">
-                <span>Drawdown máximo:</span>
-                <span className="font-medium text-red-500">{metadataStats.maxDrawdown?.toFixed(2)}%</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Balance más alto:</span>
-                <span className="font-medium">${metadataStats.highestBalance?.toFixed(2)}</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Fecha balance más alto:</span>
-                <span className="font-medium">{new Date(metadataStats.highestBalanceDate).toLocaleDateString()}</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
-            <h3 className="text-md font-semibold mb-2">Estadísticas de trades</h3>
-            <ul className="space-y-2">
-              <li className="flex justify-between">
-                <span>Total trades:</span>
-                <span className="font-medium">{metadataStats.trades}</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Trades ganados:</span>
-                <span className="font-medium text-green-500">{metadataStats.wonTrades} ({metadataStats.wonTradesPercent?.toFixed(2)}%)</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Trades perdidos:</span>
-                <span className="font-medium text-red-500">{metadataStats.lostTrades} ({metadataStats.lostTradesPercent?.toFixed(2)}%)</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Ganancia media:</span>
-                <span className="font-medium text-green-500">${metadataStats.averageWin?.toFixed(2)}</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Pérdida media:</span>
-                <span className="font-medium text-red-500">${metadataStats.averageLoss?.toFixed(2)}</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Mejor trade:</span>
-                <span className="font-medium text-green-500">${metadataStats.bestTrade?.toFixed(2)}</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Peor trade:</span>
-                <span className="font-medium text-red-500">${metadataStats.worstTrade?.toFixed(2)}</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Factor de rentabilidad:</span>
-                <span className="font-medium">{metadataStats.profitFactor?.toFixed(2)}</span>
-              </li>
-            </ul>
-          </div>
+      
+      {/* Componente WinLoss adaptado para historial */}
+      <WinLossHistorical metadata={metadataStats} />
+      
+      {/* Estadísticas */}
+      <div className="flex flex-col md:flex-row gap-4 mt-6">
+        <div className="w-full md:w-1/1 rounded-lg">
+          <h2 className="text-lg font-bold mb-4">Estadísticas</h2>
+          <StatisticsHistorical 
+            metadata={metadataStats}
+            phase={challengeData?.data?.phase || "Desconocida"}
+            brokerInitialBalance={metadataStats.deposits || challengeData?.data?.broker_account?.balance}
+          />
         </div>
       </div>
 
-      {/* Resumen de instrumentos */}
+      {/* Información por instrumentos */}
       {metadataStats.currencySummary && metadataStats.currencySummary.length > 0 && (
         <div className="mt-6">
           <h2 className="text-lg font-semibold">Resumen por instrumentos</h2>
@@ -307,13 +247,13 @@ const HistorialMetrix = () => {
                   <li className="flex justify-between">
                     <span>Trades ganados:</span>
                     <span className="font-medium text-green-500">
-                      {currency.total.wonTrades} ({currency.total.wonTradesPercent?.toFixed(2)}%)
+                      {currency.total.wonTrades || 0} ({currency.total.wonTradesPercent?.toFixed(2) || 0}%)
                     </span>
                   </li>
                   <li className="flex justify-between">
                     <span>Trades perdidos:</span>
                     <span className="font-medium text-red-500">
-                      {currency.total.lostTrades} ({currency.total.lostTradesPercent?.toFixed(2)}%)
+                      {currency.total.lostTrades || 0} ({currency.total.lostTradesPercent?.toFixed(2) || 0}%)
                     </span>
                   </li>
                 </ul>
