@@ -10,8 +10,8 @@ const WithdrawalsPage = () => {
     const { data: session } = useSession();
     const token = session?.jwt;
 
-    // Usamos el hook para obtener los datos del usuario con sus challenges y retiros
-    const { data, error, isLoading } = useStrapiData('users/me?populate[challenges][populate][withdraw]=*', token);
+    // Updated API call to include challenge_relation and challenge_stages
+    const { data, error, isLoading } = useStrapiData('users/me?populate[challenges][populate][withdraw]=*&populate[challenges][populate][challenge_relation][populate][challenge_stages]=*', token);
     console.log(data);
     if (isLoading) {
         return (
@@ -41,7 +41,9 @@ const WithdrawalsPage = () => {
                     ...challenge.withdraw,
                     challengeId: challenge.challengeId,
                     phase: challenge.phase,
-                    challenge: challenge.documentId
+                    challenge: challenge.documentId,
+                    // Include challenge_relation for stage name
+                    challenge_relation: challenge.challenge_relation
                 });
             }
         });
@@ -75,14 +77,30 @@ const WithdrawalsPage = () => {
         );
     };
 
-    // Obtener el nombre de la fase
-    const getPhaseLabel = (phase) => {
-        switch (phase) {
-            case 1: return "Fase 1";
-            case 2: return "Fase 2";
-            case 3: return "Fase 3 - ";
-            default: return `Fase ${phase}`;
+    // Function to get the stage name from challenge_stages
+    const getStageName = (withdrawal) => {
+        const { phase, challenge_relation } = withdrawal;
+
+        // Default fallback if no data is available
+        const fallbackName = `Fase ${phase}`;
+
+        // If no challenge_relation or challenge_stages, return fallback
+        if (!challenge_relation?.challenge_stages ||
+            !Array.isArray(challenge_relation.challenge_stages) ||
+            challenge_relation.challenge_stages.length === 0) {
+            return fallbackName;
         }
+
+        // Sort stages by ID
+        const sortedStages = [...challenge_relation.challenge_stages].sort((a, b) => a.id - b.id);
+
+        // Get stage name for the current phase
+        if (phase > 0 && phase <= sortedStages.length) {
+            // Always use the name from challenge_stages if available
+            return sortedStages[phase - 1].name || fallbackName;
+        }
+
+        return fallbackName;
     };
 
     return (
@@ -112,7 +130,8 @@ const WithdrawalsPage = () => {
                             withdrawals.map((withdrawal, index) => (
                                 <TableRow key={index}>
                                     <TableCell className="font-medium">
-                                        {getPhaseLabel(withdrawal.phase)} # {withdrawal?.challenge}
+                                        {/* Always use getStageName for stage display */}
+                                        {getStageName(withdrawal)}
                                     </TableCell>
                                     <TableCell>
                                         {formatDate(withdrawal.createdAt)}

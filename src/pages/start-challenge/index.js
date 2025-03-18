@@ -252,15 +252,24 @@ const ChallengeRelations = () => {
     return match ? parseInt(match[1], 10) : 0;
   };
 
-  // Función para contar etapas en la relación seleccionada
+  // Función modificada para obtener los nombres de los challenge stages
   const getRelationStages = () => {
-    if (!selectedRelation) return 0;
-    // Aquí deberíamos obtener el número de etapas de la relación seleccionada
-    // Como no está claro en el código original cómo se cuentan las etapas,
-    // voy a usar una propiedad ficticia 'stages' o devolver un valor predeterminado
-    return selectedRelation.stages || relations.filter(r =>
-      r.challenge_subcategory.name === selectedRelation.challenge_subcategory.name
-    ).length;
+    if (!selectedRelation || !relations) return [];
+
+    // Verificar si la relación tiene challenge_stages directamente
+    if (selectedRelation.challenge_stages && Array.isArray(selectedRelation.challenge_stages)) {
+      return selectedRelation.challenge_stages.map(stage => stage.name || stage);
+    }
+
+    // Si no tiene challenge_stages directamente, intentar buscar los stages relacionados
+    // basados en el documentId o algún otro identificador que relacione los stages con esta relación
+    const stagesForThisRelation = relations.filter(r =>
+      r.challenge_subcategory.id === selectedRelation.challenge_subcategory.id &&
+      r.documentId === selectedRelation.documentId
+    );
+
+    // Extraer los nombres de los stages relacionados
+    return stagesForThisRelation.map(r => r.challenge_stage?.name).filter(Boolean);
   };
 
   return (
@@ -484,7 +493,6 @@ const ChallengeRelations = () => {
                   </h3>
                 </header>
 
-                {/* Nueva sección informativa de etapas */}
                 {selectedRelation && (
                   <div className="bg-zinc-800 p-4 border-b border-zinc-700">
                     <h4 className="text-amber-400 font-medium mb-2">Información Adicional</h4>
@@ -493,10 +501,23 @@ const ChallengeRelations = () => {
                         <span>Subcategoría:</span>
                         <span className="font-medium">{selectedRelation.challenge_subcategory?.name}</span>
                       </p>
-                      <p className="flex justify-between">
-                        <span>N° Etapas:</span>
-                        <span className="font-medium">{getRelationStages()}</span>
-                      </p>
+                      <div className="flex items-center justify-between gap-4">
+                        <span>Etapas:</span>
+                        <div className="">
+                          {(() => {
+                            const stages = getRelationStages();
+                            return stages.length > 0 ? (
+                              stages.map((stageName, index) => (
+                                <span key={index} className="inline-block bg-zinc-700 text-white text-xs px-2 py-1 rounded ml-2">
+                                  {stageName}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-zinc-500">No hay stages disponibles</span>
+                            );
+                          })()}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
