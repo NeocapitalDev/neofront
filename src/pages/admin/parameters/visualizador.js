@@ -8,15 +8,6 @@ import { cn } from "@/lib/utils";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import DashboardLayout from "..";
 
-/**
- * Estructura:
- * 1) Mostrar TODOS los Steps (de "challenge-steps")
- * 2) Subcategorías, Products y Stages vienen de "challenge-relations" (un segundo fetch)
- * 3) Filtramos por documentId (Step, Subcat) para Products & Stages
- * 4) Tarjetas de parámetros POR CADA STAGE, usando grid para alineación horizontal
- * 5) Fechas en formato dd/mm/aaaa
- */
-
 // Función para formatear la fecha en dd/mm/aaaa
 function formatDate(dateString) {
   if (!dateString) return "—";
@@ -27,23 +18,21 @@ function formatDate(dateString) {
   return `${day}/${month}/${year}`;
 }
 
-export default function StepSubcatAutoShowNoResumen() {
+export default function StepsOrganizado() {
   const router = useRouter();
 
-  // --- Colecciones ---
-  const [allSteps, setAllSteps] = useState([]);
-  const [relations, setRelations] = useState([]);
+  // Estado unificado - estructura organizada
+  const [stepsData, setStepsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedStepIndex, setSelectedStepIndex] = useState(null);
+  const [selectedSubcatIndex, setSelectedSubcatIndex] = useState(null);
 
-  // --- Selecciones ---
-  const [selectedStepDoc, setSelectedStepDoc] = useState(null);
-  const [selectedSubcatDoc, setSelectedSubcatDoc] = useState(null);
-
-  // ----------------------------------------------------------------
-  // 1) Cargar Steps y ChallengeRelation
-  // ----------------------------------------------------------------
+  // Carga de datos
   useEffect(() => {
     async function loadData() {
       try {
+        setLoading(true);
+        
         // Fetch 1: TODOS los Steps
         const stepsRes = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-steps?populate=*`,
@@ -52,13 +41,7 @@ export default function StepSubcatAutoShowNoResumen() {
         if (!stepsRes.ok) throw new Error("Error al cargar Steps");
         const stepsJson = await stepsRes.json();
         const stepsItems = stepsJson.data || [];
-        setAllSteps(stepsItems);
-
-        if (stepsItems.length > 0 && selectedStepDoc === null) {
-          const firstDocId = stepsItems[0].documentId;
-          if (firstDocId) setSelectedStepDoc(firstDocId);
-        }
-
+        
         // Fetch 2: ChallengeRelation (para subcats, products, stages)
         const relRes = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations?populate=*`,
@@ -67,118 +50,194 @@ export default function StepSubcatAutoShowNoResumen() {
         if (!relRes.ok) throw new Error("Error al cargar ChallengeRelation");
         const relJson = await relRes.json();
         const relItems = relJson.data || [];
-        setRelations(relItems);
-
+        
         console.log("Steps =>", stepsItems);
         console.log("ChallengeRelations =>", relItems);
+        
+        // Estructura reorganizada
+        const organizedData = organizarDatos(stepsItems, relItems);
+        setStepsData(organizedData);
+        
+        // Seleccionar el primer step por defecto
+        if (organizedData.length > 0) {
+          setSelectedStepIndex(0);
+        }
+        
+        setLoading(false);
       } catch (error) {
         console.error("loadData error:", error);
+        setLoading(false);
       }
     }
+    
     loadData();
-  }, [selectedStepDoc]);
+  }, []);
+
+  // Función para organizar datos en la estructura solicitada
+  function organizarDatos(steps, relations) {
+    // Primero, agrupamos steps por nombre para combinar los que son iguales
+    const stepsByName = {};
+    
+    steps.forEach(step => {
+      const stepName = step.name.trim();
+      
+      if (!stepsByName[stepName]) {
+        stepsByName[stepName] = {
+          step: {
+            id: step.id,
+            documentId: step.documentId,
+            name: stepName,
+            createdAt: step.createdAt,
+            updatedAt: step.updatedAt,
+            publishedAt: step.publishedAt
+          },
+          subcategories: [],
+          relations: []
+        };
+      }
+      
+      // Añadimos la relación de este step a todas las relaciones
+      relations.forEach(rel => {
+        if (rel.challenge_step && rel.challenge_step.documentId === step.documentId) {
+          // Evitamos duplicados
+          if (!stepsByName[stepName].relations.some(r => r.id === rel.id)) {
+            stepsByName[stepName].relations.push(rel);
+          }
+          
+          // Procesamos subcategorías
+          if (rel.challenge_subcategory) {
+            const subcat = rel.challenge_subcategory;
+            const subcatDoc = subcat.documentId;
+            
+            // Verificamos si ya existe esta subcategoría
+            let existingSubcat = stepsByName[stepName].subcategories.find(
+              sc => sc.documentId === subcatDoc
+            );
+            
+            if (!existingSubcat) {
+              existingSubcat = {
+                id: subcat.id,
+                documentId: subcatDoc,
+                name: subcat.name || "Subcat sin nombre",
+                stages: []
+              };
+              stepsByName[stepName].subcategories.push(existingSubcat);
+            }
+            
+            // Procesamos stages
+            if (rel.challenge_stages && rel.challenge_stages.length > 0) {
+              rel.challenge_stages.forEach(stage => {
+                // Verificamos si este stage ya existe en esta subcategoría
+                if (!existingSubcat.stages.some(s => s.id === stage.id)) {
+                  existingSubcat.stages.push({
+                    id: stage.id,
+                    documentId: stage.documentId,
+                    name: stage.name || "Stage sin nombre",
+                    parametros: {
+                      id: rel.id,
+                      documentId: rel.documentId,
+                      minimumTradingDays: rel.minimumTradingDays,
+                      maximumDailyLoss: rel.maximumDailyLoss,
+                      profitTarget: rel.profitTarget,
+                      leverage: rel.leverage,
+                      maximumTotalLoss: rel.maximumTotalLoss,
+                      maximumLossPerTrade: rel.maximumLossPerTrade,
+                      createdAt: rel.createdAt,
+                      updatedAt: rel.updatedAt
+                    }
+                  });
+                }
+              });
+            } else {
+              // Si no hay stages explícitos, creamos uno basado en la relación
+              if (!existingSubcat.stages.some(s => s.id === rel.id)) {
+                existingSubcat.stages.push({
+                  id: rel.id,
+                  documentId: rel.documentId,
+                  name: `Stage ${existingSubcat.stages.length + 1}`,
+                  parametros: {
+                    id: rel.id,
+                    documentId: rel.documentId,
+                    minimumTradingDays: rel.minimumTradingDays,
+                    maximumDailyLoss: rel.maximumDailyLoss,
+                    profitTarget: rel.profitTarget,
+                    leverage: rel.leverage,
+                    maximumTotalLoss: rel.maximumTotalLoss,
+                    maximumLossPerTrade: rel.maximumLossPerTrade,
+                    createdAt: rel.createdAt,
+                    updatedAt: rel.updatedAt
+                  }
+                });
+              }
+            }
+            
+            // Procesamos productos relacionados con esta subcategoría
+            if (rel.challenge_products && rel.challenge_products.length > 0) {
+              if (!existingSubcat.products) {
+                existingSubcat.products = [];
+              }
+              
+              rel.challenge_products.forEach(product => {
+                if (!existingSubcat.products.some(p => p.id === product.id)) {
+                  existingSubcat.products.push({
+                    id: product.id,
+                    documentId: product.documentId,
+                    name: product.name || "Product sin nombre"
+                  });
+                }
+              });
+            }
+          }
+        }
+      });
+    });
+    
+    // Convertimos a array para la salida final
+    return Object.values(stepsByName);
+  }
 
   // Reset subcategoría cuando cambie el Step
   useEffect(() => {
-    setSelectedSubcatDoc(null);
-  }, [selectedStepDoc]);
+    setSelectedSubcatIndex(null);
+  }, [selectedStepIndex]);
 
   // Botón "+"
   function handlePlusClick() {
     router.push("/admin/steps");
   }
 
-  // ----------------------------------------------------------------
-  // 2) Steps: { doc, name }
-  // ----------------------------------------------------------------
-  const stepOptions = allSteps
-    .filter((s) => s.documentId)
-    .map((s) => ({
-      doc: s.documentId,
-      name: s.name || "Step sin nombre",
-      id: s.id,
-    }));
+  // Obtener el step seleccionado
+  const selectedStep = selectedStepIndex !== null ? stepsData[selectedStepIndex] : null;
+  
+  // Obtener subcategorías del step seleccionado
+  const subcatOptions = selectedStep ? selectedStep.subcategories : [];
+  
+  // Obtener la subcategoría seleccionada
+  const selectedSubcat = selectedSubcatIndex !== null && subcatOptions.length > 0 
+    ? subcatOptions[selectedSubcatIndex] : null;
 
-  // ----------------------------------------------------------------
-  // 3) Subcategorías
-  // ----------------------------------------------------------------
-  let subcatOptions = [];
-  if (selectedStepDoc) {
-    const subcatMap = new Map();
-    relations.forEach((rel) => {
-      const step = rel.challenge_step;
-      const subcat = rel.challenge_subcategory;
-      if (step && subcat && step.documentId === selectedStepDoc) {
-        const docSubcat = subcat.documentId;
-        const nameSubcat = subcat.name || "Subcat sin nombre";
-        if (!subcatMap.has(docSubcat)) {
-          subcatMap.set(docSubcat, { doc: docSubcat, name: nameSubcat, id: subcat.id });
-        }
-      }
-    });
-    subcatOptions = Array.from(subcatMap.values());
-  }
-
-  // ----------------------------------------------------------------
-  // 4) Products & Stages
-  // ----------------------------------------------------------------
-  let productList = [];
-  let stageList = [];
-  let selectedSubcat = null;
-  let options = {};
-
-  if (selectedStepDoc && selectedSubcatDoc) {
-    relations.forEach((rel) => {
-      const step = rel.challenge_step;
-      const subcat = rel.challenge_subcategory;
-      if (step && subcat && step.documentId === selectedStepDoc && subcat.documentId === selectedSubcatDoc) {
-        selectedSubcat = subcat;
-        options = {
-          minTradingDays: rel.minimumTradingDays,
-          maxDailyLoss: rel.maximumDailyLoss,
-          maxLoss: rel.maximumLoss,
-          profitTarget: rel.profitTarget,
-          leverage: rel.leverage,
-          brokerAccount: rel.broker_account,
-          maximumTotalLoss: rel.maximumTotalLoss,
-          maximumLossPerTrade: rel.maximumLossPerTrade,
-          createdAt: rel.createdAt,
-          updatedAt: rel.updatedAt,
-        };
-
-        // PRODUCTS
-        const productsArr = rel.challenge_products || [];
-        productsArr.forEach((p) => {
-          const pDoc = p.documentId;
-          const pName = p.name || "Product sin nombre";
-          if (!productList.some((x) => x.doc === pDoc)) {
-            productList.push({ doc: pDoc, name: pName, id: p.id });
-          }
-        });
-
-        // STAGES
-        const stagesArr = rel.challenge_stages || [];
-        stagesArr.forEach((sg) => {
-          const sgDoc = sg.documentId;
-          const sgName = sg.name || "Stage sin nombre";
-          if (!stageList.some((x) => x.doc === sgDoc)) {
-            stageList.push({ doc: sgDoc, name: sgName, id: sg.id });
-          }
-        });
-      }
-    });
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-screen p-6 bg-gradient-to-b  text-yellow-100">
+          <div className="flex items-center justify-center h-32">
+            <p className="text-amber-500">Cargando datos...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   return (
     <DashboardLayout>
       {/* Fondo general con un degradado oscuro */}
-      <div className="min-h-screen p-6 bg-gradient-to-b from-black via-zinc-900 to-black text-yellow-100">
+      <div className="min-h-screen p-6 bg-gradient-to-b  text-yellow-100">
         <div className="max-w-7xl mx-auto space-y-8">
           <h2 className="text-2xl font-bold text-center">Step → Subcategory → Products & Stages & Parameters</h2>
 
           {/* 1) STEPS */}
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            {stepOptions.length === 0 ? (
+            {stepsData.length === 0 ? (
               <>
                 <span className="text-gray-400">No hay Steps</span>
                 <Button
@@ -190,18 +249,18 @@ export default function StepSubcatAutoShowNoResumen() {
               </>
             ) : (
               <>
-                {stepOptions.map((stepObj) => (
+                {stepsData.map((stepObj, index) => (
                   <button
-                    key={stepObj.doc}
-                    onClick={() => setSelectedStepDoc(stepObj.doc)}
+                    key={stepObj.step.documentId}
+                    onClick={() => setSelectedStepIndex(index)}
                     className={cn(
                       "px-4 py-2 rounded-lg transition",
-                      selectedStepDoc === stepObj.doc
+                      selectedStepIndex === index
                         ? "bg-amber-500 text-black"
                         : "bg-zinc-800 hover:bg-zinc-700 text-yellow-100"
                     )}
                   >
-                    {stepObj.name}
+                    {stepObj.step.name}
                   </button>
                 ))}
                 <Button
@@ -215,7 +274,7 @@ export default function StepSubcatAutoShowNoResumen() {
           </div>
 
           {/* 2) SUBCATEGORY */}
-          {selectedStepDoc && (
+          {selectedStep && (
             <div className="flex items-center justify-center gap-4 flex-wrap">
               {subcatOptions.length === 0 ? (
                 <>
@@ -229,13 +288,13 @@ export default function StepSubcatAutoShowNoResumen() {
                 </>
               ) : (
                 <>
-                  {subcatOptions.map((sc) => (
+                  {subcatOptions.map((sc, index) => (
                     <button
-                      key={sc.doc}
-                      onClick={() => setSelectedSubcatDoc(sc.doc)}
+                      key={sc.documentId}
+                      onClick={() => setSelectedSubcatIndex(index)}
                       className={cn(
                         "px-4 py-2 rounded-lg transition",
-                        selectedSubcatDoc === sc.doc
+                        selectedSubcatIndex === index
                           ? "bg-amber-500 text-black"
                           : "bg-zinc-800 hover:bg-zinc-700 text-yellow-100"
                       )}
@@ -255,11 +314,11 @@ export default function StepSubcatAutoShowNoResumen() {
           )}
 
           {/* 3) PRODUCTS & STAGES */}
-          {selectedSubcatDoc && (
+          {selectedSubcat && (
             <div
               className={cn(
                 "mt-6",
-                stageList.length === 1
+                selectedSubcat.stages.length === 1
                   ? "flex flex-col items-center gap-6"
                   : "flex flex-row gap-6"
               )}
@@ -267,16 +326,16 @@ export default function StepSubcatAutoShowNoResumen() {
               {/* PRODUCTS */}
               <Card className={cn(
                 "bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100",
-                stageList.length === 1 ? "w-full md:w-1/2" : "flex-1"
+                selectedSubcat.stages.length === 1 ? "w-full md:w-1/2" : "flex-1"
               )}>
                 <CardHeader>
                   <CardTitle className="text-amber-400">Products Relacionados</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-3 flex-wrap">
-                    {productList.length > 0 ? (
+                    {selectedSubcat.products && selectedSubcat.products.length > 0 ? (
                       <>
-                        {productList.map((p) => (
+                        {selectedSubcat.products.map((p) => (
                           <div key={p.id} className="px-4 py-2 bg-zinc-800 rounded-lg">
                             {p.name}
                           </div>
@@ -306,16 +365,16 @@ export default function StepSubcatAutoShowNoResumen() {
               {/* STAGES */}
               <Card className={cn(
                 "bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100",
-                stageList.length === 1 ? "w-full md:w-1/2" : "flex-1"
+                selectedSubcat.stages.length === 1 ? "w-full md:w-1/2" : "flex-1"
               )}>
                 <CardHeader>
                   <CardTitle className="text-amber-400">Stages Relacionados</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-3 flex-wrap">
-                    {stageList.length > 0 ? (
+                    {selectedSubcat.stages.length > 0 ? (
                       <>
-                        {stageList.map((sg) => (
+                        {selectedSubcat.stages.map((sg) => (
                           <div key={sg.id} className="px-4 py-2 bg-zinc-800 rounded-lg">
                             {sg.name}
                           </div>
@@ -345,14 +404,14 @@ export default function StepSubcatAutoShowNoResumen() {
           )}
 
           {/* 4) TARJETAS DE PARÁMETROS POR CADA STAGE */}
-          {selectedSubcat && stageList.length > 0 && (
+          {selectedSubcat && selectedSubcat.stages.length > 0 && (
             <div className="mt-8 space-y-6">
-              {stageList.length === 1 ? (
+              {selectedSubcat.stages.length === 1 ? (
                 <div className="flex justify-center">
                   <div className="w-full md:w-1/2">
                     <Card className="bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100 w-full">
                       <CardHeader>
-                        <CardTitle className="text-amber-400">{stageList[0].name}</CardTitle>
+                        <CardTitle className="text-amber-400">{selectedSubcat.stages[0].name}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-2 text-sm">
@@ -362,48 +421,44 @@ export default function StepSubcatAutoShowNoResumen() {
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Min Trading Days: </span>
-                            {options.minTradingDays ?? "—"}
+                            {selectedSubcat.stages[0].parametros.minimumTradingDays ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Max Daily Loss: </span>
-                            {options.maxDailyLoss ?? "—"}
-                          </div>
-                          <div>
-                            <span className="font-medium text-amber-300">Max Loss: </span>
-                            {options.maxLoss ?? "—"}
+                            {selectedSubcat.stages[0].parametros.maximumDailyLoss ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Profit Target: </span>
-                            {options.profitTarget ?? "—"}
+                            {selectedSubcat.stages[0].parametros.profitTarget ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Leverage: </span>
-                            {options.leverage ?? "—"}
+                            {selectedSubcat.stages[0].parametros.leverage ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Maximum Total Loss: </span>
-                            {options.maximumTotalLoss ?? "—"}
+                            {selectedSubcat.stages[0].parametros.maximumTotalLoss ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Maximum Loss Per Trade: </span>
-                            {options.maximumLossPerTrade ?? "—"}
+                            {selectedSubcat.stages[0].parametros.maximumLossPerTrade ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Creado: </span>
-                            {formatDate(options.createdAt)}
+                            {formatDate(selectedSubcat.stages[0].parametros.createdAt)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Actualizado: </span>
-                            {formatDate(options.updatedAt)}
+                            {formatDate(selectedSubcat.stages[0].parametros.updatedAt)}
                           </div>
                         </div>
                       </CardContent>
                     </Card>
                   </div>
                 </div>
-              ) : stageList.length === 2 ? (
+              ) : selectedSubcat.stages.length === 2 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {stageList.map((sg) => (
+                  {selectedSubcat.stages.map((sg) => (
                     <Card
                       key={sg.id}
                       className="bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100 w-full"
@@ -419,39 +474,35 @@ export default function StepSubcatAutoShowNoResumen() {
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Min Trading Days: </span>
-                            {options.minTradingDays ?? "—"}
+                            {sg.parametros.minimumTradingDays ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Max Daily Loss: </span>
-                            {options.maxDailyLoss ?? "—"}
-                          </div>
-                          <div>
-                            <span className="font-medium text-amber-300">Max Loss: </span>
-                            {options.maxLoss ?? "—"}
+                            {sg.parametros.maximumDailyLoss ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Profit Target: </span>
-                            {options.profitTarget ?? "—"}
+                            {sg.parametros.profitTarget ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Leverage: </span>
-                            {options.leverage ?? "—"}
+                            {sg.parametros.leverage ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Maximum Total Loss: </span>
-                            {options.maximumTotalLoss ?? "—"}
+                            {sg.parametros.maximumTotalLoss ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Maximum Loss Per Trade: </span>
-                            {options.maximumLossPerTrade ?? "—"}
+                            {sg.parametros.maximumLossPerTrade ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Creado: </span>
-                            {formatDate(options.createdAt)}
+                            {formatDate(sg.parametros.createdAt)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Actualizado: </span>
-                            {formatDate(options.updatedAt)}
+                            {formatDate(sg.parametros.updatedAt)}
                           </div>
                         </div>
                       </CardContent>
@@ -460,7 +511,7 @@ export default function StepSubcatAutoShowNoResumen() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {stageList.map((sg) => (
+                  {selectedSubcat.stages.map((sg) => (
                     <Card
                       key={sg.id}
                       className="bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100 w-full"
@@ -476,39 +527,35 @@ export default function StepSubcatAutoShowNoResumen() {
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Min Trading Days: </span>
-                            {options.minTradingDays ?? "—"}
+                            {sg.parametros.minimumTradingDays ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Max Daily Loss: </span>
-                            {options.maxDailyLoss ?? "—"}
-                          </div>
-                          <div>
-                            <span className="font-medium text-amber-300">Max Loss: </span>
-                            {options.maxLoss ?? "—"}
+                            {sg.parametros.maximumDailyLoss ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Profit Target: </span>
-                            {options.profitTarget ?? "—"}
+                            {sg.parametros.profitTarget ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Leverage: </span>
-                            {options.leverage ?? "—"}
+                            {sg.parametros.leverage ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Maximum Total Loss: </span>
-                            {options.maximumTotalLoss ?? "—"}  {/* Nuevo campo */}
+                            {sg.parametros.maximumTotalLoss ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Maximum Loss Per Trade: </span>
-                            {options.maximumLossPerTrade ?? "—"}  {/* Nuevo campo */}
+                            {sg.parametros.maximumLossPerTrade ?? "—"}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Creado: </span>
-                            {formatDate(options.createdAt)}
+                            {formatDate(sg.parametros.createdAt)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Actualizado: </span>
-                            {formatDate(options.updatedAt)}
+                            {formatDate(sg.parametros.updatedAt)}
                           </div>
                         </div>
                       </CardContent>
