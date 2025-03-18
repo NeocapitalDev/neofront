@@ -252,15 +252,24 @@ const ChallengeRelations = () => {
     return match ? parseInt(match[1], 10) : 0;
   };
 
-  // Función para contar etapas en la relación seleccionada
+  // Función modificada para obtener los nombres de los challenge stages
   const getRelationStages = () => {
-    if (!selectedRelation) return 0;
-    // Aquí deberíamos obtener el número de etapas de la relación seleccionada
-    // Como no está claro en el código original cómo se cuentan las etapas,
-    // voy a usar una propiedad ficticia 'stages' o devolver un valor predeterminado
-    return selectedRelation.stages || relations.filter(r =>
-      r.challenge_subcategory.name === selectedRelation.challenge_subcategory.name
-    ).length;
+    if (!selectedRelation || !relations) return [];
+
+    // Verificar si la relación tiene challenge_stages directamente
+    if (selectedRelation.challenge_stages && Array.isArray(selectedRelation.challenge_stages)) {
+      return selectedRelation.challenge_stages.map(stage => stage.name || stage);
+    }
+
+    // Si no tiene challenge_stages directamente, intentar buscar los stages relacionados
+    // basados en el documentId o algún otro identificador que relacione los stages con esta relación
+    const stagesForThisRelation = relations.filter(r =>
+      r.challenge_subcategory.id === selectedRelation.challenge_subcategory.id &&
+      r.documentId === selectedRelation.documentId
+    );
+
+    // Extraer los nombres de los stages relacionados
+    return stagesForThisRelation.map(r => r.challenge_stage?.name).filter(Boolean);
   };
 
   return (
@@ -381,90 +390,30 @@ const ChallengeRelations = () => {
               </section>
             )}
 
-            {selectedRelationId && (
-              <section className="bg-zinc-900 rounded-lg p-5 shadow-md border border-zinc-800">
-                <div className="flex items-center mb-3">
-                  <h3 className="text-amber-400 font-medium">Productos</h3>
-                  <div className="relative ml-2 group">
-                    <InformationCircleIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-300" />
-                    <div className="absolute z-10 invisible group-hover:visible bg-zinc-800 text-xs text-zinc-200 p-2 rounded-md w-48 top-full left-0 mt-1">
-                      Selecciona el producto que deseas adquirir
+            {selectedRelation && (
+              <div className="bg-zinc-800 p-4 border-b border-zinc-700">
+                <h4 className="text-amber-400 font-medium mb-2">Información Adicional</h4>
+                <div className="text-zinc-300">
+                  <p className="flex justify-between mb-2">
+                    <span>Subcategoría:</span>
+                    <span className="font-medium">{selectedRelation.challenge_subcategory?.name}</span>
+                  </p>
+                  <div className="mt-2">
+                    <span>Etapas:</span>
+                    <div className="mt-1">
+                      {getRelationStages().length > 0 ? (
+                        getRelationStages().map((stageName, index) => (
+                          <span key={index} className="inline-block bg-zinc-700 text-white text-xs px-2 py-1 rounded mr-2 mb-2">
+                            {stageName}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-zinc-500">No hay etapas disponibles</span>
+                      )}
                     </div>
                   </div>
                 </div>
-                <p className="text-zinc-400 mb-4 text-sm">
-                  Elige el producto para{" "}
-                  {stepsData
-                    .find(item => item.step === selectedStep)
-                    .relations.find(r => r.id === selectedRelationId)
-                    ?.challenge_subcategory?.name}.
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {(() => {
-                    const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
-                    const selectedRelation = stepRelations.find(r => r.id === selectedRelationId);
-                    const relationProductNames = selectedRelation?.challenge_products.map(p => p.name) || [];
-
-                    if (allproducts && allproducts.length > 0) {
-                      // Sort products by balance value (10k, 20k, etc.)
-                      const sortedProducts = [...allproducts].sort((a, b) => {
-                        return extractBalance(a.balance) - extractBalance(b.balance);
-                      });
-
-                      return sortedProducts.map((product, productIndex) => {
-                        const isInRelation = relationProductNames.includes(product.name);
-
-                        return (
-                          <div key={`allproduct-${productIndex}`} className="relative">
-                            <input
-                              type="radio"
-                              id={`allproduct-${productIndex}`}
-                              name="product"
-                              checked={selectedProduct && selectedProduct.name === product.name}
-                              onChange={() => handleProductClick(product)}
-                              className="sr-only"
-                              disabled={!isInRelation}
-                            />
-                            <label
-                              htmlFor={`allproduct-${productIndex}`}
-                              className={classNames(
-                                "block p-4 rounded-lg border cursor-pointer transition-all",
-                                selectedProduct && selectedProduct.name === product.name
-                                  ? "bg-zinc-800 border-amber-500 text-white"
-                                  : isInRelation
-                                    ? "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
-                                    : "bg-gray-900/20 border-gray-700 text-gray-500 opacity-50"
-                              )}
-                            >
-                              <span className="block font-medium">{product.name}</span>
-                              {product.balance && (
-                                <span className="block text-xs mt-1 text-zinc-500">
-                                  {product.balance}
-                                </span>
-                              )}
-                              {product.isPremium && (
-                                <span className="inline-block bg-amber-500 text-black text-xs px-2 py-1 rounded mt-2 font-semibold">
-                                  Premium
-                                </span>
-                              )}
-                              {selectedProduct && selectedProduct.name === product.name && (
-                                <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-amber-500" />
-                              )}
-                            </label>
-                          </div>
-                        );
-                      });
-                    } else {
-                      return (
-                        <p className="text-zinc-500 col-span-3">
-                          No hay productos disponibles
-                        </p>
-                      );
-                    }
-                  })()}
-                </div>
-              </section>
+              </div>
             )}
           </div>
 
@@ -484,7 +433,6 @@ const ChallengeRelations = () => {
                   </h3>
                 </header>
 
-                {/* Nueva sección informativa de etapas */}
                 {selectedRelation && (
                   <div className="bg-zinc-800 p-4 border-b border-zinc-700">
                     <h4 className="text-amber-400 font-medium mb-2">Información Adicional</h4>
@@ -493,10 +441,23 @@ const ChallengeRelations = () => {
                         <span>Subcategoría:</span>
                         <span className="font-medium">{selectedRelation.challenge_subcategory?.name}</span>
                       </p>
-                      <p className="flex justify-between">
-                        <span>N° Etapas:</span>
-                        <span className="font-medium">{getRelationStages()}</span>
-                      </p>
+                      <div className="mt-2">
+                        <span>Etapas:</span>
+                        <div className="mt-1">
+                          {(() => {
+                            const stages = getRelationStages();
+                            return stages.length > 0 ? (
+                              stages.map((stageName, index) => (
+                                <span key={index} className="inline-block bg-zinc-700 text-white text-xs px-2 py-1 rounded mr-2 mb-2">
+                                  {stageName}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-zinc-500">No hay stages disponibles</span>
+                            );
+                          })()}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}

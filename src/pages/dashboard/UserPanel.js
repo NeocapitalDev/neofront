@@ -191,78 +191,78 @@ export default function Index() {
                                         className="relative p-6 mb-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black"
                                     >
                                         <p className="font-bold text-zinc-800 mb-2 dark:text-zinc-200 text-lg">
-                                            Challenge - {challenge.parentId || challenge.documentId}
-                                            <br />
-                                            <span className='text-sm'>Login: {challenge.broker_account?.login || "-"}</span>
+                                            Login: {challenge.broker_account?.login || "-"}
                                         </p>
 
-                                        {isVisible && (
-                                            <>
-                                                <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
-                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Balance:{" "}
-                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                            {typeof balanceDisplay === "number" ? `$${balanceDisplay}` : balanceDisplay}
-                                                        </span>
-                                                    </p>
-                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Inicio:{" "}
-                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                            {challenge.startDate ? new Date(challenge.startDate).toLocaleDateString() : "-"}
-                                                        </span>
-                                                    </p>
-                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Fin:{" "}
-                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                            {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "-"}
-                                                        </span>
-                                                    </p>
-                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Resultado:{" "}
-                                                        <span
-                                                            className={`font-bold ${{
-                                                                progress: "text-[var(--app-primary)]",
-                                                                disapproved: "text-red-500",
-                                                                approved: "text-green-500",
-                                                            }[challenge.result] || "text-slate-800 dark:text-slate-200"
-                                                                }`}
-                                                        >
-                                                            {
+                                        {
+                                            isVisible && (
+                                                <>
+                                                    <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
+                                                        <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                            Balance:{" "}
+                                                            <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                                {typeof balanceDisplay === "number" ? `$${balanceDisplay}` : balanceDisplay}
+                                                            </span>
+                                                        </p>
+                                                        <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                            Inicio:{" "}
+                                                            <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                                {challenge.startDate ? new Date(challenge.startDate).toLocaleDateString() : "-"}
+                                                            </span>
+                                                        </p>
+                                                        <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                            Fin:{" "}
+                                                            <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                                {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "-"}
+                                                            </span>
+                                                        </p>
+                                                        <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                            Resultado:{" "}
+                                                            <span
+                                                                className={`font-bold ${{
+                                                                    progress: "text-[var(--app-primary)]",
+                                                                    disapproved: "text-red-500",
+                                                                    approved: "text-green-500",
+                                                                }[challenge.result] || "text-slate-800 dark:text-slate-200"
+                                                                    }`}
+                                                            >
                                                                 {
-                                                                    init: "Por iniciar",
-                                                                    progress: "En curso",
-                                                                    disapproved: "Desaprobado",
-                                                                    approved: "Aprobado",
-                                                                    retry: "Repetir",
-                                                                }[challenge.result] || challenge.result
-                                                            }
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                                <div className="mt-4 flex space-x-4 items-center">
-                                                    <Link href={`/metrix2/${challenge.documentId}`}>
-                                                        <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
-                                                            <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                                                            <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
-                                                        </button>
-                                                    </Link>
-                                                    {!isVerified && challenge.phase === 3 &&
-                                                        challenge.result === "approved" && (<p className='font-light text-gray-300'>Debes estar verificado para retirar tus ganancias, ve al apartado de verificación.</p>)}
-                                                    {isVerified &&
-                                                        challenge.phase === 3 &&
-                                                        challenge.result === "approved" && (
-                                                            <div className='flex gap-2 items-center'>
-                                                                <BilleteraCripto
-                                                                    balance={balances[challenge.id] || 1000000}
-                                                                    brokerBalance={challenge.broker_account?.balance || "0"}
-                                                                    userId={data?.id}
-                                                                    challengeId={challenge.documentId}
-                                                                />
-                                                            </div>
-                                                        )}
-                                                </div>
-                                            </>
-                                        )}
+                                                                    {
+                                                                        init: "Por iniciar",
+                                                                        progress: "En curso",
+                                                                        disapproved: "Desaprobado",
+                                                                        approved: "Aprobado",
+                                                                        retry: "Repetir",
+                                                                    }[challenge.result] || challenge.result
+                                                                }
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div className="mt-4 flex space-x-4 items-center">
+                                                        <Link href={`/metrix2/${challenge.documentId}`}>
+                                                            <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
+                                                                <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+                                                                <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
+                                                            </button>
+                                                        </Link>
+                                                        {!isVerified && challenge.phase === 3 &&
+                                                            challenge.result === "approved" && (<p className='font-light text-gray-300'>Debes estar verificado para retirar tus ganancias, ve al apartado de verificación.</p>)}
+                                                        {isVerified &&
+                                                            challenge.phase === 3 &&
+                                                            challenge.result === "approved" && (
+                                                                <div className='flex gap-2 items-center'>
+                                                                    <BilleteraCripto
+                                                                        balance={balances[challenge.id] || 1000000}
+                                                                        brokerBalance={challenge.broker_account?.balance || "0"}
+                                                                        userId={data?.id}
+                                                                        challengeId={challenge.documentId}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                    </div>
+                                                </>
+                                            )
+                                        }
 
                                         <ButtonInit documentId={challenge.documentId} result={challenge.result} phase={challenge.phase} />
 
@@ -285,6 +285,6 @@ export default function Index() {
             ) : (
                 <p className="text-center text-gray-500 dark:text-gray-400">No hay challenges disponibles.</p>
             )}
-        </div>
+        </div >
     );
 }
