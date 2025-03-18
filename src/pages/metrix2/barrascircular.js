@@ -63,14 +63,43 @@ const Dashboard = ({ brokerInitialBalance, maxAllowedDrawdownPercent, profitTarg
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [hasData, setHasData] = useState(false);
 
   useEffect(() => {
-    if (!metricsData) return;
-    if (!brokerInitialBalance) return;
-    if (maxAllowedDrawdownPercent == null) return;
-    if (profitTargetPercent == null) return;
+    if (!metricsData) {
+      setLoading(false);
+      setHasData(false);
+      return;
+    }
+    if (!brokerInitialBalance) {
+      setLoading(false);
+      setHasData(false);
+      return;
+    }
+    if (maxAllowedDrawdownPercent == null) {
+      setLoading(false);
+      setHasData(false);
+      return;
+    }
+    if (profitTargetPercent == null) {
+      setLoading(false);
+      setHasData(false);
+      return;
+    }
 
     try {
+      // Verificar si hay datos válidos para mostrar
+      const hasValidData = metricsData && 
+                         (metricsData.balance !== undefined || 
+                          metricsData.maxDrawdown !== undefined || 
+                          metricsData.profitFactor !== undefined);
+      
+      if (!hasValidData) {
+        setHasData(false);
+        setLoading(false);
+        return;
+      }
+      
       // Cálculos para las barras circulares
       calculateProgressData(
         brokerInitialBalance, 
@@ -78,10 +107,12 @@ const Dashboard = ({ brokerInitialBalance, maxAllowedDrawdownPercent, profitTarg
         profitTargetPercent, 
         metricsData
       );
+      setHasData(true);
       setLoading(false);
     } catch (err) {
       console.error("Error calculando datos de progreso:", err);
       setError(err.message || "Error desconocido");
+      setHasData(false);
       setLoading(false);
     }
   }, [brokerInitialBalance, maxAllowedDrawdownPercent, profitTargetPercent, metricsData]);
@@ -176,6 +207,14 @@ const Dashboard = ({ brokerInitialBalance, maxAllowedDrawdownPercent, profitTarg
     return (
       <div className="flex items-center justify-center py-8 text-red-500 bg-black my-6 rounded-md">
         <p>Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (!hasData) {
+    return (
+      <div className="text-center p-4 bg-black rounded-lg shadow-md text-white border-zinc-700 shadow-black my-6">
+        No hay datos disponibles para mostrar.
       </div>
     );
   }
