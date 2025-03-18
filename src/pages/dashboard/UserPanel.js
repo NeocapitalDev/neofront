@@ -171,7 +171,8 @@ export default function Index() {
                     return (
                         <div key={stageName} className="mb-8">
                             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
-                                {stageName} ({stageChallengers.length} {stageChallengers.length === 1 ? 'challenge' : 'challenges'})
+                                {stageName}
+                                {/* ({stageChallengers.length} {stageChallengers.length === 1 ? 'challenge' : 'challenges'}) */}
                             </h2>
 
                             {stageChallengers.map((challenge, index) => {
@@ -251,7 +252,6 @@ export default function Index() {
                                                         challenge.phase === 3 &&
                                                         challenge.result === "approved" && (
                                                             <div className='flex gap-2 items-center'>
-                                                                <strong className='text-[var(--app-primary)]'>¡Puedes Retirar tus ganancias!</strong>
                                                                 <BilleteraCripto
                                                                     balance={balances[challenge.id] || 1000000}
                                                                     brokerBalance={challenge.broker_account?.balance || "0"}

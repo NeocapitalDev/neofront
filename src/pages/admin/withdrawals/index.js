@@ -69,7 +69,7 @@ export default function WithdrawsTable() {
   const handleAccept = async (documentId) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/withdraw-status`, {
+      const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/withdraw-status1`, {
         method: "POST",
         body: JSON.stringify({
           documentId: documentId,
@@ -79,15 +79,15 @@ export default function WithdrawsTable() {
           "Content-Type": "application/json"
         },
       });
-
       if (response.ok) {
-        toast.success("Retiro completado");
-        // Force page reload after successful withdrawal acceptance
+        // console.log("Respuesta del servidor:", response);s
+        toast.success("Retiro completado ", response.respuesta || response.ok);
+        // Force page reload after successful withresponse.respuesta || response.okdrawal acceptance
         setTimeout(() => {
-          window.location.reload();
+          // window.location.reload();
         }, 1000); // Delay of 1 second to allow the toast to be visible
       } else {
-        throw new Error("Error en la respuesta del servidor");
+        throw new Error("Error en la respuesta del servidor", response.respuesta || response.error);
       }
     } catch (error) {
       toast.error("Error, no se pudo completar el retiro");
@@ -111,7 +111,7 @@ export default function WithdrawsTable() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/withdraw-status`, {
+      const response = await fetch(`https://n8n.neocapitalfunding.com/webhook/withdraw-status1`, {
         method: "POST",
         body: JSON.stringify({
           documentId: selectedWithdrawal.documentId,
@@ -124,10 +124,10 @@ export default function WithdrawsTable() {
       });
 
       if (response.ok) {
-        toast.success("Retiro rechazado y notificado al usuario.");
+        toast.success("Retiro rechazado y notificado al usuario. ", response.respuesta || response.ok);
         setIsRejectModalOpen(false);
       } else {
-        throw new Error("Error en la respuesta del servidor");
+        throw new Error("Error en la respuesta del servidor", response.respuesta || response.error);
       }
     } catch (error) {
       toast.error("Ha ocurrido un error al rechazar la solicitud de retiro.");

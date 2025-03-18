@@ -189,6 +189,7 @@ export default function BilleteraCripto({ balance = "1000000", userId, challenge
                     // Verificar el estado actualizado después de enviar la solicitud
                     checkWithdrawStatus();
                 }, 3000);
+                window.location.reload();
             } else {
                 throw new Error("Error al enviar la solicitud al webhook");
             }
