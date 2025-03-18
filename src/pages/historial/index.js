@@ -10,7 +10,8 @@ import {
     ChartBarIcon,
     CalendarIcon,
     MagnifyingGlassIcon,
-    FunnelIcon
+    FunnelIcon,
+    ClockIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
@@ -129,21 +130,28 @@ export default function Historial() {
 
     return (
         <Layout>
-            <div className="p-6 dark:bg-zinc-800 bg-white rounded-lg dark:text-white">
-                <div className="flex flex-wrap justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold mb-2 sm:mb-0">Historial de Challenges</h1>
+            {/* Cabecera del historial - siguiendo estilo de profile */}
+            <div className="p-4 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+                <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-2">
+                        <ClockIcon className="w-5 h-5 text-gray-600 dark:text-gray-200" />
+                        <h1 className="text-lg font-semibold">Historial de Challenges</h1>
+                    </div>
                     <button
                         onClick={() => setIsFilterOpen(!isFilterOpen)}
-                        className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-yellow-500 text-black hover:bg-yellow-600 transition-colors shadow-md"
+                        className="inline-flex items-center space-x-2 bg-[var(--app-primary)] text-black font-medium py-2 px-4 rounded-lg hover:bg-[var(--app-secondary)] transition"
                     >
                         <FunnelIcon className="h-5 w-5" />
-                        <span className="font-semibold">Filtros</span>
+                        <span className="font-medium">Filtros</span>
                     </button>
                 </div>
+            </div>
 
-                {/* Filtros (colapsables) */}
+            {/* Sección de filtros */}
+            <div className="mt-4">
                 {isFilterOpen && (
-                    <div className="mb-6 p-4 bg-gray-100 dark:bg-zinc-700 rounded-lg shadow-md border border-gray-200 dark:border-zinc-600">
+                    <div className="p-5 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+                        <p className="text-base font-semibold mb-3">Opciones de filtrado</p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -154,7 +162,7 @@ export default function Historial() {
                                     placeholder="Buscar por ID"
                                     value={searchParentId}
                                     onChange={(e) => setSearchParentId(e.target.value)}
-                                    className="pl-10 p-2 w-full border rounded-lg dark:bg-zinc-800 dark:text-white dark:border-zinc-600 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                                    className="pl-10 p-2 w-full border rounded-lg dark:bg-zinc-800 dark:text-white dark:border-zinc-600 focus:ring-2 focus:ring-[var(--app-primary)] focus:border-transparent"
                                 />
                             </div>
                             <div className="relative">
@@ -165,7 +173,7 @@ export default function Historial() {
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    className="pl-10 p-2 w-full border rounded-lg dark:bg-zinc-800 dark:text-white dark:border-zinc-600 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                                    className="pl-10 p-2 w-full border rounded-lg dark:bg-zinc-800 dark:text-white dark:border-zinc-600 focus:ring-2 focus:ring-[var(--app-primary)] focus:border-transparent"
                                     placeholder="Fecha inicio"
                                 />
                             </div>
@@ -177,18 +185,26 @@ export default function Historial() {
                                     type="date"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                    className="pl-10 p-2 w-full border rounded-lg dark:bg-zinc-800 dark:text-white dark:border-zinc-600 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                                    className="pl-10 p-2 w-full border rounded-lg dark:bg-zinc-800 dark:text-white dark:border-zinc-600 focus:ring-2 focus:ring-[var(--app-primary)] focus:border-transparent"
                                     placeholder="Fecha fin"
                                 />
                             </div>
                         </div>
                     </div>
                 )}
+            </div>
 
+            {/* Título de la sección de challenges */}
+            <div className="mt-4">
+                <p className="text-base font-semibold mb-3">Lista de Challenges</p>
+            </div>
+
+            {/* Contenedor principal de challenges */}
+            <div className="mt-4 p-5 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                 {/* Grupos de Challenges */}
                 <div className="space-y-4">
                     {Object.entries(filteredGroups).length === 0 ? (
-                        <div className="text-center p-8 bg-gray-50 dark:bg-zinc-700 rounded-lg border border-gray-200 dark:border-zinc-600 shadow-md">
+                        <div className="text-center p-8 bg-gray-50 dark:bg-zinc-800 rounded-lg">
                             <p className="text-gray-500 dark:text-gray-400">No hay challenges que coincidan con los filtros.</p>
                         </div>
                     ) : (
@@ -202,13 +218,13 @@ export default function Historial() {
                             return (
                                 <div
                                     key={parentId}
-                                    className="border border-gray-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 rounded-lg shadow-md overflow-hidden"
+                                    className="border border-gray-200 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800 rounded-lg shadow-md overflow-hidden"
                                 >
                                     {/* Cabecera del Challenge (siempre visible) */}
                                     <div className="flex flex-col p-4 lg:p-6">
                                         {/* Identificador del challenge y botón de expansión en una fila */}
                                         <div className="flex items-center justify-between mb-4">
-                                            <div className="bg-yellow-500 text-black font-bold text-lg px-3 py-2 rounded-lg shadow-md text-center">
+                                            <div className="bg-[var(--app-primary)] text-black font-bold text-lg px-3 py-2 rounded-lg shadow-md text-center">
                                                 <span className="block" title={parentId}>Challenge - {parentId}</span>
                                             </div>
                                             <div className="flex items-center">
@@ -226,8 +242,8 @@ export default function Historial() {
 
                                                 {/* Botón de metrix */}
                                                 <Link href={lastChallenge.result === 'progress' ? `/metrix2/${lastChallenge.documentId}` : `/historial/${lastChallenge.documentId}`}>
-                                                    <button className="hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-slate-900 dark:text-white px-5 py-2 rounded-lg text-base font-semibold shadow-md flex items-center justify-center space-x-2">
-                                                        <ChartBarIcon className="h-5 w-5" />
+                                                    <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
+                                                        <ChartBarIcon className="h-5 w-5 mr-2" />
                                                         <span>Metrix</span>
                                                     </button>
                                                 </Link>
@@ -279,13 +295,13 @@ export default function Historial() {
 
                                     {/* Detalles del Challenge (expandible) */}
                                     {isExpanded && (
-                                        <div className="px-6 py-4 bg-gray-50 dark:bg-zinc-800 border-t border-gray-200 dark:border-zinc-600">
+                                        <div className="px-6 py-4 bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-700">
                                             <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-300 mb-3">Historial de fases</h3>
                                             <div className="space-y-3">
                                                 {challenges.map((challenge, index) => (
                                                     <div
                                                         key={index}
-                                                        className={`p-4 rounded-lg shadow-sm border ${statusBgColors[challenge.result] || 'bg-gray-50 dark:bg-zinc-700'} border-gray-200 dark:border-zinc-600`}
+                                                        className={`p-4 rounded-lg shadow-sm border ${statusBgColors[challenge.result] || 'bg-gray-50 dark:bg-zinc-800'} border-gray-200 dark:border-zinc-700`}
                                                     >
                                                         <div className="flex flex-col sm:flex-row justify-between">
                                                             {/* Info de la fase */}
@@ -315,8 +331,8 @@ export default function Historial() {
                                                             <Link
                                                                 href={challenge.result === 'progress' ? `/metrix2/${challenge.documentId}` : `/historial/${challenge.documentId}`}
                                                             >
-                                                                <button className="w-full sm:w-auto hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-slate-900 dark:text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md flex items-center justify-center space-x-2">
-                                                                    <ChartBarIcon className="h-4 w-4" />
+                                                                <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
+                                                                    <ChartBarIcon className="h-4 w-4 mr-2" />
                                                                     <span>Ver detalles</span>
                                                                 </button>
                                                             </Link>

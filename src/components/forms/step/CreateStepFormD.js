@@ -76,7 +76,7 @@ export function CreateStepFormC() {
     (item, index, self) => self.findIndex(i => i.documentId === item.documentId) === index
   );
   const allStages = [...(stageData || []), ...customStages].filter(
-    (item, index, self) => self.findIndex(i => i.documentId === item.documentId) === index
+    (item, index, self) => self.findIndex(i => i.name === item.name) === index
   );
   // console.log("allStages", allStages);
   // console.log("allSubcategories", allSubcategories);
@@ -121,18 +121,19 @@ export function CreateStepFormC() {
       // Asegurar que no exista documentId (lo generará Strapi)
       data.documentId = "";
       // console.log("JSON final:", data);
+      console.log("Data a enviar:", data);
 
-      await createStepWithRelations(data);
+      // await createStepWithRelations(data);
       // Limpieza
-      form.reset();
-      setCustomSubcategories([]);
-      setCustomStages([]);
+      // form.reset();
+      // setCustomSubcategories([]);
+      // setCustomStages([]);
 
-      // Redirección tras crear exitosamente
-      router.push({
-        pathname: "/admin/steps",
-        query: { toast: "success", message: "Step creado correctamente." }
-      });
+      // // Redirección tras crear exitosamente
+      // router.push({
+      //   pathname: "/admin/steps",
+      //   query: { toast: "success", message: "Step creado correctamente." }
+      // });
       // onToast("Step creado correctamente.", "success");
     } catch (error) {
       // onToast("Error al crear el step. Revisa la consola.", "error");
@@ -190,7 +191,7 @@ export function CreateStepFormC() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-yellow-500 text-lg">Nombre</FormLabel>
+                <FormLabel className="text-yellow-500 text-lg">Nombrec</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -431,9 +432,7 @@ export function CreateStepFormC() {
                                       `custom-${index}`;
                                     // Comprobamos si el elemento está seleccionado comparando la uniqueKey almacenada
                                     const isSelected = field.value.some(
-                                      (item) =>
-                                        (item.documentId || item.id) ===
-                                        (stage.documentId || stage.id)
+                                      (item) => item.name === stage.name
                                     );
                                     return (
                                       <CommandItem
@@ -443,16 +442,17 @@ export function CreateStepFormC() {
                                           const current = field.value;
                                           let newValues;
                                           if (isSelected) {
-                                            // Filtramos eliminando el objeto con esa uniqueKey
+                                            // Filtramos eliminando el objeto con ese nombre
                                             newValues = current.filter(
-                                              (v) =>
-                                                (v.documentId || v.id) !==
-                                                (stage.documentId ||
-                                                  stage.id)
+                                              (v) => v.name !== stage.name
                                             );
                                           } else {
-                                            // Al seleccionar, guardamos el stage junto con su uniqueKey para identificarlo luego
-                                            newValues = [...current, stage];
+                                            // Al seleccionar, verificamos si no existe ya con el mismo nombre
+                                            if (!current.some(v => v.name === stage.name)) {
+                                              newValues = [...current, stage];
+                                            } else {
+                                              newValues = current; // No agregar duplicados
+                                            }
                                           }
                                           field.onChange(newValues);
                                         }}
@@ -507,8 +507,7 @@ export function CreateStepFormC() {
                                   onClick={() => {
                                     field.onChange(
                                       field.value.filter(
-                                        (v) =>
-                                          v.documentId !== stage.documentId
+                                        (v) => v.name !== stage.name
                                       )
                                     );
                                   }}
