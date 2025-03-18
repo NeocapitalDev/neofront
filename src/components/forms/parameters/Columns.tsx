@@ -1,3 +1,4 @@
+// src/components/forms/parameters/Columns.tsx
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
@@ -15,7 +16,8 @@ export type ChallengeRelationsStages = {
   documentId: string;
   minimumTradingDays: number | null;
   maximumDailyLoss: number;
-  maximumLoss: number;
+  maximumTotalLoss: number; // Cambiado de maximumLoss a maximumTotalLoss
+  maximumLossPerTrade: number; // Nuevo campo añadido
   profitTarget: number | null;
   leverage: number;
   createdAt: string;
@@ -194,7 +196,8 @@ export default function Columns(
         const prop = {
           minimumTradingDays: data.minimumTradingDays,
           maximumDailyLoss: data.maximumDailyLoss,
-          maximumLoss: data.maximumLoss,
+          maximumTotalLoss: data.maximumTotalLoss, // Cambiado de maximumLoss
+          maximumLossPerTrade: data.maximumLossPerTrade, // Nuevo campo añadido
           profitTarget: data.profitTarget,
           documentId: data.documentId,
           leverage: data.leverage,

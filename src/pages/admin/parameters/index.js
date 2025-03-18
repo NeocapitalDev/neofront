@@ -1,3 +1,4 @@
+// src/pages/admin/parameters/index.js
 import React from "react";
 import { useRouter } from "next/navigation"; // o "next/router" en Next.js 12
 import DataTable from "@/components/forms/parameters/DataTable";
