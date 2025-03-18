@@ -123,18 +123,18 @@ export function CreateStepFormC() {
       // console.log("JSON final:", data);
       console.log("Data a enviar:", data);
 
-      // await createStepWithRelations(data);
-      // Limpieza
-      // form.reset();
-      // setCustomSubcategories([]);
-      // setCustomStages([]);
+      await createStepWithRelations(data);
+      Limpieza
+      form.reset();
+      setCustomSubcategories([]);
+      setCustomStages([]);
 
-      // // Redirección tras crear exitosamente
-      // router.push({
-      //   pathname: "/admin/steps",
-      //   query: { toast: "success", message: "Step creado correctamente." }
-      // });
-      // onToast("Step creado correctamente.", "success");
+      // Redirección tras crear exitosamente
+      router.push({
+        pathname: "/admin/steps",
+        query: { toast: "success", message: "Step creado correctamente." }
+      });
+      onToast("Step creado correctamente.", "success");
     } catch (error) {
       // onToast("Error al crear el step. Revisa la consola.", "error");
       console.error("Error al crear el step:", error);
