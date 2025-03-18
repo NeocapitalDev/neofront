@@ -209,7 +209,7 @@ export default function Historial() {
                                         {/* Identificador del challenge y botón de expansión en una fila */}
                                         <div className="flex items-center justify-between mb-4">
                                             <div className="bg-yellow-500 text-black font-bold text-lg px-3 py-2 rounded-lg shadow-md text-center">
-                                                <span className="block" title={parentId}>#{parentId}</span>
+                                                <span className="block" title={parentId}>Challenge - {parentId}</span>
                                             </div>
                                             <div className="flex items-center">
                                                 <button
@@ -240,11 +240,11 @@ export default function Historial() {
                                             <div className="flex flex-wrap items-center gap-3 mb-3">
                                                 <div className="inline-flex items-center gap-2">
                                                     <span className={`inline-block w-3 h-3 rounded-full ${status === 'approved' ? 'bg-green-600' :
-                                                            status === 'progress' ? 'bg-yellow-500' :
-                                                                status === 'disapproved' ? 'bg-red-600' :
-                                                                    status === 'init' ? 'bg-blue-500' :
-                                                                        status === 'withdrawal' ? 'bg-purple-500' :
-                                                                            'bg-orange-500'
+                                                        status === 'progress' ? 'bg-yellow-500' :
+                                                            status === 'disapproved' ? 'bg-red-600' :
+                                                                status === 'init' ? 'bg-blue-500' :
+                                                                    status === 'withdrawal' ? 'bg-purple-500' :
+                                                                        'bg-orange-500'
                                                         }`} />
                                                     <span className={`font-semibold ${statusColors[status] || 'text-gray-600 dark:text-gray-300'}`}>
                                                         {status === 'approved' ? 'Aprobado' :

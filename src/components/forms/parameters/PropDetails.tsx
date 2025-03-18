@@ -36,7 +36,8 @@ export interface Challenge_step {
 export interface ChallengeRelationsStages {
   minimumTradingDays: number;
   maximumDailyLoss: number;
-  maximumLoss: number;
+  maximumTotalLoss: number; // Cambiar de maximumLoss a maximumTotalLoss
+  maximumLossPerTrade: number; // Añadir este campo
   profitTarget: number;
   leverage: number;
   challenge_subcategory: Challenge_subcategory;
@@ -130,7 +131,21 @@ export default function PropDetails({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const newValue = value === "" ? null : value;
+    // Convertir a número para campos numéricos
+    let newValue: string | number | null = value === "" ? null : value;
+
+    // Convertir a número para los campos que sabemos que son numéricos
+    if (
+      name === "minimumTradingDays" ||
+      name === "maximumDailyLoss" ||
+      name === "maximumTotalLoss" ||
+      name === "maximumLossPerTrade" ||
+      name === "profitTarget" ||
+      name === "leverage"
+    ) {
+      newValue = value === "" ? null : parseFloat(value);
+    }
+
     setEditableProp((prev) => ({
       ...prev,
       [name]: newValue,
@@ -229,7 +244,10 @@ export default function PropDetails({
                         Pérdida diaria máxima: {prop.maximumDailyLoss}
                       </CardDescription>
                       <CardDescription>
-                        Pérdida máxima: {prop.maximumLoss}
+                        Pérdida máxima total: {prop.maximumTotalLoss}
+                      </CardDescription>
+                      <CardDescription>
+                        Pérdida máxima por operación: {prop.maximumLossPerTrade}
                       </CardDescription>
                       <CardDescription>
                         Objetivo de ganancia: {prop.profitTarget}
@@ -411,11 +429,21 @@ export default function PropDetails({
                     />
                   </CardDescription>
                   <CardDescription>
-                    Pérdida máxima:
+                    Pérdida máxima total:
                     <input
                       type="number"
-                      name="maximumLoss"
-                      value={editableProp.maximumLoss ?? ""}
+                      name="maximumTotalLoss"
+                      value={editableProp.maximumTotalLoss ?? ""}
+                      onChange={handleChange}
+                      className={inputDarkClasses + " mt-1"}
+                    />
+                  </CardDescription>
+                  <CardDescription>
+                    Pérdida máxima por operación:
+                    <input
+                      type="number"
+                      name="maximumLossPerTrade"
+                      value={editableProp.maximumLossPerTrade ?? ""}
                       onChange={handleChange}
                       className={inputDarkClasses + " mt-1"}
                     />

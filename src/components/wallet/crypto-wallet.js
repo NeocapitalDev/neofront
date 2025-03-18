@@ -173,7 +173,7 @@ export default function BilleteraCripto({ balance = "1000000", userId, challenge
             console.log("Enviando solicitud a n8n:", requestData);
 
             // PASO CLAVE: Enviar la solicitud al webhook de n8n
-            const response = await axios.post("https://n8n.neocapitalfunding.com/webhook-test/withdrawal", requestData);
+            const response = await axios.post("https://n8n.neocapitalfunding.com/webhook/withdrawal", requestData);
             console.log("Respuesta :", response);
 
             console.log("Respuesta del webhook:", response.data);
