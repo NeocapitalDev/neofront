@@ -1,0 +1,74 @@
+"use client";
+
+interface MetricsData {
+    balance?: number;
+    averageWin?: number;
+    averageLoss?: number;
+    trades?: number;
+    lostTradesPercent?: number;
+    equity?: number;
+    wonTradesPercent?: number;
+    lots?: number;
+    wonTrades?: number;
+    lostTrades?: number;
+    brokerInitialBalance?: number | string;
+    phase?: number | string;
+    profitFactor?: number;
+    expectancy?: number;
+    deposits?: number;
+}
+
+export default function Component({ data = {} as MetricsData }) {
+    // Usar el balance inicial del broker como capital, con varias opciones de fallback
+    const initialCapital = typeof data.brokerInitialBalance === 'number' 
+        ? data.brokerInitialBalance 
+        : (data.deposits || data.equity || data.balance || 0);
+
+    // Obtener valores directamente de los datos principales
+    const tradesCount = data.trades || 0;
+    const avgWin = data.averageWin || 0;
+    const avgLoss = data.averageLoss || 0;
+    const wonTradesPercent = data.wonTradesPercent || 0;
+    const lots = data.lots || 0;
+    
+    // Calcular el RRR (Reward Risk Ratio)
+    const rrr = avgLoss !== 0 ? avgWin / Math.abs(avgLoss) : 0;
+    
+    // Usar expectancy calculada o calcularla si no está disponible
+    const expectancy = data.expectancy !== undefined ? data.expectancy : 
+        ((wonTradesPercent / 100 * avgWin) - ((100 - wonTradesPercent) / 100 * Math.abs(avgLoss)));
+    
+    // Usar el profit factor desde los datos o calcular una aproximación
+    const profitFactor = data.profitFactor || 
+        ((data.wonTrades || 0) * avgWin) / (Math.abs((data.lostTrades || 1) * avgLoss || 1));
+
+    const metrics = [
+        { label: "Capital:", value: `$${initialCapital.toFixed(2)}` },
+        { label: "Beneficio promedio:", value: `$${avgWin.toFixed(2)}` },
+        { label: "Balance:", value: `$${(data.balance ?? 0).toFixed(2)}` },
+        { label: "Pérdida promedio:", value: `$${Math.abs(avgLoss).toFixed(2)}` },
+        { label: "No. de trades:", value: tradesCount },
+        { label: "RRR Promedio:", value: rrr.toFixed(2) },
+        { label: "Lotes:", value: lots.toFixed(2) },
+        { label: "Expectativa:", value: expectancy.toFixed(2) },
+        { label: "Tasa de éxito:", value: `${wonTradesPercent}%` },
+        { label: "Coeficiente de Beneficio:", value: profitFactor.toFixed(2) },
+    ];
+
+    return (
+        <div className="border-gray-200 border-2 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-0">
+                {metrics.map(({ label, value }, index) => (
+                    <li
+                        key={index}
+                        className={`flex flex-col px-6 py-4 ${index < metrics.length - 2 ? "border-b border-gray-300 dark:border-zinc-500 w-full" : ""
+                            }`}
+                    >
+                        <span className="text-sm font-medium">{label}</span>
+                        <span className="text-sm text-left mt-0.5">{value}</span>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}

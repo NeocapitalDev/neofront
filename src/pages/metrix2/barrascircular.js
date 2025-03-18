@@ -1,4 +1,3 @@
-// src/pages/metrix2/barracircular.js
 'use client'
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/router';
@@ -56,86 +55,43 @@ const CircularProgress = ({ percentage = 0, size = 100, strokeWidth = 10, color 
 };
 
 // Componente principal Dashboard
-const Dashboard = () => {
+const Dashboard = ({ brokerInitialBalance, maxAllowedDrawdownPercent, profitTargetPercent, metricsData }) => {
   const [progressData, setProgressData] = useState({
     target: { value: 0, current: 0, percentage: 0, color: "green", label: "Objetivo de Profit" },
     drawdown: { value: 0, current: 0, percentage: 0, color: "yellow", label: "Drawdown Máximo" },
-    winRate: { value: 50, current: 0, percentage: 0, color: "blue", label: "Win Rate" },
+    profitFactor: { value: 2, current: 0, percentage: 0, color: "blue", label: "Profit Factor" }, // Reemplazando Win Rate
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const router = useRouter();
-  const { idcuenta } = router.query;
-
   useEffect(() => {
-    if (!idcuenta) return;
+    if (!metricsData) return;
+    if (!brokerInitialBalance) return;
+    if (maxAllowedDrawdownPercent == null) return;
+    if (profitTargetPercent == null) return;
 
-    const fetchAllData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // 1. Obtener datos del challenge (Strapi) -> broker_account.balance
-        const challengeUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${idcuenta}?populate=broker_account`;
-        const challengeRes = await fetch(challengeUrl, {
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!challengeRes.ok) {
-          throw new Error(`Error obteniendo datos del challenge: ${challengeRes.status}`);
-        }
-        const challengeData = await challengeRes.json();
-        const accountId = challengeData?.data?.broker_account?.idMeta;
-        // Balance inicial
-        const deposit = challengeData?.data?.broker_account?.balance || 10000;
-
-        if (!accountId) {
-          throw new Error("No se encontró el ID de la cuenta MetaAPI (idMeta).");
-        }
-
-        // 2. Obtener maxDrawdown y profitTarget desde ChallengeRelation (filtrando por documentId)
-        const relationUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations?filters[challenges][documentId][$eq]=${idcuenta}&populate=*`;
-        const relationRes = await fetch(relationUrl, {
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!relationRes.ok) {
-          throw new Error(`Error obteniendo datos de ChallengeRelation: ${relationRes.status}`);
-        }
-        const relationData = await relationRes.json();
-
-        // Ejemplo: data[0].maxDrawdown y data[0].profitTarget
-        const ddPercent = relationData?.data?.[0]?.maxDrawdown || 10;
-        const profitTargetPercent = relationData?.data?.[0]?.profitTarget || 10;
-
-        // 3. Obtener métricas reales desde Meta API
-        const metaStats = new MetaStats(process.env.NEXT_PUBLIC_TOKEN_META_API);
-        const metricsData = await metaStats.getMetrics(accountId);
-        console.log("Métricas de Meta API:", metricsData);
-
-        // 4. Calcular los datos para las barras circulares
-        calculateProgressData(deposit, ddPercent, profitTargetPercent, metricsData);
-      } catch (err) {
-        console.error("Error general:", err);
-        setError(err.message || "Error desconocido");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAllData();
-  }, [idcuenta]);
+    try {
+      // Cálculos para las barras circulares
+      calculateProgressData(
+        brokerInitialBalance, 
+        maxAllowedDrawdownPercent, 
+        profitTargetPercent, 
+        metricsData
+      );
+      setLoading(false);
+    } catch (err) {
+      console.error("Error calculando datos de progreso:", err);
+      setError(err.message || "Error desconocido");
+      setLoading(false);
+    }
+  }, [brokerInitialBalance, maxAllowedDrawdownPercent, profitTargetPercent, metricsData]);
 
   /**
    * Combina:
-   * - deposit: balance inicial (Strapi)
-   * - ddPercent (maxDrawdown permitido)
-   * - profitTargetPercent (profitTarget permitido)
-   * - metricsData: (balance actual, maxDrawdown real, wonTradesPercent, etc.)
+   * - brokerInitialBalance: balance inicial 
+   * - maxAllowedDrawdownPercent: máximo drawdown permitido (%)
+   * - profitTargetPercent: objetivo de profit permitido (%)
+   * - metricsData: datos de MetaAPI (balance actual, maxDrawdown real, profitFactor, etc.)
    */
   const calculateProgressData = (deposit, ddPercent, profitTargetPercent, metricsData) => {
     if (!metricsData) return;
@@ -145,7 +101,7 @@ const Dashboard = () => {
     //    - Si está por encima o igual al target => 100%
     //    - En rango intermedio => porcentaje lineal
     const currentBalance = metricsData.balance || deposit;
-    const targetValue = deposit + (deposit * profitTargetPercent / 100); // Ej: deposit=10000, profitTarget=2 => 10200
+    const targetValue = deposit + (deposit * profitTargetPercent / 100); // Ej: deposit=10000, profitTarget=10 => 11000
 
     let profitPercentage = 0;
     if (currentBalance <= deposit) {
@@ -163,11 +119,12 @@ const Dashboard = () => {
     let drawdownPercentage = (drawdownReal / drawdownAllowed) * 100;
     const cappedDrawdownPercentage = Math.min(100, Math.max(0, drawdownPercentage));
 
-    // 3) Win Rate
-    const targetWinRate = 50;
-    const currentWinRate = metricsData.wonTradesPercent || 0;
-    let winRatePercentage = (currentWinRate / targetWinRate) * 100;
-    const cappedWinRatePercentage = Math.min(100, Math.max(0, winRatePercentage));
+    // 3) Profit Factor (reemplazando Win Rate)
+    // Un profit factor ideal es de 2 o superior (200%)
+    const targetProfitFactor = 2;
+    const currentProfitFactor = metricsData.profitFactor || 0;
+    let profitFactorPercentage = (currentProfitFactor / targetProfitFactor) * 100;
+    const cappedProfitFactorPercentage = Math.min(100, Math.max(0, profitFactorPercentage));
 
     setProgressData({
       // Objetivo de Profit
@@ -192,16 +149,16 @@ const Dashboard = () => {
           "green",
         label: "Drawdown Máximo"
       },
-      // Win Rate
-      winRate: {
-        value: targetWinRate,
-        current: currentWinRate,
-        percentage: cappedWinRatePercentage,
+      // Profit Factor (nuevo)
+      profitFactor: {
+        value: targetProfitFactor,
+        current: currentProfitFactor,
+        percentage: cappedProfitFactorPercentage,
         color:
-          cappedWinRatePercentage >= 80 ? "green" :
-          cappedWinRatePercentage >= 50 ? "blue" :
+          cappedProfitFactorPercentage >= 80 ? "green" :
+          cappedProfitFactorPercentage >= 50 ? "blue" :
           "yellow",
-        label: "Win Rate"
+        label: "Profit Factor"
       }
     });
   };
@@ -244,10 +201,10 @@ const Dashboard = () => {
             // Ej: "6.00%" / "10.00%"
             currentDisplay = `${item.current.toFixed(2)}%`;
             targetDisplay = `${item.value.toFixed(2)}%`;
-          } else if (key === "winRate") {
-            // Ej: "30.00%" / "50.00%"
-            currentDisplay = `${item.current.toFixed(2)}%`;
-            targetDisplay = `${item.value.toFixed(2)}%`;
+          } else if (key === "profitFactor") {
+            // Ej: "1.50" / "2.00"
+            currentDisplay = item.current.toFixed(2);
+            targetDisplay = item.value.toFixed(2);
           }
 
           return (

@@ -8,10 +8,13 @@ import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outl
 import CredencialesModal from "../dashboard/credentials";
 import Link from "next/link";
 import { MetaStats } from 'metaapi.cloud-sdk';
+import WinLoss from "./winloss";
+import Statistics from './statistics';
 
 // Ajusta la ruta de estos imports a donde tengas tus componentes
 import MyPage from "./grafico";           // Gráfica
 import Dashboard from "src/pages/metrix2/barrascircular"; // Barras circulares
+import Objetivos from "./objetivos";
 
 import RelatedChallenges from "../../components/challenges/RelatedChallenges";
 
@@ -54,6 +57,9 @@ const Metrix = () => {
   const [maxDrawdownAbsolute, setMaxDrawdownAbsolute] = useState(null);
   const [profitTargetAbsolute, setProfitTargetAbsolute] = useState(null);
 
+  // 6. Guardar configuración del desafío para Objetivos
+  const [challengeConfig, setChallengeConfig] = useState(null);
+
   /**
    * useEffect #1: Obtener métricas de MetaStats
    */
@@ -64,8 +70,10 @@ const Metrix = () => {
       try {
         const metrics = await metaStats.getMetrics(idMeta);
         setMetricsData(metrics);
+        console.log("Métricas de MetaStats:", metrics);
       } catch (err) {
         setMetricsError(err);
+        console.error("Error obteniendo métricas:", err);
       } finally {
         setIsMetricsLoading(false);
       }
@@ -112,7 +120,7 @@ const Metrix = () => {
   }, [challengeData]);
 
   /**
-   * useEffect #3: Obtener maxDrawdown y profitTarget de ChallengeRelation, 
+   * useEffect #3: Obtener datos de ChallengeRelation, 
    * filtrando por challenges.documentId = idcuenta
    */
   useEffect(() => {
@@ -120,7 +128,7 @@ const Metrix = () => {
     if (!challengeData?.data) return;
 
     // Balance inicial del broker
-    const brokerInitialBalance = challengeData.data.broker_account?.balance ;
+    const brokerInitialBalance = challengeData.data.broker_account?.balance;
     console.log("Balance inicial del broker_account:", brokerInitialBalance);
 
     const fetchRelation = async () => {
@@ -143,26 +151,40 @@ const Metrix = () => {
         const item = json?.data?.[0];
         if (!item) return;
 
-        // ddPercent = item.maxDrawdown (porcentaje)
-        // profitTargetPercent = item.profitTarget (porcentaje)
-        const ddP = item.maxDrawdown ;
+        // Obtener todos los parámetros necesarios para los objetivos
+        const ddP = item.maximumTotalLoss;
         const ptP = item.profitTarget;
+        const minTradingDays = item.minimumTradingDays;
+        const maxDailyLossP = item.maximumDailyLoss;
 
-        console.log("maxDrawdown (porcentaje):", ddP, " - profitTarget:", ptP);
+        console.log("Parámetros de objetivos:", {
+          maxDrawdown: ddP,
+          profitTarget: ptP,
+          minimumTradingDays: minTradingDays,
+          maximumDailyLoss: maxDailyLossP
+        });
+
+        // Guardar valores para maxDrawdown y profitTarget
         setDdPercent(ddP);
         setProfitTargetPercent(ptP);
 
         // 1) Calcular maxDrawdownAbsolute en valor monetario (resta)
-        //    Ej: ddP=10 y balance=10000 => 10000 - 1000 => 9000
         const ddAbsolute = brokerInitialBalance - (ddP / 100) * brokerInitialBalance;
         console.log("maxDrawdown en valor monetario (resta):", ddAbsolute);
         setMaxDrawdownAbsolute(ddAbsolute);
 
         // 2) Calcular profitTargetAbsolute en valor monetario (suma)
-        //    Ej: ptP=10 y balance=10000 => 10000 + 1000 => 11000
         const ptAbsolute = brokerInitialBalance + (ptP / 100) * brokerInitialBalance;
         console.log("profitTarget en valor monetario (suma):", ptAbsolute);
         setProfitTargetAbsolute(ptAbsolute);
+
+        // Guardar configuración para el componente Objetivos
+        setChallengeConfig({
+          minimumTradingDays: minTradingDays,
+          maximumDailyLossPercent: maxDailyLossP,
+          maxDrawdownPercent: ddP,
+          profitTargetPercent: ptP
+        });
 
       } catch (err) {
         console.error("Error consultando Strapi (ChallengeRelation):", err);
@@ -190,6 +212,11 @@ const Metrix = () => {
             <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">
               No se pudieron cargar los datos. Por favor, intenta nuevamente más tarde.
             </p>
+            {metricsError && metricsError.message && (
+              <div className="mt-4 p-3 bg-red-100 dark:bg-red-900 rounded text-sm text-red-800 dark:text-red-200">
+                Error: {metricsError.message}
+              </div>
+            )}
           </div>
         </div>
       </Layout>
@@ -197,11 +224,11 @@ const Metrix = () => {
   }
 
   // Tomar el brokerInitialBalance para pasárselo a Dashboard
-  const brokerInitialBalance = challengeData?.data?.broker_account?.balance ;
+  const brokerInitialBalance = challengeData?.data?.broker_account?.balance;
 
   return (
     <Layout>
-      <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+      <h1 className="flex p-6 pl-12 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
         Account Metrix {challengeData?.data?.broker_account?.login || "Sin nombre"}
       </h1>
@@ -240,14 +267,71 @@ const Metrix = () => {
       {/* Gráfica de líneas */}
       <div className="mt-6">
         <MyPage
-          statisticsData={apiResult}            // data del equity-chart
-          maxDrawdownAbsolute={maxDrawdownAbsolute} // drawdown en valor monetario (restado)
+          statisticsData={apiResult}
+          maxDrawdownAbsolute={maxDrawdownAbsolute}
           profitTargetAbsolute={profitTargetAbsolute} // target en valor monetario (sumado)
         />
       </div>
+
+      {/* Componente de WinLoss */}
+      <WinLoss data={metricsData || {}} />
+
+      {/* Objetivos */}
+      <div className="mt-6">
+        <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
+        {challengeConfig ? (
+          <Objetivos
+            // Pasar la configuración del desafío desde Strapi
+            challengeConfig={challengeConfig}
+            // Pasar los datos de métricas reales del SDK
+            metricsData={metricsData}
+            // Balance inicial para cálculos
+            initBalance={challengeData?.data?.broker_account?.balance}
+            // Fase actual
+            pase={challengeData?.data?.phase}
+          />
+        ) : (
+          <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-6 text-center">
+            <p>Cargando objetivos...</p>
+          </div>
+        )}
+      </div>
+
+      {/* Estadísticas */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="w-full md:w-1/1 rounded-lg">
+          <h2 className="text-lg font-bold mb-4 pt-5">Estadísticas</h2>
+          <Statistics
+            data={{
+              ...metricsData,
+              phase: challengeData?.data?.phase || "Desconocida",
+              brokerInitialBalance: brokerInitialBalance // Pasar el balance inicial
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="bg-black text-white p-6 rounded-lg shadow-lg my-6">
+        <h2 className="text-xl font-bold mb-4">Datos en Bruto para Comparación</h2>
+
+        <div className="mb-6">
+          <h3 className="font-semibold text-blue-400 mb-2">MetricsData</h3>
+          <pre className="bg-zinc-900 p-4 rounded-lg whitespace-pre-wrap overflow-auto max-h-96 text-xs">
+            {JSON.stringify(metricsData, null, 2)}
+          </pre>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-green-400 mb-2">EquityChartData</h3>
+          <pre className="bg-zinc-900 p-4 rounded-lg whitespace-pre-wrap overflow-auto max-h-96 text-xs">
+            {JSON.stringify(apiResult, null, 2)}
+          </pre>
+        </div>
+      </div>
+      
       {/* Componente para mostrar los challenges relacionados */}
       {challengeData?.data && (
-            <RelatedChallenges currentChallenge={challengeData.data} />
+          <RelatedChallenges currentChallenge={challengeData.data} />
       )}
     </Layout>
   );

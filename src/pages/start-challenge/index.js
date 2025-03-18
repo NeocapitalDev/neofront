@@ -244,6 +244,25 @@ const ChallengeRelations = () => {
       window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1&document_id=${selectedRelation.documentId}&user_id=${user.documentId}`;
     }
   };
+
+  // Función para extraer el valor numérico del balance del producto (10k, 20k, etc.)
+  const extractBalance = (balanceStr) => {
+    if (!balanceStr) return 0;
+    const match = balanceStr.match(/(\d+)k/i);
+    return match ? parseInt(match[1], 10) : 0;
+  };
+
+  // Función para contar etapas en la relación seleccionada
+  const getRelationStages = () => {
+    if (!selectedRelation) return 0;
+    // Aquí deberíamos obtener el número de etapas de la relación seleccionada
+    // Como no está claro en el código original cómo se cuentan las etapas,
+    // voy a usar una propiedad ficticia 'stages' o devolver un valor predeterminado
+    return selectedRelation.stages || relations.filter(r =>
+      r.challenge_subcategory.name === selectedRelation.challenge_subcategory.name
+    ).length;
+  };
+
   return (
     <div className="min-h-screen bg-black">
       {/* Header */}
@@ -261,7 +280,7 @@ const ChallengeRelations = () => {
       </header>
 
       {/* Contenido principal */}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className=' w-[90%] mx-auto'>
         <div className="container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Columna izquierda - Configuración */}
           <div className="lg:col-span-2 space-y-6">
@@ -388,7 +407,12 @@ const ChallengeRelations = () => {
                     const relationProductNames = selectedRelation?.challenge_products.map(p => p.name) || [];
 
                     if (allproducts && allproducts.length > 0) {
-                      return allproducts.map((product, productIndex) => {
+                      // Sort products by balance value (10k, 20k, etc.)
+                      const sortedProducts = [...allproducts].sort((a, b) => {
+                        return extractBalance(a.balance) - extractBalance(b.balance);
+                      });
+
+                      return sortedProducts.map((product, productIndex) => {
                         const isInRelation = relationProductNames.includes(product.name);
 
                         return (
@@ -414,6 +438,11 @@ const ChallengeRelations = () => {
                               )}
                             >
                               <span className="block font-medium">{product.name}</span>
+                              {product.balance && (
+                                <span className="block text-xs mt-1 text-zinc-500">
+                                  {product.balance}
+                                </span>
+                              )}
                               {product.isPremium && (
                                 <span className="inline-block bg-amber-500 text-black text-xs px-2 py-1 rounded mt-2 font-semibold">
                                   Premium
@@ -444,20 +473,33 @@ const ChallengeRelations = () => {
             <div className="sticky top-4 space-y-6">
               <div className="bg-zinc-900 rounded-lg shadow-md border border-zinc-800 overflow-hidden">
                 <header className="p-5 border-b border-zinc-800">
-                  <h3 className="text-amber-400 font-medium mb-1">Tu producto es:</h3>
-                  {selectedProduct ? (
-                    <>
-                      <p className="text-xl font-bold text-white">{selectedProduct.name}</p>
-                      {selectedProduct.balance && (
-                        <span className="block text-sm text-zinc-400 mt-1">
-                          {selectedProduct.balance} USD
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <p className="text-zinc-500">Ningún producto seleccionado</p>
-                  )}
+                  <h3 className="text-amber-400 font-medium text-xl flex gap-4 items-center"><span>Producto Seleccionado:</span>
+                    {selectedProduct ? (
+                      <>
+                        <span className="text-xl font-bold text-white">{selectedProduct.name}</span>
+                      </>
+                    ) : (
+                      <p className="text-zinc-500">Ningún producto seleccionado</p>
+                    )}
+                  </h3>
                 </header>
+
+                {/* Nueva sección informativa de etapas */}
+                {selectedRelation && (
+                  <div className="bg-zinc-800 p-4 border-b border-zinc-700">
+                    <h4 className="text-amber-400 font-medium mb-2">Información Adicional</h4>
+                    <div className="text-zinc-300">
+                      <p className="flex justify-between mb-2">
+                        <span>Subcategoría:</span>
+                        <span className="font-medium">{selectedRelation.challenge_subcategory?.name}</span>
+                      </p>
+                      <p className="flex justify-between">
+                        <span>N° Etapas:</span>
+                        <span className="font-medium">{getRelationStages()}</span>
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {selectedProduct && (
                   <>

@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Line } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -11,7 +11,9 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js'
-import zoomPlugin from 'chartjs-plugin-zoom'
+
+// No importar el plugin de zoom aquí directamente
+// import zoomPlugin from 'chartjs-plugin-zoom'
 
 ChartJS.register(
   CategoryScale,
@@ -24,38 +26,50 @@ ChartJS.register(
 )
 
 export function LineChart({ data, index, categories, yFormatter }) {
+  // Estado para controlar si estamos en el cliente
+  const [isClient, setIsClient] = useState(false)
+
+  // Registrar plugin de zoom SOLO en el cliente
   useEffect(() => {
-    ChartJS.register(zoomPlugin)
+    setIsClient(true)
+    
+    // Importación dinámica del plugin de zoom
+    const registerZoomPlugin = async () => {
+      const zoomPlugin = (await import('chartjs-plugin-zoom')).default
+      ChartJS.register(zoomPlugin)
+    }
+    
+    registerZoomPlugin()
   }, [])
 
   // Definimos colores y estilos para cada categoría
-  // Añadimos pointRadius y pointHoverRadius
   const lineStyles = {
     balance: {
-      color: '#3B82F6', 
+      color: '#3B82F6',
       dash: [],
-      pointRadius: 0,       // Si quieres ver círculos en balance, pon 3
+      pointRadius: 2,          // balance con puntos pequeños
       pointHoverRadius: 6,
     },
     max_drawdown: {
-      color: '#F87171', 
+      color: '#F87171',        // Rojo punteado
       dash: [5, 5],
-      pointRadius: 3,       // Círculos SIEMPRE visibles en la línea horizontal
-      pointHoverRadius: 6,
+      pointRadius: 0,          // SIN puntos (solo línea)
+      pointHoverRadius: 0,
     },
     profit_target: {
-      color: '#10B981',
+      color: '#10B981',        // Verde
       dash: [],
-      pointRadius: 3,       // Círculos SIEMPRE visibles en la línea horizontal
-      pointHoverRadius: 6,
+      pointRadius: 0,          // SIN puntos (solo línea)
+      pointHoverRadius: 0,
     },
+    // otros estilos si lo requieres
   }
 
   // Construimos datasets para Chart.js
   const chartData = {
     labels: data.map((item) => item[index]),
     datasets: categories.map((cat) => {
-      const style = lineStyles[cat] || { color: '#FFF', dash: [], pointRadius: 0, pointHoverRadius: 5 }
+      const style = lineStyles[cat] || { color: '#FFF', dash: [], pointRadius: 0, pointHoverRadius: 0 }
       return {
         label: cat,
         data: data.map((item) => item[cat]),
@@ -63,8 +77,9 @@ export function LineChart({ data, index, categories, yFormatter }) {
         backgroundColor: 'transparent',
         borderDash: style.dash,
         borderWidth: 2,
-        pointRadius: style.pointRadius,         // <--- USAMOS LO DEFINIDO EN lineStyles
+        pointRadius: style.pointRadius,
         pointHoverRadius: style.pointHoverRadius,
+        spanGaps: true, // para trazar líneas aunque haya huecos
       }
     }),
   }
@@ -85,7 +100,7 @@ export function LineChart({ data, index, categories, yFormatter }) {
   }
   const minVal = Math.min(...allValues)
   const maxVal = Math.max(...allValues)
-  const paddingFactor = 0.05 
+  const paddingFactor = 0.05
   const range = maxVal - minVal
   const suggestedMin = minVal - range * paddingFactor
   const suggestedMax = maxVal + range * paddingFactor
@@ -112,28 +127,33 @@ export function LineChart({ data, index, categories, yFormatter }) {
         borderColor: '#FFF',
         borderWidth: 1,
       },
-      zoom: {
+      // Solo habilitamos zoom si estamos en el cliente
+      ...(isClient && {
         zoom: {
-          wheel: { enabled: true },
-          pinch: { enabled: true },
-          mode: 'x',
-        },
-        pan: {
-          enabled: true,
-          mode: 'x',
-        },
-        limits: {
-          x: {
-            min: 'original',
-            max: 'original',
-            minRange: 2,
+          zoom: {
+            wheel: { enabled: true },
+            pinch: { enabled: true },
+            mode: 'x',
           },
-        },
-      },
+          pan: {
+            enabled: true,
+            mode: 'x',
+          },
+          limits: {
+            x: {
+              min: 'original',
+              max: 'original',
+              minRange: 2,
+            },
+          },
+        }
+      }),
     },
     scales: {
       x: {
-        ticks: { display: false },
+        ticks: {
+          display: false,
+        },
       },
       y: {
         suggestedMin,

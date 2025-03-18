@@ -165,7 +165,7 @@ export default function TicketCards() {
 
       {/* Show message if no tickets */}
       {(!tickets || tickets.length === 0) && (
-        <div className="text-center py-8 bg-gray-900 rounded-lg border border-yellow-800">
+        <div className="text-center py-8 bg-zinc-900 rounded-lg border border-yellow-800">
           <TicketIcon className="h-12 w-12 mx-auto text-yellow-500 mb-3" />
           <p className="text-yellow-200">No tienes tickets disponibles</p>
         </div>
