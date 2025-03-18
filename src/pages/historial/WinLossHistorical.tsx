@@ -1,11 +1,11 @@
-// src/pages/metrix2/winloss.tsx
+// src/pages/historial/WinLossHistorical.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { BarChart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
-export default function WinLoss({ data }) {
+export default function WinLossHistorical({ metadata }) {
   const [chartData, setChartData] = useState({
     wonTradesPercent: 0,
     lostTradesPercent: 0,
@@ -21,16 +21,20 @@ export default function WinLoss({ data }) {
   });
 
   useEffect(() => {
-    if (data) {
+    if (metadata) {
+      // La estructura del metadata puede variar, así que buscamos la ruta correcta
+      // Normalmente tendríamos que navegar a metrics si existe
+      const metricsData = metadata.metrics || metadata;
+      
       // Extraer los datos con valores por defecto para evitar errores
-      const wonTrades = data.wonTrades || 0;
-      const lostTrades = data.lostTrades || 0;
-      const averageWin = data.averageWin || 0;
-      const averageLoss = data.averageLoss || 0;
-      const wonTradesPercent = data.wonTradesPercent || 0;
-      const lostTradesPercent = data.lostTradesPercent || 0;
-      const profitFactor = data.profitFactor || 0;
-      const totalProfit = data.profit || 0;
+      const wonTrades = metricsData.wonTrades || 0;
+      const lostTrades = metricsData.lostTrades || 0;
+      const averageWin = metricsData.averageWin || 0;
+      const averageLoss = metricsData.averageLoss || 0;
+      const wonTradesPercent = metricsData.wonTradesPercent || 0;
+      const lostTradesPercent = metricsData.lostTradesPercent || 0;
+      const profitFactor = metricsData.profitFactor || 0;
+      const totalProfit = metricsData.profit || 0;
 
       // Calcular ganancia total y pérdida total
       const wonBalance = wonTrades * averageWin;
@@ -50,7 +54,7 @@ export default function WinLoss({ data }) {
         netProfit: totalProfit
       });
     }
-  }, [data]);
+  }, [metadata]);
 
   const noTrades = chartData.totalTrades === 0;
   

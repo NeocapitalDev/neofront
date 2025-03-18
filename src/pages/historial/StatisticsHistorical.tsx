@@ -1,4 +1,4 @@
-// src/pages/metrix2/statistics.tsx
+// src/pages/historial/StatisticsHistorical.tsx
 "use client";
 
 interface MetricsData {
@@ -19,7 +19,10 @@ interface MetricsData {
     deposits?: number;
 }
 
-export default function Component({ data = {} as MetricsData }) {
+export default function StatisticsHistorical({ metadata }) {
+    // Determinar la estructura de los datos (puede variar)
+    const data: MetricsData = metadata?.metrics || metadata || {};
+
     // Usar el balance inicial del broker como capital, con varias opciones de fallback
     const initialCapital = typeof data.brokerInitialBalance === 'number' 
         ? data.brokerInitialBalance 
