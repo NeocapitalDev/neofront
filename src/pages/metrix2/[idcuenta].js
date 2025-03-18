@@ -152,7 +152,7 @@ const Metrix = () => {
         if (!item) return;
 
         // Obtener todos los parámetros necesarios para los objetivos
-        const ddP = item.maxDrawdown;
+        const ddP = item.maximumTotalLoss;
         const ptP = item.profitTarget;
         const minTradingDays = item.minimumTradingDays;
         const maxDailyLossP = item.maximumDailyLoss;
