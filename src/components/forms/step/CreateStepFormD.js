@@ -125,7 +125,7 @@ export function CreateStepFormC() {
       console.log("Data a enviar:", data);
 
       await createStepWithRelations(data);
-      Limpieza
+      // Limpieza
       form.reset();
       setCustomSubcategories([]);
       setCustomStages([]);
