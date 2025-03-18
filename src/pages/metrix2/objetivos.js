@@ -59,8 +59,16 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
             ));
         }
 
-        // Para maxAbsoluteDrawdown, usamos maxDrawdown del SDK
-        const maxAbsoluteDrawdown = Math.abs(metricsData.maxDrawdown || 0);
+        // Calcular la pérdida total directamente de metricsData
+        let maxAbsoluteDrawdown = Math.abs(metricsData.maxDrawdown || 0);
+        
+        // Si tenemos datos de trades, calculamos la pérdida total
+        if (metricsData.lostTrades > 0 && metricsData.averageLoss) {
+            const totalLoss = Math.abs(metricsData.lostTrades * metricsData.averageLoss);
+            // Usamos el valor mayor entre la pérdida total y el maxDrawdown actual
+            maxAbsoluteDrawdown = totalLoss;
+            console.log("Pérdida total calculada:", totalLoss);
+        }
 
         // Para maxRelativeProfit, usamos profit del SDK
         const maxRelativeProfit = metricsData.profit || 0;
@@ -96,9 +104,7 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
             {
                 nombre: `Pérdida Máx. - $${(balance * challengeConfig.maxDrawdownPercent / 100).toFixed(2)}`,
                 resultado: `$${maxAbsoluteDrawdown.toFixed(2)} (${(
-                    (maxAbsoluteDrawdown / (balance * challengeConfig.maxDrawdownPercent / 100)) *
-                    100
-                ).toFixed(2)}%)`,
+                    (maxAbsoluteDrawdown / (balance * challengeConfig.maxDrawdownPercent / 100)) *100).toFixed(2)}%)`,
                 estado: maxAbsoluteDrawdown <= balance * challengeConfig.maxDrawdownPercent / 100,
                 descripcion: "Este valor representa el capital registrado más bajo en su cuenta desde el momento en que se empezó a operar.",
                 videoUrl: "https://www.youtube.com/watch?v=AsNUg0O-9iQ",
