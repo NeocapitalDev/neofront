@@ -42,17 +42,22 @@ export default function Component({ data = {} as MetricsData }) {
     const profitFactor = data.profitFactor || 
         ((data.wonTrades || 0) * avgWin) / (Math.abs((data.lostTrades || 1) * avgLoss || 1));
 
+    // Función para formatear valores numéricos a 2 decimales
+    const formatValue = (value: number) => {
+        return value.toFixed(2);
+    };
+
     const metrics = [
-        { label: "Capital:", value: `$${initialCapital.toFixed(2)}` },
-        { label: "Beneficio promedio:", value: `$${avgWin.toFixed(2)}` },
-        { label: "Balance:", value: `$${(data.balance ?? 0).toFixed(2)}` },
-        { label: "Pérdida promedio:", value: `$${Math.abs(avgLoss).toFixed(2)}` },
-        { label: "No. de trades:", value: tradesCount },
-        { label: "RRR Promedio:", value: rrr.toFixed(2) },
-        { label: "Lotes:", value: lots.toFixed(2) },
-        { label: "Expectativa:", value: expectancy.toFixed(2) },
-        { label: "Tasa de éxito:", value: `${wonTradesPercent}%` },
-        { label: "Coeficiente de Beneficio:", value: profitFactor.toFixed(2) },
+        { label: "Capital:", value: `$${formatValue(initialCapital)}` },
+        { label: "Beneficio promedio:", value: `$${formatValue(avgWin)}` },
+        { label: "Balance:", value: `$${formatValue(data.balance ?? 0)}` },
+        { label: "Pérdida promedio:", value: `$${formatValue(Math.abs(avgLoss))}` },
+        { label: "No. de trades:", value: tradesCount },  // Sin decimales porque es un contador
+        { label: "RRR Promedio:", value: formatValue(rrr) },
+        { label: "Lotes:", value: formatValue(lots) },
+        { label: "Expectativa:", value: formatValue(expectancy) },
+        { label: "Tasa de éxito:", value: `${formatValue(wonTradesPercent)}%` },
+        { label: "Coeficiente de Beneficio:", value: formatValue(profitFactor) },
     ];
 
     return (
