@@ -1,3 +1,4 @@
+// src/pages/metrix2/objetivos.js
 "use client";
 
 import React, { useState, useEffect } from "react";

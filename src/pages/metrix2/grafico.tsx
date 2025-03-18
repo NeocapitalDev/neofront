@@ -1,3 +1,4 @@
+// src/pages/metrix2/grafico.tsx
 'use client'
 import React, { useEffect, useState } from 'react'
 import { LineChart } from '@/components/ui/chart-line'
