@@ -83,12 +83,29 @@ const ChallengeRelations = () => {
   const [cancellationAccepted, setCancellationAccepted] = useState(false);
 
   // Procesar los datos para obtener steps únicos y sus relaciones
+  {/*
   const stepsData = relations
     ? [...new Set(relations.map(relation => relation.challenge_step.name))].map(stepName => ({
       step: stepName,
       relations: relations.filter(relation => relation.challenge_step.name === stepName),
     }))
     : [];
+  */}
+
+  const stepsData = relations
+  ? [...new Set(relations.map(relation => relation.challenge_step.name))].map(stepName => {
+      const stepRelations = relations.filter(relation => relation.challenge_step.name === stepName);
+      // Obtener todas las etapas de todas las relaciones del step y eliminar duplicados
+      const allStages = stepRelations.flatMap(relation => relation.challenge_stages || []);
+      const uniqueStages = [...new Set(allStages.map(stage => stage.id))];
+      const numberOfStages = uniqueStages.length;
+      return {
+        step: stepName,
+        relations: stepRelations,
+        numberOfStages,
+      };
+    }).sort((a, b) => a.numberOfStages - b.numberOfStages) // Ordenar de menor a mayor
+  : [];
 
   // Seleccionar el primer step, relación y producto por defecto al cargar los datos
   useEffect(() => {
@@ -440,18 +457,13 @@ const ChallengeRelations = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {(() => {
                     const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
-                    const selectedRelation = stepRelations.find(r => r.id === selectedRelationId);
+                    const selectedRelation = stepRelations.find(r => r.id === selectedRelationId);  
                     const relationProductNames = selectedRelation?.challenge_products.map(p => p.name) || [];
-
                     if (allproducts && allproducts.length > 0) {
-                      // Sort products by balance value (10k, 20k, etc.)
-                      const sortedProducts = [...allproducts].sort((a, b) => {
-                        return extractBalance(a.balance) - extractBalance(b.balance);
-                      });
-
+                      // Ordenar productos por el campo "precio" de menor a mayor
+                      const sortedProducts = [...allproducts].sort((a, b) => a.precio - b.precio);
                       return sortedProducts.map((product, productIndex) => {
                         const isInRelation = relationProductNames.includes(product.name);
-
                         return (
                           <div key={`allproduct-${productIndex}`} className="relative">
                             <input
