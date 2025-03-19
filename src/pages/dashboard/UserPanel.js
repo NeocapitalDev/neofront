@@ -246,7 +246,11 @@ export default function Index() {
                                                             </button>
                                                         </Link>
                                                         {!isVerified && challenge.phase === 3 &&
-                                                            challenge.result === "approved" && (<p className='font-light text-gray-300'>Debes estar verificado para retirar tus ganancias, ve al apartado de verificación.</p>)}
+                                                            challenge.result === "approved" && (
+                                                                <p className='font-light text-gray-300'>
+                                                                    Debes estar verificado para retirar tus ganancias, ve al <Link href="/verification" className="underline">apartado de verificación</Link>.
+                                                                </p>
+                                                            )}
                                                         {isVerified &&
                                                             challenge.phase === 3 &&
                                                             challenge.result === "approved" && (
