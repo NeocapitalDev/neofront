@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import Layout from "../../components/layout/dashboard";
 import Loader from "../../components/loaders/loader";
 import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
-import CredencialesModal from "../dashboard/credentials";
 import Link from "next/link";
 
 // Componentes importados
@@ -27,78 +26,155 @@ const HistorialMetrix = () => {
   const router = useRouter();
   const { documentId } = router.query;
   const [metadataStats, setMetadataStats] = useState(null);
+  const [currentStage, setCurrentStage] = useState(null);
   const [debugMode, setDebugMode] = useState(false);
+  const [initialBalance, setInitialBalance] = useState(null);
 
   // Obtener los datos del challenge, incluyendo el campo metadata
   const { data: challengeData, error, isLoading } = useSWR(
     documentId
-      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${documentId}?populate=broker_account`
+      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${documentId}?populate=*`
       : null,
     fetcher
   );
 
   // Cuando los datos del challenge se cargan, extraer los datos de metadata
   useEffect(() => {
-    if (challengeData?.data?.metadata) {
-      // Función para verificar si un objeto tiene propiedades relevantes de trading
-      const hasTradeProps = (obj) => {
-        const relevantProps = ['balance', 'trades', 'profit', 'equity', 'deposits', 'dailyGrowth'];
-        return relevantProps.some(prop => prop in obj);
-      };
+    // Verificar si los datos del challenge están disponibles
+    if (!challengeData?.data) {
+      console.log('No hay datos del challenge disponibles aún');
+      return;
+    }
 
-      // Primero comprobar si tiene la estructura anidada (metadata.data.metadata)
-      if (challengeData.data.metadata.data && challengeData.data.metadata.data.metadata) {
-        if (hasTradeProps(challengeData.data.metadata.data.metadata)) {
-          // Estructura anidada con datos de trading válidos
-          setMetadataStats(challengeData.data.metadata.data.metadata);
-          return;
+    // Console log para verificar los datos completos recibidos
+    console.log('Datos del challenge recibidos:', {
+      documentId,
+      phase: challengeData.data.phase,
+      hasMetadata: !!challengeData.data.metadata,
+      metadataType: typeof challengeData.data.metadata
+    });
+
+    // Extraer el phase
+    const phase = challengeData.data.phase;
+    console.log('Phase extraído:', phase);
+
+    // Verificar si existe el campo metadata
+    if (challengeData.data.metadata) {
+      try {
+        // Intentar parsear el JSON si es un string
+        const metadata = typeof challengeData.data.metadata === 'string' 
+          ? JSON.parse(challengeData.data.metadata) 
+          : challengeData.data.metadata;
+
+        console.log('Metadata parseada correctamente');
+        console.log('Estructura de la metadata:', {
+          tieneMetaId: !!metadata.metaId,
+          tieneMetrics: !!metadata.metrics,
+          tieneEquityChart: !!metadata.equityChart,
+          tieneBrokerAccount: !!metadata.broker_account,
+          tieneChallengeStages: Array.isArray(metadata.challenge_stages),
+          cantidadDeStages: metadata.challenge_stages?.length
+        });
+        
+        // Extraer el balance inicial del broker_account
+        let balanceInicial = null;
+        
+        // Intentar obtener el balance de diferentes ubicaciones posibles
+        if (metadata.broker_account && metadata.broker_account.balance) {
+          balanceInicial = metadata.broker_account.balance;
+          console.log('Balance inicial encontrado en metadata.broker_account:', balanceInicial);
+        } else if (metadata.deposits) {
+          balanceInicial = metadata.deposits;
+          console.log('Balance inicial encontrado en metadata.deposits:', balanceInicial);
+        } else if (metadata.metrics && metadata.metrics.deposits) {
+          balanceInicial = metadata.metrics.deposits;
+          console.log('Balance inicial encontrado en metadata.metrics.deposits:', balanceInicial);
+        } else if (challengeData.data.broker_account && challengeData.data.broker_account.balance) {
+          balanceInicial = challengeData.data.broker_account.balance;
+          console.log('Balance inicial encontrado en challengeData.data.broker_account:', balanceInicial);
         }
-      }
-      
-      // Comprobar si la estructura directa tiene propiedades válidas
-      if (hasTradeProps(challengeData.data.metadata)) {
-        // Estructura plana con datos válidos
-        setMetadataStats(challengeData.data.metadata);
-        return;
-      }
-      
-      // Si llegamos aquí, intentamos buscar los datos en cualquier nivel
-      // Si hay metaId y metrics, probablemente es el formato correcto
-      if (challengeData.data.metadata.metaId && challengeData.data.metadata.metrics) {
-        setMetadataStats(challengeData.data.metadata.metrics);
-        return;
-      }
+        
+        // Guardar el balance inicial en el estado
+        setInitialBalance(balanceInicial);
 
-      // Buscar recursivamente en cualquier nivel
-      const searchMetadata = (obj, depth = 0) => {
-        // Limitar la profundidad de búsqueda para evitar bucles infinitos
-        if (depth > 5 || typeof obj !== 'object' || obj === null) return null;
-        
-        // Comprobar si el objeto actual tiene propiedades relevantes
-        if (hasTradeProps(obj)) return obj;
-        
-        // Buscar recursivamente en todas las propiedades que son objetos
-        for (const key in obj) {
-          if (typeof obj[key] === 'object' && obj[key] !== null) {
-            const result = searchMetadata(obj[key], depth + 1);
-            if (result) return result;
+        // Verificar si la metadata tiene las propiedades necesarias
+        if (metadata && (metadata.metrics || metadata.trades)) {
+          // Dar prioridad a metrics si existe, sino usar toda la metadata
+          const statsToUse = { ...metadata.metrics || metadata };
+          
+          // Agregar propiedades adicionales
+          statsToUse.broker_account = metadata.broker_account || challengeData.data.broker_account;
+          statsToUse.equityChart = metadata.equityChart;
+          
+          // Asegurarse de que el balance inicial esté disponible en las estadísticas
+          statsToUse.initialBalance = balanceInicial;
+
+          // Añadir stage correspondiente al phase actual
+          const challengePhase = challengeData.data.phase;
+          const matchedStage = metadata.challenge_stages?.find(stage => stage.phase === challengePhase);
+
+          console.log('Phase del challenge:', challengePhase);
+          
+          if (matchedStage) {
+            console.log('Stage encontrado:', matchedStage);
+          } else {
+            console.warn('No se encontró un stage para el phase:', challengePhase);
+            console.log('Stages disponibles:', metadata.challenge_stages);
           }
-        }
-        
-        return null;
-      };
 
-      // Buscar los datos en cualquier nivel del objeto
-      const foundMetadata = searchMetadata(challengeData.data.metadata);
-      if (foundMetadata) {
-        setMetadataStats(foundMetadata);
-      } else {
-        console.warn('No se encontraron datos de trading válidos en el objeto metadata');
+          // Establecer el stage actual
+          setCurrentStage(matchedStage);
+
+          // Establecer las estadísticas
+          setMetadataStats(statsToUse);
+          
+          // Log final de los datos procesados
+          console.log('Datos procesados correctamente:', {
+            phase: challengePhase,
+            balanceInicial: balanceInicial,
+            stageEncontrado: !!matchedStage,
+            metadataStats: {
+              trades: statsToUse.trades,
+              wonTradesPercent: statsToUse.wonTradesPercent,
+              profit: statsToUse.profit,
+              balance: statsToUse.balance
+            }
+          });
+        } else {
+          console.warn('La metadata no contiene datos válidos:', metadata);
+          setMetadataStats(null);
+        }
+      } catch (parseError) {
+        console.error('Error al parsear metadata:', parseError);
         setMetadataStats(null);
       }
+    } else {
+      console.warn('No se encontró el campo metadata');
+      setMetadataStats(null);
     }
-  }, [challengeData]);
+  }, [challengeData, documentId]);
 
+  // Efecto adicional para verificar los datos después de que se establecen en el estado
+  useEffect(() => {
+    if (metadataStats) {
+      console.log('Estado metadataStats establecido con éxito:', {
+        trades: metadataStats.trades,
+        profit: metadataStats.profit,
+        balance: metadataStats.balance,
+        initialBalance: metadataStats.initialBalance || initialBalance
+      });
+    }
+    
+    if (currentStage) {
+      console.log('Estado currentStage establecido con éxito:', currentStage);
+    }
+    
+    if (initialBalance) {
+      console.log('Balance inicial establecido:', initialBalance);
+    }
+  }, [metadataStats, currentStage, initialBalance]);
+
+  // Render de carga
   if (isLoading) {
     return (
       <Layout>
@@ -107,6 +183,7 @@ const HistorialMetrix = () => {
     );
   }
 
+  // Render de error
   if (error || !challengeData) {
     return (
       <Layout>
@@ -122,7 +199,7 @@ const HistorialMetrix = () => {
     );
   }
 
-  // Si no hay metadata, mostrar mensaje y datos básicos del challenge
+  // Sin metadata
   if (!metadataStats) {
     return (
       <Layout>
@@ -131,7 +208,6 @@ const HistorialMetrix = () => {
           Historial de Cuenta {challengeData?.data?.broker_account?.login || "Sin nombre"}
         </h1>
         
-        {/* Información básica del challenge */}
         <div className="mt-6 bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
           <h2 className="text-lg font-semibold mb-4">Información básica del challenge</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -144,11 +220,11 @@ const HistorialMetrix = () => {
               <p><span className="font-semibold">Fecha de inicio:</span> {challengeData?.data?.startDate ? new Date(challengeData.data.startDate).toLocaleDateString() : "No disponible"}</p>
               <p><span className="font-semibold">Fecha de fin:</span> {challengeData?.data?.endDate ? new Date(challengeData.data.endDate).toLocaleDateString() : "En progreso"}</p>
               <p><span className="font-semibold">Login MT4/MT5:</span> {challengeData?.data?.broker_account?.login || "No disponible"}</p>
+              <p><span className="font-semibold">Balance inicial:</span> ${challengeData?.data?.broker_account?.balance || "No disponible"}</p>
             </div>
           </div>
         </div>
         
-        {/* Fases relacionadas */}
         {challengeData?.data && (
           <RelatedChallenges currentChallenge={challengeData.data} />
         )}
@@ -178,6 +254,7 @@ const HistorialMetrix = () => {
     );
   }
 
+  // Render principal con metadata
   return (
     <Layout>
       <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
@@ -185,47 +262,34 @@ const HistorialMetrix = () => {
         Historial de Cuenta {challengeData?.data?.broker_account?.login || "Sin nombre"}
       </h1>
 
-      <div className="flex justify-start gap-3 my-6">
-        {challengeData?.data?.broker_account && (
-          <CredencialesModal {...challengeData.data.broker_account} />
-        )}
-
-        <Link
-          href="/support"
-          className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500"
-        >
-          <PhoneIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-          <span className="text-xs lg:text-sm dark:text-zinc-200">Contacte con nosotros</span>
-        </Link>
-        <button
-          onClick={() => router.reload()}
-          className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500"
-        >
-          <ArrowPathIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-          <span className="text-xs lg:text-sm dark:text-zinc-200">Actualizar</span>
-        </button>
-      </div>
-
-      {/* Componentes de visualización usando los datos de metadata */}
-      <CircularProgressMetadata metadata={metadataStats} />
-      <ChartMetadata metadata={metadataStats} />
+      <CircularProgressMetadata 
+        metadata={metadataStats} 
+        stageConfig={currentStage}
+        initialBalance={initialBalance}
+      />
+      <ChartMetadata 
+        metadata={metadataStats} 
+        stageConfig={currentStage}
+        initialBalance={initialBalance}
+      />
       
-      {/* Componente WinLoss adaptado para historial */}
-      <WinLossHistorical metadata={metadataStats} />
+      <WinLossHistorical 
+        metadata={metadataStats} 
+        stageConfig={currentStage}
+      />
       
-      {/* Estadísticas */}
       <div className="flex flex-col md:flex-row gap-4 mt-6">
         <div className="w-full md:w-1/1 rounded-lg">
           <h2 className="text-lg font-bold mb-4">Estadísticas</h2>
           <StatisticsHistorical 
             metadata={metadataStats}
             phase={challengeData?.data?.phase || "Desconocida"}
-            brokerInitialBalance={metadataStats.deposits || challengeData?.data?.broker_account?.balance}
+            stageConfig={currentStage}
+            brokerInitialBalance={initialBalance || metadataStats.deposits || challengeData?.data?.broker_account?.balance}
           />
         </div>
       </div>
 
-      {/* Información por instrumentos */}
       {metadataStats.currencySummary && metadataStats.currencySummary.length > 0 && (
         <div className="mt-6">
           <h2 className="text-lg font-semibold">Resumen por instrumentos</h2>
@@ -263,12 +327,10 @@ const HistorialMetrix = () => {
         </div>
       )}
 
-      {/* Fases relacionadas */}
       {challengeData?.data && (
         <RelatedChallenges currentChallenge={challengeData.data} />
       )}
 
-      {/* Información completa en formato JSON */}
       <div className="mt-6">
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Datos completos</h2>
@@ -291,10 +353,19 @@ const HistorialMetrix = () => {
           </div>
         </div>
         
-        {/* Modo depuración - muestra la estructura de datos completa */}
         {debugMode && (
           <div className="mt-4">
-            <h3 className="text-md font-semibold mb-2">Datos originales (estructura completa)</h3>
+            <h3 className="text-md font-semibold mb-2">Stage actual</h3>
+            <pre className="bg-gray-800 text-yellow-400 p-4 rounded-lg overflow-auto text-sm mt-2">
+              {JSON.stringify(currentStage, null, 2)}
+            </pre>
+            
+            <h3 className="text-md font-semibold mb-2 mt-4">Balance inicial</h3>
+            <pre className="bg-gray-800 text-yellow-400 p-4 rounded-lg overflow-auto text-sm mt-2">
+              {initialBalance}
+            </pre>
+            
+            <h3 className="text-md font-semibold mb-2 mt-4">Datos originales (estructura completa)</h3>
             <pre className="bg-gray-800 text-yellow-400 p-4 rounded-lg overflow-auto text-sm mt-2">
               {JSON.stringify(challengeData?.data, null, 2)}
             </pre>

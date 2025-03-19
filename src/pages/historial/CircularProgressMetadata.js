@@ -1,7 +1,8 @@
 // src/pages/historial/CircularProgressMetadata.js
+'use client'
 import { useState, useEffect } from "react";
 
-// Componente individual de CircularProgress
+// Componente CircularProgress (barra circular) - manteniendo el diseño original
 const CircularProgress = ({ percentage = 0, size = 100, strokeWidth = 10, color = "green" }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -20,7 +21,7 @@ const CircularProgress = ({ percentage = 0, size = 100, strokeWidth = 10, color 
       }
       setProgress(start);
     }, stepTime);
-    
+
     return () => clearInterval(interval);
   }, [percentage]);
 
@@ -52,124 +53,194 @@ const CircularProgress = ({ percentage = 0, size = 100, strokeWidth = 10, color 
   );
 };
 
-// Componente principal que usa los datos de metadata
+// Componente principal para la página de historial
 const CircularProgressMetadata = ({ metadata }) => {
-  // Si no hay metadata, no renderizar nada
-  if (!metadata) return null;
+  const [progressData, setProgressData] = useState({
+    target: { value: 0, current: 0, percentage: 0, color: "green", label: "Objetivo de Profit" },
+    drawdown: { value: 0, current: 0, percentage: 0, color: "yellow", label: "Drawdown Máximo" },
+    profitFactor: { value: 2, current: 0, percentage: 0, color: "blue", label: "Profit Factor" },
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [hasData, setHasData] = useState(false);
 
-  // Datos calculados para los círculos de progreso
-  // Usamos un valor por defecto (10000) si no tenemos el valor inicial del depósito
-  // Si hay un balance inicial registrado en el objeto, lo usamos como valor inicial
-  const initialBalance = metadata.deposits || 10000;
-  const currentBalance = metadata.balance || initialBalance;
-  const targetValue = initialBalance * 1.1; // 10% sobre balance inicial
-  
-  // 1. Objetivo de Profit (Target)
-  let profitPercentage = 0;
-  if (currentBalance <= initialBalance) {
-    // Progreso negativo: qué porcentaje del objetivo hemos perdido
-    profitPercentage = ((currentBalance - initialBalance) / initialBalance) * 100;
-  } else if (currentBalance >= targetValue) {
-    // Objetivo superado
-    profitPercentage = 100;
-  } else {
-    // Progreso positivo hacia el objetivo
-    profitPercentage = ((currentBalance - initialBalance) / (targetValue - initialBalance)) * 100;
-  }
-  
-  const cappedProfitPercentage = Math.min(100, Math.max(0, profitPercentage));
-  
-  // 2. Drawdown Máximo
-  const maxAllowedDrawdown = 10; // 10% es el máximo permitido típicamente
-  
-  // Calcular el drawdown si no está disponible directamente
-  let currentDrawdownPercentage = 0;
-  if (metadata.maxDrawdown !== undefined) {
-    currentDrawdownPercentage = metadata.maxDrawdown;
-  } else if (metadata.highestBalance && metadata.balance) {
-    // Calcular el drawdown basado en la diferencia entre el balance más alto y el actual
-    const drawdownAmount = metadata.highestBalance - metadata.balance;
-    currentDrawdownPercentage = (drawdownAmount / metadata.highestBalance) * 100;
-  }
-  
-  const drawdownUsagePercentage = (currentDrawdownPercentage / maxAllowedDrawdown) * 100;
-  const cappedDrawdownPercentage = Math.min(100, Math.max(0, drawdownUsagePercentage));
-  
-  // 3. Win Rate
-  const targetWinRate = 50; // 50% suele ser un buen objetivo
-  
-  // Calcular win rate si no está disponible directamente
-  let currentWinRate = 0;
-  if (metadata.wonTradesPercent !== undefined) {
-    currentWinRate = metadata.wonTradesPercent;
-  } else if (metadata.wonTrades !== undefined && metadata.trades !== undefined && metadata.trades > 0) {
-    // Calcular win rate basado en trades ganados / total de trades
-    currentWinRate = (metadata.wonTrades / metadata.trades) * 100;
-  } else if (metadata.lostTradesPercent !== undefined) {
-    // Si tenemos el porcentaje de trades perdidos, podemos deducir el win rate
-    currentWinRate = 100 - metadata.lostTradesPercent;
-  }
-  
-  const winRatePercentage = (currentWinRate / targetWinRate) * 100;
-  const cappedWinRatePercentage = Math.min(100, Math.max(0, winRatePercentage));
+  useEffect(() => {
+    if (!metadata) {
+      setLoading(false);
+      setHasData(false);
+      return;
+    }
 
-  // Datos para los círculos de progreso
-  const progressData = {
-    target: {
-      value: targetValue,
-      current: currentBalance,
-      percentage: cappedProfitPercentage,
-      color: profitPercentage >= 100 ? "green" : profitPercentage < 0 ? "red" : "blue",
-      label: "Objetivo de Profit"
-    },
-    drawdown: {
-      value: maxAllowedDrawdown,
-      current: currentDrawdownPercentage,
-      percentage: cappedDrawdownPercentage,
-      color: cappedDrawdownPercentage >= 80 ? "red" : cappedDrawdownPercentage >= 50 ? "yellow" : "green",
-      label: "Drawdown Máximo"
-    },
-    winRate: {
-      value: targetWinRate,
-      current: currentWinRate,
-      percentage: cappedWinRatePercentage,
-      color: cappedWinRatePercentage >= 80 ? "green" : cappedWinRatePercentage >= 50 ? "blue" : "yellow",
-      label: "Win Rate"
-    },
+    try {
+      // Determinar si los datos están anidados en metrics
+      const metrics = metadata.metrics || metadata;
+
+      // Verificar si hay datos válidos para mostrar
+      const hasValidData = metrics &&
+        (metrics.balance !== undefined ||
+          metrics.maxDrawdown !== undefined ||
+          metrics.profitFactor !== undefined);
+
+      if (!hasValidData) {
+        setHasData(false);
+        setLoading(false);
+        return;
+      }
+
+      // Obtener valores iniciales para los cálculos
+      const initialBalance = metrics.deposits || 10000;
+      const profitTargetPercent = 10; // Valor por defecto si no está definido
+      const maxAllowedDrawdownPercent = 10; // Valor por defecto si no está definido
+
+      // Cálculos para las barras circulares
+      calculateProgressData(
+        initialBalance,
+        maxAllowedDrawdownPercent,
+        profitTargetPercent,
+        metrics
+      );
+      setHasData(true);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error calculando datos de progreso:", err);
+      setError(err.message || "Error desconocido");
+      setHasData(false);
+      setLoading(false);
+    }
+  }, [metadata]);
+
+  /**
+   * Adaptación de la función calculateProgressData para el componente de historial
+   */
+  const calculateProgressData = (deposit, ddPercent, profitTargetPercent, metricsData) => {
+    if (!metricsData) return;
+
+    // 1) Objetivo de Profit:
+    const currentBalance = metricsData.balance || deposit;
+    const targetValue = deposit + (deposit * profitTargetPercent / 100);
+
+    let profitPercentage = 0;
+    if (currentBalance <= deposit) {
+      profitPercentage = 0;
+    } else if (currentBalance >= targetValue) {
+      profitPercentage = 100;
+    } else {
+      profitPercentage = ((currentBalance - deposit) / (targetValue - deposit)) * 100;
+    }
+    const cappedProfitPercentage = Math.min(100, Math.max(0, profitPercentage));
+
+    // 2) Drawdown Máximo
+    const drawdownAllowed = ddPercent;
+    const drawdownReal = metricsData.maxDrawdown || 0; // % real
+    let drawdownPercentage = (drawdownReal / drawdownAllowed) * 100;
+    const cappedDrawdownPercentage = Math.min(100, Math.max(0, drawdownPercentage));
+
+    // 3) Profit Factor
+    const targetProfitFactor = 2;
+    const currentProfitFactor = metricsData.profitFactor || 0;
+    let profitFactorPercentage = (currentProfitFactor / targetProfitFactor) * 100;
+    const cappedProfitFactorPercentage = Math.min(100, Math.max(0, profitFactorPercentage));
+
+    setProgressData({
+      // Objetivo de Profit
+      target: {
+        value: targetValue,
+        current: currentBalance,
+        percentage: cappedProfitPercentage,
+        color:
+          cappedProfitPercentage >= 100 ? "green" :
+            cappedProfitPercentage <= 0 ? "red" :
+              "blue",
+        label: "Objetivo de Profit"
+      },
+      // Drawdown Máximo
+      drawdown: {
+        value: drawdownAllowed,
+        current: drawdownReal,
+        percentage: cappedDrawdownPercentage,
+        color:
+          cappedDrawdownPercentage >= 80 ? "green" :
+            cappedDrawdownPercentage >= 50 ? "yellow" :
+              "red",
+        label: "Drawdown Máximo"
+      },
+      // Profit Factor
+      profitFactor: {
+        value: targetProfitFactor,
+        current: currentProfitFactor,
+        percentage: cappedProfitFactorPercentage,
+        color:
+          cappedProfitFactorPercentage >= 80 ? "green" :
+            cappedProfitFactorPercentage >= 50 ? "blue" :
+              "yellow",
+        label: "Profit Factor"
+      }
+    });
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-8 text-white bg-black my-6 rounded-md">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+        <span className="ml-3">Cargando datos...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-8 text-red-500 bg-black my-6 rounded-md">
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (!hasData) {
+    return (
+      <div className="text-center p-4 bg-black rounded-lg shadow-md text-white border-zinc-700 shadow-black my-6">
+        No hay datos disponibles para mostrar.
+      </div>
+    );
+  }
+
+  // Renderizado responsivo manteniendo el diseño original
   return (
     <div className="flex flex-col items-center justify-center py-8 text-white bg-black my-6 rounded-md">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {Object.keys(progressData).map((key) => {
           const item = progressData[key];
-          const textColorClass = 
-            item.color === "green" ? "text-green-500" : 
-            item.color === "yellow" ? "text-yellow-500" : 
-            item.color === "red" ? "text-red-500" : "text-blue-500";
-          
-          // Personalizar cómo se muestran los valores según el tipo de métrica
+          const textColorClass =
+            item.color === "green" ? "text-green-500" :
+            item.color === "yellow" ? "text-yellow-500" :
+            item.color === "red" ? "text-red-500" :
+            "text-blue-500";
+
+          // Formatear la visualización
           let currentDisplay, targetDisplay;
           if (key === "target") {
+            // Ej: "$9800.00" / "$10200.00"
             currentDisplay = `$${item.current.toFixed(2)}`;
             targetDisplay = `$${item.value.toFixed(2)}`;
           } else if (key === "drawdown") {
+            // Ej: "6.00%" / "10.00%"
             currentDisplay = `${item.current.toFixed(2)}%`;
             targetDisplay = `${item.value.toFixed(2)}%`;
-          } else if (key === "winRate") {
-            currentDisplay = `${item.current.toFixed(2)}%`;
-            targetDisplay = `${item.value.toFixed(2)}%`;
+          } else if (key === "profitFactor") {
+            // Ej: "1.50" / "2.00"
+            currentDisplay = item.current.toFixed(2);
+            targetDisplay = item.value.toFixed(2);
           }
-          
+
           return (
             <div key={key} className="flex gap-4">
-              <CircularProgress 
-                percentage={item.percentage} 
+              <CircularProgress
+                percentage={item.percentage}
                 color={
-                  item.color === "green" ? "#10B981" : 
-                  item.color === "yellow" ? "#F59E0B" : 
-                  item.color === "red" ? "#EF4444" : "#3B82F6"
-                } 
+                  item.color === "green" ? "#10B981" :
+                  item.color === "yellow" ? "#F59E0B" :
+                  item.color === "red" ? "#EF4444" :
+                  "#3B82F6"
+                }
               />
               <div>
                 <p className="text-gray-400">{item.label}</p>
