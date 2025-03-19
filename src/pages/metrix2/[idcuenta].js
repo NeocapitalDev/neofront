@@ -49,7 +49,7 @@ const Metrix = () => {
   const [metricsError, setMetricsError] = useState(null);
   const [isMetricsLoading, setIsMetricsLoading] = useState(false);
 
-  // 4. Guardar maxDrawdown (en porcentaje) y profitTarget (en porcentaje) de ChallengeRelation
+  // 4. Guardar maxDrawdown (en porcentaje) y profitTarget (en porcentaje) de ChallengeStage
   const [ddPercent, setDdPercent] = useState(10);       // fallback
   const [profitTargetPercent, setProfitTargetPercent] = useState(10); // fallback
 
@@ -120,8 +120,8 @@ const Metrix = () => {
   }, [challengeData]);
 
   /**
-   * useEffect #3: Obtener datos de ChallengeRelation, 
-   * filtrando por challenges.documentId = idcuenta
+   * useEffect #3: Obtener datos de ChallengeRelation para encontrar los stages,
+   * luego obtener los parámetros desde ChallengeStage
    */
   useEffect(() => {
     if (!idcuenta) return;
@@ -131,33 +131,65 @@ const Metrix = () => {
     const brokerInitialBalance = challengeData.data.broker_account?.balance;
     console.log("Balance inicial del broker_account:", brokerInitialBalance);
 
-    const fetchRelation = async () => {
+    const fetchStageParameters = async () => {
       try {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations?filters[challenges][documentId][$eq]=${idcuenta}&populate=*`;
-        console.log("URL Strapi (ChallengeRelation):", url);
+        // 1. Primero obtenemos las relaciones para identificar los stages asociados
+        const relationUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations?filters[challenges][documentId][$eq]=${idcuenta}&populate=challenge_stages`;
+        console.log("URL Strapi (ChallengeRelation):", relationUrl);
 
-        const res = await fetch(url, {
+        const relationRes = await fetch(relationUrl, {
           headers: {
             Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
             "Content-Type": "application/json",
           },
         });
 
-        if (!res.ok) {
-          throw new Error(`Error fetching from Strapi: ${res.status}`);
+        if (!relationRes.ok) {
+          throw new Error(`Error fetching from Strapi: ${relationRes.status}`);
         }
 
-        const json = await res.json();
-        const item = json?.data?.[0];
-        if (!item) return;
+        const relationJson = await relationRes.json();
+        const relation = relationJson?.data?.[0];
+        
+        if (!relation || !relation.challenge_stages || relation.challenge_stages.length === 0) {
+          console.error("No se encontraron stages asociados al challenge");
+          return;
+        }
+        
+        // 2. Obtenemos el stage actual (podríamos mejorar esta lógica basada en la fase del challenge)
+        const currentStage = relation.challenge_stages[0]; // Tomamos el primer stage como ejemplo
+        const stageDocumentId = currentStage.documentId;
+        
+        // 3. Ahora obtenemos los parámetros desde ChallengeStage
+        const stageUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-stages?filters[documentId][$eq]=${stageDocumentId}`;
+        console.log("URL Strapi (ChallengeStage):", stageUrl);
+        
+        const stageRes = await fetch(stageUrl, {
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        });
+        
+        if (!stageRes.ok) {
+          throw new Error(`Error fetching from Strapi: ${stageRes.status}`);
+        }
+        
+        const stageJson = await stageRes.json();
+        const stage = stageJson?.data?.[0];
+        
+        if (!stage) {
+          console.error("No se encontró el stage con los parámetros");
+          return;
+        }
+        
+        // Obtener todos los parámetros necesarios para los objetivos desde el stage
+        const ddP = stage.maximumTotalLoss;
+        const ptP = stage.profitTarget;
+        const minTradingDays = stage.minimumTradingDays;
+        const maxDailyLossP = stage.maximumDailyLoss;
 
-        // Obtener todos los parámetros necesarios para los objetivos
-        const ddP = item.maximumTotalLoss;
-        const ptP = item.profitTarget;
-        const minTradingDays = item.minimumTradingDays;
-        const maxDailyLossP = item.maximumDailyLoss;
-
-        console.log("Parámetros de objetivos:", {
+        console.log("Parámetros de objetivos (desde ChallengeStage):", {
           maxDrawdown: ddP,
           profitTarget: ptP,
           minimumTradingDays: minTradingDays,
@@ -187,11 +219,11 @@ const Metrix = () => {
         });
 
       } catch (err) {
-        console.error("Error consultando Strapi (ChallengeRelation):", err);
+        console.error("Error consultando datos de stage:", err);
       }
     };
 
-    fetchRelation();
+    fetchStageParameters();
   }, [idcuenta, challengeData?.data]);
 
   // Loading y Error

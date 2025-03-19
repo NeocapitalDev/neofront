@@ -18,6 +18,14 @@ function formatDate(dateString) {
   return `${day}/${month}/${year}`;
 }
 
+// Función para formatear valores porcentuales
+function formatPercentage(value) {
+  if (value === null || value === undefined || value === "") {
+    return "—";
+  }
+  return `${value}%`;
+}
+
 export default function StepsOrganizado() {
   const router = useRouter();
 
@@ -42,7 +50,7 @@ export default function StepsOrganizado() {
         const stepsJson = await stepsRes.json();
         const stepsItems = stepsJson.data || [];
         
-        // Fetch 2: ChallengeRelation (para subcats, products, stages)
+        // Fetch 2: ChallengeRelation (para subcats, products)
         const relRes = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations?populate=*`,
           { headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}` } }
@@ -51,11 +59,21 @@ export default function StepsOrganizado() {
         const relJson = await relRes.json();
         const relItems = relJson.data || [];
         
+        // Fetch 3: ChallengeStage (para los parámetros de stages)
+        const stageRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-stages?populate=*`,
+          { headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}` } }
+        );
+        if (!stageRes.ok) throw new Error("Error al cargar ChallengeStage");
+        const stageJson = await stageRes.json();
+        const stageItems = stageJson.data || [];
+        
         console.log("Steps =>", stepsItems);
         console.log("ChallengeRelations =>", relItems);
+        console.log("ChallengeStages =>", stageItems);
         
         // Estructura reorganizada
-        const organizedData = organizarDatos(stepsItems, relItems);
+        const organizedData = organizarDatos(stepsItems, relItems, stageItems);
         setStepsData(organizedData);
         
         // Seleccionar el primer step por defecto
@@ -74,7 +92,7 @@ export default function StepsOrganizado() {
   }, []);
 
   // Función para organizar datos en la estructura solicitada
-  function organizarDatos(steps, relations) {
+  function organizarDatos(steps, relations, stages) {
     // Primero, agrupamos steps por nombre para combinar los que son iguales
     const stepsByName = {};
     
@@ -119,64 +137,51 @@ export default function StepsOrganizado() {
                 id: subcat.id,
                 documentId: subcatDoc,
                 name: subcat.name || "Subcat sin nombre",
-                stages: []
+                stages: [],
+                products: []
               };
               stepsByName[stepName].subcategories.push(existingSubcat);
             }
             
-            // Procesamos stages
+            // Procesamos los stages asociados a esta relación
             if (rel.challenge_stages && rel.challenge_stages.length > 0) {
-              rel.challenge_stages.forEach(stage => {
+              rel.challenge_stages.forEach(stageRef => {
+                // Buscamos los parámetros del stage en la tabla ChallengeStage
+                const stageParams = stages.find(s => s.documentId === stageRef.documentId);
+                
                 // Verificamos si este stage ya existe en esta subcategoría
-                if (!existingSubcat.stages.some(s => s.id === stage.id)) {
+                if (!existingSubcat.stages.some(s => s.id === stageRef.id)) {
                   existingSubcat.stages.push({
-                    id: stage.id,
-                    documentId: stage.documentId,
-                    name: stage.name || "Stage sin nombre",
-                    parametros: {
-                      id: rel.id,
-                      documentId: rel.documentId,
-                      minimumTradingDays: rel.minimumTradingDays,
-                      maximumDailyLoss: rel.maximumDailyLoss,
-                      profitTarget: rel.profitTarget,
-                      leverage: rel.leverage,
-                      maximumTotalLoss: rel.maximumTotalLoss,
-                      maximumLossPerTrade: rel.maximumLossPerTrade,
-                      createdAt: rel.createdAt,
-                      updatedAt: rel.updatedAt
+                    id: stageRef.id,
+                    documentId: stageRef.documentId,
+                    name: stageRef.name || "Stage sin nombre",
+                    parametros: stageParams ? {
+                      id: stageParams.id,
+                      documentId: stageParams.documentId,
+                      minimumTradingDays: stageParams.minimumTradingDays,
+                      maximumDailyLoss: stageParams.maximumDailyLoss,
+                      profitTarget: stageParams.profitTarget,
+                      leverage: stageParams.leverage,
+                      maximumTotalLoss: stageParams.maximumTotalLoss,
+                      maximumLossPerTrade: stageParams.maximumLossPerTrade,
+                      createdAt: stageParams.createdAt,
+                      updatedAt: stageParams.updatedAt
+                    } : {
+                      // Valores por defecto si no se encuentra el stage
+                      minimumTradingDays: null,
+                      maximumDailyLoss: null,
+                      profitTarget: null,
+                      leverage: null,
+                      maximumTotalLoss: null,
+                      maximumLossPerTrade: null
                     }
                   });
                 }
               });
-            } else {
-              // Si no hay stages explícitos, creamos uno basado en la relación
-              if (!existingSubcat.stages.some(s => s.id === rel.id)) {
-                existingSubcat.stages.push({
-                  id: rel.id,
-                  documentId: rel.documentId,
-                  name: `Stage ${existingSubcat.stages.length + 1}`,
-                  parametros: {
-                    id: rel.id,
-                    documentId: rel.documentId,
-                    minimumTradingDays: rel.minimumTradingDays,
-                    maximumDailyLoss: rel.maximumDailyLoss,
-                    profitTarget: rel.profitTarget,
-                    leverage: rel.leverage,
-                    maximumTotalLoss: rel.maximumTotalLoss,
-                    maximumLossPerTrade: rel.maximumLossPerTrade,
-                    createdAt: rel.createdAt,
-                    updatedAt: rel.updatedAt
-                  }
-                });
-              }
             }
             
             // Procesamos productos relacionados con esta subcategoría
             if (rel.challenge_products && rel.challenge_products.length > 0) {
-              if (!existingSubcat.products) {
-                existingSubcat.products = [];
-              }
-              
               rel.challenge_products.forEach(product => {
                 if (!existingSubcat.products.some(p => p.id === product.id)) {
                   existingSubcat.products.push({
@@ -219,7 +224,7 @@ export default function StepsOrganizado() {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="min-h-screen p-6 bg-gradient-to-b  text-yellow-100">
+        <div className="min-h-screen p-6 bg-gradient-to-b text-yellow-100">
           <div className="flex items-center justify-center h-32">
             <p className="text-amber-500">Cargando datos...</p>
           </div>
@@ -231,7 +236,7 @@ export default function StepsOrganizado() {
   return (
     <DashboardLayout>
       {/* Fondo general con un degradado oscuro */}
-      <div className="min-h-screen p-6 bg-gradient-to-b  text-yellow-100">
+      <div className="min-h-screen p-6 bg-gradient-to-b text-yellow-100">
         <div className="max-w-7xl mx-auto space-y-8">
           <h2 className="text-2xl font-bold text-center">Step → Subcategory → Products & Stages & Parameters</h2>
 
@@ -425,11 +430,11 @@ export default function StepsOrganizado() {
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Max Daily Loss: </span>
-                            {selectedSubcat.stages[0].parametros.maximumDailyLoss ?? "—"}
+                            {formatPercentage(selectedSubcat.stages[0].parametros.maximumDailyLoss)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Profit Target: </span>
-                            {selectedSubcat.stages[0].parametros.profitTarget ?? "—"}
+                            {formatPercentage(selectedSubcat.stages[0].parametros.profitTarget)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Leverage: </span>
@@ -437,11 +442,11 @@ export default function StepsOrganizado() {
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Maximum Total Loss: </span>
-                            {selectedSubcat.stages[0].parametros.maximumTotalLoss ?? "—"}
+                            {formatPercentage(selectedSubcat.stages[0].parametros.maximumTotalLoss)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Maximum Loss Per Trade: </span>
-                            {selectedSubcat.stages[0].parametros.maximumLossPerTrade ?? "—"}
+                            {formatPercentage(selectedSubcat.stages[0].parametros.maximumLossPerTrade)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Creado: </span>
@@ -478,11 +483,11 @@ export default function StepsOrganizado() {
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Max Daily Loss: </span>
-                            {sg.parametros.maximumDailyLoss ?? "—"}
+                            {formatPercentage(sg.parametros.maximumDailyLoss)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Profit Target: </span>
-                            {sg.parametros.profitTarget ?? "—"}
+                            {formatPercentage(sg.parametros.profitTarget)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Leverage: </span>
@@ -490,11 +495,11 @@ export default function StepsOrganizado() {
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Maximum Total Loss: </span>
-                            {sg.parametros.maximumTotalLoss ?? "—"}
+                            {formatPercentage(sg.parametros.maximumTotalLoss)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Maximum Loss Per Trade: </span>
-                            {sg.parametros.maximumLossPerTrade ?? "—"}
+                            {formatPercentage(sg.parametros.maximumLossPerTrade)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Creado: </span>
@@ -531,11 +536,11 @@ export default function StepsOrganizado() {
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Max Daily Loss: </span>
-                            {sg.parametros.maximumDailyLoss ?? "—"}
+                            {formatPercentage(sg.parametros.maximumDailyLoss)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Profit Target: </span>
-                            {sg.parametros.profitTarget ?? "—"}
+                            {formatPercentage(sg.parametros.profitTarget)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Leverage: </span>
@@ -543,11 +548,11 @@ export default function StepsOrganizado() {
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Maximum Total Loss: </span>
-                            {sg.parametros.maximumTotalLoss ?? "—"}
+                            {formatPercentage(sg.parametros.maximumTotalLoss)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Maximum Loss Per Trade: </span>
-                            {sg.parametros.maximumLossPerTrade ?? "—"}
+                            {formatPercentage(sg.parametros.maximumLossPerTrade)}
                           </div>
                           <div>
                             <span className="font-medium text-amber-300">Creado: </span>
