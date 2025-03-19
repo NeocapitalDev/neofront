@@ -131,15 +131,15 @@ export default function Historial() {
     return (
         <Layout>
             {/* Cabecera del historial - siguiendo estilo de profile */}
-            <div className="p-4 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+            <div className="bg-white p-4 rounded-lg shadow-md dark:bg-zinc-800 dark:border-zinc-700 dark:shadow-black dark:text-white">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-2">
-                        <ClockIcon className="w-5 h-5 text-gray-600 dark:text-gray-200" />
+                        <ClockIcon className="h-5 text-gray-600 w-5 dark:text-gray-200" />
                         <h1 className="text-lg font-semibold">Historial de Challenges</h1>
                     </div>
                     <button
                         onClick={() => setIsFilterOpen(!isFilterOpen)}
-                        className="inline-flex items-center space-x-2 bg-[var(--app-primary)] text-black font-medium py-2 px-4 rounded-lg hover:bg-[var(--app-secondary)] transition"
+                        className="bg-[var(--app-primary)] rounded-lg text-black font-medium hover:bg-[var(--app-secondary)] inline-flex items-center px-4 py-2 space-x-2 transition"
                     >
                         <FunnelIcon className="h-5 w-5" />
                         <span className="font-medium">Filtros</span>
@@ -150,42 +150,42 @@ export default function Historial() {
             {/* Sección de filtros */}
             <div className="mt-4">
                 {isFilterOpen && (
-                    <div className="p-5 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+                    <div className="bg-white p-5 rounded-lg shadow-md dark:bg-black dark:border-zinc-700 dark:shadow-black dark:text-white">
                         <p className="text-base font-semibold mb-3">Opciones de filtrado</p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                                <div className="flex absolute inset-y-0 items-center left-0 pl-3 pointer-events-none">
+                                    <MagnifyingGlassIcon className="h-5 text-gray-400 w-5" />
                                 </div>
                                 <input
                                     type="text"
                                     placeholder="Buscar por ID"
                                     value={searchParentId}
                                     onChange={(e) => setSearchParentId(e.target.value)}
-                                    className="pl-10 p-2 w-full border rounded-lg dark:bg-zinc-800 dark:text-white dark:border-zinc-600 focus:ring-2 focus:ring-[var(--app-primary)] focus:border-transparent"
+                                    className="border p-2 rounded-lg w-full dark:bg-zinc-800 dark:border-zinc-600 dark:text-white focus:border-transparent focus:ring-[var(--app-primary)] focus:ring-2 pl-10"
                                 />
                             </div>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <CalendarIcon className="h-5 w-5 text-gray-400" />
+                                <div className="flex absolute inset-y-0 items-center left-0 pl-3 pointer-events-none">
+                                    <CalendarIcon className="h-5 text-gray-400 w-5" />
                                 </div>
                                 <input
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    className="pl-10 p-2 w-full border rounded-lg dark:bg-zinc-800 dark:text-white dark:border-zinc-600 focus:ring-2 focus:ring-[var(--app-primary)] focus:border-transparent"
+                                    className="border p-2 rounded-lg w-full dark:bg-zinc-800 dark:border-zinc-600 dark:text-white focus:border-transparent focus:ring-[var(--app-primary)] focus:ring-2 pl-10"
                                     placeholder="Fecha inicio"
                                 />
                             </div>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <CalendarIcon className="h-5 w-5 text-gray-400" />
+                                <div className="flex absolute inset-y-0 items-center left-0 pl-3 pointer-events-none">
+                                    <CalendarIcon className="h-5 text-gray-400 w-5" />
                                 </div>
                                 <input
                                     type="date"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                    className="pl-10 p-2 w-full border rounded-lg dark:bg-zinc-800 dark:text-white dark:border-zinc-600 focus:ring-2 focus:ring-[var(--app-primary)] focus:border-transparent"
+                                    className="border p-2 rounded-lg w-full dark:bg-zinc-800 dark:border-zinc-600 dark:text-white focus:border-transparent focus:ring-[var(--app-primary)] focus:ring-2 pl-10"
                                     placeholder="Fecha fin"
                                 />
                             </div>
@@ -200,11 +200,11 @@ export default function Historial() {
             </div>
 
             {/* Contenedor principal de challenges */}
-            <div className="mt-4 p-5 dark:bg-black bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+            <div className="bg-white p-5 rounded-lg shadow-md dark:bg-black dark:border-zinc-700 dark:shadow-black dark:text-white mt-4">
                 {/* Grupos de Challenges */}
                 <div className="space-y-4">
                     {Object.entries(filteredGroups).length === 0 ? (
-                        <div className="text-center p-8 bg-gray-50 dark:bg-zinc-800 rounded-lg">
+                        <div className="bg-gray-50 p-8 rounded-lg text-center dark:bg-zinc-800">
                             <p className="text-gray-500 dark:text-gray-400">No hay challenges que coincidan con los filtros.</p>
                         </div>
                     ) : (
@@ -218,31 +218,31 @@ export default function Historial() {
                             return (
                                 <div
                                     key={parentId}
-                                    className="border border-gray-200 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800 rounded-lg shadow-md overflow-hidden"
+                                    className="bg-gray-100 border border-gray-200 rounded-lg shadow-md dark:bg-zinc-800 dark:border-zinc-700 overflow-hidden"
                                 >
                                     {/* Cabecera del Challenge (siempre visible) */}
                                     <div className="flex flex-col p-4 lg:p-6">
                                         {/* Identificador del challenge y botón de expansión en una fila */}
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="bg-[var(--app-primary)] text-black font-bold text-lg px-3 py-2 rounded-lg shadow-md text-center">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <div className="bg-[var(--app-primary)] rounded-lg shadow-md text-black text-center text-lg font-bold px-3 py-2">
                                                 <span className="block" title={parentId}>Challenge - {parentId}</span>
                                             </div>
                                             <div className="flex items-center">
                                                 <button
                                                     onClick={() => toggleGroup(parentId)}
-                                                    className="p-2 mr-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors"
+                                                    className="p-2 rounded-full dark:hover:bg-zinc-600 hover:bg-gray-200 mr-2 transition-colors"
                                                     aria-label={isExpanded ? "Collapse" : "Expand"}
                                                 >
                                                     {isExpanded ? (
-                                                        <ChevronUpIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                                                        <ChevronUpIcon className="h-6 text-gray-600 w-6 dark:text-gray-300" />
                                                     ) : (
-                                                        <ChevronDownIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                                                        <ChevronDownIcon className="h-6 text-gray-600 w-6 dark:text-gray-300" />
                                                     )}
                                                 </button>
 
                                                 {/* Botón de metrix */}
                                                 <Link href={lastChallenge.result === 'progress' ? `/metrix2/${lastChallenge.documentId}` : `/historial/${lastChallenge.documentId}`}>
-                                                    <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
+                                                    <button className="flex bg-gray-200 border border-gray-300 justify-center rounded-lg shadow-md dark:bg-zinc-700 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-300 items-center px-4 py-2 space-x-2">
                                                         <ChartBarIcon className="h-5 w-5 mr-2" />
                                                         <span>Metrix</span>
                                                     </button>
@@ -253,8 +253,8 @@ export default function Historial() {
                                         {/* Información principal */}
                                         <div className="pl-1">
                                             {/* Estado y fase actual */}
-                                            <div className="flex flex-wrap items-center gap-3 mb-3">
-                                                <div className="inline-flex items-center gap-2">
+                                            <div className="flex flex-wrap gap-3 items-center mb-3">
+                                                <div className="gap-2 inline-flex items-center">
                                                     <span className={`inline-block w-3 h-3 rounded-full ${status === 'approved' ? 'bg-green-600' :
                                                         status === 'progress' ? 'bg-yellow-500' :
                                                             status === 'disapproved' ? 'bg-red-600' :
@@ -272,21 +272,21 @@ export default function Historial() {
                                                     </span>
                                                 </div>
                                                 <span className="text-gray-500 dark:text-gray-400 hidden md:inline">|</span>
-                                                <span className="text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-zinc-600 px-3 py-1 rounded-md">
+                                                <span className="bg-gray-100 rounded-md text-gray-600 dark:bg-zinc-600 dark:text-gray-300 px-3 py-1">
                                                     Fase {lastChallenge.phase}
                                                 </span>
                                             </div>
 
                                             {/* Período */}
-                                            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                                            <div className="flex text-gray-500 text-sm dark:text-gray-400 items-center mb-3">
                                                 <span className="font-medium mr-2">Período:</span>
-                                                <span className="bg-gray-100 dark:bg-zinc-600 px-3 py-1 rounded-md text-gray-700 dark:text-gray-300">{startDateFormatted} - {endDateFormatted}</span>
+                                                <span className="bg-gray-100 rounded-md text-gray-700 dark:bg-zinc-600 dark:text-gray-300 px-3 py-1">{startDateFormatted} - {endDateFormatted}</span>
                                             </div>
 
                                             {/* Última actualización */}
-                                            <div className="text-sm flex items-center gap-2">
+                                            <div className="flex text-sm gap-2 items-center">
                                                 <span className="text-black dark:text-white font-semibold">Última actualización:</span>
-                                                <span className="text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-zinc-600 px-3 py-1 rounded-md">
+                                                <span className="bg-gray-100 rounded-md text-gray-600 dark:bg-zinc-600 dark:text-gray-300 px-3 py-1">
                                                     {formatDate(lastChallenge.endDate ? lastChallenge.endDate : lastChallenge.startDate)}
                                                 </span>
                                             </div>
@@ -295,19 +295,19 @@ export default function Historial() {
 
                                     {/* Detalles del Challenge (expandible) */}
                                     {isExpanded && (
-                                        <div className="px-6 py-4 bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-700">
-                                            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-300 mb-3">Historial de fases</h3>
+                                        <div className="bg-gray-50 border-gray-200 border-t dark:bg-zinc-900 dark:border-zinc-700 px-6 py-4">
+                                            <h3 className="text-gray-800 text-sm dark:text-gray-300 font-semibold mb-3">Historial de fases</h3>
                                             <div className="space-y-3">
                                                 {challenges.map((challenge, index) => (
                                                     <div
                                                         key={index}
                                                         className={`p-4 rounded-lg shadow-sm border ${statusBgColors[challenge.result] || 'bg-gray-50 dark:bg-zinc-800'} border-gray-200 dark:border-zinc-700`}
                                                     >
-                                                        <div className="flex flex-col sm:flex-row justify-between">
+                                                        <div className="flex flex-col justify-between sm:flex-row">
                                                             {/* Info de la fase */}
                                                             <div className="mb-3 sm:mb-0">
                                                                 <div className="flex items-center mb-1">
-                                                                    <span className="font-semibold text-gray-800 dark:text-white text-lg">
+                                                                    <span className="text-gray-800 text-lg dark:text-white font-semibold">
                                                                         Fase {challenge.phase}
                                                                     </span>
                                                                     <span className={`ml-3 px-3 py-1 rounded-full text-xs font-medium ${statusColors[challenge.result]} ${statusBgColors[challenge.result]}`}>
@@ -319,8 +319,8 @@ export default function Historial() {
                                                                                             challenge.result === 'retry' ? 'Reintento' : challenge.result}
                                                                     </span>
                                                                 </div>
-                                                                <div className="text-sm text-gray-600 dark:text-gray-300 flex items-center mt-2">
-                                                                    <CalendarIcon className="h-4 w-4 mr-1 text-gray-500" />
+                                                                <div className="flex text-gray-600 text-sm dark:text-gray-300 items-center mt-2">
+                                                                    <CalendarIcon className="h-4 text-gray-500 w-4 mr-1" />
                                                                     <span>
                                                                         {formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}
                                                                     </span>
@@ -331,7 +331,7 @@ export default function Historial() {
                                                             <Link
                                                                 href={challenge.result === 'progress' ? `/metrix2/${challenge.documentId}` : `/historial/${challenge.documentId}`}
                                                             >
-                                                                <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
+                                                                <button className="flex bg-gray-200 border border-gray-300 justify-center rounded-lg shadow-md dark:bg-zinc-700 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-300 items-center px-4 py-2 space-x-2">
                                                                     <ChartBarIcon className="h-4 w-4 mr-2" />
                                                                     <span>Ver detalles</span>
                                                                 </button>
