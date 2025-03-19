@@ -1,3 +1,4 @@
+// src/pages/admin/challenges/index.js
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -113,7 +114,11 @@ export default function ChallengesTable() {
       equity: formatCurrency(challenge.broker_account?.balance),
       brokerGroup: challenge.broker_account?.server ?? "N/A",
       actions: (
-        <Button variant="outline" size="sm" onClick={() => handleButtonClick(challenge.documentId)}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleButtonClick(challenge.documentId)}
+        >
           Ver Detalles
         </Button>
       ),
@@ -145,7 +150,10 @@ export default function ChallengesTable() {
             <TableBody>
               {filteredData.length > 0 ? (
                 filteredData.map((challenge, index) => (
-                  <TableRow key={index} className="border-b border-zinc-300 dark:border-zinc-700">
+                  <TableRow
+                    key={index}
+                    className="border-b border-zinc-300 dark:border-zinc-700"
+                  >
                     <TableCell>{challenge.traderAccount}</TableCell>
                     <TableCell>{challenge.traderEmail}</TableCell>
                     <TableCell>{challenge.state}</TableCell>
