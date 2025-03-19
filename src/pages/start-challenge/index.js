@@ -77,6 +77,7 @@ const ChallengeRelations = () => {
   const [selectedRelationId, setSelectedRelationId] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedRelation, setSelectedRelation] = useState(null);
+  const [selectedStage, setSelectedStage] = useState(null); // New state for selected stage
   const [couponCode, setCouponCode] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [cancellationAccepted, setCancellationAccepted] = useState(false);
@@ -103,6 +104,12 @@ const ChallengeRelations = () => {
         const firstRelationProducts = firstStepRelations[0].challenge_products;
         if (firstRelationProducts.length > 0) {
           setSelectedProduct(firstRelationProducts[0]);
+        }
+
+        // Set first stage by default
+        const stages = getRelationStages(firstStepRelations[0]);
+        if (stages.length > 0) {
+          setSelectedStage(stages[0]);
         }
       }
     }
@@ -146,8 +153,6 @@ const ChallengeRelations = () => {
 
   console.log("Matching Variation:", matchingVariation);
 
-
-  {/*if (isLoading || allproductsisLoading) return <p className="text-white">Loading...</p>;*/ }
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -180,6 +185,14 @@ const ChallengeRelations = () => {
         // Otherwise, select the first product
         setSelectedProduct(firstRelationProducts[0]);
       }
+
+      // Reset stage selection
+      const stages = getRelationStages(stepRelations[0]);
+      if (stages.length > 0) {
+        setSelectedStage(stages[0]);
+      } else {
+        setSelectedStage(null);
+      }
     }
   };
 
@@ -206,11 +219,25 @@ const ChallengeRelations = () => {
     } else {
       setSelectedProduct(null);
     }
+
+    // Reset stage selection for the new relation
+    const stages = getRelationStages(relation);
+    if (stages.length > 0) {
+      setSelectedStage(stages[0]);
+    } else {
+      setSelectedStage(null);
+    }
   };
 
   // Función para manejar el clic en un producto
   const handleProductClick = (product) => {
     setSelectedProduct(product);
+  };
+
+  // Función para manejar el clic en un stage
+  const handleStageClick = (stage) => {
+    console.log('Stage seleccionado:', stage);
+    setSelectedStage(stage);
   };
 
   // Función para manejar el envío del formulario
@@ -219,6 +246,7 @@ const ChallengeRelations = () => {
     if (selectedProduct && termsAccepted && cancellationAccepted) {
       console.log('Producto seleccionado:', selectedProduct);
       console.log('Variación seleccionada:', matchingVariation);
+      console.log('Stage seleccionado:', selectedStage);
     }
   };
 
@@ -252,24 +280,24 @@ const ChallengeRelations = () => {
     return match ? parseInt(match[1], 10) : 0;
   };
 
-  // Función modificada para obtener los nombres de los challenge stages
-  const getRelationStages = () => {
-    if (!selectedRelation || !relations) return [];
+  // Función modificada para obtener los challenge stages completos, no solo sus nombres
+  const getRelationStages = (relation = selectedRelation) => {
+    if (!relation || !relations) return [];
 
     // Verificar si la relación tiene challenge_stages directamente
-    if (selectedRelation.challenge_stages && Array.isArray(selectedRelation.challenge_stages)) {
-      return selectedRelation.challenge_stages.map(stage => stage.name || stage);
+    if (relation.challenge_stages && Array.isArray(relation.challenge_stages)) {
+      return relation.challenge_stages;
     }
 
     // Si no tiene challenge_stages directamente, intentar buscar los stages relacionados
     // basados en el documentId o algún otro identificador que relacione los stages con esta relación
     const stagesForThisRelation = relations.filter(r =>
-      r.challenge_subcategory.id === selectedRelation.challenge_subcategory.id &&
-      r.documentId === selectedRelation.documentId
+      r.challenge_subcategory.id === relation.challenge_subcategory.id &&
+      r.documentId === relation.documentId
     );
 
-    // Extraer los nombres de los stages relacionados
-    return stagesForThisRelation.map(r => r.challenge_stage?.name).filter(Boolean);
+    // Extraer los objetos stage completos
+    return stagesForThisRelation.map(r => r.challenge_stage).filter(Boolean);
   };
 
   return (
@@ -501,19 +529,37 @@ const ChallengeRelations = () => {
                         <span>Subcategoría:</span>
                         <span className="font-medium">{selectedRelation.challenge_subcategory?.name}</span>
                       </p>
-                      <div className="flex items-center justify-between gap-4">
-                        <span>Etapas:</span>
-                        <div className="">
+                      <div className="mb-2">
+                        <p className="mb-2">Etapas:</p>
+                        <div className="grid grid-cols-3 gap-2">
                           {(() => {
                             const stages = getRelationStages();
                             return stages.length > 0 ? (
-                              stages.map((stageName, index) => (
-                                <span key={index} className="inline-block bg-zinc-700 text-white text-xs px-2 py-1 rounded ml-2">
-                                  {stageName}
-                                </span>
+                              stages.map((stage, index) => (
+                                <div key={index} className="relative">
+                                  <input
+                                    type="radio"
+                                    id={`stage-${index}`}
+                                    name="stage"
+                                    checked={selectedStage && selectedStage.id === stage.id}
+                                    onChange={() => handleStageClick(stage)}
+                                    className="sr-only"
+                                  />
+                                  <label
+                                    htmlFor={`stage-${index}`}
+                                    className={classNames(
+                                      "block text-center py-1 px-2 rounded-md border cursor-pointer transition-all text-sm",
+                                      selectedStage && selectedStage.id === stage.id
+                                        ? "bg-amber-500 border-amber-600 text-black font-medium"
+                                        : "bg-zinc-700 border-zinc-600 text-zinc-300 hover:bg-zinc-600"
+                                    )}
+                                  >
+                                    {stage.name}
+                                  </label>
+                                </div>
                               ))
                             ) : (
-                              <span className="text-zinc-500">No hay stages disponibles</span>
+                              <span className="text-zinc-500 col-span-3">No hay etapas disponibles</span>
                             );
                           })()}
                         </div>
@@ -522,7 +568,7 @@ const ChallengeRelations = () => {
                   </div>
                 )}
 
-                {selectedProduct && (
+                {selectedProduct && selectedStage && (
                   <>
                     {selectedRelation && (
                       <div className="bg-zinc-900 p-5 shadow-md border-zinc-800">
@@ -534,70 +580,57 @@ const ChallengeRelations = () => {
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Leverage:</span>
-                                  <strong className="ml-auto">{selectedRelation.leverage || "N/A"} %</strong>
+                                  <strong className="ml-auto">
+                                    {selectedStage.leverage ? (selectedStage.leverage + " %") : "-"}
+                                  </strong>
                                 </li>
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Maximum Daily Loss:</span>
-                                  <strong className="ml-auto">{selectedRelation.maximumDailyLoss || "N/A"} %</strong>
+                                  <strong className="ml-auto">
+                                    {selectedStage.maximumDailyLoss ? (selectedStage.maximumDailyLoss + " %") : "-"}
+                                  </strong>
                                 </li>
-                                <li className="flex items-center text-zinc-300">
+                                {/* <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Maximum Loss:</span>
-                                  <strong className="ml-auto">{selectedRelation.maximumLoss || "N/A"} %</strong>
-                                </li>
+                                  <strong className="ml-auto">
+                                    {selectedStage.maximumLoss ? (selectedStage.maximumLoss + " %") : "-"}
+                                  </strong>
+                                </li> */}
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Minimum Trading Days:</span>
-                                  <strong className="ml-auto">{selectedRelation.minimumTradingDays || "N/A"} días</strong>
+                                  <strong className="ml-auto">
+                                    {selectedStage.minimumTradingDays ? (selectedStage.minimumTradingDays + " %") : "-"}
+                                  </strong>
                                 </li>
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Profit Target:</span>
-                                  <strong className="ml-auto">{selectedRelation.profitTarget || "N/A"} %</strong>
+                                  <strong className="ml-auto">
+                                    {selectedStage.profitTarget ? (selectedStage.profitTarget + " %") : "-"}
+                                  </strong>
                                 </li>
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Maximum Total Loss:</span>
-                                  <strong className="ml-auto">{selectedRelation.maximumTotalLoss || "N/A"} %</strong>
+                                  <strong className="ml-auto">
+                                    {selectedStage.maximumTotalLoss ? (selectedStage.maximumTotalLoss + " %") : "-"}
+                                  </strong>
                                 </li>
                                 <li className="flex items-center text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Maximum Loss Per Trade:</span>
-                                  <strong className="ml-auto">{selectedRelation.maximumLossPerTrade || "N/A"} %</strong>
+                                  <strong className="ml-auto">
+                                    {selectedStage.maximumLossPerTrade ? (selectedStage.maximumLossPerTrade + " %") : "-"}
+                                  </strong>
                                 </li>
                               </ul>
                             </section>
                           </div>
 
-
                           <div className="space-y-6">
-
-                            {/*
-                            <section>
-                              <span className="block text-amber-400 font-medium mb-3">Ingresa tu cupón</span>
-                              <div className="flex">
-                                <input
-                                  type="text"
-                                  placeholder="Escribe tu cupón aquí"
-                                  className="flex-1 px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-l-md text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                                  value={couponCode}
-                                  onChange={(e) => setCouponCode(e.target.value)}
-                                />
-                                <button
-                                  type="button"
-                                  disabled={!couponCode}
-                                  onClick={applyCoupon}
-                                  className={`uppercase px-4 py-2 rounded-r-md font-medium text-sm ${couponCode
-                                    ? "bg-amber-500 text-black hover:bg-amber-600 transition-colors"
-                                    : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
-                                  }`}
-                                >
-                                  Aplicar
-                                </button>
-                              </div>
-                            </section>
-                            */}
 
                             <div className="h-px bg-zinc-800"></div>
 
@@ -607,15 +640,6 @@ const ChallengeRelations = () => {
                                 <span>{selectedProduct.name}</span>
                                 <span>${matchingVariation?.price || "N/A"}</span>
                               </div>
-                              {/*
-                              <div className="flex justify-between mb-2 text-zinc-400">
-                                <div className="flex items-center">
-                                  <span>Cupón</span>
-                                  <TicketIcon className="h-4 w-4 ml-1" />
-                                </div>
-                                <span>-$0.00</span>
-                              </div>
-                              */}
                               <div className="h-px bg-zinc-800 my-4"></div>
                               <div className="flex justify-between items-center mb-1">
                                 <span className="text-zinc-300">Total</span>
