@@ -205,54 +205,52 @@ const CircularProgressMetadata = ({ metadata }) => {
 
   // Renderizado responsivo manteniendo el diseño original
   return (
-    <div className="mt-6 mb-6">
-      <h2 className="text-lg font-semibold mb-4">Métricas de Trading</h2>
-      <div className="flex flex-col items-center justify-center py-8 text-white bg-black rounded-md px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 w-full">
-          {Object.keys(progressData).map((key) => {
-            const item = progressData[key];
-            const textColorClass =
-              item.color === "green" ? "text-green-500" :
-                item.color === "yellow" ? "text-yellow-500" :
-                  item.color === "red" ? "text-red-500" :
-                    "text-blue-500";
+    <div className="flex flex-col items-center justify-center py-8 text-white bg-black my-6 rounded-md">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {Object.keys(progressData).map((key) => {
+          const item = progressData[key];
+          const textColorClass =
+            item.color === "green" ? "text-green-500" :
+            item.color === "yellow" ? "text-yellow-500" :
+            item.color === "red" ? "text-red-500" :
+            "text-blue-500";
 
-            // Formatear la visualización
-            let currentDisplay, targetDisplay;
-            if (key === "target") {
-              currentDisplay = `$${item.current.toFixed(2)}`;
-              targetDisplay = `$${item.value.toFixed(2)}`;
-            } else if (key === "drawdown") {
-              currentDisplay = `${item.current.toFixed(2)}%`;
-              targetDisplay = `${item.value.toFixed(2)}%`;
-            } else if (key === "profitFactor") {
-              currentDisplay = item.current.toFixed(2);
-              targetDisplay = item.value.toFixed(2);
-            }
+          // Formatear la visualización
+          let currentDisplay, targetDisplay;
+          if (key === "target") {
+            // Ej: "$9800.00" / "$10200.00"
+            currentDisplay = `$${item.current.toFixed(2)}`;
+            targetDisplay = `$${item.value.toFixed(2)}`;
+          } else if (key === "drawdown") {
+            // Ej: "6.00%" / "10.00%"
+            currentDisplay = `${item.current.toFixed(2)}%`;
+            targetDisplay = `${item.value.toFixed(2)}%`;
+          } else if (key === "profitFactor") {
+            // Ej: "1.50" / "2.00"
+            currentDisplay = item.current.toFixed(2);
+            targetDisplay = item.value.toFixed(2);
+          }
 
-            return (
-              <div key={key} className="flex gap-4 justify-center md:justify-start items-center">
-                <CircularProgress
-                  percentage={item.percentage}
-                  size={90}
-                  strokeWidth={8}
-                  color={
-                    item.color === "green" ? "#10B981" :
-                      item.color === "yellow" ? "#F59E0B" :
-                        item.color === "red" ? "#EF4444" :
-                          "#3B82F6"
-                  }
-                />
-                <div>
-                  <p className="text-gray-400 text-sm md:text-base">{item.label}</p>
-                  <p className="text-base md:text-xl font-bold">{targetDisplay}</p>
-                  <p className={`${textColorClass} text-sm md:text-base`}>Actual</p>
-                  <p className={`${textColorClass} font-bold text-base md:text-lg`}>{currentDisplay}</p>
-                </div>
+          return (
+            <div key={key} className="flex gap-4">
+              <CircularProgress
+                percentage={item.percentage}
+                color={
+                  item.color === "green" ? "#10B981" :
+                  item.color === "yellow" ? "#F59E0B" :
+                  item.color === "red" ? "#EF4444" :
+                  "#3B82F6"
+                }
+              />
+              <div>
+                <p className="text-gray-400">{item.label}</p>
+                <p className="text-xl font-bold">{targetDisplay}</p>
+                <p className={textColorClass}>Actual</p>
+                <p className={`${textColorClass} font-bold`}>{currentDisplay}</p>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
