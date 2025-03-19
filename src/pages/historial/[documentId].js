@@ -28,6 +28,7 @@ const HistorialMetrix = () => {
   const [metadataStats, setMetadataStats] = useState(null);
   const [currentStage, setCurrentStage] = useState(null);
   const [debugMode, setDebugMode] = useState(false);
+  const [initialBalance, setInitialBalance] = useState(null);
 
   // Obtener los datos del challenge, incluyendo el campo metadata
   const { data: challengeData, error, isLoading } = useSWR(
@@ -39,40 +40,106 @@ const HistorialMetrix = () => {
 
   // Cuando los datos del challenge se cargan, extraer los datos de metadata
   useEffect(() => {
-    // Log para depuración
-    console.log('Datos del challenge recibidos:', challengeData);
+    // Verificar si los datos del challenge están disponibles
+    if (!challengeData?.data) {
+      console.log('No hay datos del challenge disponibles aún');
+      return;
+    }
+
+    // Console log para verificar los datos completos recibidos
+    console.log('Datos del challenge recibidos:', {
+      documentId,
+      phase: challengeData.data.phase,
+      hasMetadata: !!challengeData.data.metadata,
+      metadataType: typeof challengeData.data.metadata
+    });
+
+    // Extraer el phase
+    const phase = challengeData.data.phase;
+    console.log('Phase extraído:', phase);
 
     // Verificar si existe el campo metadata
-    if (challengeData?.data?.metadata) {
+    if (challengeData.data.metadata) {
       try {
         // Intentar parsear el JSON si es un string
         const metadata = typeof challengeData.data.metadata === 'string' 
           ? JSON.parse(challengeData.data.metadata) 
           : challengeData.data.metadata;
 
-        console.log('Metadata parseada:', metadata);
+        console.log('Metadata parseada correctamente');
+        console.log('Estructura de la metadata:', {
+          tieneMetaId: !!metadata.metaId,
+          tieneMetrics: !!metadata.metrics,
+          tieneEquityChart: !!metadata.equityChart,
+          tieneBrokerAccount: !!metadata.broker_account,
+          tieneChallengeStages: Array.isArray(metadata.challenge_stages),
+          cantidadDeStages: metadata.challenge_stages?.length
+        });
+        
+        // Extraer el balance inicial del broker_account
+        let balanceInicial = null;
+        
+        // Intentar obtener el balance de diferentes ubicaciones posibles
+        if (metadata.broker_account && metadata.broker_account.balance) {
+          balanceInicial = metadata.broker_account.balance;
+          console.log('Balance inicial encontrado en metadata.broker_account:', balanceInicial);
+        } else if (metadata.deposits) {
+          balanceInicial = metadata.deposits;
+          console.log('Balance inicial encontrado en metadata.deposits:', balanceInicial);
+        } else if (metadata.metrics && metadata.metrics.deposits) {
+          balanceInicial = metadata.metrics.deposits;
+          console.log('Balance inicial encontrado en metadata.metrics.deposits:', balanceInicial);
+        } else if (challengeData.data.broker_account && challengeData.data.broker_account.balance) {
+          balanceInicial = challengeData.data.broker_account.balance;
+          console.log('Balance inicial encontrado en challengeData.data.broker_account:', balanceInicial);
+        }
+        
+        // Guardar el balance inicial en el estado
+        setInitialBalance(balanceInicial);
 
         // Verificar si la metadata tiene las propiedades necesarias
-        if (metadata && (metadata.metrics || metadata.equityChart)) {
+        if (metadata && (metadata.metrics || metadata.trades)) {
           // Dar prioridad a metrics si existe, sino usar toda la metadata
           const statsToUse = { ...metadata.metrics || metadata };
           
           // Agregar propiedades adicionales
-          statsToUse.broker_account = challengeData.data.broker_account;
+          statsToUse.broker_account = metadata.broker_account || challengeData.data.broker_account;
           statsToUse.equityChart = metadata.equityChart;
+          
+          // Asegurarse de que el balance inicial esté disponible en las estadísticas
+          statsToUse.initialBalance = balanceInicial;
 
           // Añadir stage correspondiente al phase actual
           const challengePhase = challengeData.data.phase;
           const matchedStage = metadata.challenge_stages?.find(stage => stage.phase === challengePhase);
 
           console.log('Phase del challenge:', challengePhase);
-          console.log('Stage encontrado:', matchedStage);
+          
+          if (matchedStage) {
+            console.log('Stage encontrado:', matchedStage);
+          } else {
+            console.warn('No se encontró un stage para el phase:', challengePhase);
+            console.log('Stages disponibles:', metadata.challenge_stages);
+          }
 
           // Establecer el stage actual
           setCurrentStage(matchedStage);
 
           // Establecer las estadísticas
           setMetadataStats(statsToUse);
+          
+          // Log final de los datos procesados
+          console.log('Datos procesados correctamente:', {
+            phase: challengePhase,
+            balanceInicial: balanceInicial,
+            stageEncontrado: !!matchedStage,
+            metadataStats: {
+              trades: statsToUse.trades,
+              wonTradesPercent: statsToUse.wonTradesPercent,
+              profit: statsToUse.profit,
+              balance: statsToUse.balance
+            }
+          });
         } else {
           console.warn('La metadata no contiene datos válidos:', metadata);
           setMetadataStats(null);
@@ -85,7 +152,27 @@ const HistorialMetrix = () => {
       console.warn('No se encontró el campo metadata');
       setMetadataStats(null);
     }
-  }, [challengeData]);
+  }, [challengeData, documentId]);
+
+  // Efecto adicional para verificar los datos después de que se establecen en el estado
+  useEffect(() => {
+    if (metadataStats) {
+      console.log('Estado metadataStats establecido con éxito:', {
+        trades: metadataStats.trades,
+        profit: metadataStats.profit,
+        balance: metadataStats.balance,
+        initialBalance: metadataStats.initialBalance || initialBalance
+      });
+    }
+    
+    if (currentStage) {
+      console.log('Estado currentStage establecido con éxito:', currentStage);
+    }
+    
+    if (initialBalance) {
+      console.log('Balance inicial establecido:', initialBalance);
+    }
+  }, [metadataStats, currentStage, initialBalance]);
 
   // Render de carga
   if (isLoading) {
@@ -133,6 +220,7 @@ const HistorialMetrix = () => {
               <p><span className="font-semibold">Fecha de inicio:</span> {challengeData?.data?.startDate ? new Date(challengeData.data.startDate).toLocaleDateString() : "No disponible"}</p>
               <p><span className="font-semibold">Fecha de fin:</span> {challengeData?.data?.endDate ? new Date(challengeData.data.endDate).toLocaleDateString() : "En progreso"}</p>
               <p><span className="font-semibold">Login MT4/MT5:</span> {challengeData?.data?.broker_account?.login || "No disponible"}</p>
+              <p><span className="font-semibold">Balance inicial:</span> ${challengeData?.data?.broker_account?.balance || "No disponible"}</p>
             </div>
           </div>
         </div>
@@ -177,10 +265,12 @@ const HistorialMetrix = () => {
       <CircularProgressMetadata 
         metadata={metadataStats} 
         stageConfig={currentStage}
+        initialBalance={initialBalance}
       />
       <ChartMetadata 
         metadata={metadataStats} 
         stageConfig={currentStage}
+        initialBalance={initialBalance}
       />
       
       <WinLossHistorical 
@@ -195,7 +285,7 @@ const HistorialMetrix = () => {
             metadata={metadataStats}
             phase={challengeData?.data?.phase || "Desconocida"}
             stageConfig={currentStage}
-            brokerInitialBalance={metadataStats.deposits || challengeData?.data?.broker_account?.balance}
+            brokerInitialBalance={initialBalance || metadataStats.deposits || challengeData?.data?.broker_account?.balance}
           />
         </div>
       </div>
@@ -268,6 +358,11 @@ const HistorialMetrix = () => {
             <h3 className="text-md font-semibold mb-2">Stage actual</h3>
             <pre className="bg-gray-800 text-yellow-400 p-4 rounded-lg overflow-auto text-sm mt-2">
               {JSON.stringify(currentStage, null, 2)}
+            </pre>
+            
+            <h3 className="text-md font-semibold mb-2 mt-4">Balance inicial</h3>
+            <pre className="bg-gray-800 text-yellow-400 p-4 rounded-lg overflow-auto text-sm mt-2">
+              {initialBalance}
             </pre>
             
             <h3 className="text-md font-semibold mb-2 mt-4">Datos originales (estructura completa)</h3>
