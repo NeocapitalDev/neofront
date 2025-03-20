@@ -225,7 +225,7 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
                         'profit_target'
                     ]}
                     yFormatter={yFormatter}
-                    colors={["blue", "red", "green"]}
+                    colors={["#FBBF24", "red", "green"]}
                 />
             </div>
         </div>
