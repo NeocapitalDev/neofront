@@ -42,7 +42,7 @@ export default function ViewSteps() {
       {error && <div>Error: {error.message}</div>}
       {data && (
 
-        <div className="w-[70%] mx-auto">
+        <div className="w-[95%] mx-auto">
           {/* <Toaster position="bottom-right" /> */}
           <div className="w-full flex justify-end">
             <button onClick={handleCreate} className="px-4 py-2 bg-[var(--app-primary)] text-black font-semibold rounded hover:bg-[var(--app-secondary)]">
