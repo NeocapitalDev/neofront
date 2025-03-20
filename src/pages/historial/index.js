@@ -266,7 +266,7 @@ export default function Historial() {
                                                         {status === 'approved' ? 'Aprobado' :
                                                             status === 'progress' ? 'En progreso' :
                                                                 status === 'disapproved' ? 'Desaprobado' :
-                                                                    status === 'init' ? 'Iniciado' :
+                                                                    status === 'init' ? 'Por Iniciar' :
                                                                         status === 'withdrawal' ? 'Retirado' :
                                                                             status === 'retry' ? 'Rechazado' : 'Desconocido'}
                                                     </span>
@@ -314,7 +314,7 @@ export default function Historial() {
                                                                         {challenge.result === 'approved' ? 'Aprobado' :
                                                                             challenge.result === 'progress' ? 'En progreso' :
                                                                                 challenge.result === 'disapproved' ? 'Desaprobado' :
-                                                                                    challenge.result === 'init' ? 'Iniciado' :
+                                                                                    challenge.result === 'init' ? 'Por Iniciar' :
                                                                                         challenge.result === 'withdrawal' ? 'Retirado' :
                                                                                             challenge.result === 'retry' ? 'Rechazado' : challenge.result}
                                                                     </span>
