@@ -1,4 +1,4 @@
-// src/pages/historial/CircularProgressMetadata.js
+// src/pages/admin/challenges/CircularProgressMetadata.js
 'use client'
 import { useState, useEffect } from "react";
 
@@ -53,16 +53,23 @@ const CircularProgress = ({ percentage = 0, size = 100, strokeWidth = 10, color 
   );
 };
 
-// Componente principal para la página de historial
-const CircularProgressMetadata = ({ metadata }) => {
+// Componente principal para la página de administración de challenges
+const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => {
   const [progressData, setProgressData] = useState({
     target: { value: 0, current: 0, percentage: 0, color: "green", label: "Objetivo de Profit" },
     drawdown: { value: 0, current: 0, percentage: 0, color: "yellow", label: "Drawdown Máximo" },
-    profitFactor: { value: 2, current: 0, percentage: 0, color: "blue", label: "Profit Factor" },
+    profitFactor: { value: 2, current: 0, percentage: 0, color: "amber", label: "Profit Factor" },
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasData, setHasData] = useState(false);
+
+  // Log detallado para depuración
+  console.log('[Admin CircularProgressMetadata] Props recibidos:', {
+    metadata: metadata ? 'presente' : 'ausente',
+    stageConfig: stageConfig ? 'presente' : 'ausente',
+    initialBalance: initialBalance || 'no especificado'
+  });
 
   useEffect(() => {
     if (!metadata) {
@@ -72,48 +79,95 @@ const CircularProgressMetadata = ({ metadata }) => {
     }
 
     try {
-      // Determinar si los datos están anidados en metrics
+      // Utilizar la estructura correcta de metadata
       const metrics = metadata.metrics || metadata;
-
+      
+      // Log detallado de metrics
+      console.log('[Admin CircularProgressMetadata] Metrics encontrados:', {
+        balance: metrics.balance,
+        maxDrawdown: metrics.maxDrawdown,
+        profitFactor: metrics.profitFactor,
+        deposits: metrics.deposits
+      });
+      
       // Verificar si hay datos válidos para mostrar
-      const hasValidData = metrics &&
-        (metrics.balance !== undefined ||
-          metrics.maxDrawdown !== undefined ||
-          metrics.profitFactor !== undefined);
-
+      const hasValidData = metrics && 
+        (metrics.balance !== undefined || 
+         metrics.maxDrawdown !== undefined || 
+         metrics.profitFactor !== undefined);
+      
       if (!hasValidData) {
+        console.warn('[Admin CircularProgressMetadata] No hay datos válidos para mostrar');
         setHasData(false);
         setLoading(false);
         return;
       }
 
-      // Obtener valores iniciales para los cálculos
-      const initialBalance = metrics.deposits || 10000;
-      const profitTargetPercent = 10; // Valor por defecto si no está definido
-      const maxAllowedDrawdownPercent = 10; // Valor por defecto si no está definido
+      // Obtener el balance inicial desde los props (procesado en el componente padre)
+      const deposit = initialBalance || metrics.deposits || 10000;
+      console.log('[Admin CircularProgressMetadata] Balance inicial:', deposit);
+      
+      // Obtener valores de configuración desde stageConfig
+      let profitTargetPercent = 10; // Valor por defecto
+      let maxAllowedDrawdownPercent = 10; // Valor por defecto
+      
+      if (stageConfig) {
+        // Log detallado de stageConfig
+        console.log('[Admin CircularProgressMetadata] StageConfig completo:', stageConfig);
+        
+        // Buscar propiedades directamente en stageConfig (estructura correcta)
+        if (typeof stageConfig.profitTarget === 'number') {
+          profitTargetPercent = stageConfig.profitTarget;
+          console.log('[Admin CircularProgressMetadata] Encontrado profitTarget:', profitTargetPercent);
+        }
+        
+        // Priorizar maximumTotalLoss sobre maximumDailyLoss
+        if (typeof stageConfig.maximumTotalLoss === 'number') {
+          maxAllowedDrawdownPercent = stageConfig.maximumTotalLoss;
+          console.log('[Admin CircularProgressMetadata] Encontrado maximumTotalLoss:', maxAllowedDrawdownPercent);
+        } else if (typeof stageConfig.maximumDailyLoss === 'number') {
+          maxAllowedDrawdownPercent = stageConfig.maximumDailyLoss;
+          console.log('[Admin CircularProgressMetadata] Encontrado maximumDailyLoss:', maxAllowedDrawdownPercent);
+        }
+      }
+      
+      console.log('[Admin CircularProgressMetadata] Valores de configuración finales:', {
+        profitTargetPercent,
+        maxAllowedDrawdownPercent
+      });
 
       // Cálculos para las barras circulares
       calculateProgressData(
-        initialBalance,
-        maxAllowedDrawdownPercent,
-        profitTargetPercent,
+        deposit, 
+        maxAllowedDrawdownPercent, 
+        profitTargetPercent, 
         metrics
       );
+      
       setHasData(true);
       setLoading(false);
     } catch (err) {
-      console.error("Error calculando datos de progreso:", err);
+      console.error("[Admin CircularProgressMetadata] Error calculando datos de progreso:", err);
       setError(err.message || "Error desconocido");
       setHasData(false);
       setLoading(false);
     }
-  }, [metadata]);
+  }, [metadata, stageConfig, initialBalance]);
 
   /**
    * Adaptación de la función calculateProgressData para el componente de historial
    */
   const calculateProgressData = (deposit, ddPercent, profitTargetPercent, metricsData) => {
     if (!metricsData) return;
+
+    console.log('[Admin CircularProgressMetadata] Calculando progreso con datos:', {
+      deposit,
+      ddPercent,
+      profitTargetPercent,
+      currentBalance: metricsData.balance,
+      maxDrawdown: metricsData.maxDrawdown,
+      profitFactor: metricsData.profitFactor
+    });
 
     // 1) Objetivo de Profit:
     const currentBalance = metricsData.balance || deposit;
@@ -140,6 +194,25 @@ const CircularProgressMetadata = ({ metadata }) => {
     const currentProfitFactor = metricsData.profitFactor || 0;
     let profitFactorPercentage = (currentProfitFactor / targetProfitFactor) * 100;
     const cappedProfitFactorPercentage = Math.min(100, Math.max(0, profitFactorPercentage));
+
+    // Log de los cálculos finales
+    console.log('[Admin CircularProgressMetadata] Cálculos finales:', {
+      target: {
+        value: targetValue,
+        current: currentBalance,
+        percentage: cappedProfitPercentage
+      },
+      drawdown: {
+        value: drawdownAllowed,
+        current: drawdownReal,
+        percentage: cappedDrawdownPercentage
+      },
+      profitFactor: {
+        value: targetProfitFactor,
+        current: currentProfitFactor,
+        percentage: cappedProfitFactorPercentage
+      }
+    });
 
     setProgressData({
       // Objetivo de Profit - Nuevo esquema: rojo < 40%, amarillo 40-80%, verde > 80%
@@ -212,14 +285,16 @@ const CircularProgressMetadata = ({ metadata }) => {
         return "#F59E0B"; // Amarillo ámbar
       case "red":
         return "#EF4444"; // Rojo más intenso
+      case "amber":
+        return "#FBBF24"; // Amber 400
       default:
-        return "#3B82F6"; // Azul por defecto
+        return "#FBBF24"; // Amber 400 por defecto
     }
   };
 
-  // Renderizado responsivo manteniendo el diseño original, sin el my-6 de padding
+  // Renderizado responsivo manteniendo el diseño original
   return (
-    <div className="flex flex-col items-center justify-center py-8 text-white bg-black rounded-md">
+    <div className="flex flex-col items-center justify-center py-8 text-white bg-black my-6 rounded-md">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {Object.keys(progressData).map((key) => {
           const item = progressData[key];
@@ -227,7 +302,7 @@ const CircularProgressMetadata = ({ metadata }) => {
             item.color === "green" ? "text-green-500" :
             item.color === "yellow" ? "text-yellow-500" :
             item.color === "red" ? "text-red-500" :
-            "text-blue-500";
+            "text-amber-400"; // Amber 400 por defecto
 
           // Formatear la visualización
           let currentDisplay, targetDisplay;

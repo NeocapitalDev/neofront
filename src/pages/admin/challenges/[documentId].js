@@ -202,7 +202,7 @@ const AdminChallengeDetail = () => {
           const challengePhase = challengeData.phase;
 
           // Obtener los stages disponibles de la metadata
-          const stages = metadata.challenges_stages;
+          const stages = metadata.challenge_stages;
 
           // Aplicar la lógica especial para determinar el stage correcto
           const selectedStage = determineCorrectStage(challengePhase, stages);
