@@ -596,24 +596,31 @@ const AdminChallengeDetail = () => {
     
       {/* Objetivos */}
       <div className="mt-6">
-        <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
-        {challengeConfig ? (
-          <Objetivos
-            // Pasar la configuración del desafío desde Strapi
-            challengeConfig={challengeConfig}
-            // Pasar los datos de métricas reales del SDK
-            metricsData={metricsData}
-            // Balance inicial para cálculos
-            initBalance={challengeData?.broker_account?.balance}
-            // Fase actual
-            pase={challengeData?.phase}
-          />
-        ) : (
-          <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-6 text-center">
-            <p>Cargando objetivos...</p>
-          </div>
-        )}
-      </div>
+  <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
+  {challengeConfig ? (
+    metricsData ? (
+      <Objetivos
+        challengeConfig={challengeConfig}
+        metricsData={metricsData}
+        initBalance={challengeData?.broker_account?.balance}
+        pase={challengeData?.phase}
+      />
+    ) : (
+      <Objetivos
+        challengeConfig={challengeConfig}
+        metricsData={challengeData.metadata}
+        initBalance={challengeData?.broker_account?.balance}
+        pase={challengeData?.phase}
+      />
+    )
+  ) : (
+    <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-6 text-center">
+      <p>Cargando objetivos...</p>
+    </div>
+  )}
+</div>
+
+
 
 
       <div className="flex flex-col md:flex-row gap-4 mt-6">
