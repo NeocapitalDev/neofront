@@ -343,7 +343,7 @@ const Metrix = () => {
         </div>
       </div>
 
-      <div className="bg-black text-white p-6 rounded-lg shadow-lg my-6">
+      {/* <div className="bg-black text-white p-6 rounded-lg shadow-lg my-6">
         <h2 className="text-xl font-bold mb-4">Datos en Bruto para Comparación</h2>
 
         <div className="mb-6">
@@ -359,7 +359,7 @@ const Metrix = () => {
             {JSON.stringify(apiResult, null, 2)}
           </pre>
         </div>
-      </div>
+      </div> */}
       
       {/* Componente para mostrar los challenges relacionados */}
       {challengeData?.data && (
