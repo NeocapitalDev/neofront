@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import DashboardLayout from "..";
 import { useRouter } from "next/router";
-import { useStrapiData } from "@/services/strapiServiceJWT";
+import { useStrapiData } from "@/services/strapiService";
 const tableColumns = [
   { accessorKey: "traderAccount", header: "Trader Account" },
   { accessorKey: "traderEmail", header: "Trader Email" },
@@ -41,8 +41,9 @@ const tableColumns = [
 export default function ChallengesTable() {
   const { data: session } = useSession();
 
-  const route = session?.jwt ? "challenges?populate=*" : null;
-  const { data, error, isLoading } = useStrapiData(route, session?.jwt);
+  // const route = session?.jwt ? "challenges?populate=*" : null;
+  const { data, error, isLoading } = useStrapiData("challenges?populate=*");
+  console.log("data", data);
 
   // const { data, error, isLoading } = useSWR(
   //   session?.jwt
@@ -80,9 +81,9 @@ export default function ChallengesTable() {
   };
 
   const filteredData = useMemo(() => {
-    if (!data || !data.data) return [];
+    // if (!data || !data.data) return [];
 
-    return data.data.map((challenge) => ({
+    return data.map((challenge) => ({
       traderAccount: challenge.broker_account?.login ?? "N/A",
       traderEmail: challenge.user?.email ?? "N/A",
       state: translateResult(challenge.result),
