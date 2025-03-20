@@ -25,7 +25,7 @@ export default function WinLossHistorical({ metadata }) {
       // La estructura del metadata puede variar, así que buscamos la ruta correcta
       // Normalmente tendríamos que navegar a metrics si existe
       const metricsData = metadata.metrics || metadata;
-      
+
       // Extraer los datos con valores por defecto para evitar errores
       const wonTrades = metricsData.wonTrades || 0;
       const lostTrades = metricsData.lostTrades || 0;
@@ -57,7 +57,7 @@ export default function WinLossHistorical({ metadata }) {
   }, [metadata]);
 
   const noTrades = chartData.totalTrades === 0;
-  
+
   // Función para formatear números como moneda
   const formatCurrency = (value) => {
     return value.toLocaleString(undefined, {
@@ -69,7 +69,7 @@ export default function WinLossHistorical({ metadata }) {
   return (
     <div className="mt-6 w-full">
       <h2 className="text-lg font-semibold flex items-center">
-        <BarChart className="w-5 h-5 mr-2" /> 
+        <BarChart className="w-5 h-5 mr-2" />
         Win/Loss Rates
       </h2>
       <Card className="mt-4">
@@ -92,7 +92,7 @@ export default function WinLossHistorical({ metadata }) {
                     <span>Loss Rate: {chartData.lostTradesPercent.toFixed(1)}% ({chartData.lostTrades} trades)</span>
                   </div>
                 </div>
-                
+
                 <div className="relative w-full h-8 bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden">
                   {/* Porcentaje de Wins */}
                   {chartData.wonTradesPercent > 0 && (
@@ -106,7 +106,7 @@ export default function WinLossHistorical({ metadata }) {
                       {chartData.wonTradesPercent > 5 ? `${chartData.wonTradesPercent.toFixed(1)}%` : ""}
                     </div>
                   )}
-                  
+
                   {/* Porcentaje de Losses */}
                   {chartData.lostTradesPercent > 0 && (
                     <div
@@ -122,7 +122,7 @@ export default function WinLossHistorical({ metadata }) {
                   )}
                 </div>
               </div>
-              
+
               {/* Estadísticas de ganancia/pérdida promedio */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-900">
@@ -134,7 +134,7 @@ export default function WinLossHistorical({ metadata }) {
                     Total Ganancia: ${formatCurrency(chartData.wonBalance)}
                   </div>
                 </div>
-                
+
                 <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-900">
                   <div className="text-red-700 dark:text-red-400 font-semibold mb-1">Average Loss</div>
                   <div className="text-2xl font-bold text-red-600 dark:text-red-300">
@@ -145,30 +145,29 @@ export default function WinLossHistorical({ metadata }) {
                   </div>
                 </div>
               </div>
-              
+
               {/* Factor de ganancias y beneficio neto */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-900">
+              <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-900">
                 <div className="flex justify-between">
                   <div>
-                    <div className="text-blue-700 dark:text-blue-400 font-semibold mb-1">Profit Factor</div>
-                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-300">
+                    <div className="text-amber-700 dark:text-amber-400 font-semibold mb-1">Profit Factor</div>
+                    <div className="text-2xl font-bold text-amber-600 dark:text-amber-300">
                       {chartData.profitFactor.toFixed(2)}
                     </div>
-                    <div className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                    <div className="text-sm text-amber-600 dark:text-amber-400 mt-1">
                       (Ratio Ganancia/Pérdida)
                     </div>
                   </div>
-                  
+
                   <div>
-                    <div className="text-blue-700 dark:text-blue-400 font-semibold mb-1">Beneficio Neto</div>
-                    <div className={`text-2xl font-bold ${
-                      chartData.netProfit >= 0 
-                        ? "text-green-600 dark:text-green-300" 
+                    <div className="text-amber-700 dark:text-amber-400 font-semibold mb-1">Beneficio Neto</div>
+                    <div className={`text-2xl font-bold ${chartData.netProfit >= 0
+                        ? "text-green-600 dark:text-green-300"
                         : "text-red-600 dark:text-red-300"
-                    }`}>
+                      }`}>
                       ${formatCurrency(chartData.netProfit)}
                     </div>
-                    <div className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                    <div className="text-sm text-amber-600 dark:text-amber-400 mt-1">
                       (Total Ganancia - Total Pérdida)
                     </div>
                   </div>

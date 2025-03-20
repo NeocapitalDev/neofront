@@ -80,6 +80,7 @@ export default function MyPage({
             'profit_target'
           ]}
           yFormatter={yFormatter}
+          colors={["#FBBF24", "red", "green"]}
         />
       </div>
     </>
