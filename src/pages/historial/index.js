@@ -196,7 +196,7 @@ export default function Historial() {
 
             {/* Título de la sección de challenges */}
             <div className="mt-4">
-                <p className="text-base font-semibold mb-3">Lista de Challenges</p>
+                {/* <p className="text-base font-semibold mb-3">Lista de Challenges</p> */}
             </div>
 
             {/* Contenedor principal de challenges */}
@@ -225,7 +225,7 @@ export default function Historial() {
                                         {/* Identificador del challenge y botón de expansión en una fila */}
                                         <div className="flex justify-between items-center mb-4">
                                             <div className="bg-[var(--app-primary)] rounded-lg shadow-md text-black text-center text-lg font-bold px-3 py-2">
-                                                <span className="block" title={parentId}>Challenge - {parentId}</span>
+                                                <span className="block" title={parentId}>CH-{challenges[0].id}</span>
                                             </div>
                                             <div className="flex items-center">
                                                 <button
@@ -265,10 +265,10 @@ export default function Historial() {
                                                     <span className={`font-semibold ${statusColors[status] || 'text-gray-600 dark:text-gray-300'}`}>
                                                         {status === 'approved' ? 'Aprobado' :
                                                             status === 'progress' ? 'En progreso' :
-                                                                status === 'disapproved' ? 'Rechazado' :
+                                                                status === 'disapproved' ? 'Desaprobado' :
                                                                     status === 'init' ? 'Iniciado' :
                                                                         status === 'withdrawal' ? 'Retirado' :
-                                                                            status === 'retry' ? 'Reintento' : 'Desconocido'}
+                                                                            status === 'retry' ? 'Rechazado' : 'Desconocido'}
                                                     </span>
                                                 </div>
                                                 <span className="text-gray-500 dark:text-gray-400 hidden md:inline">|</span>
@@ -313,10 +313,10 @@ export default function Historial() {
                                                                     <span className={`ml-3 px-3 py-1 rounded-full text-xs font-medium ${statusColors[challenge.result]} ${statusBgColors[challenge.result]}`}>
                                                                         {challenge.result === 'approved' ? 'Aprobado' :
                                                                             challenge.result === 'progress' ? 'En progreso' :
-                                                                                challenge.result === 'disapproved' ? 'Rechazado' :
+                                                                                challenge.result === 'disapproved' ? 'Desaprobado' :
                                                                                     challenge.result === 'init' ? 'Iniciado' :
                                                                                         challenge.result === 'withdrawal' ? 'Retirado' :
-                                                                                            challenge.result === 'retry' ? 'Reintento' : challenge.result}
+                                                                                            challenge.result === 'retry' ? 'Rechazado' : challenge.result}
                                                                     </span>
                                                                 </div>
                                                                 <div className="flex text-gray-600 text-sm dark:text-gray-300 items-center mt-2">
