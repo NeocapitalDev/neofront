@@ -363,12 +363,6 @@ const AdminChallengeDetail = () => {
           </div>
 
           <div className="mt-4 flex gap-2">
-            <Button variant="outline" className="bg-yellow-500 text-white hover:bg-yellow-600">
-              Contactar usuario
-            </Button>
-            <Button variant="outline" className="bg-purple-500 text-white hover:bg-purple-600">
-              Cambiar estado
-            </Button>
             {challengeData?.broker_account && (
               <CredencialesModal {...challengeData.broker_account} />
             )}
