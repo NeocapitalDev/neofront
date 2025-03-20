@@ -1,6 +1,6 @@
 // src/pages/admin/challenges/index.js
 "use client";
- 
+
 import React, { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
@@ -66,7 +66,7 @@ export default function ChallengesTable() {
   const translateResult = (result) => {
     switch (result) {
       case "init":
-        return "Iniciado";
+        return "Por Iniciar";
       case "approved":
         return "Aprobado";
       case "disapproved":
