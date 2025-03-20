@@ -20,9 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import DashboardLayout from "..";
 import { useRouter } from "next/router";
-import { useStrapiData } from "@/services/strapiService";
-
-// Columnas de la tabla en español
+import { useStrapiData } from "@/services/strapiServiceJWT";
 const tableColumns = [
   { accessorKey: "traderAccount", header: "Trader Account" },
   { accessorKey: "traderEmail", header: "Trader Email" },
@@ -82,12 +80,7 @@ export default function ChallengesTable() {
   };
 
   const filteredData = useMemo(() => {
-<<<<<<< HEAD
     if (!data || !data.data) return [];
-=======
-    console.log(data);
-    if (!data) return [];
->>>>>>> f3ab44b64c1d5fd35bf1a6136b57133dd77e3f29
 
     return data.data.map((challenge) => ({
       traderAccount: challenge.broker_account?.login ?? "N/A",
