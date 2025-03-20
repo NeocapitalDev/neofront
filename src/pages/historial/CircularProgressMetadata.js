@@ -142,37 +142,37 @@ const CircularProgressMetadata = ({ metadata }) => {
     const cappedProfitFactorPercentage = Math.min(100, Math.max(0, profitFactorPercentage));
 
     setProgressData({
-      // Objetivo de Profit
+      // Objetivo de Profit - Nuevo esquema: rojo < 40%, amarillo 40-80%, verde > 80%
       target: {
         value: targetValue,
         current: currentBalance,
         percentage: cappedProfitPercentage,
         color:
-          cappedProfitPercentage >= 100 ? "green" :
-            cappedProfitPercentage <= 0 ? "red" :
-              "blue",
+          cappedProfitPercentage >= 80 ? "green" :
+          cappedProfitPercentage >= 40 ? "yellow" :
+          "red",
         label: "Objetivo de Profit"
       },
-      // Drawdown Máximo
+      // Drawdown Máximo - Nuevo esquema: verde < 40%, amarillo 40-80%, rojo > 80%
       drawdown: {
         value: drawdownAllowed,
         current: drawdownReal,
         percentage: cappedDrawdownPercentage,
         color:
-          cappedDrawdownPercentage >= 80 ? "green" :
-            cappedDrawdownPercentage >= 50 ? "yellow" :
-              "red",
+          cappedDrawdownPercentage >= 80 ? "red" :
+          cappedDrawdownPercentage >= 40 ? "yellow" :
+          "green",
         label: "Drawdown Máximo"
       },
-      // Profit Factor
+      // Profit Factor - Nuevo esquema: rojo < 40%, amarillo 40-80%, verde > 80%
       profitFactor: {
         value: targetProfitFactor,
         current: currentProfitFactor,
         percentage: cappedProfitFactorPercentage,
         color:
           cappedProfitFactorPercentage >= 80 ? "green" :
-            cappedProfitFactorPercentage >= 50 ? "blue" :
-              "yellow",
+          cappedProfitFactorPercentage >= 40 ? "yellow" :
+          "red",
         label: "Profit Factor"
       }
     });
@@ -202,6 +202,20 @@ const CircularProgressMetadata = ({ metadata }) => {
       </div>
     );
   }
+
+  // Definir los colores hexadecimales para cada color
+  const getColorHex = (colorName) => {
+    switch (colorName) {
+      case "green":
+        return "#10B981"; // Verde más intenso
+      case "yellow":
+        return "#F59E0B"; // Amarillo ámbar
+      case "red":
+        return "#EF4444"; // Rojo más intenso
+      default:
+        return "#3B82F6"; // Azul por defecto
+    }
+  };
 
   // Renderizado responsivo manteniendo el diseño original
   return (
@@ -235,12 +249,7 @@ const CircularProgressMetadata = ({ metadata }) => {
             <div key={key} className="flex gap-4">
               <CircularProgress
                 percentage={item.percentage}
-                color={
-                  item.color === "green" ? "#10B981" :
-                  item.color === "yellow" ? "#F59E0B" :
-                  item.color === "red" ? "#EF4444" :
-                  "#3B82F6"
-                }
+                color={getColorHex(item.color)}
               />
               <div>
                 <p className="text-gray-400">{item.label}</p>

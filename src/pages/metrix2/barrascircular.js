@@ -160,36 +160,39 @@ const Dashboard = ({ brokerInitialBalance, maxAllowedDrawdownPercent, profitTarg
 
     setProgressData({
       // Objetivo de Profit
+      // Rojo hasta 40%, amarillo hasta 80%, verde después
       target: {
         value: targetValue,
         current: currentBalance,
         percentage: cappedProfitPercentage,
         color:
-          cappedProfitPercentage >= 100 ? "green" :
-          cappedProfitPercentage <= 0 ? "red" :
-          "blue",
+          cappedProfitPercentage >= 80 ? "green" :
+          cappedProfitPercentage >= 40 ? "yellow" :
+          "red",
         label: "Objetivo de Profit"
       },
       // Drawdown Máximo
+      // Verde hasta 40%, amarillo hasta 80%, rojo después
       drawdown: {
         value: drawdownAllowed,
         current: drawdownReal,
         percentage: cappedDrawdownPercentage,
         color:
           cappedDrawdownPercentage >= 80 ? "red" :
-          cappedDrawdownPercentage >= 50 ? "yellow" :
+          cappedDrawdownPercentage >= 40 ? "yellow" :
           "green",
         label: "Drawdown Máximo"
       },
-      // Profit Factor (nuevo)
+      // Profit Factor
+      // Rojo hasta 40%, amarillo hasta 80%, verde después
       profitFactor: {
         value: targetProfitFactor,
         current: currentProfitFactor,
         percentage: cappedProfitFactorPercentage,
         color:
           cappedProfitFactorPercentage >= 80 ? "green" :
-          cappedProfitFactorPercentage >= 50 ? "blue" :
-          "yellow",
+          cappedProfitFactorPercentage >= 40 ? "yellow" :
+          "red",
         label: "Profit Factor"
       }
     });
@@ -219,6 +222,20 @@ const Dashboard = ({ brokerInitialBalance, maxAllowedDrawdownPercent, profitTarg
       </div>
     );
   }
+
+  // Definir los colores hexadecimales para cada color
+  const getColorHex = (colorName) => {
+    switch (colorName) {
+      case "green":
+        return "#10B981"; // Verde más intenso
+      case "yellow":
+        return "#F59E0B"; // Amarillo ámbar
+      case "red":
+        return "#EF4444"; // Rojo más intenso
+      default:
+        return "#3B82F6"; // Azul por defecto
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center py-8 text-white bg-black my-6 rounded-md">
@@ -251,12 +268,7 @@ const Dashboard = ({ brokerInitialBalance, maxAllowedDrawdownPercent, profitTarg
             <div key={key} className="flex gap-4">
               <CircularProgress
                 percentage={item.percentage}
-                color={
-                  item.color === "green" ? "#10B981" :
-                  item.color === "yellow" ? "#F59E0B" :
-                  item.color === "red" ? "#EF4444" :
-                  "#3B82F6"
-                }
+                color={getColorHex(item.color)}
               />
               <div>
                 <p className="text-gray-400">{item.label}</p>
