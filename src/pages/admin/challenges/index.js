@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import DashboardLayout from "..";
 import { useRouter } from "next/router";
-import { useStrapiData } from "@/services/strapiServiceJWT";
+import { useStrapiData } from "@/services/strapiService";
 
 // Columnas de la tabla en español
 const tableColumns = [
@@ -106,7 +106,7 @@ export default function ChallengesTable() {
 
   const filteredData = useMemo(() => {
     console.log(data);
-    if (!data || !data.data) return [];
+    if (!data) return [];
 
     return data.map((challenge) => ({
       traderAccount: challenge.broker_account?.login ?? "N/A",
