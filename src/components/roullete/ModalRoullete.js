@@ -1,34 +1,38 @@
-import React from 'react'
+import React from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Gift } from 'lucide-react'
-import RuletaSorteo from "@/components/roullete/RoulleteWo";
+} from "@/components/ui/dialog";
+import { Gift } from 'lucide-react';
 import TicketsList from './TicketsList';
 
 export default function ModalRoullete() {
-
   return (
-    <Dialog className="">
-      <DialogTrigger className="p-3 bg-black text-[var(--app-primary)] rounded-full hover:bg-[var(--app-primary)] hover:text-black transition-colors">
+    <Dialog>
+      <DialogTrigger className="p-3 bg-black text-[var(--app-primary)] rounded-full hover:bg-[var(--app-primary)] hover:text-black transition-colors duration-300">
         <Gift size={64} />
       </DialogTrigger>
-      <DialogContent className="bg-black text-[var(--app-secondary)] p-3 rounded-lg border-2 border-[var(--app-secondary)] shadow-lg">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-center">
+      <DialogContent className="bg-black text-[var(--app-primary)] p-0 rounded-lg border-2 border-[var(--app-primary)] shadow-[0_0_20px_rgba(255,215,0,0.3)] max-w-md w-full max-h-[80vh] overflow-hidden">
+        <DialogHeader className="p-6 border-b border-[var(--app-primary)]/20 bg-gradient-to-b from-black to-black/95">
+          <DialogTitle className="text-2xl font-bold text-center flex flex-col items-center gap-3">
+            <div className="w-16 h-16 rounded-full bg-black border-2 border-[var(--app-primary)] flex items-center justify-center shadow-[0_0_10px_rgba(255,215,0,0.3)]">
+              <Gift className="h-8 w-8 text-[var(--app-primary)]" />
+            </div>
+            <span>Mis Tickets</span>
           </DialogTitle>
-          <DialogDescription className="mt-2">
-          </DialogDescription>
         </DialogHeader>
 
-        <TicketsList> </TicketsList>
-        {/* <RuletaSorteo /> */}
+        {/* Scrollable content area with improved styling */}
+        <div className="overflow-y-auto max-h-[calc(80vh-130px)] py-4 px-4 bg-black">
+          <TicketsList />
+
+          {/* Hidden gradient at bottom to fade out scrollable content */}
+          <div className="sticky bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-black to-transparent pointer-events-none -mt-4"></div>
+        </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
