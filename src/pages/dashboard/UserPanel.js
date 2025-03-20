@@ -58,7 +58,6 @@ export default function Index() {
                     if (challenge.broker_account?.idMeta) {
                         try {
                             const metrics = await metaStats.getMetrics(challenge.broker_account.idMeta);
-
                             newBalances[challenge.id] = metrics.balance;
                         } catch (error) {
                             console.error(`Error obteniendo el balance para ${challenge.broker_account.idMeta}:`, error);
@@ -84,21 +83,16 @@ export default function Index() {
 
     // Función para obtener el nombre del stage según la fase del challenge
     const getStageName = (challenge) => {
-        if (!challenge.challenge_relation?.challenge_stages ||
-            !Array.isArray(challenge.challenge_relation.challenge_stages) ||
-            challenge.challenge_relation.challenge_stages.length === 0) {
-            return `Fase ${challenge.phase}`;
+        switch (challenge.phase) {
+            case 1:
+                return "Fase 1";
+            case 2:
+                return "Fase 2";
+            case 3:
+                return "Fase Real";
+            default:
+                return `Fase ${challenge.phase}`;
         }
-
-        // Ordenar los stages (asumimos que tienen un orden implícito por ID)
-        const sortedStages = [...challenge.challenge_relation.challenge_stages].sort((a, b) => a.id - b.id);
-
-        // Verificar si hay un stage correspondiente a la fase actual
-        if (challenge.phase > 0 && challenge.phase <= sortedStages.length) {
-            return sortedStages[challenge.phase - 1].name || `Fase ${challenge.phase}`;
-        }
-
-        return `Fase ${challenge.phase}`;
     };
 
     if (isLoading) return <Loader />;
@@ -154,11 +148,8 @@ export default function Index() {
 
     // Ordenar los stages por su número de fase
     const sortedStages = Object.keys(groupedChallengesByStage).sort((a, b) => {
-        const extractPhaseNumber = (stageName) => {
-            const match = stageName.match(/Fase (\d+)/);
-            return match ? parseInt(match[1]) : 0;
-        };
-        return extractPhaseNumber(a) - extractPhaseNumber(b);
+        const phaseOrder = { "Fase 1": 1, "Fase 2": 2, "Fase Real": 3 };
+        return (phaseOrder[a] || 999) - (phaseOrder[b] || 999); // 999 como fallback para fases no mapeadas
     });
 
     return (
@@ -194,75 +185,72 @@ export default function Index() {
                                             Login: {challenge.broker_account?.login || "-"}
                                         </p>
 
-                                        {
-                                            isVisible && (
-                                                <>
-                                                    <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
-                                                        <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                            Balance:{" "}
-                                                            <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                                {typeof balanceDisplay === "number" ? `$${balanceDisplay}` : balanceDisplay}
-                                                            </span>
-                                                        </p>
-                                                        <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                            Inicio:{" "}
-                                                            <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                                {challenge.startDate ? new Date(challenge.startDate).toLocaleDateString() : "-"}
-                                                            </span>
-                                                        </p>
-                                                        <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                            Fin:{" "}
-                                                            <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                                {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "-"}
-                                                            </span>
-                                                        </p>
-                                                        <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                            Resultado:{" "}
-                                                            <span
-                                                                className={`font-bold ${{
-                                                                    progress: "text-[var(--app-primary)]",
-                                                                    disapproved: "text-red-500",
-                                                                    approved: "text-green-500",
-                                                                }[challenge.result] || "text-slate-800 dark:text-slate-200"
-                                                                    }`}
-                                                            >
-                                                                {
-                                                                    {
-                                                                        init: "Por iniciar",
-                                                                        progress: "En curso",
-                                                                        disapproved: "Desaprobado",
-                                                                        approved: "Aprobado",
-                                                                        retry: "Repetir",
-                                                                    }[challenge.result] || challenge.result
-                                                                }
-                                                            </span>
-                                                        </p>
-                                                    </div>
-                                                    <div className="mt-4 flex space-x-4 items-center">
-                                                        <Link href={`/metrix2/${challenge.documentId}`}>
-                                                            <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
-                                                                <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                                                                <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
-                                                            </button>
-                                                        </Link>
-                                                        {!isVerified && challenge.phase === 3 &&
-                                                            challenge.result === "approved" && (<p className='font-light text-gray-300'>Debes estar verificado para retirar tus ganancias, ve al apartado de verificación.</p>)}
-                                                        {isVerified &&
-                                                            challenge.phase === 3 &&
-                                                            challenge.result === "approved" && (
-                                                                <div className='flex gap-2 items-center'>
-                                                                    <BilleteraCripto
-                                                                        balance={balances[challenge.id] || 1000000}
-                                                                        brokerBalance={challenge.broker_account?.balance || "0"}
-                                                                        userId={data?.id}
-                                                                        challengeId={challenge.documentId}
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                    </div>
-                                                </>
-                                            )
-                                        }
+                                        {isVisible && (
+                                            <>
+                                                <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
+                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                        Balance:{" "}
+                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                            {typeof balanceDisplay === "number" ? `$${balanceDisplay}` : balanceDisplay}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                        Inicio:{" "}
+                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                            {challenge.startDate ? new Date(challenge.startDate).toLocaleDateString() : "-"}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                        Fin:{" "}
+                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                            {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "-"}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                                        Resultado:{" "}
+                                                        <span
+                                                            className={`font-bold ${{
+                                                                progress: "text-[var(--app-primary)]",
+                                                                disapproved: "text-red-500",
+                                                                approved: "text-green-500",
+                                                            }[challenge.result] || "text-slate-800 dark:text-slate-200"}`}
+                                                        >
+                                                            {{
+                                                                init: "Por iniciar",
+                                                                progress: "En curso",
+                                                                disapproved: "Desaprobado",
+                                                                approved: "Aprobado",
+                                                                retry: "Repetir",
+                                                            }[challenge.result] || challenge.result}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                                <div className="mt-4 flex space-x-4 items-center">
+                                                    <Link href={`/metrix2/${challenge.documentId}`}>
+                                                        <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
+                                                            <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+                                                            <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
+                                                        </button>
+                                                    </Link>
+                                                    {!isVerified && challenge.phase === 3 &&
+                                                        challenge.result === "approved" && (
+                                                            <p className="font-light text-gray-300">Debes estar verificado para retirar tus ganancias, ve al apartado de verificación.</p>
+                                                        )}
+                                                    {isVerified &&
+                                                        challenge.phase === 3 &&
+                                                        challenge.result === "approved" && (
+                                                            <div className="flex gap-2 items-center">
+                                                                <BilleteraCripto
+                                                                    balance={balances[challenge.id] || 1000000}
+                                                                    brokerBalance={challenge.broker_account?.balance || "0"}
+                                                                    userId={data?.id}
+                                                                    challengeId={challenge.documentId}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                </div>
+                                            </>
+                                        )}
 
                                         <ButtonInit documentId={challenge.documentId} result={challenge.result} phase={challenge.phase} />
 
@@ -285,6 +273,6 @@ export default function Index() {
             ) : (
                 <p className="text-center text-gray-500 dark:text-gray-400">No hay challenges disponibles.</p>
             )}
-        </div >
+        </div>
     );
 }

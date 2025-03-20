@@ -38,7 +38,7 @@ export interface ChallengeStage {
   maximumTotalLoss: number;
   maximumLossPerTrade: number;
   profitTarget: number;
-  leverage: string;
+  leverage: number;
 }
 
 export interface ChallengeRelationsStages {

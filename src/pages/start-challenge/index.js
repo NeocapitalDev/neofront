@@ -145,6 +145,10 @@ const ChallengeRelations = () => {
     process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
   const hasCredentials = !!consumerKey;
   const shouldFetch = endpoint && hasCredentials;
+  
+  console.log("consumerKey",consumerKey)
+  console.log("hasCredentials",hasCredentials)
+  console.log("shouldFetch",shouldFetch)
 
   // Use useSWR unconditionally to fetch variations
   const {
