@@ -39,6 +39,11 @@ const formatProfit = (initialBalance, currentProfit, profitTarget) => {
 };
 
 export default function Objetivos({ challengeConfig, metricsData, initBalance, pase }) {
+    console.log(challengeConfig)
+    console.log(metricsData)
+    console.log(initBalance)
+    console.log(pase)
+
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [objetivos, setObjetivos] = useState([]);
 
