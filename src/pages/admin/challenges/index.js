@@ -104,6 +104,7 @@ export default function ChallengesTable() {
   };
 
   const filteredData = useMemo(() => {
+    console.log(data);
     if (!data || !data.data) return [];
 
     return data.data.map((challenge) => ({
