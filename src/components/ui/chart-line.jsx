@@ -12,9 +12,6 @@ import {
   Legend,
 } from 'chart.js'
 
-// No importar el plugin de zoom aquí directamente
-// import zoomPlugin from 'chartjs-plugin-zoom'
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -65,14 +62,44 @@ export function LineChart({ data, index, categories, yFormatter }) {
     // otros estilos si lo requieres
   }
 
+  // Encontrar los valores únicos para las líneas de referencia
+  // Buscar el primer valor no nulo para max_drawdown y profit_target
+  const findReferenceValue = (category) => {
+    for (let i = 0; i < data.length; i++) {
+      const value = data[i][category];
+      if (value !== null && value !== undefined) {
+        return value;
+      }
+    }
+    return null;
+  };
+
+  const maxDrawdownValue = findReferenceValue('max_drawdown');
+  const profitTargetValue = findReferenceValue('profit_target');
+
   // Construimos datasets para Chart.js
   const chartData = {
     labels: data.map((item) => item[index]),
     datasets: categories.map((cat) => {
       const style = lineStyles[cat] || { color: '#FFF', dash: [], pointRadius: 0, pointHoverRadius: 0 }
+      
+      // Crear datos especiales para max_drawdown y profit_target (líneas horizontales)
+      let categoryData;
+      
+      if (cat === 'max_drawdown' && maxDrawdownValue !== null) {
+        // Crear una línea horizontal con el valor de max_drawdown
+        categoryData = new Array(data.length).fill(maxDrawdownValue);
+      } else if (cat === 'profit_target' && profitTargetValue !== null) {
+        // Crear una línea horizontal con el valor de profit_target
+        categoryData = new Array(data.length).fill(profitTargetValue);
+      } else {
+        // Para otros datos, usar los valores normales
+        categoryData = data.map((item) => item[cat]);
+      }
+      
       return {
         label: cat,
-        data: data.map((item) => item[cat]),
+        data: categoryData,
         borderColor: style.color,
         backgroundColor: 'transparent',
         borderDash: style.dash,
@@ -80,6 +107,11 @@ export function LineChart({ data, index, categories, yFormatter }) {
         pointRadius: style.pointRadius,
         pointHoverRadius: style.pointHoverRadius,
         spanGaps: true, // para trazar líneas aunque haya huecos
+        // Para max_drawdown y profit_target, forzamos su visualización
+        ...(cat === 'max_drawdown' || cat === 'profit_target' ? {
+          fill: false,
+          tension: 0, // línea recta sin curvas
+        } : {})
       }
     }),
   }
@@ -94,6 +126,10 @@ export function LineChart({ data, index, categories, yFormatter }) {
       }
     })
   })
+
+  // Asegurarse que max_drawdown y profit_target están incluidos en el cálculo del rango
+  if (maxDrawdownValue !== null) allValues.push(maxDrawdownValue);
+  if (profitTargetValue !== null) allValues.push(profitTargetValue);
 
   if (allValues.length === 0) {
     allValues = [0, 100]

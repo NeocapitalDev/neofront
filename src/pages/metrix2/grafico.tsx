@@ -52,7 +52,7 @@ export default function MyPage({
 
       return {
         date,
-        balance: item.lastBalance,
+        balance: item.lastEquity,
         max_drawdown: ddAbsolute,
         profit_target: ptAbsolute,
       }
