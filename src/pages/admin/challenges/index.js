@@ -56,8 +56,9 @@ const statusBgColors = {
 export default function ChallengesTable() {
   const { data: session } = useSession();
 
-  const route = session?.jwt ? "challenges?populate=*" : null;
-  const { data, error, isLoading } = useStrapiData(route, session?.jwt);
+  // const route = session?.jwt ? "challenges?populate=*" : null;
+  const { data, error, isLoading } = useStrapiData("challenges?populate=*");
+  console.log("data", data);
 
   const formatCurrency = (amount) =>
     amount ? `$${parseFloat(amount).toLocaleString("es-ES", { minimumFractionDigits: 2 })}` : "N/A";
@@ -107,7 +108,7 @@ export default function ChallengesTable() {
     console.log(data);
     if (!data || !data.data) return [];
 
-    return data.data.map((challenge) => ({
+    return data.map((challenge) => ({
       traderAccount: challenge.broker_account?.login ?? "N/A",
       traderEmail: challenge.user?.email ?? "N/A",
       state: getStatusElement(challenge.result),

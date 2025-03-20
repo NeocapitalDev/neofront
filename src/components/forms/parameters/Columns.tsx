@@ -14,12 +14,7 @@ import PropDetails from "./PropDetails";
 export type ChallengeRelationsStages = {
   id: number;
   documentId: string;
-  minimumTradingDays: number | null;
-  maximumDailyLoss: number;
-  maximumTotalLoss: number; // Cambiado de maximumLoss a maximumTotalLoss
-  maximumLossPerTrade: number; // Nuevo campo añadido
-  profitTarget: number | null;
-  leverage: number;
+
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
@@ -49,6 +44,12 @@ export type ChallengeRelationsStages = {
   }[];
   challenge_stages: {
     id: number;
+    minimumTradingDays: number | null;
+    maximumDailyLoss: number;
+    maximumTotalLoss: number; // Cambiado de maximumLoss a maximumTotalLoss
+    maximumLossPerTrade: number; // Nuevo campo añadido
+    profitTarget: number | null;
+    leverage: number;
     documentId: string;
     name: string;
     createdAt: string;
@@ -194,13 +195,7 @@ export default function Columns(
       cell: ({ row }) => {
         const data = row.original;
         const prop = {
-          minimumTradingDays: data.minimumTradingDays,
-          maximumDailyLoss: data.maximumDailyLoss,
-          maximumTotalLoss: data.maximumTotalLoss, // Cambiado de maximumLoss
-          maximumLossPerTrade: data.maximumLossPerTrade, // Nuevo campo añadido
-          profitTarget: data.profitTarget,
           documentId: data.documentId,
-          leverage: data.leverage,
           challenge_stages: data.challenge_stages,
           challenge_step: data.challenge_step,
           challenge_subcategory: data.challenge_subcategory,
