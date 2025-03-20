@@ -205,7 +205,7 @@ const CircularProgressMetadata = ({ metadata }) => {
 
   // Renderizado responsivo manteniendo el diseño original
   return (
-    <div className="flex flex-col items-center justify-center py-8 text-white bg-black my-6 rounded-md">
+    <div className="flex flex-col items-center justify-center py-8 text-white bg-black  rounded-md">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {Object.keys(progressData).map((key) => {
           const item = progressData[key];

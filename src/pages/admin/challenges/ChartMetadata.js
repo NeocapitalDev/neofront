@@ -192,7 +192,7 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
     // Mostrar error si lo hay
     if (error) {
         return (
-            <div className="text-red-500 p-4 bg-red-100 dark:bg-red-900/30 rounded-lg dark:bg-zinc-800 shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+            <div className="text-red-500  bg-red-100 dark:bg-red-900/30 rounded-lg dark:bg-zinc-800 shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
                 Error cargando datos del gráfico: {error}
             </div>
         )
@@ -201,7 +201,7 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
     // Mensaje cuando no hay datos
     if (chartData.length === 0) {
         return (
-            <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+            <div className="text-center  bg-gray-100 dark:bg-zinc-800 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
                 No hay datos disponibles para mostrar.
                 <pre className="mt-4 text-xs text-gray-600 dark:text-gray-400">
                     Datos recibidos: {JSON.stringify(metadata, null, 2)}
@@ -212,19 +212,9 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
 
     // Renderizar gráfico
     return (
-        <div className="mt-6">
+        <div className="mt-4">
             <h2 className="text-lg font-semibold mb-4">Evolución del Balance</h2>
-            <div className="dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black p-4">
-                {stageConfig && (
-                    <div className="mb-4 text-sm grid grid-cols-2 gap-4">
-                        <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded">
-                            <span className="font-semibold">Objetivo de Profit:</span> {stageConfig.profitTarget || 0}%
-                        </div>
-                        <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded">
-                            <span className="font-semibold">Máxima Pérdida:</span> {stageConfig.maximumTotalLoss || stageConfig.maximumDailyLoss || 0}%
-                        </div>
-                    </div>
-                )}
+            <div className="dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black ">
                 <LineChart
                     data={chartData}
                     index="date"

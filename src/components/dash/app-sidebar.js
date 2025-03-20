@@ -70,12 +70,6 @@ export function AppSidebar({ ...props }) {
       isActive: false,
     },
     {
-      title: "Movements",
-      url: "/admin/movements",
-      icon: Award,
-      isActive: false,
-    },
-    {
       title: "Payouts",
       url: "/admin/payouts",
       icon: Award,

@@ -374,61 +374,6 @@ const HistorialMetrix = () => {
       {challengeData?.data && (
         <RelatedChallenges currentChallenge={challengeData.data} />
       )}
-
-      <div className="mt-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold">Datos completos</h2>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setDebugMode(!debugMode)}
-              className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
-            >
-              {debugMode ? "Ocultar Debug" : "Modo Debug"}
-            </button>
-            <button 
-              onClick={() => {
-                const el = document.getElementById('metadata-json');
-                el.style.display = el.style.display === 'none' ? 'block' : 'none';
-              }}
-              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 rounded text-sm"
-            >
-              Mostrar/Ocultar
-            </button>
-          </div>
-        </div>
-        
-        {debugMode && (
-          <div className="mt-4">
-            <h3 className="text-md font-semibold mb-2">Stage actual</h3>
-            <pre className="bg-gray-800 text-yellow-400 p-4 rounded-lg overflow-auto text-sm mt-2">
-              {JSON.stringify(currentStage, null, 2)}
-            </pre>
-            
-            <h3 className="text-md font-semibold mb-2 mt-4">Balance inicial</h3>
-            <pre className="bg-gray-800 text-yellow-400 p-4 rounded-lg overflow-auto text-sm mt-2">
-              {initialBalance}
-            </pre>
-            
-            <h3 className="text-md font-semibold mb-2 mt-4">Fase del challenge</h3>
-            <pre className="bg-gray-800 text-yellow-400 p-4 rounded-lg overflow-auto text-sm mt-2">
-              {challengeData?.data?.phase}
-            </pre>
-            
-            <h3 className="text-md font-semibold mb-2 mt-4">Datos originales (estructura completa)</h3>
-            <pre className="bg-gray-800 text-yellow-400 p-4 rounded-lg overflow-auto text-sm mt-2">
-              {JSON.stringify(challengeData?.data, null, 2)}
-            </pre>
-          </div>
-        )}
-        
-        <pre 
-          id="metadata-json"
-          className="bg-black text-white p-4 rounded-lg overflow-auto text-sm mt-2"
-          style={{display: 'none'}}
-        >
-          {JSON.stringify(metadataStats, null, 2)}
-        </pre>
-      </div>
     </Layout>
   );
 };

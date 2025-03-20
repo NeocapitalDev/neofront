@@ -14,7 +14,7 @@ import WinLossHistorical from "./WinLossHistorical";
 import StatisticsHistorical from "./StatisticsHistorical";
 import RelatedChallenges from "../../../components/challenges/RelatedChallenges";
 import CredencialesModal from "../../dashboard/credentials";
-import { useStrapiData } from "src/services/strapiService";
+import { useStrapiData } from "@/services/strapiServiceJWT";
 
 /**
  * Función para determinar el stage correcto basado en la fase actual y los stages disponibles
@@ -22,40 +22,84 @@ import { useStrapiData } from "src/services/strapiService";
  * @param {Array} stages - Array de stages disponibles
  * @returns {Object} Stage seleccionado
  */
+// Función mejorada para determinar el stage correcto
 const determineCorrectStage = (currentPhase, stages) => {
-  if (!stages || !Array.isArray(stages) || stages.length === 0) {
-    console.warn('No hay stages disponibles');
+  // Convertir currentPhase a número
+  const phaseNum = parseInt(currentPhase, 10);
+  
+  // Validación de datos de entrada
+  if (isNaN(phaseNum)) {
+    console.error('La fase actual no es un número válido:', currentPhase);
     return null;
+  }
+  
+  // Verificación más robusta de stages
+  if (!stages || !Array.isArray(stages) || stages.length === 0) {
+    console.warn('No hay stages disponibles o el formato es incorrecto');
+    // Crear un stage predeterminado en caso de que no haya stages
+    return {
+      name: "Stage por defecto",
+      description: "Stage creado automáticamente debido a falta de datos",
+      targets: {
+        profit_target: 8,
+        max_daily_loss: 5,
+        max_loss: 10
+      }
+    };
   }
 
   const totalStages = stages.length;
   let stageIndex;
 
-  console.log(`Determinando stage: Fase actual=${currentPhase}, Total stages=${totalStages}`);
+  console.log(`Determinando stage: Fase actual=${phaseNum}, Total stages=${totalStages}, Stages disponibles:`, stages);
 
-  // Si tenemos 2 o 3 stages totales, aplicamos la lógica inversa
+  // Si tenemos 2 o 3 stages totales, aplicamos la lógica especial
   if (totalStages === 2 || totalStages === 3) {
-    if (currentPhase === 2) {
+    if (phaseNum === 2) {
       // Si la fase es 2 (con 2 fases totales), seleccionamos el primer stage (índice 0)
       stageIndex = 0;
-      console.log(`Caso especial: Fase 2 con ${totalStages} stages totales -> Seleccionando índice 0`);
-    } else if (currentPhase === 3) {
+      console.log(`Caso especial: Fase ${phaseNum} con ${totalStages} stages totales -> Seleccionando índice 0`);
+    } else if (phaseNum === 3) {
       // Si la fase es 3 (con 1 fase total), seleccionamos el único stage
       stageIndex = 0;
-      console.log(`Caso especial: Fase 3 con ${totalStages} stages totales -> Seleccionando índice 0`);
+      console.log(`Caso especial: Fase ${phaseNum} con ${totalStages} stages totales -> Seleccionando índice 0`);
     } else {
       // Para otras fases, calculamos el índice correspondiente sin pasarnos del total
-      stageIndex = Math.min(currentPhase - 1, totalStages - 1);
-      console.log(`Caso normal con ${totalStages} stages: Calculando índice ${stageIndex} (min(${currentPhase}-1, ${totalStages}-1))`);
+      stageIndex = Math.min(phaseNum - 1, totalStages - 1);
+      console.log(`Caso normal con ${totalStages} stages: Calculando índice ${stageIndex} (min(${phaseNum}-1, ${totalStages}-1))`);
     }
   } else {
     // Para otros casos de cantidad de stages, simplemente usamos la fase actual - 1 como índice
-    stageIndex = Math.min(currentPhase - 1, totalStages - 1);
-    console.log(`Caso estándar: Calculando índice ${stageIndex} (min(${currentPhase}-1, ${totalStages}-1))`);
+    stageIndex = Math.min(phaseNum - 1, totalStages - 1);
+    console.log(`Caso estándar: Calculando índice ${stageIndex} (min(${phaseNum}-1, ${totalStages}-1))`);
   }
 
-  console.log(`Stage seleccionado con índice ${stageIndex}:`, stages[stageIndex]);
-  return stages[stageIndex];
+  // Verificación adicional
+  if (stageIndex < 0 || stageIndex >= totalStages) {
+    console.warn(`Índice calculado (${stageIndex}) fuera de rango para ${totalStages} stages disponibles.`);
+    stageIndex = 0; // Usar el primer stage como fallback
+    console.log(`Usando stage 0 como fallback.`);
+  }
+
+  const selectedStage = stages[stageIndex];
+  console.log(`Stage seleccionado con índice ${stageIndex}:`, selectedStage);
+  
+  // Verificación de la estructura del stage
+  if (!selectedStage) {
+    console.error(`No se pudo seleccionar un stage válido en el índice ${stageIndex}`);
+    // Retornar un stage por defecto en lugar de null
+    return {
+      name: "Stage por defecto",
+      description: "Stage creado automáticamente debido a error en la selección",
+      targets: {
+        profit_target: 8,
+        max_daily_loss: 5,
+        max_loss: 10
+      }
+    };
+  }
+
+  return selectedStage;
 };
 
 const AdminChallengeDetail = () => {
@@ -65,15 +109,19 @@ const AdminChallengeDetail = () => {
   const [currentStage, setCurrentStage] = useState(null);
   const [debugMode, setDebugMode] = useState(false);
   const [initialBalance, setInitialBalance] = useState(null);
-  
+
   // Extraer documentId de la URL
   const { documentId } = router.query;
-  
-  // Usar el hook solo cuando se ha cargado la página completamente y documentId existe
-  const { data: challengeData, error, isLoading, mutate } = useStrapiData(
-    router.isReady && documentId ? `challenges/${documentId}?populate=*` : undefined
-  );
-  
+  console.log("documentId", documentId);
+
+  // Usar el servicio con el token JWT
+  const route = documentId && session?.jwt ? `challenges/${documentId}?populate=*` : null;
+  const { data, error, isLoading, mutate } = useStrapiData(route, session?.jwt);
+
+  // Extraer challengeData de la estructura anidada
+  const challengeData = data?.data;
+  console.log("challengeData", challengeData);
+
   // Función para volver a la lista de challenges
   const handleBack = () => {
     router.push("/admin/challenges");
@@ -82,8 +130,8 @@ const AdminChallengeDetail = () => {
   // Cuando los datos del challenge se cargan, extraer los datos de metadata
   useEffect(() => {
     // Verificar si los datos del challenge están disponibles
-    if (!challengeData || !documentId) {
-      console.log('No hay datos del challenge disponibles aún o documentId no existe');
+    if (!challengeData) {
+      console.log('No hay datos del challenge disponibles aún');
       return;
     }
 
@@ -113,8 +161,8 @@ const AdminChallengeDetail = () => {
           tieneMetrics: !!metadata.metrics,
           tieneEquityChart: !!metadata.equityChart,
           tieneBrokerAccount: !!metadata.broker_account,
-          tieneChallengeStages: Array.isArray(metadata.challenge_stages),
-          cantidadDeStages: metadata.challenge_stages?.length
+          tieneChallengeStages: Array.isArray(metadata.challenges_stages),
+          cantidadDeStages: metadata.challenges_stages?.length
         });
 
         // Extraer el balance inicial del broker_account
@@ -154,7 +202,7 @@ const AdminChallengeDetail = () => {
           const challengePhase = challengeData.phase;
 
           // Obtener los stages disponibles de la metadata
-          const stages = metadata.challenge_stages;
+          const stages = metadata.challenges_stages;
 
           // Aplicar la lógica especial para determinar el stage correcto
           const selectedStage = determineCorrectStage(challengePhase, stages);
@@ -217,8 +265,8 @@ const AdminChallengeDetail = () => {
     }
   }, [metadataStats, currentStage, initialBalance]);
 
-  // Verificar si estamos esperando que el router proporcione el documentId o termine de cargar
-  if (!router.isReady || !documentId) {
+  // Verificar si estamos esperando que el router proporcione el documentId o la sesión
+  if (!documentId || !session) {
     return (
       <DashboardLayout>
         <Loader />
@@ -310,7 +358,7 @@ const AdminChallengeDetail = () => {
             </div>
             <div>
               <p><span className="font-semibold">ID de Usuario:</span> {challengeData?.user?.id || "No disponible"}</p>
-              <p><span className="font-semibold">Fecha de registro:</span> {challengeData?.user?.createdAt ? new Date(challengeData?.user?.createdAt).toLocaleDateString() : "No disponible"}</p>
+              <p><span className="font-semibold">Fecha de registro:</span> {challengeData?.user?.createdAt ? new Date(challengeData.user.createdAt).toLocaleDateString() : "No disponible"}</p>
             </div>
           </div>
 
@@ -383,38 +431,32 @@ const AdminChallengeDetail = () => {
           </Link>
         </div>
       </div>
+      <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+        <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
+        Historial de Cuenta {challengeData?.broker_account?.login || "Sin nombre"}
+      </h1>
 
       {/* Información del usuario (solo visible para admin) */}
-      <div className="mb-6 bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
-        <h2 className="text-lg font-semibold mb-4">Información del usuario</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className=" bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+        <h2 className="text-xl font-semibold mb-4">Información del usuario</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
-            <p><span className="font-semibold">Email:</span> {challengeData?.user?.email || "No disponible"}</p>
-            <p><span className="font-semibold">Nombre:</span> {challengeData?.user?.username || "No disponible"}</p>
+            <p className="mb-2"><span className="font-semibold">Email:</span> {challengeData?.user?.email || "No disponible"}</p>
+            <p className="mb-2"><span className="font-semibold">Nombre:</span> {challengeData?.user?.username || "No disponible"}</p>
           </div>
           <div>
-            <p><span className="font-semibold">ID de Usuario:</span> {challengeData?.user?.id || "No disponible"}</p>
-            <p><span className="font-semibold">Fecha de registro:</span> {challengeData?.user?.createdAt ? new Date(challengeData?.user?.createdAt).toLocaleDateString() : "No disponible"}</p>
+            <p className="mb-2"><span className="font-semibold">ID de Usuario:</span> {challengeData?.user?.id || "No disponible"}</p>
+            <p className="mb-2"><span className="font-semibold">Fecha de registro:</span> {challengeData?.user?.createdAt ? new Date(challengeData.user.createdAt).toLocaleDateString() : "No disponible"}</p>
           </div>
         </div>
 
-        <div className="mt-4 flex gap-2">
-          <Button variant="outline" className="bg-yellow-500 text-white hover:bg-yellow-600">
-            Contactar usuario
-          </Button>
-          <Button variant="outline" className="bg-purple-500 text-white hover:bg-purple-600">
-            Cambiar estado
-          </Button>
+        <div className="flex flex-wrap gap-3">
           {challengeData?.broker_account && (
             <CredencialesModal {...challengeData.broker_account} />
           )}
         </div>
       </div>
-
-      <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-        <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
-        Historial de Cuenta {challengeData?.broker_account?.login || "Sin nombre"}
-      </h1>
 
       <CircularProgressMetadata
         metadata={metadataStats}
@@ -534,7 +576,7 @@ const AdminChallengeDetail = () => {
         <pre
           id="metadata-json"
           className="bg-black text-white p-4 rounded-lg overflow-auto text-sm mt-2"
-          style={{display: 'none'}}
+          style={{ display: 'none' }}
         >
           {JSON.stringify(metadataStats, null, 2)}
         </pre>
