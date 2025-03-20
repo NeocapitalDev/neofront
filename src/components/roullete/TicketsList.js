@@ -46,7 +46,7 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
 
         {/* Ticket code */}
         <span className="text-lg font-semibold text-yellow-300">
-          {ticket.codigo || 'No definido'}
+          <strong>Codigo:</strong> {ticket.codigo || 'No definido'}
         </span>
 
         {/* Status and expiration */}
@@ -94,7 +94,7 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
           ) : (
             // If ticket is used and has no prize
             <span className="w-full sm:w-auto text-center text-base font-semibold bg-red-600 text-white px-6 py-2 rounded-lg">
-              Usado
+              Listo para Usar
             </span>
           )
         )}
