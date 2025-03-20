@@ -22,7 +22,7 @@ ChartJS.register(
   Legend
 )
 
-export function LineChart({ data, index, categories, yFormatter }) {
+export function LineChart({ data, index, categories, yFormatter, colors }) {
   // Estado para controlar si estamos en el cliente
   const [isClient, setIsClient] = useState(false)
 
@@ -42,7 +42,7 @@ export function LineChart({ data, index, categories, yFormatter }) {
   // Definimos colores y estilos para cada categoría
   const lineStyles = {
     balance: {
-      color: '#3B82F6',
+      color: '#FBBF24', // Cambiado de '#3B82F6' (azul) a '#FBBF24' (Amber 400)
       dash: [],
       pointRadius: 2,          // balance con puntos pequeños
       pointHoverRadius: 6,
@@ -60,6 +60,13 @@ export function LineChart({ data, index, categories, yFormatter }) {
       pointHoverRadius: 0,
     },
     // otros estilos si lo requieres
+  }
+
+  // Si se proporcionan colores personalizados, actualizar los colores en lineStyles
+  if (colors && Array.isArray(colors) && colors.length >= 3) {
+    lineStyles.balance.color = colors[0];
+    lineStyles.max_drawdown.color = colors[1];
+    lineStyles.profit_target.color = colors[2];
   }
 
   // Encontrar los valores únicos para las líneas de referencia
