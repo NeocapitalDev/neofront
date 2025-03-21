@@ -324,9 +324,9 @@ const ChallengeRelations = () => {
       </div>
 
       <form onSubmit={handleSubmit} className='w-full mx-auto'>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
           {/* Columna izquierda - Configuración */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-1 space-y-6">
             {/* Steps Section */}
             <section className="bg-white rounded-lg p-5 shadow-md border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
               <div className="flex items-center mb-3">
@@ -523,7 +523,7 @@ const ChallengeRelations = () => {
                   </h3>
                 </header>
 
-                {selectedRelation && (
+                {/* {selectedRelation && (
                   <div className="bg-gray-50 p-4 border-b border-gray-200 dark:bg-zinc-800 dark:border-zinc-700">
                     <h4 className="text-[var(--app-primary)] font-medium mb-2">Información Adicional</h4>
                     <div className="text-gray-700 dark:text-zinc-300">
@@ -568,14 +568,14 @@ const ChallengeRelations = () => {
                       </div>
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {selectedProduct && selectedStage && (
                   <>
                     {selectedRelation && (
                       <div className="p-5">
                         <div className="grid grid-cols-1 gap-6">
-                          <div>
+                         {/*  <div>
                             <section>
                               <h3 className="text-lg font-medium text-[var(--app-primary)] mb-4">Características:</h3>
                               <ul className="space-y-3">
@@ -623,18 +623,18 @@ const ChallengeRelations = () => {
                                 </li>
                               </ul>
                             </section>
-                          </div>
+                          </div> */}
 
                           <div className="space-y-6">
-                            <div className="h-px bg-gray-200 dark:bg-zinc-800"></div>
+                            {/* <div className="h-px bg-gray-200 dark:bg-zinc-800"></div> */}
 
                             <section>
-                              <h4 className="text-gray-700 dark:text-zinc-300 font-medium mb-4">Subtotal</h4>
+                              {/* <h4 className="text-gray-700 dark:text-zinc-300 font-medium mb-4">Subtotal</h4>
                               <div className="flex justify-between mb-2 text-gray-700 dark:text-zinc-300">
                                 <span>{selectedProduct.name}</span>
                                 <span>${matchingVariation?.price || "N/A"}</span>
-                              </div>
-                              <div className="h-px bg-gray-200 dark:bg-zinc-800 my-4"></div>
+                              </div> */}
+                              {/* <div className="h-px bg-gray-200 dark:bg-zinc-800 my-4"></div> */}
                               <div className="flex justify-between items-center mb-1">
                                 <span className="text-gray-700 dark:text-zinc-300">Total</span>
                                 <p className="text-2xl font-semibold text-[var(--app-primary)]">${matchingVariation?.price || "N/A"}</p>
