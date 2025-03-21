@@ -93,7 +93,7 @@ const ChallengeRelations = () => {
   */}
 
   const stepsData = relations
-  ? [...new Set(relations.map(relation => relation.challenge_step.name))].map(stepName => {
+    ? [...new Set(relations.map(relation => relation.challenge_step.name))].map(stepName => {
       const stepRelations = relations.filter(relation => relation.challenge_step.name === stepName);
       // Obtener todas las etapas de todas las relaciones del step y eliminar duplicados
       const allStages = stepRelations.flatMap(relation => relation.challenge_stages || []);
@@ -105,7 +105,7 @@ const ChallengeRelations = () => {
         numberOfStages,
       };
     }).sort((a, b) => a.numberOfStages - b.numberOfStages) // Ordenar de menor a mayor
-  : [];
+    : [];
 
   // Seleccionar el primer step, relación y producto por defecto al cargar los datos
   useEffect(() => {
@@ -145,10 +145,10 @@ const ChallengeRelations = () => {
     process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
   const hasCredentials = !!consumerKey;
   const shouldFetch = endpoint && hasCredentials;
-  
-  console.log("consumerKey",consumerKey)
-  console.log("hasCredentials",hasCredentials)
-  console.log("shouldFetch",shouldFetch)
+
+  console.log("consumerKey", consumerKey)
+  console.log("hasCredentials", hasCredentials)
+  console.log("shouldFetch", shouldFetch)
 
   // Use useSWR unconditionally to fetch variations
   const {
@@ -461,7 +461,7 @@ const ChallengeRelations = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {(() => {
                     const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
-                    const selectedRelation = stepRelations.find(r => r.id === selectedRelationId);  
+                    const selectedRelation = stepRelations.find(r => r.id === selectedRelationId);
                     const relationProductNames = selectedRelation?.challenge_products.map(p => p.name) || [];
                     if (allproducts && allproducts.length > 0) {
                       // Ordenar productos por el campo "precio" de menor a mayor
@@ -668,7 +668,7 @@ const ChallengeRelations = () => {
                       </div>
                     )}
 
-                    {/* <section className="p-5 space-y-4">
+                    <section className="p-5 space-y-4">
                       <div className="flex items-start">
                         <input
                           type="checkbox"
@@ -682,7 +682,7 @@ const ChallengeRelations = () => {
                           <span className="font-bold text-amber-400 cursor-pointer">Términos y Condiciones</span>,{" "}
                           <span className="font-bold text-amber-400 cursor-pointer">Política de Privacidad</span> y{" "}
                           <span className="font-bold text-amber-400 cursor-pointer">Política de Cookies</span>
-                        </label> 
+                        </label>
                       </div>
 
                       <div className="flex items-start">
@@ -693,22 +693,18 @@ const ChallengeRelations = () => {
                           checked={cancellationAccepted}
                           onChange={() => setCancellationAccepted(!cancellationAccepted)}
                         />
-                         <label htmlFor="acceptCancelation" className="ml-2 text-sm text-zinc-300">
+                        <label htmlFor="acceptCancelation" className="ml-2 text-sm text-zinc-300">
                           Declaro que he leído y estoy de acuerdo con las Políticas de Cancelación y Reembolso.
-                        </label> 
+                        </label>
                       </div>
-                    </section> */}
+                    </section>
 
                     <div className="p-5">
                       <button
                         onClick={handleContinue}
                         type="submit"
-                 //       disabled={!selectedProduct || !termsAccepted || !cancellationAccepted}
-
-                        disabled={!selectedProduct}
-                     //   className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct && termsAccepted && cancellationAccepted
-
-                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct 
+                        disabled={!selectedProduct || !termsAccepted || !cancellationAccepted}
+                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct && termsAccepted && cancellationAccepted
                           ? "bg-amber-500 hover:bg-amber-600 text-black font-bold"
                           : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
                           }`}
