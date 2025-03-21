@@ -7,6 +7,7 @@ import Layout from "../../components/layout/dashboard";
 import Loader from "../../components/loaders/loader";
 import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { BarChart } from "lucide-react";
 
 // Componentes importados
 import CircularProgressMetadata from "./CircularProgressMetadata";
@@ -17,7 +18,7 @@ import RelatedChallenges from "../../components/challenges/RelatedChallenges";
 import Objetivos from "./objetivos";
 
 // Fetcher simplificado sin Content-Type para GET requests
-const fetcher = (url, token) => 
+const fetcher = (url, token) =>
   fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -87,9 +88,9 @@ const HistorialMetrix = () => {
   const { data: userData, error, isLoading } = useSWR(
     session?.jwt && documentId
       ? [
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges]=*`,
-          session.jwt
-        ]
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges]=*`,
+        session.jwt
+      ]
       : null,
     ([url, token]) => {
       console.log("Consultando URL:", url); // Para depuración
@@ -103,10 +104,10 @@ const HistorialMetrix = () => {
       const basicChallenge = userData.challenges.find(
         (challenge) => challenge.documentId === documentId
       );
-      
+
       if (basicChallenge && basicChallenge.id) {
         console.log('Challenge básico encontrado:', basicChallenge);
-        
+
         // Obtener detalles completos del challenge en una consulta separada
         fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${basicChallenge.id}?populate[broker_account]=*&populate[challenge_relation][populate][challenge_stages]=*`, {
           headers: {
@@ -120,30 +121,30 @@ const HistorialMetrix = () => {
           .then(response => {
             const detailedChallenge = response.data || response;
             console.log('Detalles completos del challenge:', detailedChallenge);
-            
+
             // Extraer broker_account considerando diferentes estructuras posibles
             let brokerAccount = null;
-            
+
             // Caso 1: broker_account directamente en detailedChallenge
             if (detailedChallenge.broker_account) {
               brokerAccount = detailedChallenge.broker_account;
-            } 
+            }
             // Caso 2: broker_account en attributes
             else if (detailedChallenge.attributes && detailedChallenge.attributes.broker_account) {
               brokerAccount = detailedChallenge.attributes.broker_account;
             }
             // Caso 3: broker_account con formato data/attributes
-            else if (detailedChallenge.attributes && 
-                     detailedChallenge.attributes.broker_account && 
-                     detailedChallenge.attributes.broker_account.data) {
+            else if (detailedChallenge.attributes &&
+              detailedChallenge.attributes.broker_account &&
+              detailedChallenge.attributes.broker_account.data) {
               brokerAccount = detailedChallenge.attributes.broker_account.data.attributes;
             }
-            
+
             console.log('Broker account extraído:', brokerAccount);
-            
+
             // Combinar datos básicos con detalles y broker_account procesado
             setCurrentChallenge({
-              ...basicChallenge, 
+              ...basicChallenge,
               ...(detailedChallenge.attributes || detailedChallenge),
               broker_account: brokerAccount
             });
@@ -183,8 +184,8 @@ const HistorialMetrix = () => {
     if (currentChallenge.metadata) {
       try {
         // Intentar parsear el JSON si es un string
-        const metadata = typeof currentChallenge.metadata === 'string' 
-          ? JSON.parse(currentChallenge.metadata) 
+        const metadata = typeof currentChallenge.metadata === 'string'
+          ? JSON.parse(currentChallenge.metadata)
           : currentChallenge.metadata;
 
         console.log('Metadata parseada correctamente');
@@ -196,10 +197,10 @@ const HistorialMetrix = () => {
           tieneChallengeStages: Array.isArray(metadata.challenge_stages),
           cantidadDeStages: metadata.challenge_stages?.length
         });
-        
+
         // Extraer el balance inicial del broker_account
         let balanceInicial = null;
-        
+
         // Intentar obtener el balance de diferentes ubicaciones posibles
         if (metadata.broker_account && metadata.broker_account.balance) {
           balanceInicial = metadata.broker_account.balance;
@@ -214,7 +215,7 @@ const HistorialMetrix = () => {
           balanceInicial = currentChallenge.broker_account.balance;
           console.log('Balance inicial encontrado en currentChallenge.broker_account:', balanceInicial);
         }
-        
+
         // Guardar el balance inicial en el estado
         setInitialBalance(balanceInicial);
 
@@ -222,22 +223,22 @@ const HistorialMetrix = () => {
         if (metadata && (metadata.metrics || metadata.trades)) {
           // Dar prioridad a metrics si existe, sino usar toda la metadata
           const statsToUse = { ...metadata.metrics || metadata };
-          
+
           // Agregar propiedades adicionales
           statsToUse.broker_account = metadata.broker_account || currentChallenge.broker_account;
           statsToUse.equityChart = metadata.equityChart;
-          
+
           // Asegurarse de que el balance inicial esté disponible en las estadísticas
           statsToUse.initialBalance = balanceInicial;
 
           // Obtener la fase actual del challenge
           const challengePhase = currentChallenge.phase;
-          
+
           // Obtener los stages disponibles de la metadata o de challenge_relation
-          const stages = metadata.challenge_stages || 
-                        (currentChallenge.challenge_relation && 
-                         currentChallenge.challenge_relation.challenge_stages);
-          
+          const stages = metadata.challenge_stages ||
+            (currentChallenge.challenge_relation &&
+              currentChallenge.challenge_relation.challenge_stages);
+
           // Aplicar la lógica especial para determinar el stage correcto
           const selectedStage = determineCorrectStage(challengePhase, stages);
 
@@ -252,7 +253,7 @@ const HistorialMetrix = () => {
 
           // Establecer las estadísticas
           setMetadataStats(statsToUse);
-          
+
           // Log final de los datos procesados
           console.log('Datos procesados correctamente:', {
             phase: challengePhase,
@@ -289,11 +290,11 @@ const HistorialMetrix = () => {
         initialBalance: metadataStats.initialBalance || initialBalance
       });
     }
-    
+
     if (currentStage) {
       console.log('Estado currentStage establecido con éxito:', currentStage);
     }
-    
+
     if (initialBalance) {
       console.log('Balance inicial establecido:', initialBalance);
     }
@@ -304,25 +305,25 @@ const HistorialMetrix = () => {
     if (currentChallenge) {
       console.group('Depuración de estructura de broker_account');
       console.log('currentChallenge:', currentChallenge);
-      
+
       // Verificar broker_account directo
       console.log('broker_account directo:', currentChallenge.broker_account);
-      
+
       // Verificar si hay datos anidados
       if (currentChallenge.broker_account && currentChallenge.broker_account.data) {
         console.log('broker_account.data:', currentChallenge.broker_account.data);
         console.log('broker_account.data.attributes:', currentChallenge.broker_account.data.attributes);
       }
-      
+
       // Verificar si hay broker_account en metadata
       if (currentChallenge.metadata) {
         const metadata = typeof currentChallenge.metadata === 'string'
           ? JSON.parse(currentChallenge.metadata)
           : currentChallenge.metadata;
-        
+
         console.log('metadata.broker_account:', metadata.broker_account);
       }
-      
+
       // Intentar obtener login de diferentes rutas
       const possibleLogins = [
         currentChallenge.broker_account?.login,
@@ -331,7 +332,7 @@ const HistorialMetrix = () => {
           ? JSON.parse(currentChallenge.metadata)?.broker_account?.login
           : currentChallenge.metadata?.broker_account?.login
       ];
-      
+
       console.log('Posibles valores de login:', possibleLogins);
       console.groupEnd();
     }
@@ -382,7 +383,7 @@ const HistorialMetrix = () => {
           <div className="p-8 bg-white dark:bg-zinc-800 rounded-lg shadow-lg w-full">
             <h1 className="text-2xl font-bold text-yellow-600">⚠️ Challenge no encontrado ⚠️</h1>
             <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">
-              No se encontró ningún challenge con el ID proporcionado en tu cuenta. 
+              No se encontró ningún challenge con el ID proporcionado en tu cuenta.
               Verifica que el ID sea correcto o que tengas acceso a este challenge.
             </p>
           </div>
@@ -395,179 +396,239 @@ const HistorialMetrix = () => {
   if (!metadataStats) {
     return (
       <Layout>
-        <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-          <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
-          Historial de Cuenta {currentChallenge?.broker_account?.login || 
-                             currentChallenge?.broker_account?.data?.attributes?.login || 
-                             (currentChallenge?.metadata && typeof currentChallenge.metadata === 'string' 
-                               ? JSON.parse(currentChallenge.metadata)?.broker_account?.login 
-                               : currentChallenge?.metadata?.broker_account?.login) || 
-                             "Sin nombre"}
+        <h1 className="flex p-4 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black text-lg">
+          <ChartBarIcon className="w-5 h-5 mr-2 text-gray-700 dark:text-white" />
+          Historial de Cuenta {currentChallenge?.broker_account?.login || "Sin nombre"}
         </h1>
-        
-        <div className="mt-6 bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
-          <h2 className="text-lg font-semibold mb-4">Información básica del challenge</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p><span className="font-semibold">ID de Challenge:</span> {currentChallenge?.challengeId || "No disponible"}</p>
-              <p><span className="font-semibold">Fase:</span> {currentChallenge?.phase || "No disponible"}</p>
-              <p><span className="font-semibold">Resultado:</span> {currentChallenge?.result || "No disponible"}</p>
-            </div>
-            <div>
-              <p><span className="font-semibold">Fecha de inicio:</span> {currentChallenge?.startDate ? new Date(currentChallenge.startDate).toLocaleDateString() : "No disponible"}</p>
-              <p><span className="font-semibold">Fecha de fin:</span> {currentChallenge?.endDate ? new Date(currentChallenge.endDate).toLocaleDateString() : "En progreso"}</p>
-              <p><span className="font-semibold">Login MT4/MT5:</span> {currentChallenge?.broker_account?.login || 
-                                                                      currentChallenge?.broker_account?.data?.attributes?.login || 
-                                                                      (currentChallenge?.metadata && typeof currentChallenge.metadata === 'string' 
-                                                                        ? JSON.parse(currentChallenge.metadata)?.broker_account?.login 
-                                                                        : currentChallenge?.metadata?.broker_account?.login) || 
-                                                                      "No disponible"}</p>
-              <p><span className="font-semibold">Balance inicial:</span> ${currentChallenge?.broker_account?.balance || 
-                                                                         currentChallenge?.broker_account?.data?.attributes?.balance || 
-                                                                         (currentChallenge?.metadata && typeof currentChallenge.metadata === 'string' 
-                                                                           ? JSON.parse(currentChallenge.metadata)?.broker_account?.balance 
-                                                                           : currentChallenge?.metadata?.broker_account?.balance) || 
-                                                                         "No disponible"}</p>
-            </div>
-          </div>
+
+        {/* Contenido para cuando no hay metadataStats */}
+        <div className="mt-4 bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+          <h2 className="text-base font-semibold mb-2">Información básica del challenge</h2>
+          {/* Contenido básico */}
         </div>
-        
+
         {userData?.challenges && (
-          <RelatedChallenges 
-            currentChallenge={currentChallenge} 
-            userChallenges={userData.challenges} 
+          <RelatedChallenges
+            currentChallenge={currentChallenge}
+            userChallenges={userData.challenges}
           />
         )}
-        
-        <div className="flex flex-col items-center justify-center py-10 mt-6 text-center">
-          <div className="p-8 bg-white dark:bg-zinc-800 rounded-lg shadow-lg w-full">
-            <h1 className="text-2xl font-bold text-yellow-600">⚠️ Sin datos históricos detallados ⚠️</h1>
-            <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">
+
+        <div className="flex flex-col items-center justify-center py-6 mt-4 text-center">
+          <div className="p-6 bg-white dark:bg-zinc-800 rounded-lg shadow-lg w-full">
+            <h1 className="text-xl font-bold text-yellow-600">⚠️ Sin datos históricos detallados ⚠️</h1>
+            <p className="mt-2 text-base text-gray-700 dark:text-gray-300">
               No hay datos estadísticos guardados para este challenge en el campo metadata.
             </p>
-            {currentChallenge?.result === 'progress' && (
-              <div className="mt-6">
-                <p className="text-gray-700 dark:text-gray-300">
-                  Este challenge está actualmente en progreso. Para ver sus estadísticas en tiempo real, utiliza el enlace a continuación:
-                </p>
-                <div className="mt-4">
-                  <Link href={`/metrix2/${documentId}`} className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg inline-flex items-center">
-                    <ChartBarIcon className="w-5 h-5 mr-2" />
-                    Ver métricas en tiempo real
-                  </Link>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </Layout>
     );
   }
 
-  // Render principal con metadata
+  // Render principal con metadata - reestructurado según la imagen
   return (
     <Layout>
-      <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-        <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
-        Historial de Cuenta {currentChallenge?.broker_account?.login || 
-                           currentChallenge?.broker_account?.data?.attributes?.login || 
-                           (currentChallenge?.metadata && typeof currentChallenge.metadata === 'string' 
-                             ? JSON.parse(currentChallenge.metadata)?.broker_account?.login 
-                             : currentChallenge?.metadata?.broker_account?.login) || 
-                           "Sin nombre"}
+      <h1 className="flex p-3 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black text-lg">
+        <ChartBarIcon className="w-5 h-5 mr-2 text-gray-700 dark:text-white" />
+        Historial de Cuenta {currentChallenge?.broker_account?.login || "Sin nombre"}
       </h1>
 
-      <CircularProgressMetadata 
-        metadata={metadataStats} 
-        stageConfig={currentStage}
-        initialBalance={initialBalance}
-      />
-      <ChartMetadata 
-        metadata={metadataStats} 
-        stageConfig={currentStage}
-        initialBalance={initialBalance}
-      />
-      
-      <WinLossHistorical 
-        metadata={metadataStats} 
-        stageConfig={currentStage}
-      />
-
-      {/* Objetivos */}
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
-        {currentStage ? (
-          <Objetivos
-            // Usar currentStage como la configuración del desafío
-            challengeConfig={currentStage}
-            // Usar metadataStats como los datos de métricas
-            metricsData={metadataStats}
-            // Usar initialBalance para cálculos
-            initBalance={initialBalance}
-            // Usar la fase actual del challenge (corregido de "pase" a "phase")
-            phase={currentChallenge?.phase}
-          />
-        ) : (
-          <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-6 text-center">
-            <p>No hay información de objetivos disponible.</p>
-          </div>
-        )}
-      </div>
-      
-      <div className="flex flex-col md:flex-row gap-4 mt-6">
-        <div className="w-full md:w-1/1 rounded-lg">
-          <h2 className="text-lg font-bold mb-4">Estadísticas</h2>
-          <StatisticsHistorical 
-            metadata={metadataStats}
-            phase={currentChallenge?.phase || "Desconocida"}
-            stageConfig={currentStage}
-            brokerInitialBalance={initialBalance || metadataStats.deposits || currentChallenge?.broker_account?.balance}
-          />
-        </div>
-      </div>
-
-      {metadataStats.currencySummary && metadataStats.currencySummary.length > 0 && (
-        <div className="mt-6">
-          <h2 className="text-lg font-semibold">Resumen por instrumentos</h2>
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {metadataStats.currencySummary.map((currency, index) => (
-              <div key={index} className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
-                <h3 className="text-md font-semibold mb-2">{currency.currency}</h3>
-                <ul className="space-y-2">
-                  <li className="flex justify-between">
-                    <span>Total trades:</span>
-                    <span className="font-medium">{currency.total.trades}</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span>Ganancia/Pérdida:</span>
-                    <span className={`font-medium ${currency.total.profit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                      ${currency.total.profit?.toFixed(2)}
-                    </span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span>Trades ganados:</span>
-                    <span className="font-medium text-green-500">
-                      {currency.total.wonTrades || 0} ({currency.total.wonTradesPercent?.toFixed(2) || 0}%)
-                    </span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span>Trades perdidos:</span>
-                    <span className="font-medium text-red-500">
-                      {currency.total.lostTrades || 0} ({currency.total.lostTradesPercent?.toFixed(2) || 0}%)
-                    </span>
-                  </li>
-                </ul>
+      {/* Nueva estructura similar a la imagen - más compacta */}
+      <div className="flex flex-col lg:flex-row gap-4 mt-4">
+        {/* Columna izquierda con gráfico principal */}
+        <div className="w-full lg:w-7/12">
+          {/* Componente de saldo/balance con el gráfico principal */}
+          <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-base font-semibold">Saldo de la cuenta</h2>
+              <div className="text-right">
+                <div className="text-xl font-bold">${initialBalance || "$10000"}</div>
+                <div className="flex items-center justify-end text-sm">
+                  <span className="mr-2">Equidad: ${metadataStats.equity || initialBalance}</span>
+                  <span className={`${metadataStats.profitPercentage >= 0 ? 'text-green-500' : 'text-red-500'} font-medium`}>
+                    {metadataStats.profitPercentage >= 0 ? '+' : ''}{metadataStats.profitPercentage || '0'}%
+                  </span>
+                </div>
               </div>
-            ))}
+            </div>
+
+            {/* <div className="text-base mt-2 font-medium">Evolución del Balance por hora</div> */}
+
+            {/* Gráfico principal */}
+            <ChartMetadata
+              metadata={metadataStats}
+              stageConfig={currentStage}
+              initialBalance={initialBalance}
+            />
+          </div>
+
+          {/* Resto de componentes en la columna izquierda */}
+          <div className="grid grid-cols-1 gap-4 mt-4">
+            {/* Indicadores de progreso circular */}
+            {/* <h2 className="text-lg font-semibold flex items-center">
+              Objetivos
+            </h2>
+            <div className=" shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <CircularProgressMetadata
+                metadata={metadataStats}
+                stageConfig={currentStage}
+                initialBalance={initialBalance}
+              />
+            </div> */}
+
+            {/* Historial de ganancias/pérdidas */}
+            <h2 className="text-lg font-semibold flex items-center">
+              <BarChart className="w-5 h-5 mr-2" />
+              Win/Loss Rates
+            </h2>
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <WinLossHistorical
+                metadata={metadataStats}
+                stageConfig={currentStage}
+              />
+            </div>
+
+            {/* Estadísticas */}
+            <h2 className="text-lg font-semibold flex items-center">
+              {/* <BarChart className="w-5 h-5 mr-2" /> */}
+              Estadisticas
+            </h2>
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              {/* <h2 className="text-base font-semibold mb-2">Estadísticas</h2> */}
+              <StatisticsHistorical
+                metadata={metadataStats}
+                phase={currentChallenge?.phase || "Desconocida"}
+                stageConfig={currentStage}
+                brokerInitialBalance={initialBalance || metadataStats.deposits || currentChallenge?.broker_account?.balance}
+              />
+            </div>
+          </div>
+
+          {/* Resumen por instrumentos (si existe) - Opcional, puede eliminarse si ocupa demasiado espacio */}
+          {metadataStats.currencySummary && metadataStats.currencySummary.length > 0 && (
+            <div className="mt-4 bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <h2 className="text-base font-semibold mb-2">Resumen por instrumentos</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {metadataStats.currencySummary.slice(0, 4).map((currency, index) => (
+                  <div key={index} className="bg-gray-50 dark:bg-zinc-900 p-3 rounded-md">
+                    <h3 className="text-sm font-semibold mb-1">{currency.currency}</h3>
+                    <div className="grid grid-cols-2 gap-1 text-sm">
+                      <div>Total trades: <span className="font-medium">{currency.total.trades}</span></div>
+                      <div>Ganancia: <span className={`font-medium ${currency.total.profit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        ${currency.total.profit?.toFixed(2)}
+                      </span></div>
+                      <div>Ganados: <span className="font-medium text-green-500">
+                        {currency.total.wonTrades || 0} ({currency.total.wonTradesPercent?.toFixed(1) || 0}%)
+                      </span></div>
+                      <div>Perdidos: <span className="font-medium text-red-500">
+                        {currency.total.lostTrades || 0} ({currency.total.lostTradesPercent?.toFixed(1) || 0}%)
+                      </span></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Columna derecha con métricas y objetivos - más compacta */}
+        <div className="w-full lg:w-5/12">
+          <div className="grid grid-cols-1 gap-3">
+            {/* Plataforma */}
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium">Plataforma</h3>
+                <span className="bg-[var(--app-primary)] text-white text-xs px-2 py-1 rounded">METATRADE</span>
+              </div>
+            </div>
+
+            {/* Tipo de cuenta */}
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium">Tipo de cuenta</h3>
+                <span className="bg-amber-100 text-[var(--app-secondary)] text-xs px-2 py-1 rounded">{currentStage?.name || "2 PASOS PRO"}</span>
+              </div>
+            </div>
+
+            {/* Fase */}
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium">Fase</h3>
+                <span className="font-medium">{currentChallenge?.phase || "3"}</span>
+              </div>
+            </div>
+
+            {/* Tamaño de la cuenta */}
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium">Tamaño de la cuenta:</h3>
+                <span className="font-bold">${initialBalance || "$10000"}</span>
+              </div>
+            </div>
+
+            {/* Periodo de inicio */}
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium">Periodo de inicio:</h3>
+                <span className="font-medium">
+                  {currentChallenge?.startDate
+                    ? new Date(currentChallenge.startDate).toLocaleDateString()
+                    : "21/3/2025"}
+                </span>
+              </div>
+            </div>
+
+            {/* Fin del periodo */}
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium">Fin del periodo:</h3>
+                <span className="font-medium">
+                  {currentChallenge?.endDate
+                    ? new Date(currentChallenge.endDate).toLocaleDateString()
+                    : "21/3/2025"}
+                </span>
+              </div>
+            </div>
+
+            {/* Recompensas totales */}
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium">Recompensas totales</h3>
+                <span className="font-bold">${metadataStats.totalRewards || "$0.00"} ({metadataStats.rewardsCount || "0"})</span>
+              </div>
+            </div>
+
+            {/* Objetivos comerciales */}
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <h2 className="text-base font-semibold mb-2">Objetivos comerciales</h2>
+
+              {/* Nuevo componente Objetivos */}
+              {currentStage ? (
+                <Objetivos
+                  challengeConfig={currentStage}
+                  metricsData={metadataStats}
+                  initBalance={initialBalance}
+                  phase={currentChallenge?.phase}
+                />
+              ) : (
+                <div className="text-center p-3">
+                  <p className="text-sm">No hay información de objetivos disponible.</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      )}
+      </div>
 
+      {/* Relacionados desafíos (si existen) */}
       {userData?.challenges && (
-        <RelatedChallenges 
-          currentChallenge={currentChallenge} 
-          userChallenges={userData.challenges}
-        />
+        <div className="mt-4">
+          <RelatedChallenges
+            currentChallenge={currentChallenge}
+            userChallenges={userData.challenges}
+          />
+        </div>
       )}
     </Layout>
   );

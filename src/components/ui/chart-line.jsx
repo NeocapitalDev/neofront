@@ -213,7 +213,7 @@ export function LineChart({ data, index, categories, yFormatter, colors }) {
   }
 
   return (
-    <div style={{ backgroundColor: '#000', padding: '1rem', borderRadius: '8px' }}>
+    <div style={{ backgroundColor: '#18181B', padding: '1rem', borderRadius: '8px' }}>
       <div style={{ width: '100%', height: '60vh' }}>
         <Line data={chartData} options={options} />
       </div>

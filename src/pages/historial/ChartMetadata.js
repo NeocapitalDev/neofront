@@ -33,26 +33,26 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
 
         try {
             setLoading(true)
-            
+
             // Determinar si los datos están en metrics o directamente en metadata
             const metrics = metadata.metrics || metadata
-            
+
             // Obtener el balance inicial
             // Prioridad: 1. valor pasado como prop, 2. valor en metrics.deposits, 3. valor por defecto
             const baseBalance = initialBalance || metrics.deposits || 10000
             console.log('Balance base para cálculos:', baseBalance);
-            
+
             // Obtener los valores de profit target y max drawdown del stageConfig
             // Si no están disponibles, usar valores por defecto
             let profitTargetPercent = 10;  // Valor por defecto: 10%
             let maxDrawdownPercent = 10;   // Valor por defecto: 10%
-            
+
             if (stageConfig) {
                 // Usar los valores del stage si están disponibles
                 if (typeof stageConfig.profitTarget === 'number') {
                     profitTargetPercent = stageConfig.profitTarget;
                 }
-                
+
                 // Para el max drawdown, priorizar maximumTotalLoss, si no está disponible usar maximumDailyLoss
                 if (typeof stageConfig.maximumTotalLoss === 'number') {
                     maxDrawdownPercent = stageConfig.maximumTotalLoss;
@@ -60,29 +60,29 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
                     maxDrawdownPercent = stageConfig.maximumDailyLoss;
                 }
             }
-            
+
             console.log('Porcentajes utilizados:', {
                 profitTargetPercent,
                 maxDrawdownPercent
             });
-            
+
             // Cálculo de valores absolutos para líneas horizontales
             const maxDrawdownAbsolute = baseBalance * (1 - maxDrawdownPercent / 100);
             const profitTargetAbsolute = baseBalance * (1 + profitTargetPercent / 100);
-            
+
             console.log('Valores absolutos calculados:', {
                 maxDrawdownAbsolute,
                 profitTargetAbsolute
             });
-            
+
             // Guardar los valores para las líneas horizontales
             setHorizontalLines({
                 maxDrawdown: maxDrawdownAbsolute,
                 profitTarget: profitTargetAbsolute
             });
-            
+
             let balanceData = [];
-            
+
             // Priorizar el uso de equityChart si está disponible
             if (metadata.equityChart && metadata.equityChart.length > 0) {
                 console.log('Usando datos de equityChart para la gráfica');
@@ -98,14 +98,14 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
                 console.warn("No hay datos suficientes para el gráfico, usando valores simulados");
                 balanceData = generateSampleBalanceData(baseBalance);
             }
-            
+
             // Para líneas horizontales, usamos un enfoque híbrido
             const processedData = processDataForChart(
-                balanceData, 
-                maxDrawdownAbsolute, 
+                balanceData,
+                maxDrawdownAbsolute,
                 profitTargetAbsolute
             );
-            
+
             setChartData(processedData);
             setLoading(false);
         } catch (err) {
@@ -177,7 +177,7 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
             };
         });
     }
-    
+
     /**
      * Procesa los datos para el componente LineChart
      * Usamos un enfoque híbrido - series separadas para visualización de líneas
@@ -185,31 +185,31 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
      */
     const processDataForChart = (balanceData, maxDrawdownValue, profitTargetValue) => {
         if (!balanceData || balanceData.length === 0) return [];
-        
+
         // Extraer la primera y última fecha
         const dates = balanceData.map(item => item.date);
         const firstDate = dates[0];
         const lastDate = dates[dates.length - 1];
-        
+
         // Crear series individuales para cada tipo de dato
         // 1. Serie completa para balance
         const balanceSeries = balanceData.map(item => ({
             date: item.date,
             balance: item.balance
         }));
-        
+
         // 2. Serie para max_drawdown (solo 2 puntos, inicio y fin)
         const maxDrawdownSeries = [
             { date: firstDate, max_drawdown: maxDrawdownValue, tooltipValue: maxDrawdownValue },
             { date: lastDate, max_drawdown: maxDrawdownValue, tooltipValue: maxDrawdownValue }
         ];
-        
+
         // 3. Serie para profit_target (solo 2 puntos, inicio y fin)
         const profitTargetSeries = [
             { date: firstDate, profit_target: profitTargetValue, tooltipValue: profitTargetValue },
             { date: lastDate, profit_target: profitTargetValue, tooltipValue: profitTargetValue }
         ];
-        
+
         // 4. Serie para tooltips (todos los puntos con todos los valores)
         const tooltipSeries = balanceData.map(item => ({
             date: item.date,
@@ -217,7 +217,7 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
             tooltipMaxDrawdown: maxDrawdownValue,
             tooltipProfitTarget: profitTargetValue
         }));
-        
+
         // Combinar todas las series
         const combinedData = [
             ...balanceSeries,
@@ -225,40 +225,40 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
             ...profitTargetSeries,
             ...tooltipSeries
         ];
-        
+
         return combinedData;
     }
-    
+
     /**
      * Personaliza el tooltip para mostrar todos los valores
      */
     const customTooltipFormatter = (dataPoint, category) => {
         const date = dataPoint.date;
-        
+
         // Encontrar todos los puntos con esta fecha
         const pointsWithSameDate = chartData.filter(item => item.date === date);
-        
+
         // Extraer valores para el tooltip
         let balanceValue = null;
         let maxDrawdownValue = null;
         let profitTargetValue = null;
-        
+
         pointsWithSameDate.forEach(point => {
             if (point.balance !== undefined) balanceValue = point.balance;
             if (point.max_drawdown !== undefined) maxDrawdownValue = point.max_drawdown;
             if (point.profit_target !== undefined) profitTargetValue = point.profit_target;
-            
+
             // También buscar en campos de tooltip si están disponibles
             if (point.tooltipBalance !== undefined) balanceValue = point.tooltipBalance;
             if (point.tooltipMaxDrawdown !== undefined) maxDrawdownValue = point.tooltipMaxDrawdown;
             if (point.tooltipProfitTarget !== undefined) profitTargetValue = point.tooltipProfitTarget;
         });
-        
+
         // Formatear valores para el tooltip
         const formattedBalance = balanceValue !== null ? yFormatter(balanceValue) : 'N/A';
         const formattedMaxDrawdown = maxDrawdownValue !== null ? yFormatter(maxDrawdownValue) : 'N/A';
         const formattedProfitTarget = profitTargetValue !== null ? yFormatter(profitTargetValue) : 'N/A';
-        
+
         // El formato depende de la categoría actual
         if (category === 'balance') {
             return `balance: ${formattedBalance}`;
@@ -267,7 +267,7 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
         } else if (category === 'profit_target') {
             return `profit_target: ${formattedProfitTarget}`;
         }
-        
+
         // Por defecto mostrar solo el valor actual
         return `${category}: ${yFormatter(dataPoint[category] || 0)}`;
     };

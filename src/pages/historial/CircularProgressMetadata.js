@@ -2,8 +2,8 @@
 'use client'
 import { useState, useEffect } from "react";
 
-// Componente CircularProgress (barra circular) - manteniendo el diseño original
-const CircularProgress = ({ percentage = 0, size = 100, strokeWidth = 10, color = "green" }) => {
+// Componente CircularProgress (barra circular) - versión más compacta
+const CircularProgress = ({ percentage = 0, size = 80, strokeWidth = 8, color = "green" }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const [progress, setProgress] = useState(0);
@@ -46,14 +46,14 @@ const CircularProgress = ({ percentage = 0, size = 100, strokeWidth = 10, color 
         style={{ transition: "stroke-dashoffset 0.5s ease-in-out" }}
       />
       {/* Texto del porcentaje */}
-      <text x="50%" y="50%" textAnchor="middle" dy=".3em" fontSize="20" fill={color} fontWeight="bold">
+      <text x="50%" y="50%" textAnchor="middle" dy=".3em" fontSize="16" fill={color} fontWeight="bold">
         {Math.round(progress)}%
       </text>
     </svg>
   );
 };
 
-// Componente principal para la página de historial
+// Componente principal - versión compacta
 const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => {
   const [progressData, setProgressData] = useState({
     target: { value: 0, current: 0, percentage: 0, color: "green", label: "Objetivo de Profit" },
@@ -65,13 +65,6 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
   const [hasData, setHasData] = useState(false);
 
   useEffect(() => {
-    // Log para depuración
-    console.log('Datos recibidos en CircularProgressMetadata:', {
-      metadata: metadata ? 'presente' : 'ausente',
-      stageConfig: stageConfig ? 'presente' : 'ausente',
-      initialBalance: initialBalance || 'no especificado'
-    });
-
     if (!metadata) {
       setLoading(false);
       setHasData(false);
@@ -81,28 +74,26 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
     try {
       // Utilizar datos procesados correctamente
       const metrics = metadata;
-      
+
       // Verificar si hay datos válidos para mostrar
-      const hasValidData = metrics && 
-        (metrics.balance !== undefined || 
-         metrics.maxDrawdown !== undefined || 
-         metrics.profitFactor !== undefined);
-      
+      const hasValidData = metrics &&
+        (metrics.balance !== undefined ||
+          metrics.maxDrawdown !== undefined ||
+          metrics.profitFactor !== undefined);
+
       if (!hasValidData) {
-        console.warn('No hay datos válidos para mostrar en CircularProgressMetadata');
         setHasData(false);
         setLoading(false);
         return;
       }
 
-      // Obtener el balance inicial desde los props (procesado en el componente padre)
+      // Obtener el balance inicial desde los props
       const deposit = initialBalance || metrics.deposits || metrics.initialBalance || 10000;
-      console.log('Balance inicial en CircularProgressMetadata:', deposit);
-      
+
       // Obtener valores de configuración desde stageConfig
       let profitTargetPercent = 10; // Valor por defecto
       let maxAllowedDrawdownPercent = 10; // Valor por defecto
-      
+
       if (stageConfig) {
         // Obtener profit target del stageConfig
         if (typeof stageConfig.profitTarget === 'number') {
@@ -110,7 +101,7 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
         } else if (typeof stageConfig.profitTargetPercent === 'number') {
           profitTargetPercent = stageConfig.profitTargetPercent;
         }
-        
+
         // Obtener drawdown del stageConfig
         if (typeof stageConfig.maximumTotalLoss === 'number') {
           maxAllowedDrawdownPercent = stageConfig.maximumTotalLoss;
@@ -120,24 +111,18 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
           maxAllowedDrawdownPercent = stageConfig.maximumDailyLoss;
         }
       }
-      
-      console.log('Valores de configuración en CircularProgressMetadata:', {
-        profitTargetPercent,
-        maxAllowedDrawdownPercent
-      });
 
       // Cálculos para las barras circulares
       calculateProgressData(
-        deposit, 
-        maxAllowedDrawdownPercent, 
-        profitTargetPercent, 
+        deposit,
+        maxAllowedDrawdownPercent,
+        profitTargetPercent,
         metrics
       );
-      
+
       setHasData(true);
       setLoading(false);
     } catch (err) {
-      console.error("Error calculando datos de progreso:", err);
       setError(err.message || "Error desconocido");
       setHasData(false);
       setLoading(false);
@@ -145,19 +130,10 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
   }, [metadata, stageConfig, initialBalance]);
 
   /**
-   * Adaptación de la función calculateProgressData para el componente de historial
+   * Función calculateProgressData para el componente de historial
    */
   const calculateProgressData = (deposit, ddPercent, profitTargetPercent, metricsData) => {
     if (!metricsData) return;
-
-    console.log('Calculando progreso con datos:', {
-      deposit,
-      ddPercent,
-      profitTargetPercent,
-      currentBalance: metricsData.balance,
-      maxDrawdown: metricsData.maxDrawdown,
-      profitFactor: metricsData.profitFactor
-    });
 
     // 1) Objetivo de Profit:
     const currentBalance = metricsData.balance || deposit;
@@ -193,8 +169,8 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
         percentage: cappedProfitPercentage,
         color:
           cappedProfitPercentage >= 80 ? "green" :
-          cappedProfitPercentage >= 40 ? "yellow" :
-          "red",
+            cappedProfitPercentage >= 40 ? "yellow" :
+              "red",
         label: "Objetivo de Profit"
       },
       // Drawdown Máximo - Nuevo esquema: verde < 40%, amarillo 40-80%, rojo > 80%
@@ -204,8 +180,8 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
         percentage: cappedDrawdownPercentage,
         color:
           cappedDrawdownPercentage >= 80 ? "red" :
-          cappedDrawdownPercentage >= 40 ? "yellow" :
-          "green",
+            cappedDrawdownPercentage >= 40 ? "yellow" :
+              "green",
         label: "Drawdown Máximo"
       },
       // Profit Factor - Nuevo esquema: rojo < 40%, amarillo 40-80%, verde > 80%
@@ -215,8 +191,8 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
         percentage: cappedProfitFactorPercentage,
         color:
           cappedProfitFactorPercentage >= 80 ? "green" :
-          cappedProfitFactorPercentage >= 40 ? "yellow" :
-          "red",
+            cappedProfitFactorPercentage >= 40 ? "yellow" :
+              "red",
         label: "Profit Factor"
       }
     });
@@ -224,16 +200,16 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-8 text-white bg-black my-6 rounded-md">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-        <span className="ml-3">Cargando datos...</span>
+      <div className="flex justify-center items-center py-4 text-white bg-black my-3 rounded-md">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+        <span className="ml-2 text-sm">Cargando...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center py-8 text-red-500 bg-black my-6 rounded-md">
+      <div className="flex items-center justify-center py-3 text-red-500 bg-black my-3 rounded-md text-sm">
         <p>Error: {error}</p>
       </div>
     );
@@ -241,7 +217,7 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
 
   if (!hasData) {
     return (
-      <div className="text-center p-4 bg-black rounded-lg shadow-md text-white border-zinc-700 shadow-black my-6">
+      <div className="text-center p-3 bg-black rounded-lg shadow-md text-white border-zinc-700 shadow-black my-3 text-sm">
         No hay datos disponibles para mostrar.
       </div>
     );
@@ -263,51 +239,52 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
     }
   };
 
-  // Renderizado responsivo manteniendo el diseño original
+  // Renderizado compacto y responsivo
   return (
-    <div className="flex flex-col items-center justify-center py-8 text-white bg-black my-6 rounded-md">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3  bg-black py-2 px-3 rounded-xl">
         {Object.keys(progressData).map((key) => {
           const item = progressData[key];
           const textColorClass =
             item.color === "green" ? "text-green-500" :
-            item.color === "yellow" ? "text-yellow-500" :
-            item.color === "red" ? "text-red-500" :
-            "text-amber-400";
+              item.color === "yellow" ? "text-yellow-500" :
+                item.color === "red" ? "text-red-500" :
+                  "text-amber-400";
 
           // Formatear la visualización
           let currentDisplay, targetDisplay;
           if (key === "target") {
-            // Ej: "$9800.00" / "$10200.00"
             currentDisplay = `$${item.current.toFixed(2)}`;
             targetDisplay = `$${item.value.toFixed(2)}`;
           } else if (key === "drawdown") {
-            // Ej: "6.00%" / "10.00%"
             currentDisplay = `${item.current.toFixed(2)}%`;
             targetDisplay = `${item.value.toFixed(2)}%`;
           } else if (key === "profitFactor") {
-            // Ej: "1.50" / "2.00"
             currentDisplay = item.current.toFixed(2);
             targetDisplay = item.value.toFixed(2);
           }
 
           return (
-            <div key={key} className="flex gap-4">
+            <div key={key} className="flex items-center space-x-2 p-2 bg-zinc-900 rounded-md">
               <CircularProgress
                 percentage={item.percentage}
                 color={getColorHex(item.color)}
+                size={60}
+                strokeWidth={6}
               />
-              <div>
-                <p className="text-gray-400">{item.label}</p>
-                <p className="text-xl font-bold">{targetDisplay}</p>
-                <p className={textColorClass}>Actual</p>
-                <p className={`${textColorClass} font-bold`}>{currentDisplay}</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-gray-400 mb-1">{item.label}</p>
+                <p className="text-sm font-bold mb-1">{targetDisplay}</p>
+                <div className="flex justify-between items-center">
+                  <p className={`text-xs ${textColorClass}`}>Actual:</p>
+                  <p className={`text-xs font-bold ${textColorClass}`}>{currentDisplay}</p>
+                </div>
               </div>
             </div>
           );
         })}
       </div>
-    </div>
+    </>
   );
 };
 

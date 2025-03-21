@@ -11,8 +11,13 @@ const CheckIcon = () => (
 );
 
 const XMarkIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6 mr-2 rounded-lg text-white bg-red-500">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 mr-2 rounded-lg text-white bg-red-500">
         <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+    </svg>
+);
+const InfoIcon = () => (
+    <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd"></path>
     </svg>
 );
 
@@ -96,10 +101,10 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
             console.log("Usando worstTrade como aproximación de pérdida diaria:", maxDailyDrawdown);
         }
         // Método 4: Usar periods.today.profit si es negativo
-        else if (metricsData.periods && 
-                metricsData.periods.today && 
-                metricsData.periods.today.profit !== undefined && 
-                metricsData.periods.today.profit < 0) {
+        else if (metricsData.periods &&
+            metricsData.periods.today &&
+            metricsData.periods.today.profit !== undefined &&
+            metricsData.periods.today.profit < 0) {
             maxDailyDrawdown = Math.abs(metricsData.periods.today.profit);
             console.log("Usando periods.today.profit como pérdida diaria:", maxDailyDrawdown);
         }
@@ -111,7 +116,7 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
 
         // Para la pérdida máxima total (maxDrawdown), calcular basado en datos disponibles
         let maxAbsoluteDrawdown = 0;
-        
+
         if (typeof metricsData.maxDrawdown === 'number') {
             // Si tenemos maxDrawdown como porcentaje, convertir a valor monetario
             maxAbsoluteDrawdown = (balance * metricsData.maxDrawdown) / 100;
@@ -207,70 +212,63 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
     }
 
     return (
-        <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
-            <table className="w-full">
-                <thead>
-                    <tr className="border-b border-gray-500 dark:border-zinc-600">
-                        <th className="px-6 py-4 text-md text-start text-gray-700 dark:text-white">
-                            Objetivos de Trading
-                        </th>
-                        <th className="px-6 py-4 text-md text-start text-gray-700 dark:text-white">
-                            Resultados
-                        </th>
-                        <th className="px-6 py-4 text-md text-start text-gray-700 dark:text-white">
-                            Estado
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {objetivos.map((obj, index) => (
-                        <React.Fragment key={index}>
-                            <tr
-                                className={`cursor-pointer dark:hover:bg-zinc-700 hover:bg-gray-100 ${index === objetivos.length - 1 ? "" : "border-b border-gray-500 dark:border-zinc-600"
-                                    }`}
+        <div className="space-y-3">
+            {objetivos.map((objetivo, index) => (
+                <div key={index} className="rounded-md bg-zinc-800 dark:text-white overflow-hidden">
+                    {/* Cabecera del objetivo */}
+                    <div className="p-3">
+                        <div className="flex justify-between items-center mb-1">
+                            <h3 className="text-sm font-medium text-amber-400">{objetivo.nombre}</h3>
+                            <button
                                 onClick={() => toggleExpand(index)}
+                                className="text-gray-400 hover:text-white"
                             >
-                                <td className="px-6 py-4 text-[var(--app-primary)] font-semibold">
-                                    {expandedIndex === index ? `- ${obj.nombre}` : `+ ${obj.nombre}`}
-                                </td>
-                                <td className="px-6 py-4 bg-gray-100 dark:bg-zinc-900">{obj.resultado}</td>
-                                <td className="px-6 py-4">
-                                    {obj.estado ? (
-                                        <div className="flex items-center">
-                                            <CheckIcon />
-                                            <span>Aprobado</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center">
-                                            <XMarkIcon />
-                                            <span>No aprobado</span>
-                                        </div>
-                                    )}
-                                </td>
-                            </tr>
-                            {expandedIndex === index && (
-                                <tr>
-                                    <td colSpan="3" className="text-center align-middle px-6 py-6">
-                                        <div className="flex flex-col items-center">
-                                            <p>{obj.descripcion}</p>
-                                            <div className="mt-4 flex justify-center">
-                                                <iframe
-                                                    width="200"
-                                                    src={obj.videoUrl.replace("watch?v=", "embed/")}
-                                                    title="YouTube video"
-                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                    referrerPolicy="strict-origin-when-cross-origin"
-                                                    allowFullScreen
-                                                ></iframe>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-                        </React.Fragment>
-                    ))}
-                </tbody>
-            </table>
+                                <InfoIcon />
+                            </button>
+                        </div>
+
+                        <div className="flex justify-between items-center mb-2 border-2">
+                            <div className="text-base font-semibold">{objetivo.resultado}</div>
+                            <div className="flex items-center">
+                                <span className="mr-2">{objetivo.porcentaje}%</span>
+                                <div className={`rounded-full w-full flex items-center justify-center ${objetivo.estado ? 'bg-green-500' : 'bg-red-500'}`}>
+                                    {objetivo.estado ? <CheckIcon /> : <XMarkIcon />}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Barra de progreso */}
+                        {/* <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                            <div
+                                className={`h-full ${objetivo.estado ? 'bg-amber-500' : 'bg-amber-500'}`}
+                                style={{ width: `${Math.min(100, objetivo.porcentaje)}%` }}
+                            ></div>
+                        </div> */}
+
+                        <div className="mt-1 text-xs text-gray-400">
+                            {objetivo.subInfo}
+                        </div>
+                    </div>
+
+                    {/* Contenido expandible */}
+                    {expandedIndex === index && (
+                        <div className="border-t border-gray-700 p-3">
+                            <p className="text-sm text-gray-300 mb-2">{objetivo.descripcion}</p>
+                            <div className="flex justify-center">
+                                <iframe
+                                    width="180"
+                                    height="120"
+                                    src={objetivo.videoUrl.replace("watch?v=", "embed/")}
+                                    title="YouTube video"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    referrerPolicy="strict-origin-when-cross-origin"
+                                    allowFullScreen
+                                ></iframe>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            ))}
         </div>
     );
 }
