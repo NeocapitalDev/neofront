@@ -80,8 +80,6 @@ const ChallengeRelations = () => {
   const [selectedRelation, setSelectedRelation] = useState(null);
   const [selectedStage, setSelectedStage] = useState(null); // New state for selected stage
   const [couponCode, setCouponCode] = useState('');
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [cancellationAccepted, setCancellationAccepted] = useState(false);
 
   const stepsData = relations
     ? [...new Set(relations.map(relation => relation.challenge_step.name))].map(stepName => {
@@ -266,7 +264,7 @@ const ChallengeRelations = () => {
   // Función para manejar el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (selectedProduct && termsAccepted && cancellationAccepted) {
+    if (selectedProduct) {
       console.log('Producto seleccionado:', selectedProduct);
       console.log('Variación seleccionada:', matchingVariation);
       console.log('Stage seleccionado:', selectedStage);
@@ -290,7 +288,7 @@ const ChallengeRelations = () => {
       return; // Detener la ejecución aquí
     }
 
-    if (selectedProduct && termsAccepted && cancellationAccepted) {
+    if (selectedProduct) {
       const woocommerceId = matchingVariation?.id || selectedProduct.woocommerceId;
       window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1&document_id=${selectedRelation.documentId}&user_id=${user.documentId}`;
     }
@@ -648,44 +646,15 @@ const ChallengeRelations = () => {
                       </div>
                     )}
 
-                    <section className="p-5 space-y-4">
-                      <div className="flex items-start">
-                        <input
-                          type="checkbox"
-                          id="acceptTerms"
-                          className="mt-1 h-4 w-4 border-gray-300 rounded bg-gray-100 text-amber-500 focus:ring-amber-500 dark:border-zinc-700 dark:bg-zinc-800"
-                          checked={termsAccepted}
-                          onChange={() => setTermsAccepted(!termsAccepted)}
-                        />
-                        <label htmlFor="acceptTerms" className="ml-2 text-sm text-gray-700 dark:text-zinc-300">
-                          Declaro que he leído y estoy de acuerdo con los{" "}
-                          <span className="font-bold text-[var(--app-primary)] cursor-pointer">Términos y Condiciones</span>,{" "}
-                          <span className="font-bold text-[var(--app-primary)] cursor-pointer">Política de Privacidad</span> y{" "}
-                          <span className="font-bold text-[var(--app-primary)] cursor-pointer">Política de Cookies</span>
-                        </label>
-                      </div>
-
-                      <div className="flex items-start">
-                        <input
-                          type="checkbox"
-                          id="acceptCancelation"
-                          className="mt-1 h-4 w-4 border-gray-300 rounded bg-gray-100 text-amber-500 focus:ring-amber-500 dark:border-zinc-700 dark:bg-zinc-800"
-                          checked={cancellationAccepted}
-                          onChange={() => setCancellationAccepted(!cancellationAccepted)}
-                        />
-                        <label htmlFor="acceptCancelation" className="ml-2 text-sm text-gray-700 dark:text-zinc-300">
-                          Declaro que he leído y estoy de acuerdo con las Políticas de Cancelación y Reembolso.
-                        </label>
-                      </div>
-                    </section>
+                    {/* Terms section removed */}
 
                     <div className="p-5">
                       <button
                         onClick={handleContinue}
                         type="submit"
-                        disabled={!selectedProduct || !termsAccepted || !cancellationAccepted}
+                        disabled={!selectedProduct}
                         className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${
-                          selectedProduct && termsAccepted && cancellationAccepted
+                          selectedProduct
                             ? "bg-[var(--app-primary)] hover:bg-[var(--app-secondary)] text-black font-bold"
                             : "bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-zinc-700 dark:text-zinc-500"
                         }`}
