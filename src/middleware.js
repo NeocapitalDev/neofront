@@ -48,6 +48,8 @@ export const config = {
     "/trial",
     "/admin/:path*",
     "/start-challenge",
+    "/metrix2/:path*",
+    "/historial/:path*",
     "/",
 
   ],
