@@ -32,10 +32,10 @@ const formatDays = (days, minimumDays) => {
 // Utility function to format profit/loss
 const formatProfit = (initialBalance, currentProfit, profitTarget) => {
     const profit = Math.max(0, currentProfit);
-    
+
     // Calcular el porcentaje con respecto al objetivo, no al balance inicial
     const percentage = profit === 0 ? 0 : (profit / profitTarget) * 100;
-    
+
     return {
         displayProfit: profit.toFixed(2),
         displayPercentage: percentage.toFixed(2),

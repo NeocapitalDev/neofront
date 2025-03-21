@@ -62,7 +62,7 @@ const PayoutsPage = () => {
   return (
     <DashboardLayout>
       <div className="p-6 text-white rounded-lg shadow-lg">
-        <h1 className="text-4xl font-bold mb-6">Movements</h1>
+        <h1 className="text-4xl font-bold mb-6">Payouts</h1>
         {/* Filtros */}
         <div className="mb-4">
           <label className="mr-4 space-x-2">
