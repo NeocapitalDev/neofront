@@ -56,28 +56,71 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
         // Extraer los datos reales del trading desde metricsData
         const tradeDayCount = Math.max(0, metricsData.daysSinceTradingStarted || 0);
 
-        // CORRECCIÓN: Para calcular pérdidas, usar directamente el valor absoluto del profit negativo
-        // Esto asegura que tanto la pérdida diaria como la pérdida máxima usen el mismo valor
-        let totalLoss = 0;
-        
-        // Usar el valor absoluto del profit negativo
-        if (metricsData.profit < 0) {
-            totalLoss = Math.abs(metricsData.profit);
-        }
-        
-        // Si no hay profit negativo, intentar buscarlo en dailyGrowth
-        else if (Array.isArray(metricsData.dailyGrowth) && metricsData.dailyGrowth.length > 0) {
-            totalLoss = metricsData.dailyGrowth.reduce((total, day) => {
-                if (day.profit < 0) {
-                    return total + Math.abs(day.profit);
+        // CORRECCIÓN: Cálculo de pérdida máxima diaria real
+        let maxDailyDrawdown = 0;
+
+        // Método 1: Búsqueda en dailyGrowth (mejor opción - datos diarios)
+        if (Array.isArray(metricsData.dailyGrowth) && metricsData.dailyGrowth.length > 0) {
+            // Buscar el día con la mayor pérdida (el valor negativo más grande en valor absoluto)
+            metricsData.dailyGrowth.forEach(day => {
+                if (day.profit !== undefined && day.profit < 0) {
+                    const dailyLoss = Math.abs(day.profit);
+                    if (dailyLoss > maxDailyDrawdown) {
+                        maxDailyDrawdown = dailyLoss;
+                    }
+                } else if (day.drawdownProfit !== undefined && day.drawdownProfit > 0) {
+                    // Alternativa: usar drawdownProfit si está disponible
+                    if (day.drawdownProfit > maxDailyDrawdown) {
+                        maxDailyDrawdown = day.drawdownProfit;
+                    }
                 }
-                return total;
-            }, 0);
+            });
+            console.log("Pérdida máxima diaria encontrada en dailyGrowth:", maxDailyDrawdown);
         }
+        // Método 2: Verificar en openTradesByHour para ver pérdidas por hora 
+        else if (metricsData.openTradesByHour && metricsData.openTradesByHour.length > 0) {
+            // Buscar la hora con la mayor pérdida
+            metricsData.openTradesByHour.forEach(hourData => {
+                if (hourData.lostProfit !== undefined && hourData.lostProfit < 0) {
+                    const hourLoss = Math.abs(hourData.lostProfit);
+                    if (hourLoss > maxDailyDrawdown) {
+                        maxDailyDrawdown = hourLoss;
+                    }
+                }
+            });
+            console.log("Pérdida máxima diaria encontrada en openTradesByHour:", maxDailyDrawdown);
+        }
+        // Método 3: Usar worstTrade como aproximación (es una sola operación pero puede ser indicativo)
+        else if (metricsData.worstTrade !== undefined && metricsData.worstTrade < 0) {
+            maxDailyDrawdown = Math.abs(metricsData.worstTrade);
+            console.log("Usando worstTrade como aproximación de pérdida diaria:", maxDailyDrawdown);
+        }
+        // Método 4: Usar periods.today.profit si es negativo
+        else if (metricsData.periods && 
+                metricsData.periods.today && 
+                metricsData.periods.today.profit !== undefined && 
+                metricsData.periods.today.profit < 0) {
+            maxDailyDrawdown = Math.abs(metricsData.periods.today.profit);
+            console.log("Usando periods.today.profit como pérdida diaria:", maxDailyDrawdown);
+        }
+        // Método 5: Fallback a la pérdida total solo si no tenemos otra opción
+        else if (metricsData.profit < 0) {
+            maxDailyDrawdown = Math.abs(metricsData.profit);
+            console.log("ADVERTENCIA: Usando profit total como fallback para pérdida diaria:", maxDailyDrawdown);
+        }
+
+        // Para la pérdida máxima total (maxDrawdown), calcular basado en datos disponibles
+        let maxAbsoluteDrawdown = 0;
         
-        // Usar el mismo valor para pérdida diaria y pérdida máxima
-        const maxDailyDrawdown = totalLoss;
-        const maxAbsoluteDrawdown = totalLoss;
+        if (typeof metricsData.maxDrawdown === 'number') {
+            // Si tenemos maxDrawdown como porcentaje, convertir a valor monetario
+            maxAbsoluteDrawdown = (balance * metricsData.maxDrawdown) / 100;
+            console.log("Pérdida máxima calculada a partir de maxDrawdown (%):", maxAbsoluteDrawdown);
+        } else if (metricsData.profit < 0) {
+            // Si no hay dato específico, usar el profit negativo como approximación
+            maxAbsoluteDrawdown = Math.abs(metricsData.profit);
+            console.log("Usando profit total como aproximación de pérdida máxima:", maxAbsoluteDrawdown);
+        }
 
         // Para maxRelativeProfit, usamos profit del SDK (solo si es positivo)
         const maxRelativeProfit = metricsData.profit > 0 ? metricsData.profit : 0;
@@ -154,37 +197,80 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
         setExpandedIndex(expandedIndex === index ? null : index);
     };
 
-    // Versión simplificada que se ajusta a la imagen de referencia
+    // Si no hay objetivos, no mostrar nada
+    if (!objetivos.length) {
+        return (
+            <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-6 text-center">
+                <p>No hay datos de objetivos disponibles.</p>
+            </div>
+        )
+    }
+
     return (
         <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
-            <div className="grid grid-cols-3 text-left">
-                <div className="p-5 font-semibold">Objetivos de Trading</div>
-                <div className="p-5 font-semibold">Resultados</div>
-                <div className="p-5 font-semibold">Estado</div>
-            </div>
-            
-            {objetivos.map((obj, index) => (
-                <div 
-                    key={index} 
-                    className="grid grid-cols-3 text-left border-t border-gray-500 dark:border-zinc-700"
-                >
-                    <div className="p-5 text-amber-400">{obj.nombre}</div>
-                    <div className="p-5">{obj.resultado}</div>
-                    <div className="p-5">
-                        {obj.estado ? (
-                            <div className="flex items-center">
-                                <CheckIcon />
-                                <span>Aprobado</span>
-                            </div>
-                        ) : (
-                            <div className="flex items-center">
-                                <XMarkIcon />
-                                <span>No aprobado</span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            ))}
+            <table className="w-full">
+                <thead>
+                    <tr className="border-b border-gray-500 dark:border-zinc-600">
+                        <th className="px-6 py-4 text-md text-start text-gray-700 dark:text-white">
+                            Objetivos de Trading
+                        </th>
+                        <th className="px-6 py-4 text-md text-start text-gray-700 dark:text-white">
+                            Resultados
+                        </th>
+                        <th className="px-6 py-4 text-md text-start text-gray-700 dark:text-white">
+                            Estado
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {objetivos.map((obj, index) => (
+                        <React.Fragment key={index}>
+                            <tr
+                                className={`cursor-pointer dark:hover:bg-zinc-700 hover:bg-gray-100 ${index === objetivos.length - 1 ? "" : "border-b border-gray-500 dark:border-zinc-600"
+                                    }`}
+                                onClick={() => toggleExpand(index)}
+                            >
+                                <td className="px-6 py-4 text-[var(--app-primary)] font-semibold">
+                                    {expandedIndex === index ? `- ${obj.nombre}` : `+ ${obj.nombre}`}
+                                </td>
+                                <td className="px-6 py-4 bg-gray-100 dark:bg-zinc-900">{obj.resultado}</td>
+                                <td className="px-6 py-4">
+                                    {obj.estado ? (
+                                        <div className="flex items-center">
+                                            <CheckIcon />
+                                            <span>Aprobado</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center">
+                                            <XMarkIcon />
+                                            <span>No aprobado</span>
+                                        </div>
+                                    )}
+                                </td>
+                            </tr>
+                            {expandedIndex === index && (
+                                <tr>
+                                    <td colSpan="3" className="text-center align-middle px-6 py-6">
+                                        <div className="flex flex-col items-center">
+                                            <p>{obj.descripcion}</p>
+                                            <div className="mt-4 flex justify-center">
+                                                <iframe
+                                                    width="200"
+                                                    src={obj.videoUrl.replace("watch?v=", "embed/")}
+                                                    title="YouTube video"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                    referrerPolicy="strict-origin-when-cross-origin"
+                                                    allowFullScreen
+                                                ></iframe>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
+                        </React.Fragment>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 }
