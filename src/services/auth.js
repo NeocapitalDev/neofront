@@ -1,3 +1,4 @@
+// src/services/auth.js
 import axios from 'axios';
 
 const strapiUrl = process.env.NEXT_PUBLIC_BACKEND_URL;

@@ -1,4 +1,4 @@
-// lib/strapiService.js
+// src/services/strapiServiceId.js
 import useSWR from 'swr';
 // Función fetcher para obtener los datos
 const fetcher = async (url) => {

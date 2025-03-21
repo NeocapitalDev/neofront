@@ -15,26 +15,22 @@ const XMarkIcon = () => (
     </svg>
 );
 
-// Utility function to format days - CORREGIDO
+// Utility function to format days
 const formatDays = (days, minimumDays) => {
-    // Asegurar que los días no sean negativos
-    const integerDays = Math.max(0, Math.floor(days));
-    // Evitar división por cero asegurando que minimumDays sea al menos 1 SOLO para el cálculo del porcentaje
-    const safeMinimumDays = Math.max(1, minimumDays);
-    const percentage = (integerDays / safeMinimumDays) * 100;
+    const integerDays = Math.floor(days);
+    const percentage = (integerDays / minimumDays) * 100;
     return {
         displayDays: integerDays,
         displayPercentage: percentage.toFixed(2)
     };
 };
 
-// Utility function to format profit/loss - CORREGIDO
+// Utility function to format profit/loss
 const formatProfit = (initialBalance, currentProfit, profitTarget) => {
     const profit = Math.max(0, currentProfit);
-    
-    // Calcular el porcentaje con respecto al objetivo, no al balance inicial
-    const percentage = profit === 0 ? 0 : (profit / profitTarget) * 100;
-    
+    const percentage = profit === 0 ? 0 : (profit / initialBalance) * 100;
+    const targetPercentage = (profitTarget / initialBalance) * 100;
+
     return {
         displayProfit: profit.toFixed(2),
         displayPercentage: percentage.toFixed(2),
@@ -43,6 +39,11 @@ const formatProfit = (initialBalance, currentProfit, profitTarget) => {
 };
 
 export default function Objetivos({ challengeConfig, metricsData, initBalance, pase }) {
+    console.log(challengeConfig)
+    console.log(metricsData)
+    console.log(initBalance)
+    console.log(pase)
+
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [objetivos, setObjetivos] = useState([]);
 
@@ -52,7 +53,7 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
         if (!challengeConfig || !metricsData) return;
 
         // Extraer los datos reales del trading desde metricsData
-        const tradeDayCount = Math.max(0, metricsData.daysSinceTradingStarted || 0);
+        const tradeDayCount = metricsData.daysSinceTradingStarted || 0;
 
         // Para maxDailyDrawdown, podemos usar la peor pérdida diaria desde dailyGrowth
         let maxDailyDrawdown = 0;
@@ -83,7 +84,7 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
         // Para maxRelativeProfit, usamos profit del SDK
         const maxRelativeProfit = metricsData.profit || 0;
 
-        // Crear array de objetivos basado en la configuración del desafío - CORREGIDO
+        // Crear array de objetivos basado en la configuración del desafío
         const newObjetivos = [
             {
                 nombre: `Mínimo ${challengeConfig.minimumTradingDays} Días de Trading`,
@@ -94,7 +95,6 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
                     );
                     return {
                         resultado: `${displayDays} días (${displayPercentage}%)`,
-                        // Comparación correcta: si minimumTradingDays es 0, entonces 0 días sí cumpliría el objetivo
                         estado: displayDays >= challengeConfig.minimumTradingDays,
                     };
                 })(),
@@ -122,7 +122,7 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
             },
         ];
 
-        // Agregar objetivo de profit si está configurado - CORREGIDO
+        // Agregar objetivo de profit si está configurado
         if (challengeConfig.profitTargetPercent) {
             const profitTarget = balance * challengeConfig.profitTargetPercent / 100;
             const { displayProfit, displayPercentage, isTargetMet } = formatProfit(

@@ -1,3 +1,4 @@
+// src/services/strapiServiceJWT.js
 import useSWR from 'swr';
 
 // Función fetcher para obtener los datos
