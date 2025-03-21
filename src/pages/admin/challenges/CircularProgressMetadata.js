@@ -1,8 +1,8 @@
-// src/pages/admin/challenges/CircularProgressMetadata.js
+// src/pages/admin/challenges/CircularProgressMetadata.jsx
 'use client'
 import { useState, useEffect } from "react";
 
-// Componente CircularProgress (barra circular) - manteniendo el diseño original
+// Componente CircularProgress (barra circular)
 const CircularProgress = ({ percentage = 0, size = 100, strokeWidth = 10, color = "green" }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -53,7 +53,7 @@ const CircularProgress = ({ percentage = 0, size = 100, strokeWidth = 10, color 
   );
 };
 
-// Componente principal para la página de administración de challenges
+// Componente principal
 const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => {
   const [progressData, setProgressData] = useState({
     target: { value: 0, current: 0, percentage: 0, color: "green", label: "Objetivo de Profit" },
@@ -63,13 +63,6 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasData, setHasData] = useState(false);
-
-  // Log detallado para depuración
-  console.log('[Admin CircularProgressMetadata] Props recibidos:', {
-    metadata: metadata ? 'presente' : 'ausente',
-    stageConfig: stageConfig ? 'presente' : 'ausente',
-    initialBalance: initialBalance || 'no especificado'
-  });
 
   useEffect(() => {
     if (!metadata) {
@@ -82,14 +75,6 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
       // Utilizar la estructura correcta de metadata
       const metrics = metadata.metrics || metadata;
       
-      // Log detallado de metrics
-      console.log('[Admin CircularProgressMetadata] Metrics encontrados:', {
-        balance: metrics.balance,
-        maxDrawdown: metrics.maxDrawdown,
-        profitFactor: metrics.profitFactor,
-        deposits: metrics.deposits
-      });
-      
       // Verificar si hay datos válidos para mostrar
       const hasValidData = metrics && 
         (metrics.balance !== undefined || 
@@ -97,158 +82,128 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
          metrics.profitFactor !== undefined);
       
       if (!hasValidData) {
-        console.warn('[Admin CircularProgressMetadata] No hay datos válidos para mostrar');
+        console.warn('No hay datos válidos para mostrar');
         setHasData(false);
         setLoading(false);
         return;
       }
 
-      // Obtener el balance inicial desde los props (procesado en el componente padre)
+      // Obtener el balance inicial
       const deposit = initialBalance || metrics.deposits || 10000;
-      console.log('[Admin CircularProgressMetadata] Balance inicial:', deposit);
       
       // Obtener valores de configuración desde stageConfig
       let profitTargetPercent = 10; // Valor por defecto
       let maxAllowedDrawdownPercent = 10; // Valor por defecto
       
       if (stageConfig) {
-        // Log detallado de stageConfig
-        console.log('[Admin CircularProgressMetadata] StageConfig completo:', stageConfig);
-        
-        // Buscar propiedades directamente en stageConfig (estructura correcta)
+        // Buscar propiedades en stageConfig (estructura correcta)
         if (typeof stageConfig.profitTarget === 'number') {
           profitTargetPercent = stageConfig.profitTarget;
-          console.log('[Admin CircularProgressMetadata] Encontrado profitTarget:', profitTargetPercent);
+        } else if (stageConfig.targets && typeof stageConfig.targets.profit_target === 'number') {
+          profitTargetPercent = stageConfig.targets.profit_target;
         }
         
         // Priorizar maximumTotalLoss sobre maximumDailyLoss
         if (typeof stageConfig.maximumTotalLoss === 'number') {
           maxAllowedDrawdownPercent = stageConfig.maximumTotalLoss;
-          console.log('[Admin CircularProgressMetadata] Encontrado maximumTotalLoss:', maxAllowedDrawdownPercent);
         } else if (typeof stageConfig.maximumDailyLoss === 'number') {
           maxAllowedDrawdownPercent = stageConfig.maximumDailyLoss;
-          console.log('[Admin CircularProgressMetadata] Encontrado maximumDailyLoss:', maxAllowedDrawdownPercent);
+        } else if (stageConfig.targets) {
+          if (typeof stageConfig.targets.max_loss === 'number') {
+            maxAllowedDrawdownPercent = stageConfig.targets.max_loss;
+          } else if (typeof stageConfig.targets.max_daily_loss === 'number') {
+            maxAllowedDrawdownPercent = stageConfig.targets.max_daily_loss;
+          }
         }
       }
-      
-      console.log('[Admin CircularProgressMetadata] Valores de configuración finales:', {
-        profitTargetPercent,
-        maxAllowedDrawdownPercent
-      });
 
       // Cálculos para las barras circulares
-      calculateProgressData(
-        deposit, 
-        maxAllowedDrawdownPercent, 
-        profitTargetPercent, 
-        metrics
-      );
+      const currentBalance = metrics.balance || deposit;
+      const targetValue = deposit + (deposit * profitTargetPercent / 100);
+
+      // 1) Objetivo de Profit:
+      let profitPercentage = 0;
+      if (currentBalance <= deposit) {
+        profitPercentage = 0;
+      } else if (currentBalance >= targetValue) {
+        profitPercentage = 100;
+      } else {
+        profitPercentage = ((currentBalance - deposit) / (targetValue - deposit)) * 100;
+      }
+      const cappedProfitPercentage = Math.min(100, Math.max(0, profitPercentage));
+
+      // 2) Drawdown Máximo
+      const drawdownAllowed = maxAllowedDrawdownPercent;
+      const drawdownReal = metrics.maxDrawdown || 0; // % real
+      let drawdownPercentage = (drawdownReal / drawdownAllowed) * 100;
+      const cappedDrawdownPercentage = Math.min(100, Math.max(0, drawdownPercentage));
+
+      // 3) Profit Factor
+      const targetProfitFactor = 2;
+      const currentProfitFactor = metrics.profitFactor || 0;
+      let profitFactorPercentage = (currentProfitFactor / targetProfitFactor) * 100;
+      const cappedProfitFactorPercentage = Math.min(100, Math.max(0, profitFactorPercentage));
+
+      setProgressData({
+        // Objetivo de Profit - Esquema: rojo < 40%, amarillo 40-80%, verde > 80%
+        target: {
+          value: targetValue,
+          current: currentBalance,
+          percentage: cappedProfitPercentage,
+          color:
+            cappedProfitPercentage >= 80 ? "green" :
+            cappedProfitPercentage >= 40 ? "yellow" :
+            "red",
+          label: "Objetivo de Profit"
+        },
+        // Drawdown Máximo - Esquema: verde < 40%, amarillo 40-80%, rojo > 80%
+        drawdown: {
+          value: drawdownAllowed,
+          current: drawdownReal,
+          percentage: cappedDrawdownPercentage,
+          color:
+            cappedDrawdownPercentage >= 80 ? "red" :
+            cappedDrawdownPercentage >= 40 ? "yellow" :
+            "green",
+          label: "Drawdown Máximo"
+        },
+        // Profit Factor - Esquema: rojo < 40%, amarillo 40-80%, verde > 80%
+        profitFactor: {
+          value: targetProfitFactor,
+          current: currentProfitFactor,
+          percentage: cappedProfitFactorPercentage,
+          color:
+            cappedProfitFactorPercentage >= 80 ? "green" :
+            cappedProfitFactorPercentage >= 40 ? "yellow" :
+            "red",
+          label: "Profit Factor"
+        }
+      });
       
       setHasData(true);
       setLoading(false);
     } catch (err) {
-      console.error("[Admin CircularProgressMetadata] Error calculando datos de progreso:", err);
+      console.error("Error calculando datos de progreso:", err);
       setError(err.message || "Error desconocido");
       setHasData(false);
       setLoading(false);
     }
   }, [metadata, stageConfig, initialBalance]);
 
-  /**
-   * Adaptación de la función calculateProgressData para el componente de historial
-   */
-  const calculateProgressData = (deposit, ddPercent, profitTargetPercent, metricsData) => {
-    if (!metricsData) return;
-
-    console.log('[Admin CircularProgressMetadata] Calculando progreso con datos:', {
-      deposit,
-      ddPercent,
-      profitTargetPercent,
-      currentBalance: metricsData.balance,
-      maxDrawdown: metricsData.maxDrawdown,
-      profitFactor: metricsData.profitFactor
-    });
-
-    // 1) Objetivo de Profit:
-    const currentBalance = metricsData.balance || deposit;
-    const targetValue = deposit + (deposit * profitTargetPercent / 100);
-
-    let profitPercentage = 0;
-    if (currentBalance <= deposit) {
-      profitPercentage = 0;
-    } else if (currentBalance >= targetValue) {
-      profitPercentage = 100;
-    } else {
-      profitPercentage = ((currentBalance - deposit) / (targetValue - deposit)) * 100;
+  // Definir los colores hexadecimales para cada color
+  const getColorHex = (colorName) => {
+    switch (colorName) {
+      case "green":
+        return "#10B981"; // Verde más intenso
+      case "yellow":
+        return "#F59E0B"; // Amarillo ámbar
+      case "red":
+        return "#EF4444"; // Rojo más intenso
+      case "amber":
+        return "#FBBF24"; // Amber 400
+      default:
+        return "#FBBF24"; // Amber 400 por defecto
     }
-    const cappedProfitPercentage = Math.min(100, Math.max(0, profitPercentage));
-
-    // 2) Drawdown Máximo
-    const drawdownAllowed = ddPercent;
-    const drawdownReal = metricsData.maxDrawdown || 0; // % real
-    let drawdownPercentage = (drawdownReal / drawdownAllowed) * 100;
-    const cappedDrawdownPercentage = Math.min(100, Math.max(0, drawdownPercentage));
-
-    // 3) Profit Factor
-    const targetProfitFactor = 2;
-    const currentProfitFactor = metricsData.profitFactor || 0;
-    let profitFactorPercentage = (currentProfitFactor / targetProfitFactor) * 100;
-    const cappedProfitFactorPercentage = Math.min(100, Math.max(0, profitFactorPercentage));
-
-    // Log de los cálculos finales
-    console.log('[Admin CircularProgressMetadata] Cálculos finales:', {
-      target: {
-        value: targetValue,
-        current: currentBalance,
-        percentage: cappedProfitPercentage
-      },
-      drawdown: {
-        value: drawdownAllowed,
-        current: drawdownReal,
-        percentage: cappedDrawdownPercentage
-      },
-      profitFactor: {
-        value: targetProfitFactor,
-        current: currentProfitFactor,
-        percentage: cappedProfitFactorPercentage
-      }
-    });
-
-    setProgressData({
-      // Objetivo de Profit - Nuevo esquema: rojo < 40%, amarillo 40-80%, verde > 80%
-      target: {
-        value: targetValue,
-        current: currentBalance,
-        percentage: cappedProfitPercentage,
-        color:
-          cappedProfitPercentage >= 80 ? "green" :
-          cappedProfitPercentage >= 40 ? "yellow" :
-          "red",
-        label: "Objetivo de Profit"
-      },
-      // Drawdown Máximo - Nuevo esquema: verde < 40%, amarillo 40-80%, rojo > 80%
-      drawdown: {
-        value: drawdownAllowed,
-        current: drawdownReal,
-        percentage: cappedDrawdownPercentage,
-        color:
-          cappedDrawdownPercentage >= 80 ? "red" :
-          cappedDrawdownPercentage >= 40 ? "yellow" :
-          "green",
-        label: "Drawdown Máximo"
-      },
-      // Profit Factor - Nuevo esquema: rojo < 40%, amarillo 40-80%, verde > 80%
-      profitFactor: {
-        value: targetProfitFactor,
-        current: currentProfitFactor,
-        percentage: cappedProfitFactorPercentage,
-        color:
-          cappedProfitFactorPercentage >= 80 ? "green" :
-          cappedProfitFactorPercentage >= 40 ? "yellow" :
-          "red",
-        label: "Profit Factor"
-      }
-    });
   };
 
   if (loading) {
@@ -276,23 +231,7 @@ const CircularProgressMetadata = ({ metadata, stageConfig, initialBalance }) => 
     );
   }
 
-  // Definir los colores hexadecimales para cada color
-  const getColorHex = (colorName) => {
-    switch (colorName) {
-      case "green":
-        return "#10B981"; // Verde más intenso
-      case "yellow":
-        return "#F59E0B"; // Amarillo ámbar
-      case "red":
-        return "#EF4444"; // Rojo más intenso
-      case "amber":
-        return "#FBBF24"; // Amber 400
-      default:
-        return "#FBBF24"; // Amber 400 por defecto
-    }
-  };
-
-  // Renderizado responsivo manteniendo el diseño original
+  // Renderizado responsivo
   return (
     <div className="flex flex-col items-center justify-center py-8 text-white bg-black my-6 rounded-md">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

@@ -1,4 +1,4 @@
-// src/pages/historial/ChartMetadata.js
+// src/pages/historial/ChartMetadata.jsx
 'use client'
 import React, { useEffect, useState } from 'react'
 import { LineChart } from '@/components/ui/chart-line'
@@ -17,11 +17,6 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
     }
 
     useEffect(() => {
-        // Log para depuración
-        console.log('Metadata recibida en ChartMetadata:', metadata);
-        console.log('StageConfig recibido en ChartMetadata:', stageConfig);
-        console.log('InitialBalance recibido en ChartMetadata:', initialBalance);
-
         if (!metadata) {
             setLoading(false)
             return
@@ -36,7 +31,6 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
             // Obtener el balance inicial
             // Prioridad: 1. valor pasado como prop, 2. valor en metrics.deposits, 3. valor por defecto
             const baseBalance = initialBalance || metrics.deposits || 10000
-            console.log('Balance base para cálculos:', baseBalance);
             
             // Obtener los valores de profit target y max drawdown del stageConfig
             // Si no están disponibles, usar valores por defecto
@@ -44,36 +38,33 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
             let maxDrawdownPercent = 10;   // Valor por defecto: 10%
             
             if (stageConfig) {
-                // Usar los valores del stage si están disponibles
+                // Buscar valores en diferentes ubicaciones posibles
                 if (typeof stageConfig.profitTarget === 'number') {
                     profitTargetPercent = stageConfig.profitTarget;
+                } else if (stageConfig.targets && typeof stageConfig.targets.profit_target === 'number') {
+                    profitTargetPercent = stageConfig.targets.profit_target;
                 }
                 
-                // Para el max drawdown, priorizar maximumTotalLoss, si no está disponible usar maximumDailyLoss
+                // Para max drawdown, buscar valores en diferentes ubicaciones
                 if (typeof stageConfig.maximumTotalLoss === 'number') {
                     maxDrawdownPercent = stageConfig.maximumTotalLoss;
                 } else if (typeof stageConfig.maximumDailyLoss === 'number') {
                     maxDrawdownPercent = stageConfig.maximumDailyLoss;
+                } else if (stageConfig.targets) {
+                    if (typeof stageConfig.targets.max_loss === 'number') {
+                        maxDrawdownPercent = stageConfig.targets.max_loss;
+                    } else if (typeof stageConfig.targets.max_daily_loss === 'number') {
+                        maxDrawdownPercent = stageConfig.targets.max_daily_loss;
+                    }
                 }
             }
-            
-            console.log('Porcentajes utilizados:', {
-                profitTargetPercent,
-                maxDrawdownPercent
-            });
             
             // Cálculo de valores absolutos para líneas horizontales
             const maxDrawdownAbsolute = baseBalance * (1 - maxDrawdownPercent / 100);
             const profitTargetAbsolute = baseBalance * (1 + profitTargetPercent / 100);
             
-            console.log('Valores absolutos calculados:', {
-                maxDrawdownAbsolute,
-                profitTargetAbsolute
-            });
-            
             // Priorizar el uso de equityChart si está disponible
             if (metadata.equityChart && metadata.equityChart.length > 0) {
-                console.log('Usando datos de equityChart para la gráfica');
                 const processedData = transformEquityChartData(
                     metadata.equityChart,
                     maxDrawdownAbsolute,
@@ -83,7 +74,6 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
             }
             // Si no hay equityChart pero hay dailyGrowth, usarlo
             else if (metrics.dailyGrowth && metrics.dailyGrowth.length > 0) {
-                console.log('Usando datos de dailyGrowth para la gráfica');
                 const processedData = transformDailyGrowthData(
                     metrics.dailyGrowth,
                     maxDrawdownAbsolute,
@@ -203,9 +193,6 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
         return (
             <div className="text-center  bg-gray-100 dark:bg-zinc-800 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
                 No hay datos disponibles para mostrar.
-                <pre className="mt-4 text-xs text-gray-600 dark:text-gray-400">
-                    Datos recibidos: {JSON.stringify(metadata, null, 2)}
-                </pre>
             </div>
         )
     }

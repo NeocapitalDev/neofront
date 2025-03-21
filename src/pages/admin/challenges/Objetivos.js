@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+
 // Custom SVG Icons
 const CheckIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6 mr-2 rounded-lg text-white bg-green-500">
@@ -18,7 +19,7 @@ const XMarkIcon = () => (
 // Utility function to format days
 const formatDays = (days, minimumDays) => {
     const integerDays = Math.floor(days);
-    const percentage = (integerDays / minimumDays) * 100;
+    const percentage = minimumDays > 0 ? (integerDays / minimumDays) * 100 : 100;
     return {
         displayDays: integerDays,
         displayPercentage: percentage.toFixed(2)
@@ -28,8 +29,8 @@ const formatDays = (days, minimumDays) => {
 // Utility function to format profit/loss
 const formatProfit = (initialBalance, currentProfit, profitTarget) => {
     const profit = Math.max(0, currentProfit);
-    const percentage = profit === 0 ? 0 : (profit / initialBalance) * 100;
-    const targetPercentage = (profitTarget / initialBalance) * 100;
+    const percentage = initialBalance > 0 ? (profit / initialBalance) * 100 : 0;
+    const targetPercentage = initialBalance > 0 ? (profitTarget / initialBalance) * 100 : 0;
 
     return {
         displayProfit: profit.toFixed(2),
@@ -39,117 +40,126 @@ const formatProfit = (initialBalance, currentProfit, profitTarget) => {
 };
 
 export default function Objetivos({ challengeConfig, metricsData, initBalance, pase }) {
-    console.log(challengeConfig)
-    console.log(metricsData)
-    console.log(initBalance)
-    console.log(pase)
-
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [objetivos, setObjetivos] = useState([]);
 
-    const balance = initBalance || 0;
+    // Usar un valor de balance por defecto si no se proporciona
+    const balance = initBalance || 10000;
 
     useEffect(() => {
         if (!challengeConfig || !metricsData) return;
 
-        // Extraer los datos reales del trading desde metricsData
-        const tradeDayCount = metricsData.daysSinceTradingStarted || 0;
+        try {
+            // Extraer los datos reales del trading desde metricsData
+            const tradeDayCount = metricsData.daysSinceTradingStarted || 0;
 
-        // Para maxDailyDrawdown, podemos usar la peor pérdida diaria desde dailyGrowth
-        let maxDailyDrawdown = 0;
+            // Para maxDailyDrawdown, podemos usar la peor pérdida diaria desde dailyGrowth
+            let maxDailyDrawdown = 0;
 
-        if (Array.isArray(metricsData.dailyGrowth) && metricsData.dailyGrowth.length > 0) {
-            const profits = metricsData.dailyGrowth
-                .map(day => day.profit)
-                .filter(profit => typeof profit === "number" && !isNaN(profit)); // Filtra valores inválidos
+            if (Array.isArray(metricsData.dailyGrowth) && metricsData.dailyGrowth.length > 0) {
+                const profits = metricsData.dailyGrowth
+                    .map(day => day.profit)
+                    .filter(profit => typeof profit === "number" && !isNaN(profit)); // Filtra valores inválidos
 
-            console.log("Valid Profits:", profits);
-
-            if (profits.length > 0) {
-                maxDailyDrawdown = Math.abs(Math.min(...profits, 0));
+                if (profits.length > 0) {
+                    maxDailyDrawdown = Math.abs(Math.min(...profits, 0));
+                }
             }
+
+            // Calcular la pérdida total directamente de metricsData
+            let maxAbsoluteDrawdown = Math.abs(metricsData.maxDrawdown || 0);
+
+            // Si tenemos datos de trades, calculamos la pérdida total
+            if (metricsData.lostTrades > 0 && metricsData.averageLoss) {
+                const totalLoss = Math.abs(metricsData.lostTrades * metricsData.averageLoss);
+                // Usamos el valor mayor entre la pérdida total y el maxDrawdown actual
+                maxAbsoluteDrawdown = Math.max(totalLoss, maxAbsoluteDrawdown);
+            }
+
+            // Para maxRelativeProfit, usamos profit del SDK
+            const maxRelativeProfit = metricsData.profit || 0;
+
+            // Extraer configuraciones
+            const minimumTradingDays = challengeConfig.minimumTradingDays || 0;
+            const maximumDailyLossPercent = challengeConfig.maximumDailyLossPercent || 5;
+            const maxDrawdownPercent = challengeConfig.maxDrawdownPercent || 10;
+            const profitTargetPercent = challengeConfig.profitTargetPercent || 8;
+
+            // Crear array de objetivos basado en la configuración del desafío
+            const newObjetivos = [
+                {
+                    nombre: `Mínimo ${minimumTradingDays} Días de Trading`,
+                    ...(() => {
+                        const { displayDays, displayPercentage } = formatDays(
+                            tradeDayCount,
+                            minimumTradingDays
+                        );
+                        return {
+                            resultado: `${displayDays} días (${displayPercentage}%)`,
+                            estado: displayDays >= minimumTradingDays,
+                        };
+                    })(),
+                    descripcion: "Este valor representa el número de sus días de trading activos medidos en la zona horaria CE(S)T.",
+                    videoUrl: "https://www.youtube.com/watch?v=lPd0uOoRzsY",
+                },
+                {
+                    nombre: `Pérdida máxima del día - $${(balance * maximumDailyLossPercent / 100).toFixed(2)}`,
+                    resultado: `$${maxDailyDrawdown.toFixed(2)} (${(
+                        (maxDailyDrawdown / (balance * maximumDailyLossPercent / 100)) *
+                        100
+                    ).toFixed(2)}%)`,
+                    estado: maxDailyDrawdown <= balance * maximumDailyLossPercent / 100,
+                    descripcion:
+                        "Este valor representa la caída de capital más baja registrada en un día concreto. Contiene su P/L flotante y sólo puede ser sustituido por una pérdida mayor.",
+                    videoUrl: "https://www.youtube.com/watch?v=WaeBEto7Tkk",
+                },
+                {
+                    nombre: `Pérdida Máx. - $${(balance * maxDrawdownPercent / 100).toFixed(2)}`,
+                    resultado: `$${maxAbsoluteDrawdown.toFixed(2)} (${(
+                        (maxAbsoluteDrawdown / (balance * maxDrawdownPercent / 100)) * 100).toFixed(2)}%)`,
+                    estado: maxAbsoluteDrawdown <= balance * maxDrawdownPercent / 100,
+                    descripcion: "Este valor representa el capital registrado más bajo en su cuenta desde el momento en que se empezó a operar.",
+                    videoUrl: "https://www.youtube.com/watch?v=AsNUg0O-9iQ",
+                },
+            ];
+
+            // Agregar objetivo de profit si está configurado
+            if (profitTargetPercent) {
+                const profitTarget = balance * profitTargetPercent / 100;
+                const { displayProfit, displayPercentage, isTargetMet } = formatProfit(
+                    balance,
+                    maxRelativeProfit,
+                    profitTarget
+                );
+
+                newObjetivos.push({
+                    nombre: `Objetivo de Beneficio - $${profitTarget.toFixed(2)}`,
+                    resultado: `$${displayProfit} (${displayPercentage}%)`,
+                    estado: isTargetMet,
+                    descripcion: "Este valor representa su ganancia en el capital.",
+                    videoUrl: "https://www.youtube.com/watch?v=DWJts3chO_I",
+                });
+            }
+
+            setObjetivos(newObjetivos);
+        } catch (error) {
+            console.error("Error al procesar objetivos:", error);
+            // Establecer objetivos vacíos en caso de error
+            setObjetivos([]);
         }
-
-        // Calcular la pérdida total directamente de metricsData
-        let maxAbsoluteDrawdown = Math.abs(metricsData.maxDrawdown || 0);
-
-        // Si tenemos datos de trades, calculamos la pérdida total
-        if (metricsData.lostTrades > 0 && metricsData.averageLoss) {
-            const totalLoss = Math.abs(metricsData.lostTrades * metricsData.averageLoss);
-            // Usamos el valor mayor entre la pérdida total y el maxDrawdown actual
-            maxAbsoluteDrawdown = totalLoss;
-            console.log("Pérdida total calculada:", totalLoss);
-        }
-
-        // Para maxRelativeProfit, usamos profit del SDK
-        const maxRelativeProfit = metricsData.profit || 0;
-
-        // Crear array de objetivos basado en la configuración del desafío
-        const newObjetivos = [
-            {
-                nombre: `Mínimo ${challengeConfig.minimumTradingDays} Días de Trading`,
-                ...(() => {
-                    const { displayDays, displayPercentage } = formatDays(
-                        tradeDayCount,
-                        challengeConfig.minimumTradingDays
-                    );
-                    return {
-                        resultado: `${displayDays} días (${displayPercentage}%)`,
-                        estado: displayDays >= challengeConfig.minimumTradingDays,
-                    };
-                })(),
-                descripcion: "Este valor representa el número de sus días de trading activos medidos en la zona horaria CE(S)T.",
-                videoUrl: "https://www.youtube.com/watch?v=lPd0uOoRzsY",
-            },
-            {
-                nombre: `Pérdida máxima del día - $${(balance * challengeConfig.maximumDailyLossPercent / 100).toFixed(2)}`,
-                resultado: `$${maxDailyDrawdown.toFixed(2)} (${(
-                    (maxDailyDrawdown / (balance * challengeConfig.maximumDailyLossPercent / 100)) *
-                    100
-                ).toFixed(2)}%)`,
-                estado: maxDailyDrawdown <= balance * challengeConfig.maximumDailyLossPercent / 100,
-                descripcion:
-                    "Este valor representa la caída de capital más baja registrada en un día concreto. Contiene su P/L flotante y sólo puede ser sustituido por una pérdida mayor.",
-                videoUrl: "https://www.youtube.com/watch?v=WaeBEto7Tkk",
-            },
-            {
-                nombre: `Pérdida Máx. - $${(balance * challengeConfig.maxDrawdownPercent / 100).toFixed(2)}`,
-                resultado: `$${maxAbsoluteDrawdown.toFixed(2)} (${(
-                    (maxAbsoluteDrawdown / (balance * challengeConfig.maxDrawdownPercent / 100)) * 100).toFixed(2)}%)`,
-                estado: maxAbsoluteDrawdown <= balance * challengeConfig.maxDrawdownPercent / 100,
-                descripcion: "Este valor representa el capital registrado más bajo en su cuenta desde el momento en que se empezó a operar.",
-                videoUrl: "https://www.youtube.com/watch?v=AsNUg0O-9iQ",
-            },
-        ];
-
-        // Agregar objetivo de profit si está configurado
-        if (challengeConfig.profitTargetPercent) {
-            const profitTarget = balance * challengeConfig.profitTargetPercent / 100;
-            const { displayProfit, displayPercentage, isTargetMet } = formatProfit(
-                balance,
-                maxRelativeProfit,
-                profitTarget
-            );
-
-            newObjetivos.push({
-                nombre: `Objetivo de Beneficio - $${profitTarget.toFixed(2)}`,
-                resultado: `$${displayProfit} (${displayPercentage}%)`,
-                estado: isTargetMet,
-                descripcion: "Este valor representa su ganancia en el capital.",
-                videoUrl: "https://www.youtube.com/watch?v=DWJts3chO_I",
-            });
-        }
-
-        setObjetivos(newObjetivos);
     }, [challengeConfig, metricsData, balance]);
 
     const toggleExpand = (index) => {
         setExpandedIndex(expandedIndex === index ? null : index);
     };
 
-    // Si no hay datos, no mostrar nada (la carga se maneja en el componente padre)
+    // Si no hay datos, mostrar mensaje de carga
     if (!objetivos.length) {
-        return null;
+        return (
+            <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-6 text-center">
+                <p>Cargando objetivos...</p>
+            </div>
+        );
     }
 
     return (

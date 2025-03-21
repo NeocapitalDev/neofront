@@ -1,3 +1,4 @@
+// src/pages/admin/challenges/[documentId].js
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import DashboardLayout from "..";
@@ -191,12 +192,15 @@ const fetchStageConfiguration = async (documentId, jwt) => {
 const convertMetaStatsToMetadata = (metricsData, brokerAccount, initialBalance) => {
   if (!metricsData) return null;
 
-  // Adaptamos los datos de MetaStats al formato que espera nuestro componente
+  // Establecer un balance inicial predeterminado si no está disponible
+  const baseBalance = initialBalance || metricsData.deposits || 10000;
+
+  // Crear el objeto convertido con todos los campos necesarios
   const convertedData = {
     // Propiedades principales
     trades: metricsData.trades || 0,
-    balance: metricsData.balance || initialBalance,
-    equity: metricsData.equity || initialBalance,
+    balance: metricsData.balance || baseBalance,
+    equity: metricsData.equity || baseBalance,
     profit: metricsData.profit || 0,
     
     // Métricas de trading
@@ -205,39 +209,110 @@ const convertMetaStatsToMetadata = (metricsData, brokerAccount, initialBalance) 
     wonTradesPercent: metricsData.wonTradesPercent || 0,
     lostTradesPercent: metricsData.lostTradesPercent || 0,
     
-    // Métricas de riesgo
-    maxBalanceDrawdown: metricsData.maxBalanceDrawdown || 0,
-    maxBalanceDrawdownPercent: metricsData.maxBalanceDrawdownPercent || 0,
-    maxEquityDrawdown: metricsData.maxEquityDrawdown || 0,
-    maxEquityDrawdownPercent: metricsData.maxEquityDrawdownPercent || 0,
+    // Métricas de profit/loss
+    averageWin: metricsData.averageWin || 0,
+    averageLoss: metricsData.averageLoss || 0,
+    averageWinPips: metricsData.averageWinPips || 0,
+    averageLossPips: metricsData.averageLossPips || 0,
     
-    // Datos adicionales
-    broker_account: brokerAccount,
-    initialBalance: initialBalance,
-    deposits: initialBalance,
+    // Métricas de mejor/peor trade
+    bestTrade: metricsData.bestTrade || 0,
+    worstTrade: metricsData.worstTrade || 0,
+    bestTradePips: metricsData.bestTradePips || 0,
+    worstTradePips: metricsData.worstTradePips || 0,
     
-    // Propiedades auxiliares para compatibilidad
+    // Métricas de dirección (long/short)
+    longTrades: metricsData.longTrades || 0,
+    shortTrades: metricsData.shortTrades || 0,
+    longWonTrades: metricsData.longWonTrades || 0,
+    shortWonTrades: metricsData.shortWonTrades || 0,
+    longWonTradesPercent: metricsData.longWonTradesPercent || 0,
+    shortWonTradesPercent: metricsData.shortWonTradesPercent || 0,
+    
+    // Métricas de drawdown
+    maxDrawdown: metricsData.maxDrawdown || 0,
+    maxDrawdownPercent: metricsData.maxDrawdownPercent || 0,
+    maxBalanceDrawdown: metricsData.maxBalanceDrawdown || metricsData.maxDrawdown || 0,
+    maxBalanceDrawdownPercent: metricsData.maxBalanceDrawdownPercent || metricsData.maxDrawdownPercent || 0,
+    maxEquityDrawdown: metricsData.maxEquityDrawdown || metricsData.maxDrawdown || 0,
+    maxEquityDrawdownPercent: metricsData.maxEquityDrawdownPercent || metricsData.maxDrawdownPercent || 0,
+    
+    // Métricas de rendimiento
+    profitFactor: metricsData.profitFactor || 0,
+    expectancy: metricsData.expectancy || 0,
+    expectancyPips: metricsData.expectancyPips || 0,
+    
+    // Métricas de tiempo
+    daysSinceTradingStarted: metricsData.daysSinceTradingStarted || 0,
+    averageTradeLengthInMilliseconds: metricsData.averageTradeLengthInMilliseconds || 0,
+    
+    // Métricas de volumen
+    pips: metricsData.pips || 0,
+    lots: metricsData.lots || 0,
+    
+    // Datos de cuenta
+    broker_account: brokerAccount || {},
+    initialBalance: baseBalance,
+    deposits: metricsData.deposits || baseBalance,
+    
+    // Datos de gráficos
+    dailyGrowth: metricsData.dailyGrowth || [],
     balanceChart: metricsData.balanceChart || [],
     equityChart: metricsData.equityChart || [],
     
-    // Resumen por instrumentos/divisas (si está disponible)
-    currencySummary: metricsData.currencies 
-      ? metricsData.currencies.map(currency => ({
-          currency: currency.name,
-          total: {
-            trades: currency.trades || 0,
-            profit: currency.profit || 0,
-            wonTrades: currency.wonTrades || 0,
-            lostTrades: currency.lostTrades || 0,
-            wonTradesPercent: currency.wonTradesPercent || 0,
-            lostTradesPercent: currency.lostTradesPercent || 0
-          }
-        }))
-      : []
+    // Resumen por instrumentos - manejar tanto currencySummary como currencies
+    currencySummary: handleCurrencySummary(metricsData)
   };
 
   return convertedData;
 };
+
+/**
+ * Procesa el resumen de divisas desde MetaStats
+ * @param {Object} metricsData - Datos de MetaStats
+ * @returns {Array} Array formateado de resumen de divisas
+ */
+function handleCurrencySummary(metricsData) {
+  // Verificar si existe currencySummary o currencies
+  if (metricsData.currencySummary && Array.isArray(metricsData.currencySummary)) {
+    return metricsData.currencySummary.map(formatCurrencyData);
+  } else if (metricsData.currencies && Array.isArray(metricsData.currencies)) {
+    return metricsData.currencies.map(formatCurrencyData);
+  }
+  
+  return [];
+}
+
+/**
+ * Formatea los datos de una divisa individual
+ * @param {Object} currency - Datos de divisa individual
+ * @returns {Object} Datos formateados
+ */
+function formatCurrencyData(currency) {
+  return {
+    currency: currency.currency || currency.name || "Unknown",
+    total: {
+      trades: currency.total?.trades || currency.trades || 0,
+      profit: currency.total?.profit || currency.profit || 0,
+      pips: currency.total?.pips || currency.pips || 0,
+      wonTrades: currency.total?.wonTrades || currency.wonTrades || 0,
+      wonTradesPercent: currency.total?.wonTradesPercent || currency.wonTradesPercent || 0,
+      lostTrades: currency.total?.lostTrades || currency.lostTrades || 0,
+      lostTradesPercent: currency.total?.lostTradesPercent || currency.lostTradesPercent || 0
+    },
+    long: currency.long || {
+      trades: 0,
+      profit: 0,
+      pips: 0
+    },
+    short: currency.short || {
+      trades: 0,
+      profit: 0,
+      pips: 0
+    },
+    history: currency.history || []
+  };
+}
 
 const AdminChallengeDetail = () => {
   const router = useRouter();
@@ -497,6 +572,34 @@ const AdminChallengeDetail = () => {
         
         if (equityChartData) {
           convertedData.equityChart = equityChartData;
+        }
+
+        // Asegurarse de que todos los campos importantes están disponibles
+        if (convertedData) {
+          // Añadir campos calculados si faltan
+          if (!convertedData.profitFactor && convertedData.wonTrades && convertedData.lostTrades) {
+            const totalWon = convertedData.wonTrades * convertedData.averageWin;
+            const totalLost = Math.abs(convertedData.lostTrades * convertedData.averageLoss);
+            convertedData.profitFactor = totalLost > 0 ? totalWon / totalLost : 0;
+          }
+          
+          // Asegurarse de que los campos maxDrawdown sean consistentes
+          if (!convertedData.maxDrawdown && convertedData.maxBalanceDrawdown) {
+            convertedData.maxDrawdown = convertedData.maxBalanceDrawdown;
+          }
+          
+          // Calcular expectancy si no está disponible
+          if (!convertedData.expectancy) {
+            const winRate = convertedData.wonTradesPercent / 100;
+            const lossRate = convertedData.lostTradesPercent / 100;
+            convertedData.expectancy = (winRate * convertedData.averageWin) + (lossRate * convertedData.averageLoss);
+          }
+          
+          console.log("Campos adicionales calculados para convertedData:", {
+            profitFactor: convertedData.profitFactor,
+            expectancy: convertedData.expectancy,
+            maxDrawdown: convertedData.maxDrawdown
+          });
         }
         
         console.log("Datos convertidos al formato de metadata:", convertedData);

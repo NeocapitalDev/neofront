@@ -1,4 +1,4 @@
-// src/pages/historial/WinLossHistorical.tsx
+// src/pages/historial/WinLossHistorical.jsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -23,7 +23,6 @@ export default function WinLossHistorical({ metadata }) {
   useEffect(() => {
     if (metadata) {
       // La estructura del metadata puede variar, así que buscamos la ruta correcta
-      // Normalmente tendríamos que navegar a metrics si existe
       const metricsData = metadata.metrics || metadata;
 
       // Extraer los datos con valores por defecto para evitar errores
