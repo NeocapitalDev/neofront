@@ -1,4 +1,4 @@
-// lib/strapiService.js
+// src/services/strapiService.js
 import useSWR from 'swr';
 
 // Función fetcher para obtener los datos

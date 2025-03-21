@@ -1,3 +1,4 @@
+// src/components/dash/app-sidebar.js
 "use client";
 
 import * as React from "react";
@@ -82,19 +83,19 @@ export function AppSidebar({ ...props }) {
       isActive: false,
     },
     {
-      title: "brokerAccount",
+      title: "Broker Accounts",
       url: "/admin/brokerAccount",
       icon: Activity,
       isActive: false,
     },
     {
-      title: "steps",
+      title: "Steps",
       url: "/admin/steps",
       icon: Activity,
       isActive: false,
     },
     {
-      title: "manager",
+      title: "Manager",
       url: "/admin/manager",
       icon: Activity,
       isActive: false,
