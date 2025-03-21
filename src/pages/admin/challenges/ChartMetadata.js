@@ -212,20 +212,22 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
 
     // Renderizar gráfico
     return (
-        <div className="mt-4">
-            <h2 className="text-lg font-semibold mb-4">Evolución del Balance</h2>
-            <div className="dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black ">
-                <LineChart
-                    data={chartData}
-                    index="date"
-                    categories={[
-                        'balance',
-                        'max_drawdown',
-                        'profit_target'
-                    ]}
-                    yFormatter={yFormatter}
-                    colors={["#FBBF24", "red", "green"]}
-                />
+        <div className="flex justify-center items-center">
+            <div className="">
+                <h2 className="text-lg font-semibold mb-4 text-center">Evolución del Balance</h2>
+                <div className="w-full justify-center flex dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
+                    <LineChart
+                        data={chartData}
+                        index="date"
+                        categories={[
+                            'balance',
+                            'max_drawdown',
+                            'profit_target'
+                        ]}
+                        yFormatter={yFormatter}
+                        colors={["#FBBF24", "red", "green"]}
+                    />
+                </div>
             </div>
         </div>
     )
