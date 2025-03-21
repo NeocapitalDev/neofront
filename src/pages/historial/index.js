@@ -48,6 +48,16 @@ export default function Historial() {
         retry: 'bg-orange-100 dark:bg-orange-900/40',
     };
 
+    // Definir colores para los gradientes
+    const statusGradients = {
+        approved: 'from-green-600/30 dark:from-green-500/20',
+        disapproved: 'from-red-600/30 dark:from-red-500/20',
+        progress: 'from-yellow-600/30 dark:from-yellow-500/20',
+        init: 'from-blue-600/30 dark:from-blue-500/20',
+        withdrawal: 'from-purple-600/30 dark:from-purple-500/20',
+        retry: 'from-orange-600/30 dark:from-orange-500/20',
+    };
+
     // Filtrar y agrupar challenges
     useEffect(() => {
         if (data?.challenges) {
@@ -218,10 +228,10 @@ export default function Historial() {
                             return (
                                 <div
                                     key={parentId}
-                                    className="bg-gray-100 border border-gray-200 rounded-lg shadow-md dark:bg-zinc-800 dark:border-zinc-700 overflow-hidden"
+                                    className={`bg-gradient-to-b ${statusGradients[status] || 'from-gray-500/10'} to-zinc-800 rounded-lg shadow-md dark:border-zinc-700 overflow-hidden relative`}
                                 >
                                     {/* Cabecera del Challenge (siempre visible) */}
-                                    <div className="flex flex-col p-4 lg:p-6">
+                                    <div className="flex flex-col p-4 lg:p-6 relative z-10">
                                         {/* Identificador del challenge y botón de expansión en una fila */}
                                         <div className="flex justify-between items-center mb-4">
                                             <div className="bg-[var(--app-primary)] rounded-lg shadow-md text-black text-center text-lg font-bold px-3 py-2">
@@ -230,7 +240,7 @@ export default function Historial() {
                                             <div className="flex items-center">
                                                 <button
                                                     onClick={() => toggleGroup(parentId)}
-                                                    className="p-2 rounded-full dark:hover:bg-zinc-600 hover:bg-gray-200 mr-2 transition-colors"
+                                                    className="p-2 rounded-full dark:hover:bg-zinc-600/70 hover:bg-gray-200 mr-2 transition-colors"
                                                     aria-label={isExpanded ? "Collapse" : "Expand"}
                                                 >
                                                     {isExpanded ? (
@@ -242,7 +252,7 @@ export default function Historial() {
 
                                                 {/* Botón de metrix */}
                                                 <Link href={lastChallenge.result === 'progress' ? `/metrix2/${lastChallenge.documentId}` : `/historial/${lastChallenge.documentId}`}>
-                                                    <button className="flex bg-gray-200 border border-gray-300 justify-center rounded-lg shadow-md dark:bg-zinc-700 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-300 items-center px-4 py-2 space-x-2">
+                                                    <button className="flex bg-gray-200 border border-gray-300 justify-center rounded-lg shadow-md dark:bg-zinc-700/90 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-300 items-center px-4 py-2 space-x-2">
                                                         <ChartBarIcon className="h-5 w-5 mr-2" />
                                                         <span>Metrix</span>
                                                     </button>
@@ -272,7 +282,7 @@ export default function Historial() {
                                                     </span>
                                                 </div>
                                                 <span className="text-gray-500 dark:text-gray-400 hidden md:inline">|</span>
-                                                <span className="bg-gray-100 rounded-md text-gray-600 dark:bg-zinc-600 dark:text-gray-300 px-3 py-1">
+                                                <span className="bg-gray-100/20 backdrop-blur-sm rounded-md text-gray-600 dark:text-gray-300 px-3 py-1 dark:bg-zinc-700/60">
                                                     Fase {lastChallenge.phase}
                                                 </span>
                                             </div>
@@ -280,13 +290,13 @@ export default function Historial() {
                                             {/* Período */}
                                             <div className="flex text-gray-500 text-sm dark:text-gray-400 items-center mb-3">
                                                 <span className="font-medium mr-2">Período:</span>
-                                                <span className="bg-gray-100 rounded-md text-gray-700 dark:bg-zinc-600 dark:text-gray-300 px-3 py-1">{startDateFormatted} - {endDateFormatted}</span>
+                                                <span className="bg-gray-100/20 backdrop-blur-sm rounded-md text-gray-700 dark:text-gray-300 px-3 py-1 dark:bg-zinc-700/60">{startDateFormatted} - {endDateFormatted}</span>
                                             </div>
 
                                             {/* Última actualización */}
                                             <div className="flex text-sm gap-2 items-center">
                                                 <span className="text-black dark:text-white font-semibold">Última actualización:</span>
-                                                <span className="bg-gray-100 rounded-md text-gray-600 dark:bg-zinc-600 dark:text-gray-300 px-3 py-1">
+                                                <span className="bg-gray-100/20 backdrop-blur-sm rounded-md text-gray-600 dark:text-gray-300 px-3 py-1 dark:bg-zinc-700/60">
                                                     {formatDate(lastChallenge.endDate ? lastChallenge.endDate : lastChallenge.startDate)}
                                                 </span>
                                             </div>
@@ -295,50 +305,57 @@ export default function Historial() {
 
                                     {/* Detalles del Challenge (expandible) */}
                                     {isExpanded && (
-                                        <div className="bg-gray-50 border-gray-200 border-t dark:bg-zinc-900 dark:border-zinc-700 px-6 py-4">
+                                        <div className="bg-zinc-900/60 border-gray-200 border-t dark:border-zinc-700/70 px-6 py-4">
                                             <h3 className="text-gray-800 text-sm dark:text-gray-300 font-semibold mb-3">Historial de fases</h3>
                                             <div className="space-y-3">
-                                                {challenges.map((challenge, index) => (
-                                                    <div
-                                                        key={index}
-                                                        className={`p-4 rounded-lg shadow-sm border ${statusBgColors[challenge.result] || 'bg-gray-50 dark:bg-zinc-800'} border-gray-200 dark:border-zinc-700`}
-                                                    >
-                                                        <div className="flex flex-col justify-between sm:flex-row">
-                                                            {/* Info de la fase */}
-                                                            <div className="mb-3 sm:mb-0">
-                                                                <div className="flex items-center mb-1">
-                                                                    <span className="text-gray-800 text-lg dark:text-white font-semibold">
-                                                                        Fase {challenge.phase}
-                                                                    </span>
-                                                                    <span className={`ml-3 px-3 py-1 rounded-full text-xs font-medium ${statusColors[challenge.result]} ${statusBgColors[challenge.result]}`}>
-                                                                        {challenge.result === 'approved' ? 'Aprobado' :
-                                                                            challenge.result === 'progress' ? 'En progreso' :
-                                                                                challenge.result === 'disapproved' ? 'Desaprobado' :
-                                                                                    challenge.result === 'init' ? 'Por Iniciar' :
-                                                                                        challenge.result === 'withdrawal' ? 'Retirado' :
-                                                                                            challenge.result === 'retry' ? 'Rechazado' : challenge.result}
-                                                                    </span>
+                                                {challenges.map((challenge, index) => {
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className={`p-4 rounded-lg shadow-sm border bg-gradient-to-b ${statusGradients[challenge.result] || 'from-gray-500/10'} to-zinc-800 border-gray-200 dark:border-zinc-700/70 relative overflow-hidden`}
+                                                        >
+                                                            <div className="flex flex-col justify-between sm:flex-row relative z-10">
+                                                                {/* Info de la fase */}
+                                                                <div className="mb-3 sm:mb-0">
+                                                                    <div className="flex items-center mb-1">
+                                                                        <span className="text-gray-800 text-lg dark:text-white font-semibold">
+                                                                            Fase {challenge.phase}
+                                                                        </span>
+                                                                        <span className={`ml-3 px-3 py-1 rounded-full text-xs font-medium ${statusColors[challenge.result]} backdrop-blur-sm ${challenge.result === 'approved' ? 'bg-green-900/30' : 
+                                                                            challenge.result === 'progress' ? 'bg-yellow-900/30' : 
+                                                                            challenge.result === 'disapproved' ? 'bg-red-900/30' :
+                                                                            challenge.result === 'init' ? 'bg-blue-900/30' :
+                                                                            challenge.result === 'withdrawal' ? 'bg-purple-900/30' :
+                                                                            'bg-orange-900/30'}`}>
+                                                                            {challenge.result === 'approved' ? 'Aprobado' :
+                                                                                challenge.result === 'progress' ? 'En progreso' :
+                                                                                    challenge.result === 'disapproved' ? 'Desaprobado' :
+                                                                                        challenge.result === 'init' ? 'Por Iniciar' :
+                                                                                            challenge.result === 'withdrawal' ? 'Retirado' :
+                                                                                                challenge.result === 'retry' ? 'Rechazado' : challenge.result}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex text-gray-600 text-sm dark:text-gray-300 items-center mt-2">
+                                                                        <CalendarIcon className="h-4 text-gray-500 w-4 mr-1" />
+                                                                        <span>
+                                                                            {formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}
+                                                                        </span>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="flex text-gray-600 text-sm dark:text-gray-300 items-center mt-2">
-                                                                    <CalendarIcon className="h-4 text-gray-500 w-4 mr-1" />
-                                                                    <span>
-                                                                        {formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
 
-                                                            {/* Botón de detalles */}
-                                                            <Link
-                                                                href={challenge.result === 'progress' ? `/metrix2/${challenge.documentId}` : `/historial/${challenge.documentId}`}
-                                                            >
-                                                                <button className="flex bg-gray-200 border border-gray-300 justify-center rounded-lg shadow-md dark:bg-zinc-700 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-300 items-center px-4 py-2 space-x-2">
-                                                                    <ChartBarIcon className="h-4 w-4 mr-2" />
-                                                                    <span>Ver detalles</span>
-                                                                </button>
-                                                            </Link>
+                                                                {/* Botón de detalles */}
+                                                                <Link
+                                                                    href={challenge.result === 'progress' ? `/metrix2/${challenge.documentId}` : `/historial/${challenge.documentId}`}
+                                                                >
+                                                                    <button className="flex bg-gray-200/20 backdrop-blur-sm border border-gray-300/30 justify-center rounded-lg shadow-md dark:bg-zinc-700/70 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-300/30 items-center px-4 py-2 space-x-2">
+                                                                        <ChartBarIcon className="h-4 w-4 mr-2" />
+                                                                        <span>Ver detalles</span>
+                                                                    </button>
+                                                                </Link>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ))}
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     )}
