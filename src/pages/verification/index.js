@@ -46,14 +46,14 @@ const SocialsPage = () => {
 
     const route = token ? "users/me?populate[challenges][populate]=broker_account" : null;
     const { data, error, isLoading, mutate } = useStrapiData(route, token);
-
+    console.log("data: ", data);
 
 
 
 
     const { isVerified, statusSign, challenges = [] } = data || {};
-
-    const { hasPhase1Or2Challenge, newAccount } = useMemo(() => ({
+    console.log("challenges: ", challenges);
+    const { hasPhase3Challenge, hasPhase1Or2Challenge, newAccount } = useMemo(() => ({
         hasPhase3Challenge: challenges.some(challenge => challenge.phase === 3),
         hasPhase1Or2Challenge: challenges.some(challenge => [1, 2].includes(challenge.phase)),
         newAccount: challenges.length === 0,
@@ -68,9 +68,9 @@ const SocialsPage = () => {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
+                    "Authorization": `Bearer ${token}`,
                 },
-                body: JSON.stringify({ statusSign: true }),
+                body: JSON.stringify({ statusSign: true, isVerified: true }),
             });
             console.log("token: ", token);
             if (!response.ok) {
@@ -110,18 +110,11 @@ const SocialsPage = () => {
                         </div>
                     </div>
 
-                    {((hasPhase1Or2Challenge || newAccount) && !isVerified) ? (
+                    {((!hasPhase3Challenge && (hasPhase1Or2Challenge || newAccount)) && !isVerified) ? (
                         <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                             <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-                                {/* <CheckCircleIcon className="h-6 w-6 mr-2" /> */}
                                 La sección de verificación se desbloqueará para usted una vez que esté a punto de firmar o cambiar un contrato con nosotros. Se desbloqueará automáticamente una vez que haya llegado a fase NeoTrader.
                             </p>
-                            {/* <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
-                                {newAccount
-                                    ? "Actualmente no tienes ningún desafío activo. Una vez que inicies tu primer NEO Challenge, esta sección se desbloqueará automáticamente."
-                                    : "Tu desafío está en curso en la fase 1 o 2. Continúa operando y alcanza la fase NeoTrader para desbloquear esta sección."
-                                }
-                            </p> */}
                         </div>
                     ) : (
                         <>
