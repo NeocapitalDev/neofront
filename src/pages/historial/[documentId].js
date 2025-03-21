@@ -15,14 +15,19 @@ import WinLossHistorical from "./WinLossHistorical";
 import StatisticsHistorical from "./StatisticsHistorical";
 import RelatedChallenges from "../../components/challenges/RelatedChallenges";
 
-// Modify fetcher to use user's JWT token
+// Fetcher simplificado sin Content-Type para GET requests
 const fetcher = (url, token) => 
   fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
     },
-  }).then((res) => res.json());
+  }).then((res) => {
+    if (!res.ok) {
+      console.error(`Error en respuesta: ${res.status} ${res.statusText}`);
+      throw new Error(`Error API: ${res.status}`);
+    }
+    return res.json();
+  });
 
 /**
  * Función para determinar el stage correcto basado en la fase actual y los stages disponibles
@@ -76,33 +81,60 @@ const HistorialMetrix = () => {
   const [initialBalance, setInitialBalance] = useState(null);
   const [currentChallenge, setCurrentChallenge] = useState(null);
 
-  // Fetch user data including challenges instead of direct challenge fetch
+  // Fetch simplificado en dos pasos
+  // Paso 1: Obtener datos básicos del usuario con challenges
   const { data: userData, error, isLoading } = useSWR(
     session?.jwt && documentId
       ? [
-          // Modify the URL to fetch from users/me with populated challenges
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate][broker_account]=*&populate[challenges][populate][challenge_relation][populate][challenge_stages]=*&populate[challenges][populate]=*`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges]=*`,
           session.jwt
         ]
       : null,
-    ([url, token]) => fetcher(url, token)
+    ([url, token]) => {
+      console.log("Consultando URL:", url); // Para depuración
+      return fetcher(url, token);
+    }
   );
 
-  // Find the specific challenge that matches the documentId
+  // Paso 2: Encontrar el challenge específico y luego obtener sus detalles
   useEffect(() => {
-    if (userData?.challenges && documentId) {
-      const challenge = userData.challenges.find(
+    if (userData?.challenges && documentId && session?.jwt) {
+      const basicChallenge = userData.challenges.find(
         (challenge) => challenge.documentId === documentId
       );
       
-      if (challenge) {
-        console.log('Found matching challenge:', challenge);
-        setCurrentChallenge(challenge);
+      if (basicChallenge && basicChallenge.id) {
+        console.log('Challenge básico encontrado:', basicChallenge);
+        
+        // Obtener detalles completos del challenge en una consulta separada
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${basicChallenge.id}?populate[broker_account]=*&populate[challenge_relation][populate][challenge_stages]=*`, {
+          headers: {
+            Authorization: `Bearer ${session.jwt}`,
+          },
+        })
+          .then(res => {
+            if (!res.ok) throw new Error(`Error API: ${res.status}`);
+            return res.json();
+          })
+          .then(response => {
+            const detailedChallenge = response.data || response;
+            console.log('Detalles completos del challenge:', detailedChallenge);
+            // Combinar datos básicos con detalles
+            setCurrentChallenge({
+              ...basicChallenge, 
+              ...(detailedChallenge.attributes || detailedChallenge)
+            });
+          })
+          .catch(err => {
+            console.error('Error al obtener detalles del challenge:', err);
+            setCurrentChallenge(basicChallenge); // Usar datos básicos si falla
+          });
       } else {
-        console.warn('No matching challenge found for documentId:', documentId);
+        console.warn('No se encontró challenge con documentId:', documentId);
+        setCurrentChallenge(basicChallenge); // Puede ser null
       }
     }
-  }, [userData, documentId]);
+  }, [userData, documentId, session?.jwt]);
 
   // Process challenge metadata when current challenge is set
   useEffect(() => {
@@ -313,7 +345,10 @@ const HistorialMetrix = () => {
         </div>
         
         {userData?.challenges && (
-          <RelatedChallenges currentChallenge={currentChallenge} allChallenges={userData.challenges} />
+          <RelatedChallenges 
+            currentChallenge={currentChallenge} 
+            userChallenges={userData.challenges} 
+          />
         )}
         
         <div className="flex flex-col items-center justify-center py-10 mt-6 text-center">
@@ -415,7 +450,10 @@ const HistorialMetrix = () => {
       )}
 
       {userData?.challenges && (
-        <RelatedChallenges currentChallenge={currentChallenge} allChallenges={userData.challenges} />
+        <RelatedChallenges 
+          currentChallenge={currentChallenge} 
+          userChallenges={userData.challenges}
+        />
       )}
     </Layout>
   );
