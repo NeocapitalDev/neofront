@@ -668,7 +668,7 @@ const ChallengeRelations = () => {
                       </div>
                     )}
 
-                    <section className="p-5 space-y-4">
+                    {/* <section className="p-5 space-y-4">
                       <div className="flex items-start">
                         <input
                           type="checkbox"
@@ -682,7 +682,7 @@ const ChallengeRelations = () => {
                           <span className="font-bold text-amber-400 cursor-pointer">Términos y Condiciones</span>,{" "}
                           <span className="font-bold text-amber-400 cursor-pointer">Política de Privacidad</span> y{" "}
                           <span className="font-bold text-amber-400 cursor-pointer">Política de Cookies</span>
-                        </label>
+                        </label> 
                       </div>
 
                       <div className="flex items-start">
@@ -693,18 +693,22 @@ const ChallengeRelations = () => {
                           checked={cancellationAccepted}
                           onChange={() => setCancellationAccepted(!cancellationAccepted)}
                         />
-                        <label htmlFor="acceptCancelation" className="ml-2 text-sm text-zinc-300">
+                         <label htmlFor="acceptCancelation" className="ml-2 text-sm text-zinc-300">
                           Declaro que he leído y estoy de acuerdo con las Políticas de Cancelación y Reembolso.
-                        </label>
+                        </label> 
                       </div>
-                    </section>
+                    </section> */}
 
                     <div className="p-5">
                       <button
                         onClick={handleContinue}
                         type="submit"
-                        disabled={!selectedProduct || !termsAccepted || !cancellationAccepted}
-                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct && termsAccepted && cancellationAccepted
+                 //       disabled={!selectedProduct || !termsAccepted || !cancellationAccepted}
+
+                        disabled={!selectedProduct}
+                     //   className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct && termsAccepted && cancellationAccepted
+
+                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct 
                           ? "bg-amber-500 hover:bg-amber-600 text-black font-bold"
                           : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
                           }`}
