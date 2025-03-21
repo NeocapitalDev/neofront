@@ -14,6 +14,7 @@ import ChartMetadata from "./ChartMetadata";
 import WinLossHistorical from "./WinLossHistorical";
 import StatisticsHistorical from "./StatisticsHistorical";
 import RelatedChallenges from "../../components/challenges/RelatedChallenges";
+import Objetivos from "./objetivos";
 
 // Fetcher simplificado sin Content-Type para GET requests
 const fetcher = (url, token) => 
@@ -119,10 +120,32 @@ const HistorialMetrix = () => {
           .then(response => {
             const detailedChallenge = response.data || response;
             console.log('Detalles completos del challenge:', detailedChallenge);
-            // Combinar datos básicos con detalles
+            
+            // Extraer broker_account considerando diferentes estructuras posibles
+            let brokerAccount = null;
+            
+            // Caso 1: broker_account directamente en detailedChallenge
+            if (detailedChallenge.broker_account) {
+              brokerAccount = detailedChallenge.broker_account;
+            } 
+            // Caso 2: broker_account en attributes
+            else if (detailedChallenge.attributes && detailedChallenge.attributes.broker_account) {
+              brokerAccount = detailedChallenge.attributes.broker_account;
+            }
+            // Caso 3: broker_account con formato data/attributes
+            else if (detailedChallenge.attributes && 
+                     detailedChallenge.attributes.broker_account && 
+                     detailedChallenge.attributes.broker_account.data) {
+              brokerAccount = detailedChallenge.attributes.broker_account.data.attributes;
+            }
+            
+            console.log('Broker account extraído:', brokerAccount);
+            
+            // Combinar datos básicos con detalles y broker_account procesado
             setCurrentChallenge({
               ...basicChallenge, 
-              ...(detailedChallenge.attributes || detailedChallenge)
+              ...(detailedChallenge.attributes || detailedChallenge),
+              broker_account: brokerAccount
             });
           })
           .catch(err => {
@@ -276,6 +299,56 @@ const HistorialMetrix = () => {
     }
   }, [metadataStats, currentStage, initialBalance]);
 
+  // Depuración de la estructura de datos de broker_account
+  useEffect(() => {
+    if (currentChallenge) {
+      console.group('Depuración de estructura de broker_account');
+      console.log('currentChallenge:', currentChallenge);
+      
+      // Verificar broker_account directo
+      console.log('broker_account directo:', currentChallenge.broker_account);
+      
+      // Verificar si hay datos anidados
+      if (currentChallenge.broker_account && currentChallenge.broker_account.data) {
+        console.log('broker_account.data:', currentChallenge.broker_account.data);
+        console.log('broker_account.data.attributes:', currentChallenge.broker_account.data.attributes);
+      }
+      
+      // Verificar si hay broker_account en metadata
+      if (currentChallenge.metadata) {
+        const metadata = typeof currentChallenge.metadata === 'string'
+          ? JSON.parse(currentChallenge.metadata)
+          : currentChallenge.metadata;
+        
+        console.log('metadata.broker_account:', metadata.broker_account);
+      }
+      
+      // Intentar obtener login de diferentes rutas
+      const possibleLogins = [
+        currentChallenge.broker_account?.login,
+        currentChallenge.broker_account?.data?.attributes?.login,
+        typeof currentChallenge.metadata === 'string'
+          ? JSON.parse(currentChallenge.metadata)?.broker_account?.login
+          : currentChallenge.metadata?.broker_account?.login
+      ];
+      
+      console.log('Posibles valores de login:', possibleLogins);
+      console.groupEnd();
+    }
+  }, [currentChallenge]);
+
+  // Verificar los datos para el componente Objetivos
+  useEffect(() => {
+    if (currentStage && metadataStats) {
+      console.group('Datos para el componente Objetivos');
+      console.log('challengeConfig:', currentStage);
+      console.log('metadataStats:', metadataStats);
+      console.log('initialBalance:', initialBalance);
+      console.log('phase:', currentChallenge?.phase);
+      console.groupEnd();
+    }
+  }, [currentStage, metadataStats, initialBalance, currentChallenge]);
+
   // Render de carga
   if (isLoading || !session) {
     return (
@@ -324,7 +397,12 @@ const HistorialMetrix = () => {
       <Layout>
         <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
           <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
-          Historial de Cuenta {currentChallenge?.broker_account?.login || "Sin nombre"}
+          Historial de Cuenta {currentChallenge?.broker_account?.login || 
+                             currentChallenge?.broker_account?.data?.attributes?.login || 
+                             (currentChallenge?.metadata && typeof currentChallenge.metadata === 'string' 
+                               ? JSON.parse(currentChallenge.metadata)?.broker_account?.login 
+                               : currentChallenge?.metadata?.broker_account?.login) || 
+                             "Sin nombre"}
         </h1>
         
         <div className="mt-6 bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
@@ -338,8 +416,18 @@ const HistorialMetrix = () => {
             <div>
               <p><span className="font-semibold">Fecha de inicio:</span> {currentChallenge?.startDate ? new Date(currentChallenge.startDate).toLocaleDateString() : "No disponible"}</p>
               <p><span className="font-semibold">Fecha de fin:</span> {currentChallenge?.endDate ? new Date(currentChallenge.endDate).toLocaleDateString() : "En progreso"}</p>
-              <p><span className="font-semibold">Login MT4/MT5:</span> {currentChallenge?.broker_account?.login || "No disponible"}</p>
-              <p><span className="font-semibold">Balance inicial:</span> ${currentChallenge?.broker_account?.balance || "No disponible"}</p>
+              <p><span className="font-semibold">Login MT4/MT5:</span> {currentChallenge?.broker_account?.login || 
+                                                                      currentChallenge?.broker_account?.data?.attributes?.login || 
+                                                                      (currentChallenge?.metadata && typeof currentChallenge.metadata === 'string' 
+                                                                        ? JSON.parse(currentChallenge.metadata)?.broker_account?.login 
+                                                                        : currentChallenge?.metadata?.broker_account?.login) || 
+                                                                      "No disponible"}</p>
+              <p><span className="font-semibold">Balance inicial:</span> ${currentChallenge?.broker_account?.balance || 
+                                                                         currentChallenge?.broker_account?.data?.attributes?.balance || 
+                                                                         (currentChallenge?.metadata && typeof currentChallenge.metadata === 'string' 
+                                                                           ? JSON.parse(currentChallenge.metadata)?.broker_account?.balance 
+                                                                           : currentChallenge?.metadata?.broker_account?.balance) || 
+                                                                         "No disponible"}</p>
             </div>
           </div>
         </div>
@@ -381,7 +469,12 @@ const HistorialMetrix = () => {
     <Layout>
       <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
-        Historial de Cuenta {currentChallenge?.broker_account?.login || "Sin nombre"}
+        Historial de Cuenta {currentChallenge?.broker_account?.login || 
+                           currentChallenge?.broker_account?.data?.attributes?.login || 
+                           (currentChallenge?.metadata && typeof currentChallenge.metadata === 'string' 
+                             ? JSON.parse(currentChallenge.metadata)?.broker_account?.login 
+                             : currentChallenge?.metadata?.broker_account?.login) || 
+                           "Sin nombre"}
       </h1>
 
       <CircularProgressMetadata 
@@ -399,6 +492,27 @@ const HistorialMetrix = () => {
         metadata={metadataStats} 
         stageConfig={currentStage}
       />
+
+      {/* Objetivos */}
+      <div className="mt-6">
+        <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
+        {currentStage ? (
+          <Objetivos
+            // Usar currentStage como la configuración del desafío
+            challengeConfig={currentStage}
+            // Usar metadataStats como los datos de métricas
+            metricsData={metadataStats}
+            // Usar initialBalance para cálculos
+            initBalance={initialBalance}
+            // Usar la fase actual del challenge (corregido de "pase" a "phase")
+            phase={currentChallenge?.phase}
+          />
+        ) : (
+          <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-6 text-center">
+            <p>No hay información de objetivos disponible.</p>
+          </div>
+        )}
+      </div>
       
       <div className="flex flex-col md:flex-row gap-4 mt-6">
         <div className="w-full md:w-1/1 rounded-lg">

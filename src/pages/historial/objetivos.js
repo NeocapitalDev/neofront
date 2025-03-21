@@ -47,27 +47,32 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [objetivos, setObjetivos] = useState([]);
 
-    // Asegúrate de que phase esté disponible (puede venir como 'pase' o 'phase')
-    const currentPhase = phase;
-    
-    // Establecer un valor por defecto para el balance
-    const balance = initBalance || 10000;
+    const balance = initBalance || 10000; // Valor por defecto si no hay balance inicial
 
     useEffect(() => {
         if (!challengeConfig || !metricsData) return;
 
-        console.log("Datos para Objetivos:", { challengeConfig, metricsData, balance, currentPhase });
-
+        console.log("Datos de metricsData:", metricsData);
         // Extraer los datos reales del trading desde metricsData
         const tradeDayCount = Math.max(0, metricsData.daysSinceTradingStarted || 0);
 
-        // CORRECCIÓN: Usar directamente metricsData.profit como pérdida total
-        // Así tanto la pérdida diaria como la total tienen el mismo valor
+        // CORRECCIÓN: Para calcular pérdidas, usar directamente el valor absoluto del profit negativo
+        // Esto asegura que tanto la pérdida diaria como la pérdida máxima usen el mismo valor
         let totalLoss = 0;
         
         // Usar el valor absoluto del profit negativo
         if (metricsData.profit < 0) {
             totalLoss = Math.abs(metricsData.profit);
+        }
+        
+        // Si no hay profit negativo, intentar buscarlo en dailyGrowth
+        else if (Array.isArray(metricsData.dailyGrowth) && metricsData.dailyGrowth.length > 0) {
+            totalLoss = metricsData.dailyGrowth.reduce((total, day) => {
+                if (day.profit < 0) {
+                    return total + Math.abs(day.profit);
+                }
+                return total;
+            }, 0);
         }
         
         // Usar el mismo valor para pérdida diaria y pérdida máxima
@@ -77,12 +82,11 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
         // Para maxRelativeProfit, usamos profit del SDK (solo si es positivo)
         const maxRelativeProfit = metricsData.profit > 0 ? metricsData.profit : 0;
 
-        // Obtener configuración del desafío (usar los nombres de propiedades correctos)
-        // Mapear los nombres para soportar tanto los que vienen de historial como de metrix2
+        // Mapear los nombres de propiedades de challengeConfig
         const minimumTradingDays = challengeConfig.minimumTradingDays || 0;
-        const maximumDailyLossPercent = challengeConfig.maximumDailyLossPercent || challengeConfig.maximumDailyLoss || 5;
-        const maxDrawdownPercent = challengeConfig.maxDrawdownPercent || challengeConfig.maximumTotalLoss || 10;
-        const profitTargetPercent = challengeConfig.profitTargetPercent || challengeConfig.profitTarget || 8;
+        const maximumDailyLossPercent = challengeConfig.maximumDailyLoss || 5;
+        const maxDrawdownPercent = challengeConfig.maximumTotalLoss || 10;
+        const profitTargetPercent = challengeConfig.profitTarget || 8;
 
         // Calcular los valores absolutos para los objetivos
         const maxDailyLossAmount = (balance * maximumDailyLossPercent) / 100;
@@ -144,31 +148,13 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
         }
 
         setObjetivos(newObjetivos);
-    }, [challengeConfig, metricsData, balance, currentPhase]);
+    }, [challengeConfig, metricsData, balance]);
 
     const toggleExpand = (index) => {
         setExpandedIndex(expandedIndex === index ? null : index);
     };
 
-    // Si no hay datos de configuración o métricas, mostrar un mensaje de carga
-    if (!challengeConfig || !metricsData) {
-        return (
-            <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-6 text-center">
-                <p>Cargando objetivos...</p>
-            </div>
-        );
-    }
-
-    // Si no hay objetivos calculados, mostrar un mensaje
-    if (!objetivos.length) {
-        return (
-            <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-6 text-center">
-                <p>No hay datos de objetivos disponibles.</p>
-            </div>
-        );
-    }
-
-    // En historial, usamos grid para la vista básica
+    // Versión simplificada que se ajusta a la imagen de referencia
     return (
         <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
             <div className="grid grid-cols-3 text-left">
