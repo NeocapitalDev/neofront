@@ -31,13 +31,13 @@ import { useStrapiData } from "@/services/strapiServiceJWT";
 const determineCorrectStage = (currentPhase, stages) => {
   // Convertir currentPhase a número
   const phaseNum = parseInt(currentPhase, 10);
-  
+
   // Validación de datos de entrada
   if (isNaN(phaseNum)) {
     console.error('La fase actual no es un número válido:', currentPhase);
     return null;
   }
-  
+
   // Verificación más robusta de stages
   if (!stages || !Array.isArray(stages) || stages.length === 0) {
     console.warn('No hay stages disponibles o el formato es incorrecto');
@@ -88,7 +88,7 @@ const determineCorrectStage = (currentPhase, stages) => {
 
   const selectedStage = stages[stageIndex];
   console.log(`Stage seleccionado con índice ${stageIndex}:`, selectedStage);
-  
+
   // Verificación de la estructura del stage
   if (!selectedStage) {
     console.error(`No se pudo seleccionar un stage válido en el índice ${stageIndex}`);
@@ -115,6 +115,7 @@ const determineCorrectStage = (currentPhase, stages) => {
  */
 const fetchStageConfiguration = async (documentId, jwt) => {
   try {
+    console.log("Obteniendo configuración del stage para el challenge:", documentId);
     // 1. Primero obtenemos las relaciones para identificar los stages asociados
     const relationUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations?filters[challenges][documentId][$eq]=${documentId}&populate=challenge_stages`;
     console.log("URL Strapi (ChallengeRelation):", relationUrl);
@@ -132,39 +133,39 @@ const fetchStageConfiguration = async (documentId, jwt) => {
 
     const relationJson = await relationRes.json();
     const relation = relationJson?.data?.[0];
-    
+
     if (!relation || !relation.challenge_stages || relation.challenge_stages.length === 0) {
       console.error("No se encontraron stages asociados al challenge");
       return null;
     }
-    
+
     // 2. Obtenemos el stage actual (tomamos el primero por ahora)
     const currentStage = relation.challenge_stages[0];
     const stageDocumentId = currentStage.documentId;
-    
+
     // 3. Ahora obtenemos los parámetros desde ChallengeStage
     const stageUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-stages?filters[documentId][$eq]=${stageDocumentId}`;
     console.log("URL Strapi (ChallengeStage):", stageUrl);
-    
+
     const stageRes = await fetch(stageUrl, {
       headers: {
         Authorization: `Bearer ${jwt || process.env.NEXT_PUBLIC_API_TOKEN}`,
         "Content-Type": "application/json",
       },
     });
-    
+
     if (!stageRes.ok) {
       throw new Error(`Error fetching from Strapi: ${stageRes.status}`);
     }
-    
+
     const stageJson = await stageRes.json();
     const stage = stageJson?.data?.[0];
-    
+
     if (!stage) {
       console.error("No se encontró el stage con los parámetros");
       return null;
     }
-    
+
     // Extraer los parámetros importantes
     return {
       name: stage.name || "Stage",
@@ -202,25 +203,25 @@ const convertMetaStatsToMetadata = (metricsData, brokerAccount, initialBalance) 
     balance: metricsData.balance || baseBalance,
     equity: metricsData.equity || baseBalance,
     profit: metricsData.profit || 0,
-    
+
     // Métricas de trading
     wonTrades: metricsData.wonTrades || 0,
     lostTrades: metricsData.lostTrades || 0,
     wonTradesPercent: metricsData.wonTradesPercent || 0,
     lostTradesPercent: metricsData.lostTradesPercent || 0,
-    
+
     // Métricas de profit/loss
     averageWin: metricsData.averageWin || 0,
     averageLoss: metricsData.averageLoss || 0,
     averageWinPips: metricsData.averageWinPips || 0,
     averageLossPips: metricsData.averageLossPips || 0,
-    
+
     // Métricas de mejor/peor trade
     bestTrade: metricsData.bestTrade || 0,
     worstTrade: metricsData.worstTrade || 0,
     bestTradePips: metricsData.bestTradePips || 0,
     worstTradePips: metricsData.worstTradePips || 0,
-    
+
     // Métricas de dirección (long/short)
     longTrades: metricsData.longTrades || 0,
     shortTrades: metricsData.shortTrades || 0,
@@ -228,7 +229,7 @@ const convertMetaStatsToMetadata = (metricsData, brokerAccount, initialBalance) 
     shortWonTrades: metricsData.shortWonTrades || 0,
     longWonTradesPercent: metricsData.longWonTradesPercent || 0,
     shortWonTradesPercent: metricsData.shortWonTradesPercent || 0,
-    
+
     // Métricas de drawdown
     maxDrawdown: metricsData.maxDrawdown || 0,
     maxDrawdownPercent: metricsData.maxDrawdownPercent || 0,
@@ -236,30 +237,30 @@ const convertMetaStatsToMetadata = (metricsData, brokerAccount, initialBalance) 
     maxBalanceDrawdownPercent: metricsData.maxBalanceDrawdownPercent || metricsData.maxDrawdownPercent || 0,
     maxEquityDrawdown: metricsData.maxEquityDrawdown || metricsData.maxDrawdown || 0,
     maxEquityDrawdownPercent: metricsData.maxEquityDrawdownPercent || metricsData.maxDrawdownPercent || 0,
-    
+
     // Métricas de rendimiento
     profitFactor: metricsData.profitFactor || 0,
     expectancy: metricsData.expectancy || 0,
     expectancyPips: metricsData.expectancyPips || 0,
-    
+
     // Métricas de tiempo
     daysSinceTradingStarted: metricsData.daysSinceTradingStarted || 0,
     averageTradeLengthInMilliseconds: metricsData.averageTradeLengthInMilliseconds || 0,
-    
+
     // Métricas de volumen
     pips: metricsData.pips || 0,
     lots: metricsData.lots || 0,
-    
+
     // Datos de cuenta
     broker_account: brokerAccount || {},
     initialBalance: baseBalance,
     deposits: metricsData.deposits || baseBalance,
-    
+
     // Datos de gráficos
     dailyGrowth: metricsData.dailyGrowth || [],
     balanceChart: metricsData.balanceChart || [],
     equityChart: metricsData.equityChart || [],
-    
+
     // Resumen por instrumentos - manejar tanto currencySummary como currencies
     currencySummary: handleCurrencySummary(metricsData)
   };
@@ -279,7 +280,7 @@ function handleCurrencySummary(metricsData) {
   } else if (metricsData.currencies && Array.isArray(metricsData.currencies)) {
     return metricsData.currencies.map(formatCurrencyData);
   }
-  
+
   return [];
 }
 
@@ -321,14 +322,14 @@ const AdminChallengeDetail = () => {
   const [currentStage, setCurrentStage] = useState(null);
   const [debugMode, setDebugMode] = useState(false);
   const [initialBalance, setInitialBalance] = useState(null);
-  
+
   // Estados para manejo de datos del SDK
   const [metricsData, setMetricsData] = useState(null);
   const [metricsError, setMetricsError] = useState(null);
   const [isMetricsLoading, setIsMetricsLoading] = useState(false);
   const [useMetricsAPI, setUseMetricsAPI] = useState(false);
   const [equityChartData, setEquityChartData] = useState(null);
-  
+
   // Estados para objetivos
   const [challengeConfig, setChallengeConfig] = useState(null);
   const [ddPercent, setDdPercent] = useState(10); // fallback
@@ -380,15 +381,15 @@ const AdminChallengeDetail = () => {
         const metadata = typeof challengeData.metadata === 'string'
           ? JSON.parse(challengeData.metadata)
           : challengeData.metadata;
-
+        console.log('Metadata ', metadata);
         console.log('Metadata parseada correctamente');
         console.log('Estructura de la metadata:', {
           tieneMetaId: !!metadata.metaId,
           tieneMetrics: !!metadata.metrics,
           tieneEquityChart: !!metadata.equityChart,
           tieneBrokerAccount: !!metadata.broker_account,
-          tieneChallengeStages: Array.isArray(metadata.challenges_stages),
-          cantidadDeStages: metadata.challenges_stages?.length
+          tieneChallengeStages: Array.isArray(metadata.challenge_stages),
+          cantidadDeStages: metadata.challenge_stages?.length
         });
 
         // Extraer el balance inicial del broker_account
@@ -414,6 +415,7 @@ const AdminChallengeDetail = () => {
 
         // Verificar si la metadata tiene las propiedades necesarias
         if (metadata && (metadata.metrics || metadata.trades)) {
+          console.log('La metadata contiene datos válidos:');
           // Dar prioridad a metrics si existe, sino usar toda la metadata
           const statsToUse = { ...metadata.metrics || metadata };
 
@@ -440,6 +442,18 @@ const AdminChallengeDetail = () => {
           }
 
           // Establecer el stage seleccionado
+          const profitTarget = selectedStage.profitTarget || 10;
+          const maxLoss = selectedStage.maximumTotalLoss || 10;
+          const maxDailyLoss = selectedStage.maximumDailyLoss || 5;
+          const minTradingDays = selectedStage.minimumTradingDays || 0;
+          setDdPercent(maxLoss);
+          setProfitTargetPercent(profitTarget);
+          setChallengeConfig({
+            minimumTradingDays: minTradingDays,
+            maximumDailyLossPercent: maxDailyLoss,
+            maxDrawdownPercent: maxLoss,
+            profitTargetPercent: profitTarget
+          });
           setCurrentStage(selectedStage);
 
           // Establecer las estadísticas
@@ -483,29 +497,29 @@ const AdminChallengeDetail = () => {
         });
         return;
       }
-      
+
       console.log("Iniciando la obtención de datos desde MetaStats...");
 
       setIsMetricsLoading(true);
-      
+
       try {
         // 1. Obtener el metaId del broker_account
         const accountId = challengeData.broker_account.idMeta;
         console.log("accountId para MetaStats:", accountId);
-        
+
         // 2. Crear instancia del SDK
         const metaStats = new MetaStats(process.env.NEXT_PUBLIC_TOKEN_META_API);
-        
+
         // 3. Obtener las métricas
         const metrics = await metaStats.getMetrics(accountId);
         console.log("Métricas obtenidas de MetaStats:", metrics);
         setMetricsData(metrics);
-        
+
         // 4. Obtener el equity chart (opcional)
         try {
           const url = `https://risk-management-api-v1.new-york.agiliumtrade.ai/users/current/accounts/${accountId}/equity-chart?realTime=false`;
           console.log("URL para equity-chart:", url);
-          
+
           const response = await fetch(url, {
             method: "GET",
             headers: {
@@ -513,7 +527,7 @@ const AdminChallengeDetail = () => {
               "auth-token": process.env.NEXT_PUBLIC_TOKEN_META_API,
             },
           });
-          
+
           if (response.ok) {
             const equityData = await response.json();
             console.log("Datos de equity-chart obtenidos:", equityData);
@@ -522,24 +536,26 @@ const AdminChallengeDetail = () => {
         } catch (equityError) {
           console.error("Error obteniendo equity chart:", equityError);
         }
-        
+
         // 5. Obtener stage desde ChallengeRelation/ChallengeStage
+        console.log("Obteniendo configuración de stage desde Strapi...");
+        console.log("document", documentId);
         const stageConfig = await fetchStageConfiguration(documentId, session?.jwt);
         if (stageConfig) {
           console.log("Configuración de stage obtenida:", stageConfig);
           setCurrentStage(stageConfig);
-          
+
           // Extraer valores para los objetivos
           if (stageConfig.targets) {
             const profitTarget = stageConfig.targets.profit_target || 10;
             const maxLoss = stageConfig.targets.max_loss || 10;
             const maxDailyLoss = stageConfig.targets.max_daily_loss || 5;
             const minTradingDays = stageConfig.targets.minimum_trading_days || 0;
-            
+
             // Guardar valores para objetivos
             setDdPercent(maxLoss);
             setProfitTargetPercent(profitTarget);
-            
+
             // Configuración para el componente Objetivos
             setChallengeConfig({
               minimumTradingDays: minTradingDays,
@@ -549,27 +565,27 @@ const AdminChallengeDetail = () => {
             });
           }
         }
-        
+
         // 6. Convertir los datos al formato de metadata
         const balanceInicial = challengeData.broker_account.balance;
         setInitialBalance(balanceInicial);
-        
+
         // Calcular valores absolutos para objetivos
         if (balanceInicial) {
           const ddAbsolute = balanceInicial - (ddPercent / 100) * balanceInicial;
           setMaxDrawdownAbsolute(ddAbsolute);
-          
+
           const ptAbsolute = balanceInicial + (profitTargetPercent / 100) * balanceInicial;
           setProfitTargetAbsolute(ptAbsolute);
         }
-        
+
         // 7. Convertir y establecer los datos
         const convertedData = convertMetaStatsToMetadata(
-          metrics, 
+          metrics,
           challengeData.broker_account,
           balanceInicial
         );
-        
+
         if (equityChartData) {
           convertedData.equityChart = equityChartData;
         }
@@ -582,29 +598,29 @@ const AdminChallengeDetail = () => {
             const totalLost = Math.abs(convertedData.lostTrades * convertedData.averageLoss);
             convertedData.profitFactor = totalLost > 0 ? totalWon / totalLost : 0;
           }
-          
+
           // Asegurarse de que los campos maxDrawdown sean consistentes
           if (!convertedData.maxDrawdown && convertedData.maxBalanceDrawdown) {
             convertedData.maxDrawdown = convertedData.maxBalanceDrawdown;
           }
-          
+
           // Calcular expectancy si no está disponible
           if (!convertedData.expectancy) {
             const winRate = convertedData.wonTradesPercent / 100;
             const lossRate = convertedData.lostTradesPercent / 100;
             convertedData.expectancy = (winRate * convertedData.averageWin) + (lossRate * convertedData.averageLoss);
           }
-          
+
           console.log("Campos adicionales calculados para convertedData:", {
             profitFactor: convertedData.profitFactor,
             expectancy: convertedData.expectancy,
             maxDrawdown: convertedData.maxDrawdown
           });
         }
-        
+
         console.log("Datos convertidos al formato de metadata:", convertedData);
         setMetadataStats(convertedData);
-        
+
       } catch (error) {
         console.error("Error obteniendo datos de MetaStats:", error);
         setMetricsError(error);
@@ -645,7 +661,7 @@ const AdminChallengeDetail = () => {
       </DashboardLayout>
     );
   }
-  
+
   // Comprobar si tenemos token de MetaStats API
   useEffect(() => {
     if (useMetricsAPI) {
@@ -662,10 +678,14 @@ const AdminChallengeDetail = () => {
   if (isLoading || isMetricsLoading) {
     return (
       <DashboardLayout>
-        <Loader />
-        {isMetricsLoading && (
-          <div className="mt-4 text-center text-gray-500">Obteniendo métricas desde MetaStats...</div>
-        )}
+        <div className="grid place-items-center h-[100%]">
+          <div>
+            <Loader />
+            {isMetricsLoading && (
+              <div className="mt-4 text-center text-gray-500">Obteniendo métricas...</div>
+            )}
+          </div>
+        </div>
       </DashboardLayout>
     );
   }
@@ -771,7 +791,7 @@ const AdminChallengeDetail = () => {
               No hay datos estadísticos disponibles para este challenge.
             </p>
             <p className="mt-2 text-gray-700 dark:text-gray-300">
-              Se ha intentado obtener datos de MetaStats pero no ha sido posible. Puede que el challenge no tenga un idMeta válido 
+              Se ha intentado obtener datos de MetaStats pero no ha sido posible. Puede que el challenge no tenga un idMeta válido
               o que no haya datos disponibles en el servicio.
             </p>
             {challengeData?.broker_account?.idMeta && (
@@ -779,7 +799,7 @@ const AdminChallengeDetail = () => {
                 <p className="font-semibold">Información de depuración:</p>
                 <p>ID Meta disponible: {challengeData.broker_account.idMeta}</p>
                 <p>Token API: {process.env.NEXT_PUBLIC_TOKEN_META_API ? "Configurado ✓" : "No configurado ⚠️"}</p>
-                <button 
+                <button
                   onClick={() => {
                     setUseMetricsAPI(true);
                     setTimeout(() => mutate(), 500);
@@ -836,7 +856,7 @@ const AdminChallengeDetail = () => {
           </Link>
         </div>
       </div>
-      
+
       {useMetricsAPI && (
         <div className="mb-4 p-3 bg-blue-100 dark:bg-blue-900 rounded">
           <p className="text-blue-800 dark:text-blue-200 text-sm">
@@ -844,7 +864,7 @@ const AdminChallengeDetail = () => {
           </p>
         </div>
       )}
-      
+
       <h1 className="flex p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
         <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
         Historial de Cuenta {challengeData?.broker_account?.login || "Sin nombre"}
@@ -890,7 +910,7 @@ const AdminChallengeDetail = () => {
 
       {/* Objetivos */}
       <div className="mt-6">
-        <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
+        <h2 className="text-lg font-semibold pb-4">Objetivos</h2>
         {challengeConfig ? (
           <Objetivos
             // Pasar la configuración del desafío
@@ -1005,7 +1025,7 @@ const AdminChallengeDetail = () => {
             <pre className="bg-gray-800 text-yellow-400 p-4 rounded-lg overflow-auto text-sm mt-2">
               {useMetricsAPI ? "MetaStats API" : "Metadata del Challenge"}
             </pre>
-            
+
             <h3 className="text-md font-semibold mb-2 mt-4">Configuración de Objetivos</h3>
             <pre className="bg-gray-800 text-yellow-400 p-4 rounded-lg overflow-auto text-sm mt-2">
               {JSON.stringify({

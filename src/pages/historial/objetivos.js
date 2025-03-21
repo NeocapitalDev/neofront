@@ -32,10 +32,10 @@ const formatDays = (days, minimumDays) => {
 // Utility function to format profit/loss
 const formatProfit = (initialBalance, currentProfit, profitTarget) => {
     const profit = Math.max(0, currentProfit);
-    
+
     // Calcular el porcentaje con respecto al objetivo, no al balance inicial
     const percentage = profit === 0 ? 0 : (profit / profitTarget) * 100;
-    
+
     return {
         displayProfit: profit.toFixed(2),
         displayPercentage: percentage.toFixed(2),
@@ -59,12 +59,12 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
         // CORRECCIÓN: Para calcular pérdidas, usar directamente el valor absoluto del profit negativo
         // Esto asegura que tanto la pérdida diaria como la pérdida máxima usen el mismo valor
         let totalLoss = 0;
-        
+
         // Usar el valor absoluto del profit negativo
         if (metricsData.profit < 0) {
             totalLoss = Math.abs(metricsData.profit);
         }
-        
+
         // Si no hay profit negativo, intentar buscarlo en dailyGrowth
         else if (Array.isArray(metricsData.dailyGrowth) && metricsData.dailyGrowth.length > 0) {
             totalLoss = metricsData.dailyGrowth.reduce((total, day) => {
@@ -74,7 +74,7 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
                 return total;
             }, 0);
         }
-        
+
         // Usar el mismo valor para pérdida diaria y pérdida máxima
         const maxDailyDrawdown = totalLoss;
         const maxAbsoluteDrawdown = totalLoss;
@@ -162,10 +162,10 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
                 <div className="p-5 font-semibold">Resultados</div>
                 <div className="p-5 font-semibold">Estado</div>
             </div>
-            
+
             {objetivos.map((obj, index) => (
-                <div 
-                    key={index} 
+                <div
+                    key={index}
                     className="grid grid-cols-3 text-left border-t border-gray-500 dark:border-zinc-700"
                 >
                     <div className="p-5 text-amber-400">{obj.nombre}</div>
