@@ -27,10 +27,6 @@ function IndexPage() {
   }
 
   const processedData = data?.data || [];
-
-  console.log(processedData);
-
-  // const { data, error, isLoading } = useStrapiData("challenge-relations?populate=*");
   const router = useRouter();
 
   // Función para manejar el clic en "Ver Visualizador"
@@ -41,24 +37,36 @@ function IndexPage() {
 
   return (
     <DashboardLayout>
-      <section className="w-full mx-auto h-full p-4 text-white">
+      <div className="p-6 text-white rounded-lg shadow-lg">
+        <h1 className="text-4xl font-bold mb-6">Parámetros</h1>
+
         {/* Botón "Ver Visualizador" en la parte superior */}
         <div className="flex justify-end mb-4">
           <button
             onClick={handleViewVisualizer}
-            className="bg-amber-400 hover:bg-amber-500 px-3 py-2 rounded text-black"
+            className="bg-amber-400 hover:bg-amber-500 px-4 py-2 rounded text-black font-semibold transition-colors"
           >
             Ver Visualizador
           </button>
         </div>
 
-        {/* Contenido principal */}
-        <div className="flex flex-col gap-4">
-          {isLoading && <div>Loading...</div>}
-          {error && <div>Error: {error.message}</div>}
-          {data && <DataTable data={processedData} columns={Columns(actualizarDatos)} />}
+        {/* Tabla de datos */}
+        <div className="bg-zinc-900 p-4 rounded-lg border border-zinc-700 mt-4">
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-400 mx-auto"></div>
+              <p className="mt-4 text-zinc-400">Cargando datos...</p>
+            </div>
+          ) : error ? (
+            <div className="bg-red-900/30 text-red-400 p-4 rounded border border-red-800">
+              <p className="font-medium">Error al cargar los datos:</p>
+              <p>{error.message}</p>
+            </div>
+          ) : (
+            <DataTable data={processedData} columns={Columns(actualizarDatos)} />
+          )}
         </div>
-      </section>
+      </div>
     </DashboardLayout>
   );
 }

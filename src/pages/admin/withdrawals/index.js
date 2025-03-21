@@ -190,45 +190,53 @@ export default function WithdrawsTable() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 rounded-lg shadow-lg">
+      <div className="p-6 text-white rounded-lg shadow-lg">
+        <h1 className="text-4xl font-bold mb-6">Withdraws</h1>
+
         {/* Barra de búsqueda y filtros */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-2">
-          {/* Filtro por estado */}
-          <select
-            value={estadoFilter}
-            onChange={(e) => setEstadoFilter(e.target.value)}
-            className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
-          >
-            <option value="">Todos los estados</option>
-            <option value="proceso">En Proceso</option>
-            <option value="pagado">Pagado</option>
-            <option value="rechazado">Rechazado</option>
-          </select>
+        <div className="mb-4 ">
+          <label className="mr-4 space-x-2">
+            <strong>Estado:</strong>{" "}
+            <select
+              value={estadoFilter}
+              onChange={(e) => setEstadoFilter(e.target.value)}
+              className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
+            >
+              <option value="">Todos los estados</option>
+              <option value="proceso">En Proceso</option>
+              <option value="pagado">Pagado</option>
+              <option value="rechazado">Rechazado</option>
+            </select>
+          </label>
 
-          {/* Filtro por fecha de inicio */}
-          <Input
-            type="date"
-            value={startDateFilter}
-            onChange={(e) => setStartDateFilter(e.target.value)}
-            className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
-          />
+          <label className="mr-4 space-x-2">
+            <strong>Fecha desde:</strong>{" "}
+            <input
+              type="date"
+              value={startDateFilter}
+              onChange={(e) => setStartDateFilter(e.target.value)}
+              className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
+            />
+          </label>
 
-          {/* Filtro por fecha de fin */}
-          <Input
-            type="date"
-            value={endDateFilter}
-            onChange={(e) => setEndDateFilter(e.target.value)}
-            className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
-          />
+          <label className="mr-4 space-x-2">
+            <strong>Fecha hasta:</strong>{" "}
+            <input
+              type="date"
+              value={endDateFilter}
+              onChange={(e) => setEndDateFilter(e.target.value)}
+              className="h-9 px-3 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
+            />
+          </label>
         </div>
 
         {/* Tabla */}
-        <div className="border border-zinc-300 dark:border-zinc-700 rounded-md overflow-hidden mt-4">
+        <div className="bg-zinc-900 p-4 rounded-lg border border-zinc-700 mt-4">
           <Table>
-            <TableHeader className="bg-zinc-200 dark:bg-zinc-800">
+            <TableHeader className="bg-zinc-800 text-zinc-300 p-2">
               <TableRow>
                 {withdrawColumns.map((column) => (
-                  <TableHead key={column.accessorKey} className="text-zinc-900 dark:text-zinc-200 border-b border-zinc-300 dark:border-zinc-700">
+                  <TableHead key={column.accessorKey} className="text-zinc-300 border-b border-zinc-700">
                     {column.header}
                   </TableHead>
                 ))}
@@ -249,13 +257,13 @@ export default function WithdrawsTable() {
                 </TableRow>
               ) : filteredData.length > 0 ? (
                 filteredData.map((item, index) => (
-                  <TableRow key={index} className="border-b border-zinc-300 dark:border-zinc-700">
+                  <TableRow key={index} className="border-b border-zinc-700">
                     <TableCell>{item.id}</TableCell>
                     <TableCell>{item.documentId}</TableCell>
                     <TableCell>{item.wallet}</TableCell>
                     <TableCell>{item.amount}</TableCell>
                     <TableCell>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${item.estado === "completado"
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${item.estado === "pagado"
                         ? "bg-green-100 text-green-800"
                         : item.estado === "rechazado"
                           ? "bg-red-100 text-red-800"

@@ -144,7 +144,9 @@ export default function BrokerAccountsTable() {
 
     return (
         <DashboardLayout>
-            <div className="p-4 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 rounded-lg shadow-lg">
+            <div className="p-6 text-white rounded-lg shadow-lg">
+                <h1 className="text-4xl font-bold mb-6">Creador de Broker Accounts</h1>
+
                 {/* Contadores de cuentas */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
                     {accountTypes.map(({ amount, label, color }) => (
@@ -157,7 +159,7 @@ export default function BrokerAccountsTable() {
 
                 {/* Panel de selección de cuenta */}
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                    <div className="md:col-span-2 p-4 bg-white dark:bg-zinc-800 rounded-md shadow-md">
+                    <div className="md:col-span-2 p-4 bg-zinc-800 rounded-md shadow-md">
                         <p className="text-lg font-semibold mb-4">Selecciona el tipo de cuenta</p>
                         <div className="grid grid-cols-2 gap-4">
                             {accountTypes.map(({ amount, label, color }) => (
@@ -174,98 +176,103 @@ export default function BrokerAccountsTable() {
                             ))}
                         </div>
 
-{/* Formulario */}
-<div className="mt-6 rounded-md shadow-md p-4 bg-white dark:bg-zinc-800">
-    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
-        Agregar cuenta - {selectedAccountType}
-    </h2>
-    
-    <Input
-        name="login"
-        placeholder="Ingrese el login..."
-        value={formData.login}
-        onChange={handleInputChange}
-        className="mt-4 border bg-zinc-700 text-white p-2 rounded-md"
-    />
-    
-    <Input
-        name="balance"
-        type="number"
-        placeholder="Ingrese el balance..."
-        value={formData.balance}
-        onChange={handleInputChange}
-        className="mt-4 border bg-zinc-700 text-white p-2 rounded-md"
-    />
-    
-    <select
-        name="platform"
-        value={formData.platform}
-        onChange={handleInputChange}
-        className="mt-4 border bg-zinc-700 text-white p-2 rounded-md"
-    >
-        <option value="mt4">MT4</option>
-        <option value="mt5">MT5</option>
-    </select>
-    
-    <Input
-        name="password"
-        type="password"
-        placeholder="Ingrese la contraseña..."
-        value={formData.password}
-        onChange={handleInputChange}
-        className="mt-2 border bg-zinc-700 text-white p-2 rounded-md"
-    />
-        
-    <Input
-        name="inversorPass"
-        placeholder="Ingrese el inversorPass..."
-        value={formData.inversorPass}
-        onChange={handleInputChange}
-        className="mt-2 border bg-zinc-700 text-white p-2 rounded-md"
-    />
-    
-    <Input
-        name="server"
-        placeholder="Ingrese el servidor..."
-        value={formData.server}
-        onChange={handleInputChange}
-        className="mt-2 border bg-zinc-700 text-white p-2 rounded-md"
-    />
+                        {/* Formulario */}
+                        <div className="mt-6 rounded-md shadow-md p-4 bg-zinc-800">
+                            <h2 className="text-lg font-semibold text-gray-200">
+                                Agregar cuenta - {selectedAccountType}
+                            </h2>
 
+                            <Input
+                                name="login"
+                                placeholder="Ingrese el login..."
+                                value={formData.login}
+                                onChange={handleInputChange}
+                                className="mt-4 h-9 px-3 text-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
+                            />
 
-    
-    <Button className="mt-4 w-full" onClick={saveBrokerAccount}>
-        Guardar Cuenta
-    </Button>
-</div>
+                            <Input
+                                name="balance"
+                                type="number"
+                                placeholder="Ingrese el balance..."
+                                value={formData.balance}
+                                onChange={handleInputChange}
+                                className="mt-4 h-9 px-3 text-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
+                            />
 
+                            <select
+                                name="platform"
+                                value={formData.platform}
+                                onChange={handleInputChange}
+                                className="mt-4 h-9 px-3 text-sm w-full bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
+                            >
+                                <option value="mt4">MT4</option>
+                                <option value="mt5">MT5</option>
+                            </select>
+
+                            <Input
+                                name="password"
+                                type="password"
+                                placeholder="Ingrese la contraseña..."
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                className="mt-4 h-9 px-3 text-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
+                            />
+
+                            <Input
+                                name="inversorPass"
+                                placeholder="Ingrese el inversorPass..."
+                                value={formData.inversorPass}
+                                onChange={handleInputChange}
+                                className="mt-4 h-9 px-3 text-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
+                            />
+
+                            <Input
+                                name="server"
+                                placeholder="Ingrese el servidor..."
+                                value={formData.server}
+                                onChange={handleInputChange}
+                                className="mt-4 h-9 px-3 text-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 rounded-md"
+                            />
+
+                            <Button className="mt-4 w-full" onClick={saveBrokerAccount}>
+                                Guardar Cuenta
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Tabla de cuentas */}
-                    <div className="md:col-span-3 border-zinc-300 border-2 dark:border-zinc-700 rounded-md overflow-hidden h-[70vh] overflow-y-auto">
+                    <div className="md:col-span-3 bg-zinc-900 p-4 rounded-lg border border-zinc-700 mt-0 md:mt-0 h-[70vh] overflow-y-auto">
                         <Table>
-                            <TableHeader className="bg-zinc-200 dark:bg-zinc-800">
+                            <TableHeader className="bg-zinc-800 text-zinc-300 p-2">
                                 <TableRow>
                                     {brokerAccountColumns.map((column) => (
-                                        <TableHead key={column.accessorKey}>{column.header}</TableHead>
+                                        <TableHead key={column.accessorKey} className="text-zinc-300 border-b border-zinc-700">
+                                            {column.header}
+                                        </TableHead>
                                     ))}
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {data?.data?.map((account) => (
-                                    <TableRow key={account.id}>
-                                        {brokerAccountColumns.map((col) => (
-                                            <TableCell key={col.accessorKey}>
-                                                {col.accessorKey === "used"
-                                                    ? account[col.accessorKey] === false ? "No" : "Sí"
-                                                    : account[col.accessorKey] ?? account.attributes?.[col.accessorKey] ?? "N/A"}
-                                            </TableCell>
-                                        ))}
+                                {!data?.data || data.data.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={brokerAccountColumns.length} className="text-center text-zinc-500 py-6">
+                                            No se encontraron resultados.
+                                        </TableCell>
                                     </TableRow>
-                                ))}
+                                ) : (
+                                    data.data.map((account) => (
+                                        <TableRow key={account.id} className="border-b border-zinc-700">
+                                            {brokerAccountColumns.map((col) => (
+                                                <TableCell key={col.accessorKey}>
+                                                    {col.accessorKey === "used"
+                                                        ? account[col.accessorKey] === false ? "No" : "Sí"
+                                                        : account[col.accessorKey] ?? account.attributes?.[col.accessorKey] ?? "N/A"}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))
+                                )}
                             </TableBody>
-
-
                         </Table>
                     </div>
                 </div>

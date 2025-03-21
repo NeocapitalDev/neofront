@@ -18,7 +18,7 @@ const PayoutsPage = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [page, setPage] = useState(1);
-  
+
   // Parámetros para la consulta a WooCommerce
   const params = {
     per_page: 10,
@@ -65,7 +65,7 @@ const PayoutsPage = () => {
         <h1 className="text-4xl font-bold mb-6">Movements</h1>
         {/* Filtros */}
         <div className="mb-4">
-          <label className="mr-4">
+          <label className="mr-4 space-x-2">
             <strong>Estado:</strong>{" "}
             <select
               //className="bg-slate-600"
@@ -82,7 +82,7 @@ const PayoutsPage = () => {
               <option value="completed">Completado</option>
             </select>
           </label>
-          <label className="mr-4">
+          <label className="mr-4 space-x-2">
             <strong>Fecha desde:</strong>{" "}
             <input
               //className="bg-slate-600"
@@ -95,7 +95,7 @@ const PayoutsPage = () => {
               }}
             />
           </label>
-          <label className="mr-4">
+          <label className="mr-4 space-x-2">
             <strong>Fecha hasta:</strong>{" "}
             <input
               //className="bg-slate-600"

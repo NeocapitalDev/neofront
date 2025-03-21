@@ -45,6 +45,7 @@ export default function UserProfile() {
             : null,
         ([url, token]) => fetcher(url, token)
     );
+    console.log("ID de Usuario:", id); // Depuración
 
     console.log("Datos en UserProfile:", data); // Depuración
 
@@ -152,33 +153,33 @@ export default function UserProfile() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-    {filteredChallenges.map((challenge) => {
-        console.log("Challenge ID:", challenge.id);
-        console.log("Broker Account:", challenge.broker_account);
+                            {filteredChallenges.map((challenge) => {
+                                console.log("Challenge ID:", challenge.id);
+                                console.log("Broker Account:", challenge.broker_account);
 
-        // Verificamos si `broker_account` existe antes de acceder a sus atributos
-        const broker = challenge.broker_account
-            ? {
-                login: challenge.broker_account.login || "N/A",
-                server: challenge.broker_account.server || "N/A",
-                platform: challenge.broker_account.platform || "N/A",
-                balance: challenge.broker_account.balance || "N/A",
-            }
-            : { login: "N/A", server: "N/A", platform: "N/A", balance: "N/A" };
+                                // Verificamos si `broker_account` existe antes de acceder a sus atributos
+                                const broker = challenge.broker_account
+                                    ? {
+                                        login: challenge.broker_account.login || "N/A",
+                                        server: challenge.broker_account.server || "N/A",
+                                        platform: challenge.broker_account.platform || "N/A",
+                                        balance: challenge.broker_account.balance || "N/A",
+                                    }
+                                    : { login: "N/A", server: "N/A", platform: "N/A", balance: "N/A" };
 
-        return (
-            <TableRow key={challenge.id}>
-                <TableCell>{challenge.id}</TableCell>
-                <TableCell>{broker.login}</TableCell>
-                <TableCell>{broker.server}</TableCell>
-                <TableCell>{broker.platform}</TableCell>
-                <TableCell>{translateResult(challenge.result)}</TableCell>
-                <TableCell>{challenge.phase}</TableCell>
-                <TableCell>{broker.balance}</TableCell>
-            </TableRow>
-        );
-    })}
-</TableBody>
+                                return (
+                                    <TableRow key={challenge.id}>
+                                        <TableCell>{challenge.id}</TableCell>
+                                        <TableCell>{broker.login}</TableCell>
+                                        <TableCell>{broker.server}</TableCell>
+                                        <TableCell>{broker.platform}</TableCell>
+                                        <TableCell>{translateResult(challenge.result)}</TableCell>
+                                        <TableCell>{challenge.phase}</TableCell>
+                                        <TableCell>{broker.balance}</TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
 
                     </Table>
                 </div>
