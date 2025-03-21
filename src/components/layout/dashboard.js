@@ -1,3 +1,4 @@
+// src/components/layout/dashboard.js
 import Navbar from "../structure/navbar";
 import FooterInfo from "../structure/footer";
 import Sidebar from '../structure/sidebar';

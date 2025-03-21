@@ -1,7 +1,6 @@
-/* src/pages/start-challenge/index.js */
+// src/pages/start-challenge/index.js
 import { useStrapiData } from '../../services/strapiService';
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { CheckIcon, ChevronRightIcon, InformationCircleIcon, TicketIcon } from '@heroicons/react/20/solid';
 import classNames from 'classnames';
@@ -10,6 +9,8 @@ import useSWR from 'swr';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import Loader from '../../components/loaders/loader';
 import { useSession, signIn } from "next-auth/react";
+import Layout from '../../components/layout/dashboard';
+
 // Helper function to create a WooCommerce API instance
 const createWooCommerceApi = (url, consumerKey, consumerSecret, version = 'wc/v3') => {
   if (!url) throw new Error('URL no proporcionada para WooCommerce API');
@@ -79,18 +80,6 @@ const ChallengeRelations = () => {
   const [selectedRelation, setSelectedRelation] = useState(null);
   const [selectedStage, setSelectedStage] = useState(null); // New state for selected stage
   const [couponCode, setCouponCode] = useState('');
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [cancellationAccepted, setCancellationAccepted] = useState(false);
-
-  // Procesar los datos para obtener steps únicos y sus relaciones
-  {/*
-  const stepsData = relations
-    ? [...new Set(relations.map(relation => relation.challenge_step.name))].map(stepName => ({
-      step: stepName,
-      relations: relations.filter(relation => relation.challenge_step.name === stepName),
-    }))
-    : [];
-  */}
 
   const stepsData = relations
     ? [...new Set(relations.map(relation => relation.challenge_step.name))].map(stepName => {
@@ -176,14 +165,25 @@ const ChallengeRelations = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <Loader />
-      </div>
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader />
+        </div>
+      </Layout>
     );
   }
 
-  if (error) return <p className="text-red-500">Error: {error.message}</p>;
-  if (allproductserror) return <p className="text-red-500">Error: {allproductserror.message}</p>;
+  if (error) return (
+    <Layout>
+      <p className="text-red-500">Error: {error.message}</p>
+    </Layout>
+  );
+  
+  if (allproductserror) return (
+    <Layout>
+      <p className="text-red-500">Error: {allproductserror.message}</p>
+    </Layout>
+  );
 
   // Función para manejar el clic en un step
   const handleStepClick = (step) => {
@@ -264,7 +264,7 @@ const ChallengeRelations = () => {
   // Función para manejar el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (selectedProduct && termsAccepted && cancellationAccepted) {
+    if (selectedProduct) {
       console.log('Producto seleccionado:', selectedProduct);
       console.log('Variación seleccionada:', matchingVariation);
       console.log('Stage seleccionado:', selectedStage);
@@ -288,17 +288,10 @@ const ChallengeRelations = () => {
       return; // Detener la ejecución aquí
     }
 
-    if (selectedProduct && termsAccepted && cancellationAccepted) {
-      const woocommerceId = matchingVariation?.id || selectedProduct.woocommerceId; // Asegura que haya un ID por defecto si no existe
+    if (selectedProduct) {
+      const woocommerceId = matchingVariation?.id || selectedProduct.woocommerceId;
       window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${woocommerceId}&quantity=1&document_id=${selectedRelation.documentId}&user_id=${user.documentId}`;
     }
-  };
-
-  // Función para extraer el valor numérico del balance del producto (10k, 20k, etc.)
-  const extractBalance = (balanceStr) => {
-    if (!balanceStr) return 0;
-    const match = balanceStr.match(/(\d+)k/i);
-    return match ? parseInt(match[1], 10) : 0;
   };
 
   // Función modificada para obtener los challenge stages completos, no solo sus nombres
@@ -322,30 +315,22 @@ const ChallengeRelations = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Header */}
-      <header>
-        <section className="container mx-auto px-4 py-3 flex items-center">
-          <Link href="/">
-            <Image src="/images/logo-dark.png" alt="Neocapital logo" width={300} height={40} className="h-9 w-auto" />
-          </Link>
-        </section>
-        <section className="bg-zinc-900 border-b border-zinc-800">
-          <div className="container mx-auto px-4 py-4">
-            <h2 className="text-lg font-bold text-amber-400">Compra tu producto</h2>
-          </div>
-        </section>
-      </header>
+    <Layout>
+      {/* Título de la sección */}
+      <div className="bg-white p-4 rounded-lg shadow-md dark:bg-zinc-800 dark:border-zinc-700 dark:shadow-black dark:text-white mb-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-lg font-semibold">Compra tu producto</h1>
+        </div>
+      </div>
 
-      {/* Contenido principal */}
-      <form onSubmit={handleSubmit} className=' w-[90%] mx-auto'>
-        <div className="container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <form onSubmit={handleSubmit} className='w-full mx-auto'>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Columna izquierda - Configuración */}
           <div className="lg:col-span-2 space-y-6">
             {/* Steps Section */}
-            <section className="bg-zinc-900 rounded-lg p-5 shadow-md border border-zinc-800">
+            <section className="bg-white rounded-lg p-5 shadow-md border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
               <div className="flex items-center mb-3">
-                <h3 className="text-amber-400 font-medium">Steps</h3>
+                <h3 className="text-[var(--app-primary)] font-medium">Steps</h3>
                 <div className="relative ml-2 group">
                   <InformationCircleIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-300" />
                   <div className="absolute z-10 invisible group-hover:visible bg-zinc-800 text-xs text-zinc-200 p-2 rounded-md w-48 top-full left-0 mt-1">
@@ -353,7 +338,7 @@ const ChallengeRelations = () => {
                   </div>
                 </div>
               </div>
-              <p className="text-zinc-400 mb-4 text-sm">Selecciona el tipo de paso que deseas configurar.</p>
+              <p className="text-zinc-600 mb-4 text-sm dark:text-zinc-400">Selecciona el tipo de paso que deseas configurar.</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {stepsData.map((item, index) => (
@@ -371,18 +356,18 @@ const ChallengeRelations = () => {
                       className={classNames(
                         "block p-4 rounded-lg border cursor-pointer transition-all",
                         selectedStep === item.step
-                          ? "bg-zinc-800 border-amber-500 text-white"
-                          : "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+                          ? "bg-amber-500 border-amber-600 text-black font-semibold"
+                          : "bg-white border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
                       )}
                     >
                       <div className="product-info">
                         <span className="block font-medium">{item.step}</span>
-                        <span className="block text-xs mt-1 text-zinc-500">
+                        <span className={`block text-xs mt-1 ${selectedStep === item.step ? 'text-black/70' : 'text-zinc-500'}`}>
                           {item.relations.length} opciones
                         </span>
                       </div>
                       {selectedStep === item.step && (
-                        <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-amber-500" />
+                        <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-black" />
                       )}
                     </label>
                   </div>
@@ -392,9 +377,9 @@ const ChallengeRelations = () => {
 
             {/* Subcategorías Section */}
             {selectedStep && stepsData.length > 0 && (
-              <section className="bg-zinc-900 rounded-lg p-5 shadow-md border border-zinc-800">
+              <section className="bg-white rounded-lg p-5 shadow-md border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
                 <div className="flex items-center mb-3">
-                  <h3 className="text-amber-400 font-medium">Subcategorías</h3>
+                  <h3 className="text-[var(--app-primary)] font-medium">Subcategorías</h3>
                   <div className="relative ml-2 group">
                     <InformationCircleIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-300" />
                     <div className="absolute z-10 invisible group-hover:visible bg-zinc-800 text-xs text-zinc-200 p-2 rounded-md w-48 top-full left-0 mt-1">
@@ -402,7 +387,7 @@ const ChallengeRelations = () => {
                     </div>
                   </div>
                 </div>
-                <p className="text-zinc-400 mb-4 text-sm">
+                <p className="text-zinc-600 mb-4 text-sm dark:text-zinc-400">
                   Selecciona la subcategoría para el paso {selectedStep}.
                 </p>
 
@@ -424,13 +409,13 @@ const ChallengeRelations = () => {
                           className={classNames(
                             "block p-4 rounded-lg border cursor-pointer transition-all",
                             selectedRelationId === relation.id
-                              ? "bg-zinc-800 border-amber-500 text-white"
-                              : "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+                              ? "bg-amber-500 border-amber-600 text-black font-semibold"
+                              : "bg-white border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
                           )}
                         >
                           <span className="block font-medium">{relation.challenge_subcategory?.name}</span>
                           {selectedRelationId === relation.id && (
-                            <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-amber-500" />
+                            <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-black" />
                           )}
                         </label>
                       </div>
@@ -440,9 +425,9 @@ const ChallengeRelations = () => {
             )}
 
             {selectedRelationId && (
-              <section className="bg-zinc-900 rounded-lg p-5 shadow-md border border-zinc-800">
+              <section className="bg-white rounded-lg p-5 shadow-md border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
                 <div className="flex items-center mb-3">
-                  <h3 className="text-amber-400 font-medium">Productos</h3>
+                  <h3 className="text-[var(--app-primary)] font-medium">Productos</h3>
                   <div className="relative ml-2 group">
                     <InformationCircleIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-300" />
                     <div className="absolute z-10 invisible group-hover:visible bg-zinc-800 text-xs text-zinc-200 p-2 rounded-md w-48 top-full left-0 mt-1">
@@ -450,7 +435,7 @@ const ChallengeRelations = () => {
                     </div>
                   </div>
                 </div>
-                <p className="text-zinc-400 mb-4 text-sm">
+                <p className="text-zinc-600 mb-4 text-sm dark:text-zinc-400">
                   Elige el producto para{" "}
                   {stepsData
                     .find(item => item.step === selectedStep)
@@ -484,25 +469,25 @@ const ChallengeRelations = () => {
                               className={classNames(
                                 "block p-4 rounded-lg border cursor-pointer transition-all",
                                 selectedProduct && selectedProduct.name === product.name
-                                  ? "bg-zinc-800 border-amber-500 text-white"
+                                  ? "bg-amber-500 border-amber-600 text-black font-semibold"
                                   : isInRelation
-                                    ? "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
-                                    : "bg-gray-900/20 border-gray-700 text-gray-500 opacity-50"
+                                    ? "bg-white border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                                    : "bg-gray-100 border-gray-200 text-gray-500 opacity-50 dark:bg-gray-900/20 dark:border-gray-700"
                               )}
                             >
                               <span className="block font-medium">{product.name}</span>
                               {product.balance && (
-                                <span className="block text-xs mt-1 text-zinc-500">
+                                <span className={`block text-xs mt-1 ${selectedProduct && selectedProduct.name === product.name ? 'text-black/70' : 'text-zinc-500'}`}>
                                   {product.balance}
                                 </span>
                               )}
                               {product.isPremium && (
-                                <span className="inline-block bg-amber-500 text-black text-xs px-2 py-1 rounded mt-2 font-semibold">
+                                <span className="inline-block bg-amber-600 text-white text-xs px-2 py-1 rounded mt-2 font-semibold">
                                   Premium
                                 </span>
                               )}
                               {selectedProduct && selectedProduct.name === product.name && (
-                                <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-amber-500" />
+                                <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-black" />
                               )}
                             </label>
                           </div>
@@ -524,12 +509,13 @@ const ChallengeRelations = () => {
           {/* Columna derecha - Resumen del producto */}
           <div className="lg:col-span-1">
             <div className="sticky top-4 space-y-6">
-              <div className="bg-zinc-900 rounded-lg shadow-md border border-zinc-800 overflow-hidden">
-                <header className="p-5 border-b border-zinc-800">
-                  <h3 className="text-amber-400 font-medium text-xl flex gap-4 items-center"><span>Producto Seleccionado:</span>
+              <div className="bg-white rounded-lg shadow-md border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800 overflow-hidden">
+                <header className="p-5 border-b border-gray-200 dark:border-zinc-800">
+                  <h3 className="text-[var(--app-primary)] font-medium text-xl flex gap-4 items-center">
+                    <span>Producto Seleccionado:</span>
                     {selectedProduct ? (
                       <>
-                        <span className="text-xl font-bold text-white">{selectedProduct.name}</span>
+                        <span className="text-xl font-bold dark:text-white">{selectedProduct.name}</span>
                       </>
                     ) : (
                       <p className="text-zinc-500">Ningún producto seleccionado</p>
@@ -538,9 +524,9 @@ const ChallengeRelations = () => {
                 </header>
 
                 {selectedRelation && (
-                  <div className="bg-zinc-800 p-4 border-b border-zinc-700">
-                    <h4 className="text-amber-400 font-medium mb-2">Información Adicional</h4>
-                    <div className="text-zinc-300">
+                  <div className="bg-gray-50 p-4 border-b border-gray-200 dark:bg-zinc-800 dark:border-zinc-700">
+                    <h4 className="text-[var(--app-primary)] font-medium mb-2">Información Adicional</h4>
+                    <div className="text-gray-700 dark:text-zinc-300">
                       <p className="flex justify-between mb-2">
                         <span>Subcategoría:</span>
                         <span className="font-medium">{selectedRelation.challenge_subcategory?.name}</span>
@@ -567,7 +553,7 @@ const ChallengeRelations = () => {
                                       "block text-center py-1 px-2 rounded-md border cursor-pointer transition-all text-sm",
                                       selectedStage && selectedStage.id === stage.id
                                         ? "bg-amber-500 border-amber-600 text-black font-medium"
-                                        : "bg-zinc-700 border-zinc-600 text-zinc-300 hover:bg-zinc-600"
+                                        : "bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200 dark:bg-zinc-700 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-600"
                                     )}
                                   >
                                     {stage.name}
@@ -587,55 +573,48 @@ const ChallengeRelations = () => {
                 {selectedProduct && selectedStage && (
                   <>
                     {selectedRelation && (
-                      <div className="bg-zinc-900 p-5 shadow-md border-zinc-800">
-                        <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                      <div className="p-5">
+                        <div className="grid grid-cols-1 gap-6">
                           <div>
                             <section>
-                              <h3 className="text-lg font-medium text-amber-400 mb-4">Características:</h3>
+                              <h3 className="text-lg font-medium text-[var(--app-primary)] mb-4">Características:</h3>
                               <ul className="space-y-3">
-                                <li className="flex items-center text-zinc-300">
+                                <li className="flex items-center text-gray-700 dark:text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Leverage:</span>
                                   <strong className="ml-auto">
                                     {selectedStage.leverage ? (selectedStage.leverage + " %") : "-"}
                                   </strong>
                                 </li>
-                                <li className="flex items-center text-zinc-300">
+                                <li className="flex items-center text-gray-700 dark:text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Maximum Daily Loss:</span>
                                   <strong className="ml-auto">
                                     {selectedStage.maximumDailyLoss ? (selectedStage.maximumDailyLoss + " %") : "-"}
                                   </strong>
                                 </li>
-                                {/* <li className="flex items-center text-zinc-300">
-                                  <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>Maximum Loss:</span>
-                                  <strong className="ml-auto">
-                                    {selectedStage.maximumLoss ? (selectedStage.maximumLoss + " %") : "-"}
-                                  </strong>
-                                </li> */}
-                                <li className="flex items-center text-zinc-300">
+                                <li className="flex items-center text-gray-700 dark:text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Minimum Trading Days:</span>
                                   <strong className="ml-auto">
                                     {selectedStage.minimumTradingDays ? (selectedStage.minimumTradingDays + " %") : "-"}
                                   </strong>
                                 </li>
-                                <li className="flex items-center text-zinc-300">
+                                <li className="flex items-center text-gray-700 dark:text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Profit Target:</span>
                                   <strong className="ml-auto">
                                     {selectedStage.profitTarget ? (selectedStage.profitTarget + " %") : "-"}
                                   </strong>
                                 </li>
-                                <li className="flex items-center text-zinc-300">
+                                <li className="flex items-center text-gray-700 dark:text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Maximum Total Loss:</span>
                                   <strong className="ml-auto">
                                     {selectedStage.maximumTotalLoss ? (selectedStage.maximumTotalLoss + " %") : "-"}
                                   </strong>
                                 </li>
-                                <li className="flex items-center text-zinc-300">
+                                <li className="flex items-center text-gray-700 dark:text-zinc-300">
                                   <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
                                   <span>Maximum Loss Per Trade:</span>
                                   <strong className="ml-auto">
@@ -647,67 +626,38 @@ const ChallengeRelations = () => {
                           </div>
 
                           <div className="space-y-6">
-
-                            <div className="h-px bg-zinc-800"></div>
+                            <div className="h-px bg-gray-200 dark:bg-zinc-800"></div>
 
                             <section>
-                              <h4 className="text-zinc-300 font-medium mb-4">Subtotal</h4>
-                              <div className="flex justify-between mb-2 text-zinc-300">
+                              <h4 className="text-gray-700 dark:text-zinc-300 font-medium mb-4">Subtotal</h4>
+                              <div className="flex justify-between mb-2 text-gray-700 dark:text-zinc-300">
                                 <span>{selectedProduct.name}</span>
                                 <span>${matchingVariation?.price || "N/A"}</span>
                               </div>
-                              <div className="h-px bg-zinc-800 my-4"></div>
+                              <div className="h-px bg-gray-200 dark:bg-zinc-800 my-4"></div>
                               <div className="flex justify-between items-center mb-1">
-                                <span className="text-zinc-300">Total</span>
-                                <p className="text-2xl font-semibold text-amber-400">${matchingVariation?.price || "N/A"}</p>
+                                <span className="text-gray-700 dark:text-zinc-300">Total</span>
+                                <p className="text-2xl font-semibold text-[var(--app-primary)]">${matchingVariation?.price || "N/A"}</p>
                               </div>
-                              <p className="text-xs text-zinc-500 text-right">*Precio no incluye tarifa de servicio de pago.</p>
+                              <p className="text-xs text-gray-500 dark:text-zinc-500 text-right">*Precio no incluye tarifa de servicio de pago.</p>
                             </section>
                           </div>
                         </div>
                       </div>
                     )}
 
-                    <section className="p-5 space-y-4">
-                      <div className="flex items-start">
-                        <input
-                          type="checkbox"
-                          id="acceptTerms"
-                          className="mt-1 h-4 w-4 border-zinc-700 rounded bg-zinc-800 text-amber-500 focus:ring-amber-500"
-                          checked={termsAccepted}
-                          onChange={() => setTermsAccepted(!termsAccepted)}
-                        />
-                        <label htmlFor="acceptTerms" className="ml-2 text-sm text-zinc-300">
-                          Declaro que he leído y estoy de acuerdo con los{" "}
-                          <span className="font-bold text-amber-400 cursor-pointer">Términos y Condiciones</span>,{" "}
-                          <span className="font-bold text-amber-400 cursor-pointer">Política de Privacidad</span> y{" "}
-                          <span className="font-bold text-amber-400 cursor-pointer">Política de Cookies</span>
-                        </label>
-                      </div>
-
-                      <div className="flex items-start">
-                        <input
-                          type="checkbox"
-                          id="acceptCancelation"
-                          className="mt-1 h-4 w-4 border-zinc-700 rounded bg-zinc-800 text-amber-500 focus:ring-amber-500"
-                          checked={cancellationAccepted}
-                          onChange={() => setCancellationAccepted(!cancellationAccepted)}
-                        />
-                        <label htmlFor="acceptCancelation" className="ml-2 text-sm text-zinc-300">
-                          Declaro que he leído y estoy de acuerdo con las Políticas de Cancelación y Reembolso.
-                        </label>
-                      </div>
-                    </section>
+                    {/* Terms section removed */}
 
                     <div className="p-5">
                       <button
                         onClick={handleContinue}
                         type="submit"
-                        disabled={!selectedProduct || !termsAccepted || !cancellationAccepted}
-                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct && termsAccepted && cancellationAccepted
-                          ? "bg-amber-500 hover:bg-amber-600 text-black font-bold"
-                          : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
-                          }`}
+                        disabled={!selectedProduct}
+                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${
+                          selectedProduct
+                            ? "bg-[var(--app-primary)] hover:bg-[var(--app-secondary)] text-black font-bold"
+                            : "bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-zinc-700 dark:text-zinc-500"
+                        }`}
                       >
                         <span className="uppercase">Continuar</span>
                         <ChevronRightIcon className="h-5 w-5 ml-2" />
@@ -720,7 +670,7 @@ const ChallengeRelations = () => {
           </div>
         </div>
       </form>
-    </div>
+    </Layout>
   );
 };
 
