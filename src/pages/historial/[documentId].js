@@ -539,7 +539,7 @@ const HistorialMetrix = () => {
             <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
               <div className="flex justify-between items-center">
                 <h3 className="text-sm font-medium">Plataforma</h3>
-                <span className="bg-[var(--app-primary)] text-white text-xs px-2 py-1 rounded">METATRADE</span>
+                <span className="bg-[var(--app-primary)] text-white text-xs px-2 py-1 rounded">METATRADER 4</span>
               </div>
             </div>
 
