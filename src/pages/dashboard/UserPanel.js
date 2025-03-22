@@ -179,69 +179,95 @@ export default function Index() {
                                 return (
                                     <div
                                         key={index}
-                                        className="relative p-6 mb-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black"
+                                        className="relative p-6 mb-6 bg-white dark:bg-zinc-800 shadow-lg rounded-xl border border-gray-100 dark:border-zinc-700 transition-all duration-300 hover:shadow-xl dark:hover:shadow-md dark:shadow-zinc-900/30 overflow-hidden"
                                     >
-                                        <p className="font-bold text-zinc-800 mb-2 dark:text-zinc-200 text-lg">
-                                            Login: {challenge.broker_account?.login || "-"}
-                                        </p>
+                                        {/* Accent border on left side */}
+                                        <div className="absolute left-0 top-0 w-1 h-full bg-[var(--app-primary)]"></div>
+
+                                        <div className="flex justify-between items-start">
+                                            <p className="font-semibold text-zinc-800 mb-3 dark:text-zinc-200 text-lg flex items-center">
+                                                <span className='font-bold text-[var(--app-primary)] mr-2'>Login:</span>
+                                                {/* <span className="bg-gray-50 dark:bg-zinc-700/50 py-1 px-3 rounded-md transition-colors"> */}
+                                                <span className="">
+                                                    {challenge.broker_account?.login || "-"}
+                                                </span>
+                                            </p>
+
+                                            {/* Status indicator */}
+                                            <div className="flex items-center">
+                                                <div className={`h-2 w-2 rounded-full mr-2 ${challenge.result === 'progress' ? 'bg-[var(--app-primary)] animate-pulse' :
+                                                    challenge.result === 'approved' ? 'bg-green-500' :
+                                                        challenge.result === 'disapproved' ? 'bg-red-500' :
+                                                            'bg-gray-400'
+                                                    }`}></div>
+                                                <span className={`text-xs font-medium ${challenge.result === 'progress' ? 'text-[var(--app-primary)]' :
+                                                    challenge.result === 'approved' ? 'text-green-500' :
+                                                        challenge.result === 'disapproved' ? 'text-red-500' :
+                                                            'text-gray-400 dark:text-gray-300'
+                                                    }`}>
+                                                    {{
+                                                        init: "Por iniciar",
+                                                        progress: "En curso",
+                                                        disapproved: "Desaprobado",
+                                                        approved: "Aprobado",
+                                                        retry: "Repetir",
+                                                    }[challenge.result] || challenge.result}
+                                                </span>
+                                            </div>
+                                        </div>
 
                                         {isVisible && (
                                             <>
-                                                <div className="mt-2 flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-8">
-                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Balance:{" "}
-                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
-                                                            {typeof balanceDisplay === "number" ? `$${balanceDisplay}` : balanceDisplay}
-                                                        </span>
-                                                    </p>
-                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Inicio:{" "}
-                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                    <div className="p-3 bg-gray-50 dark:bg-zinc-700/30 rounded-lg transition-colors flex items-center justify-between">
+                                                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                            Balance
+                                                        </p>
+                                                        <p className="font-bold text-zinc-800 dark:text-zinc-200">
+                                                            {typeof balanceDisplay === "number" ? `$${balanceDisplay.toLocaleString()}` : balanceDisplay}
+                                                        </p>
+                                                    </div>
+
+                                                    <div className="p-3 bg-gray-50 dark:bg-zinc-700/30 rounded-lg transition-colors flex items-center justify-between">
+                                                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                            Inicio
+                                                        </p>
+                                                        <p className="font-bold text-zinc-800 dark:text-zinc-200">
                                                             {challenge.startDate ? new Date(challenge.startDate).toLocaleDateString() : "-"}
-                                                        </span>
-                                                    </p>
-                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Fin:{" "}
-                                                        <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                        </p>
+                                                    </div>
+
+                                                    <div className="p-3 bg-gray-50 dark:bg-zinc-700/30 rounded-lg transition-colors flex items-center justify-between">
+                                                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                            Fin
+                                                        </p>
+                                                        <p className="font-bold text-zinc-800 dark:text-zinc-200">
                                                             {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "-"}
-                                                        </span>
-                                                    </p>
-                                                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                                                        Resultado:{" "}
-                                                        <span
-                                                            className={`font-bold ${{
-                                                                progress: "text-[var(--app-primary)]",
-                                                                disapproved: "text-red-500",
-                                                                approved: "text-green-500",
-                                                            }[challenge.result] || "text-slate-800 dark:text-slate-200"}`}
-                                                        >
-                                                            {{
-                                                                init: "Por iniciar",
-                                                                progress: "En curso",
-                                                                disapproved: "Desaprobado",
-                                                                approved: "Aprobado",
-                                                                retry: "Repetir",
-                                                            }[challenge.result] || challenge.result}
-                                                        </span>
-                                                    </p>
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div className="mt-4 flex space-x-4 items-center">
+
+                                                <div className="mt-5 flex flex-wrap gap-3 items-center">
                                                     <Link href={`/metrix2/${challenge.documentId}`}>
-                                                        <button className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500">
-                                                            <ChartBarIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                                                            <span className="text-xs lg:text-sm dark:text-zinc-200">Metrix</span>
+                                                        <button className="flex items-center justify-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 bg-white hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 shadow-sm hover:shadow">
+                                                            <ChartBarIcon className="h-5 w-5 text-[var(--app-primary)]" />
+                                                            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Metrix</span>
                                                         </button>
                                                     </Link>
+
                                                     {!isVerified && challenge.phase === 3 &&
                                                         challenge.result === "approved" && (
-                                                            <p className="font-light text-gray-300">Debes estar verificado para retirar tus ganancias, ve al apartado de verificación.</p>
+                                                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 border-l-2 border-[var(--app-primary)]/30 pl-3">
+                                                                Debes estar verificado para retirar tus ganancias
+                                                            </p>
                                                         )}
+
                                                     {isVerified &&
                                                         challenge.phase === 3 &&
                                                         challenge.result === "approved" && (
                                                             <div className="flex gap-2 items-center">
                                                                 <BilleteraCripto
-                                                                    balance={balances[challenge.id] || 1000000}
+                                                                    balance={ba.pahselances[challenge.id] || 1000000}
                                                                     brokerBalance={challenge.broker_account?.balance || "0"}
                                                                     userId={data?.id}
                                                                     challengeId={challenge.documentId}
@@ -252,16 +278,27 @@ export default function Index() {
                                             </>
                                         )}
 
-                                        <ButtonInit documentId={challenge.documentId} result={challenge.result} phase={challenge.phase} />
+                                        <div className="mt-5 flex flex-wrap items-center justify-end gap-4 pt-4 border-t border-gray-100 dark:border-zinc-700/50">
+                                            <ButtonInit
+                                                documentId={challenge.documentId}
+                                                result={challenge.result}
+                                                phase={challenge.phase}
+                                                className="bg-[var(--app-primary)]/10 hover:bg-[var(--app-primary)]/20 text-[var(--app-primary)] border-[var(--app-primary)]/20"
+                                            />
 
-                                        <div className="mt-4 flex items-center justify-end">
                                             <div className="flex items-center space-x-2">
                                                 <Switch
                                                     id={`visible-mode-${challenge.id}-${index}`}
-                                                    checked={isVisible}
+                                                    checked={!isVisible}
                                                     onCheckedChange={() => toggleVisibility(challenge.id)}
+                                                    className="data-[state=checked]:bg-[var(--app-primary)]"
                                                 />
-                                                <Label htmlFor={`visible-mode-${challenge.id}-${index}`}>Visible</Label>
+                                                <Label
+                                                    htmlFor={`visible-mode-${challenge.id}-${index}`}
+                                                    className="text-sm font-medium text-gray-600 dark:text-gray-300"
+                                                >
+                                                    {isVisible ? "Mostrar menos" : "Mostrar más"}
+                                                </Label>
                                             </div>
                                         </div>
                                     </div>
