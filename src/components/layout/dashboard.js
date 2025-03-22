@@ -14,7 +14,7 @@ export default function Layout({ children }) {
                 {/* Estructura central */}
                 <div className="mx-auto max-w-7xl py-12 px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col lg:flex-row gap-8">
-                        <div className="hidden lg:block w-[300px] dark:shadow-black h-full bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+                        <div className="hidden lg:block w-max dark:shadow-black h-full bg-white dark:bg-gray-800 rounded-xl shadow-lg">
                             {/* Columna 1 (Sidebar) */}
                             <Sidebar />
                         </div>

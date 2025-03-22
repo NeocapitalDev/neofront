@@ -9,8 +9,8 @@ export default function Sidebar() {
 
     return (
         <div
-            className="relative dark:bg-zinc-800  h-full w-64 rounded-xl border-2 dark:border-0 dark:border-zinc-700 dark:shadow-black border-gray-200 dark:text-white"
-            style={{ minWidth: '19rem' }} // Asegurar un ancho fijo
+            className="relative dark:bg-zinc-800  h-full w-32 rounded-xl border-2 dark:border-0 dark:border-zinc-700 dark:shadow-black border-gray-200 dark:text-white"
+            style={{ minWidth: '16rem' }} // Asegurar un ancho fijo
         >
             <div className="p-4 border-b border-gray-200 dark:border-zinc-700">
                 {/* Aquí se utiliza el nuevo componente con los props correspondientes */}
@@ -30,7 +30,7 @@ export default function Sidebar() {
                     <Link
                         href={href}
                         key={id}
-                        className={`w-full flex items-center py-7 px-6 font-semibold transition duration-200 last:rounded-b-md relative 
+                        className={`w-full flex items-center py-7 px-6 font-semibold transition duration-200 last:rounded-b-md relative h-16 text-sm
             ${router.pathname === href
                                 ? 'bg-gradient-to-r from-amber-50 via-white to-transparent border-l-4 border-[var(--app-primary)] dark:bg-gradient-to-r dark:from-amber-800 dark:via-zinc-800 dark:to-transparent dark:border-l-4 dark:border-[var(--app-primary)]'
                                 : 'hover:bg-zinc-300 dark:hover:bg-zinc-700'
@@ -46,7 +46,7 @@ export default function Sidebar() {
                             }}
                         ></div>
                         <Icon
-                            className={`h-7 w-7 mr-4 z-10 ${router.pathname === href
+                            className={`h-6 w-6 mr-4 z-10 ${router.pathname === href
                                 ? 'text-[var(--app-primary)] dark:text-[var(--app-primary)]'
                                 : 'text-gray-700 dark:text-gray-300'
                                 }`}

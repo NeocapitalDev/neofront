@@ -304,8 +304,8 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
 
     // Renderizar gráfico con configuración mejorada
     return (
-        <div className="mt-6">
-            <h2 className="text-lg font-semibold mb-4">Evolución del Balance por hora</h2>
+        <div className="">
+            {/* <h2 className="text-lg font-semibold mb-4">Balance por hora</h2> */}
             <div className="dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                 <LineChart
                     data={chartData}
