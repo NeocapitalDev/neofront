@@ -4,7 +4,7 @@ import { HomeIcon, UserCircleIcon, CreditCardIcon, ChatBubbleLeftEllipsisIcon, L
 export const navigation = [
     { icon: HomeIcon, name: 'Dashboard', id: 'main', href: '/' }, // Mantengo el icono para Dashboard.
     { icon: UserCircleIcon, name: 'Perfil', id: 'profile', href: '/profile' }, // Icono más representativo para el perfil.
-    { icon: ClockIcon, name: 'Historial', id: 'history', href: '/historial' }, // Representa historial de challenges.
+  //  { icon: ClockIcon, name: 'Historial', id: 'history', href: '/historial' }, // Representa historial de challenges.
     { icon: CheckBadgeIcon, name: 'Verificación', id: 'verification', href: '/verification' }, // Icono más representativo para el perfil.
     { icon: CreditCardIcon, name: 'Facturación', id: 'billing', href: '/billing' }, // Representa pagos y facturación.
     { icon: ChatBubbleLeftEllipsisIcon, name: 'Sociales', id: 'social', href: '/social' }, // Representa interacciones sociales.

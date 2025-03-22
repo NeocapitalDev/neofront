@@ -128,16 +128,16 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance })
     return (
         <div className="space-y-1.5">
             {objetivos.map((obj, idx) => (
-                <div key={idx} className="bg-zinc-800 text-white rounded text-xs overflow-hidden">
+                <div key={idx} className=" bg-white dark:bg-zinc-900    text-white rounded text-xs overflow-hidden">
                     <div className="p-1.5">
                         <div className="flex justify-between items-center">
-                            <span className="text-amber-400 font-medium">{obj.nombre}</span>
+                            <span className="dark:text-amber-400 text-amber-500  font-medium">{obj.nombre}</span>
                             <button onClick={() => setExpanded(expanded === idx ? null : idx)} className="text-gray-400">
                                 <Icon.Info />
                             </button>
                         </div>
                         <div className="flex justify-between items-center mt-1">
-                            <span className={obj.estado ? "text-green-200" : "text-red-200"}>{obj.resultado}</span>
+                            <span className={obj.estado ? "dark:text-green-400 text-green-500" : " dark:text-red-400 text-red-500   "}>{obj.resultado}</span>
                             {obj.estado ? <Icon.Check /> : <Icon.X />}
                         </div>
                     </div>

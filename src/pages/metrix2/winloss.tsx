@@ -64,7 +64,7 @@ export default function WinLoss({ data }) {
 
   return (
     <div className="w-full">
-      <Card className="bg-zinc-900">
+      <Card className="bg-white dark:bg-zinc-900">
         <CardContent className="pt-6">
           {noTrades ? (
             <div className="text-center py-8 text-muted-foreground">

@@ -22,86 +22,96 @@ ChartJS.register(
   Legend
 )
 
-export function LineChart({ data, index, categories, yFormatter, colors }) {
-  // Estado para controlar si estamos en el cliente
+export function LineChart({ data, index, categories, yFormatter }) {
   const [isClient, setIsClient] = useState(false)
+  const [theme, setTheme] = useState('dark')
 
-  // Registrar plugin de zoom SOLO en el cliente
+  // Cargar el tema inicial y configurar el plugin de zoom
   useEffect(() => {
     setIsClient(true)
     
-    // Importación dinámica del plugin de zoom
+    const storedTheme = localStorage.getItem('theme') || 'dark'
+    setTheme(storedTheme)
+
     const registerZoomPlugin = async () => {
       const zoomPlugin = (await import('chartjs-plugin-zoom')).default
       ChartJS.register(zoomPlugin)
     }
-    
     registerZoomPlugin()
   }, [])
 
-  // Definimos colores y estilos para cada categoría
+  // Escuchar cambios en localStorage en tiempo real
+  useEffect(() => {
+    const checkTheme = () => {
+      const storedTheme = localStorage.getItem('theme') || 'dark'
+      if (storedTheme !== theme) {
+        setTheme(storedTheme)
+      }
+    }
+
+    // Escuchar cambios entre pestañas
+    const handleStorageChange = (event) => {
+      if (event.key === 'theme') {
+        setTheme(event.newValue || 'dark')
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+
+    // Intervalo para cambios en la misma pestaña
+    const intervalId = setInterval(checkTheme, 500) // Revisar cada 500ms
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      clearInterval(intervalId)
+    }
+  }, [theme]) // Dependencia en theme para reaccionar a cambios
+
+  // Colores fijos para cada categoría
   const lineStyles = {
     balance: {
-      color: '#FBBF24', // Cambiado de '#3B82F6' (azul) a '#FBBF24' (Amber 400)
+      color: '#FBBF24', // Amber 400
       dash: [],
-      pointRadius: 2,          // balance con puntos pequeños
+      pointRadius: 2,
       pointHoverRadius: 6,
     },
     max_drawdown: {
-      color: '#F87171',        // Rojo punteado
+      color: '#F87171', // Rojo
       dash: [5, 5],
-      pointRadius: 0,          // SIN puntos (solo línea)
+      pointRadius: 0,
       pointHoverRadius: 0,
     },
     profit_target: {
-      color: '#10B981',        // Verde
+      color: '#10B981', // Verde
       dash: [],
-      pointRadius: 0,          // SIN puntos (solo línea)
+      pointRadius: 0,
       pointHoverRadius: 0,
     },
-    // otros estilos si lo requieres
   }
 
-  // Si se proporcionan colores personalizados, actualizar los colores en lineStyles
-  if (colors && Array.isArray(colors) && colors.length >= 3) {
-    lineStyles.balance.color = colors[0];
-    lineStyles.max_drawdown.color = colors[1];
-    lineStyles.profit_target.color = colors[2];
-  }
-
-  // Encontrar los valores únicos para las líneas de referencia
-  // Buscar el primer valor no nulo para max_drawdown y profit_target
   const findReferenceValue = (category) => {
     for (let i = 0; i < data.length; i++) {
-      const value = data[i][category];
-      if (value !== null && value !== undefined) {
-        return value;
-      }
+      const value = data[i][category]
+      if (value !== null && value !== undefined) return value
     }
-    return null;
-  };
+    return null
+  }
 
-  const maxDrawdownValue = findReferenceValue('max_drawdown');
-  const profitTargetValue = findReferenceValue('profit_target');
+  const maxDrawdownValue = findReferenceValue('max_drawdown')
+  const profitTargetValue = findReferenceValue('profit_target')
 
-  // Construimos datasets para Chart.js
   const chartData = {
     labels: data.map((item) => item[index]),
     datasets: categories.map((cat) => {
-      const style = lineStyles[cat] || { color: '#FFF', dash: [], pointRadius: 0, pointHoverRadius: 0 }
-      
-      // Crear datos especiales para max_drawdown y profit_target (líneas horizontales)
-      let categoryData;
+      const style = lineStyles[cat] || { color: theme === 'dark' ? '#FFF' : '#000', dash: [], pointRadius: 0, pointHoverRadius: 0 }
+      let categoryData
       
       if (cat === 'max_drawdown' && maxDrawdownValue !== null) {
-        // Crear una línea horizontal con el valor de max_drawdown
-        categoryData = new Array(data.length).fill(maxDrawdownValue);
+        categoryData = new Array(data.length).fill(maxDrawdownValue)
       } else if (cat === 'profit_target' && profitTargetValue !== null) {
-        // Crear una línea horizontal con el valor de profit_target
-        categoryData = new Array(data.length).fill(profitTargetValue);
+        categoryData = new Array(data.length).fill(profitTargetValue)
       } else {
-        // Para otros datos, usar los valores normales
-        categoryData = data.map((item) => item[cat]);
+        categoryData = data.map((item) => item[cat])
       }
       
       return {
@@ -113,34 +123,26 @@ export function LineChart({ data, index, categories, yFormatter, colors }) {
         borderWidth: 2,
         pointRadius: style.pointRadius,
         pointHoverRadius: style.pointHoverRadius,
-        spanGaps: true, // para trazar líneas aunque haya huecos
-        // Para max_drawdown y profit_target, forzamos su visualización
+        spanGaps: true,
         ...(cat === 'max_drawdown' || cat === 'profit_target' ? {
           fill: false,
-          tension: 0, // línea recta sin curvas
+          tension: 0,
         } : {})
       }
     }),
   }
 
-  // Calculamos min y max para incluir valores horizontales
   let allValues = []
   data.forEach((row) => {
     categories.forEach((cat) => {
       const val = row[cat]
-      if (typeof val === 'number') {
-        allValues.push(val)
-      }
+      if (typeof val === 'number') allValues.push(val)
     })
   })
-
-  // Asegurarse que max_drawdown y profit_target están incluidos en el cálculo del rango
-  if (maxDrawdownValue !== null) allValues.push(maxDrawdownValue);
-  if (profitTargetValue !== null) allValues.push(profitTargetValue);
-
-  if (allValues.length === 0) {
-    allValues = [0, 100]
-  }
+  if (maxDrawdownValue !== null) allValues.push(maxDrawdownValue)
+  if (profitTargetValue !== null) allValues.push(profitTargetValue)
+  if (allValues.length === 0) allValues = [0, 100]
+  
   const minVal = Math.min(...allValues)
   const maxVal = Math.max(...allValues)
   const paddingFactor = 0.05
@@ -148,7 +150,34 @@ export function LineChart({ data, index, categories, yFormatter, colors }) {
   const suggestedMin = minVal - range * paddingFactor
   const suggestedMax = maxVal + range * paddingFactor
 
-  // Opciones de Chart.js
+  // Estilos por tema
+  const themeStyles = {
+    dark: {
+      backgroundColor: '#18181B',
+      textColor: '#FFF',
+      gridColor: 'rgba(255, 255, 255, 0.2)',
+      tooltip: {
+        backgroundColor: '#333',
+        titleColor: '#FFF',
+        bodyColor: '#FFF',
+        borderColor: '#FFF',
+      },
+    },
+    light: {
+      backgroundColor: '#FFFFFF',
+      textColor: '#000',
+      gridColor: 'rgba(0, 0, 0, 0.1)',
+      tooltip: {
+        backgroundColor: '#FFF',
+        titleColor: '#000',
+        bodyColor: '#000',
+        borderColor: '#000',
+      },
+    },
+  }
+
+  const currentTheme = themeStyles[theme] || themeStyles.dark
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -164,13 +193,12 @@ export function LineChart({ data, index, categories, yFormatter, colors }) {
         display: false,
       },
       tooltip: {
-        backgroundColor: '#333',
-        titleColor: '#FFF',
-        bodyColor: '#FFF',
-        borderColor: '#FFF',
+        backgroundColor: currentTheme.tooltip.backgroundColor,
+        titleColor: currentTheme.tooltip.titleColor,
+        bodyColor: currentTheme.tooltip.bodyColor,
+        borderColor: currentTheme.tooltip.borderColor,
         borderWidth: 1,
       },
-      // Solo habilitamos zoom si estamos en el cliente
       ...(isClient && {
         zoom: {
           zoom: {
@@ -202,10 +230,10 @@ export function LineChart({ data, index, categories, yFormatter, colors }) {
         suggestedMin,
         suggestedMax,
         grid: {
-          color: 'rgba(255, 255, 255, 0.2)',
+          color: currentTheme.gridColor,
         },
         ticks: {
-          color: '#FFF',
+          color: currentTheme.textColor,
           callback: (value) => yFormatter(value),
         },
       },
@@ -213,12 +241,10 @@ export function LineChart({ data, index, categories, yFormatter, colors }) {
   }
 
   return (
-    <div style={{ backgroundColor: '#18181B', padding: '1rem', borderRadius: '8px' }}>
+    <div style={{ backgroundColor: currentTheme.backgroundColor, padding: '1rem', borderRadius: '8px' }}>
       <div style={{ width: '100%', height: '60vh' }}>
         <Line data={chartData} options={options} />
       </div>
-
-      {/* Leyenda personalizada */}
       <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
         <ul
           style={{
@@ -230,7 +256,7 @@ export function LineChart({ data, index, categories, yFormatter, colors }) {
           }}
         >
           {categories.map((cat) => {
-            const style = lineStyles[cat] || { color: '#FFF', dash: [], pointRadius: 0 }
+            const style = lineStyles[cat] || { color: currentTheme.textColor, dash: [], pointRadius: 0 }
             const borderStyle = style.dash.length
               ? `2px dashed ${style.color}`
               : `2px solid ${style.color}`
@@ -246,7 +272,7 @@ export function LineChart({ data, index, categories, yFormatter, colors }) {
                     marginRight: '8px',
                   }}
                 />
-                <span style={{ color: '#FFF', textTransform: 'capitalize' }}>
+                <span style={{ color: currentTheme.textColor, textTransform: 'capitalize' }}>
                   {cat.replace(/_/g, ' ')}
                 </span>
               </li>
