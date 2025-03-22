@@ -3,289 +3,161 @@
 
 import React, { useState, useEffect } from "react";
 
-// Custom SVG Icons
-const CheckIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6 mr-2 rounded-lg text-white bg-green-500">
-        <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.208Z" clipRule="evenodd" />
-    </svg>
-);
-
-const XMarkIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6 mr-2 rounded-lg text-white bg-red-500">
-        <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-    </svg>
-);
-
-// Utility function to format days
-const formatDays = (days, minimumDays) => {
-    // Asegurar que los días no sean negativos
-    const integerDays = Math.max(0, Math.floor(days));
-    // Evitar división por cero asegurando que minimumDays sea al menos 1 SOLO para el cálculo del porcentaje
-    const safeMinimumDays = Math.max(1, minimumDays);
-    const percentage = (integerDays / safeMinimumDays) * 100;
-    return {
-        displayDays: integerDays,
-        displayPercentage: percentage.toFixed(2)
-    };
+// Minimal SVG Icons
+const Icon = {
+    Check: () => (
+        <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5 text-green-500">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+        </svg>
+    ),
+    X: () => (
+        <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5 text-red-500">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+        </svg>
+    ),
+    Info: () => (
+        <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5 text-gray-400">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+        </svg>
+    )
 };
 
-// Utility function to format profit/loss
-const formatProfit = (initialBalance, currentProfit, profitTarget) => {
-    const profit = Math.max(0, currentProfit);
-    
-    // Calcular el porcentaje con respecto al objetivo, no al balance inicial
-    const percentage = profit === 0 ? 0 : (profit / profitTarget) * 100;
-    
-    return {
-        displayProfit: profit.toFixed(2),
-        displayPercentage: percentage.toFixed(2),
-        isTargetMet: profit >= profitTarget
-    };
+// Utility functions
+const fmt = {
+    days: (days, min) => {
+        const d = Math.max(0, Math.floor(days));
+        const p = (d / Math.max(1, min)) * 100;
+        return { days: d, pct: p.toFixed(0) };
+    },
+    profit: (profit, target) => {
+        const p = Math.max(0, profit);
+        const pct = p === 0 ? 0 : (p / target) * 100;
+        return { profit: p.toFixed(0), pct: pct.toFixed(0), met: p >= target };
+    }
 };
 
-export default function Objetivos({ challengeConfig, metricsData, initBalance, phase }) {
-    const [expandedIndex, setExpandedIndex] = useState(null);
+export default function Objetivos({ challengeConfig, metricsData, initBalance }) {
+    const [expanded, setExpanded] = useState(null);
     const [objetivos, setObjetivos] = useState([]);
-
-    // Asegúrate de que phase esté disponible (puede venir como 'pase' o 'phase')
-    const currentPhase = phase;
-    
-    // Establecer un valor por defecto para el balance
     const balance = initBalance || 10000;
 
     useEffect(() => {
         if (!challengeConfig || !metricsData) return;
 
-        console.log("Datos para Objetivos:", { challengeConfig, metricsData, balance, currentPhase });
+        // Config values
+        const minDays = challengeConfig.minimumTradingDays || 0;
+        const maxDailyLossPct = challengeConfig.maximumDailyLoss || 5;
+        const maxTotalLossPct = challengeConfig.maximumTotalLoss || 10;
+        const profitTargetPct = challengeConfig.profitTarget || 8;
 
-        // Extraer los datos reales del trading desde metricsData
-        const tradeDayCount = Math.max(0, metricsData.daysSinceTradingStarted || 0);
+        // Absolute values
+        const maxDailyLossAmt = (balance * maxDailyLossPct) / 100;
+        const maxTotalLossAmt = (balance * maxTotalLossPct) / 100;
+        const profitTargetAmt = (balance * profitTargetPct) / 100;
 
-        // CORRECCIÓN: Cálculo de pérdida máxima diaria (maxDailyDrawdown)
-        let maxDailyDrawdown = 0;
+        // Trading metrics
+        const days = Math.max(0, metricsData.daysSinceTradingStarted || 0);
 
-        // Método 1: Búsqueda en dailyGrowth (mejor opción - datos diarios)
-        if (Array.isArray(metricsData.dailyGrowth) && metricsData.dailyGrowth.length > 0) {
-            // Buscar el día con la mayor pérdida (el valor negativo más grande en valor absoluto)
-            metricsData.dailyGrowth.forEach(day => {
-                if (day.profit !== undefined && day.profit < 0) {
-                    const dailyLoss = Math.abs(day.profit);
-                    if (dailyLoss > maxDailyDrawdown) {
-                        maxDailyDrawdown = dailyLoss;
-                    }
-                } else if (day.drawdownProfit !== undefined && day.drawdownProfit > 0) {
-                    // Alternativa: usar drawdownProfit si está disponible
-                    if (day.drawdownProfit > maxDailyDrawdown) {
-                        maxDailyDrawdown = day.drawdownProfit;
-                    }
-                }
-            });
-            console.log("Pérdida máxima diaria encontrada en dailyGrowth:", maxDailyDrawdown);
-        }
-        // Método 2: Verificar en openTradesByHour para ver pérdidas por hora 
-        else if (metricsData.openTradesByHour && metricsData.openTradesByHour.length > 0) {
-            // Buscar la hora con la mayor pérdida
-            metricsData.openTradesByHour.forEach(hourData => {
-                if (hourData.lostProfit !== undefined && hourData.lostProfit < 0) {
-                    const hourLoss = Math.abs(hourData.lostProfit);
-                    if (hourLoss > maxDailyDrawdown) {
-                        maxDailyDrawdown = hourLoss;
-                    }
-                }
-            });
-            console.log("Pérdida máxima diaria encontrada en openTradesByHour:", maxDailyDrawdown);
-        }
-        // Método 3: Usar worstTrade como aproximación (es una sola operación pero puede ser indicativo)
-        else if (metricsData.worstTrade !== undefined && metricsData.worstTrade < 0) {
-            maxDailyDrawdown = Math.abs(metricsData.worstTrade);
-            console.log("Usando worstTrade como aproximación de pérdida diaria:", maxDailyDrawdown);
-        }
-        // Método 4: Usar periods.today.profit si es negativo
-        else if (metricsData.periods && 
-                metricsData.periods.today && 
-                metricsData.periods.today.profit !== undefined && 
-                metricsData.periods.today.profit < 0) {
-            maxDailyDrawdown = Math.abs(metricsData.periods.today.profit);
-            console.log("Usando periods.today.profit como pérdida diaria:", maxDailyDrawdown);
-        }
-        // Método 5: Fallback a la pérdida total solo si no tenemos otra opción
-        else if (metricsData.profit < 0) {
-            maxDailyDrawdown = Math.abs(metricsData.profit);
-            console.log("ADVERTENCIA: Usando profit total como fallback para pérdida diaria:", maxDailyDrawdown);
-        }
-
-        // Para la pérdida máxima total (maxAbsoluteDrawdown), calcular basado en datos disponibles
-        let maxAbsoluteDrawdown = 0;
-        
-        if (typeof metricsData.maxDrawdown === 'number') {
-            // Si tenemos maxDrawdown como porcentaje, convertir a valor monetario
-            maxAbsoluteDrawdown = (balance * metricsData.maxDrawdown) / 100;
-            console.log("Pérdida máxima calculada a partir de maxDrawdown (%):", maxAbsoluteDrawdown);
+        // Max daily loss
+        let maxDailyLoss = 0;
+        if (Array.isArray(metricsData.dailyGrowth) && metricsData.dailyGrowth.length) {
+            maxDailyLoss = metricsData.dailyGrowth.reduce((max, day) =>
+                Math.max(max, day.profit < 0 ? Math.abs(day.profit) : 0,
+                    day.drawdownProfit > 0 ? day.drawdownProfit : 0), 0);
+        } else if (metricsData.worstTrade < 0) {
+            maxDailyLoss = Math.abs(metricsData.worstTrade);
         } else if (metricsData.profit < 0) {
-            // Si no hay dato específico, usar el profit negativo como approximación
-            maxAbsoluteDrawdown = Math.abs(metricsData.profit);
-            console.log("Usando profit total como aproximación de pérdida máxima:", maxAbsoluteDrawdown);
+            maxDailyLoss = Math.abs(metricsData.profit);
         }
 
-        // Para maxRelativeProfit, usamos profit del SDK (solo si es positivo)
-        const maxRelativeProfit = metricsData.profit > 0 ? metricsData.profit : 0;
+        // Max total loss
+        const maxTotalLoss = typeof metricsData.maxDrawdown === 'number'
+            ? (balance * metricsData.maxDrawdown) / 100
+            : (metricsData.profit < 0 ? Math.abs(metricsData.profit) : 0);
 
-        // Obtener configuración del desafío (usar los nombres de propiedades correctos)
-        // Mapear los nombres para soportar tanto los que vienen de historial como de metrix2
-        const minimumTradingDays = challengeConfig.minimumTradingDays || 0;
-        const maximumDailyLossPercent = challengeConfig.maximumDailyLossPercent || challengeConfig.maximumDailyLoss || 5;
-        const maxDrawdownPercent = challengeConfig.maxDrawdownPercent || challengeConfig.maximumTotalLoss || 10;
-        const profitTargetPercent = challengeConfig.profitTargetPercent || challengeConfig.profitTarget || 8;
+        // Profit
+        const profit = metricsData.profit > 0 ? metricsData.profit : 0;
 
-        // Calcular los valores absolutos para los objetivos
-        const maxDailyLossAmount = (balance * maximumDailyLossPercent) / 100;
-        const maxTotalLossAmount = (balance * maxDrawdownPercent) / 100;
-        const profitTargetAmount = (balance * profitTargetPercent) / 100;
+        // Format data
+        const daysData = fmt.days(days, minDays);
 
-        // Crear array de objetivos basado en la configuración del desafío
+        // Create objectives
         const newObjetivos = [
             {
-                nombre: `Mínimo ${minimumTradingDays} Días de Trading`,
-                ...(() => {
-                    const { displayDays, displayPercentage } = formatDays(
-                        tradeDayCount,
-                        minimumTradingDays
-                    );
-                    return {
-                        resultado: `${displayDays} días (${displayPercentage}%)`,
-                        estado: displayDays >= minimumTradingDays,
-                    };
-                })(),
-                descripcion: "Este valor representa el número de sus días de trading activos medidos en la zona horaria CE(S)T.",
+                nombre: ` ${minDays} Días  Mínimo de Trading`,
+                resultado: `${daysData.days} días (${daysData.pct}%)`,
+                estado: daysData.days >= minDays,
+                descripcion: "Días activos en zona CE(S)T",
                 videoUrl: "https://www.youtube.com/watch?v=lPd0uOoRzsY",
             },
             {
-                nombre: `Pérdida máxima del día - $${maxDailyLossAmount.toFixed(2)}`,
-                resultado: `$${maxDailyDrawdown.toFixed(2)} (${(
-                    (maxDailyDrawdown / maxDailyLossAmount) * 100
-                ).toFixed(2)}%)`,
-                estado: maxDailyDrawdown <= maxDailyLossAmount,
-                descripcion:
-                    "Este valor representa la caída de capital más baja registrada en un día concreto. Contiene su P/L flotante y sólo puede ser sustituido por una pérdida mayor.",
+                nombre: `Pérdida Díaria Máx: $${maxDailyLossAmt.toFixed(0)}`,
+                resultado: `$${maxDailyLoss.toFixed(0)} (${((maxDailyLoss / maxDailyLossAmt) * 100).toFixed(0)}%)`,
+                estado: maxDailyLoss <= maxDailyLossAmt,
+                descripcion: "Pérdida máxima en un día",
                 videoUrl: "https://www.youtube.com/watch?v=WaeBEto7Tkk",
             },
             {
-                nombre: `Pérdida Máx. - $${maxTotalLossAmount.toFixed(2)}`,
-                resultado: `$${maxAbsoluteDrawdown.toFixed(2)} (${(
-                    (maxAbsoluteDrawdown / maxTotalLossAmount) * 100).toFixed(2)}%)`,
-                estado: maxAbsoluteDrawdown <= maxTotalLossAmount,
-                descripcion: "Este valor representa el capital registrado más bajo en su cuenta desde el momento en que se empezó a operar.",
+                nombre: `Pérdida Total Máx: $${maxTotalLossAmt.toFixed(0)}`,
+                resultado: `$${maxTotalLoss.toFixed(0)} (${((maxTotalLoss / maxTotalLossAmt) * 100).toFixed(0)}%)`,
+                estado: maxTotalLoss <= maxTotalLossAmt,
+                descripcion: "Pérdida máxima desde inicio",
                 videoUrl: "https://www.youtube.com/watch?v=AsNUg0O-9iQ",
             },
         ];
 
-        // Agregar objetivo de profit si está configurado
-        if (profitTargetPercent) {
-            const { displayProfit, displayPercentage, isTargetMet } = formatProfit(
-                balance,
-                maxRelativeProfit,
-                profitTargetAmount
-            );
-
+        // Add profit objective if configured
+        if (profitTargetPct) {
+            const profitData = fmt.profit(profit, profitTargetAmt);
             newObjetivos.push({
-                nombre: `Objetivo de Beneficio - $${profitTargetAmount.toFixed(2)}`,
-                resultado: `$${displayProfit} (${displayPercentage}%)`,
-                estado: isTargetMet,
-                descripcion: "Este valor representa su ganancia en el capital.",
+                nombre: `Beneficio Objetivo: $${profitTargetAmt.toFixed(0)}`,
+                resultado: `$${profitData.profit} (${profitData.pct}%)`,
+                estado: profitData.met,
+                descripcion: "Ganancia objetivo",
                 videoUrl: "https://www.youtube.com/watch?v=DWJts3chO_I",
             });
         }
 
         setObjetivos(newObjetivos);
-    }, [challengeConfig, metricsData, balance, currentPhase]);
+    }, [challengeConfig, metricsData, balance]);
 
-    const toggleExpand = (index) => {
-        setExpandedIndex(expandedIndex === index ? null : index);
-    };
-
-    // Si no hay datos de configuración o métricas, mostrar un mensaje de carga
-    if (!challengeConfig || !metricsData) {
-        return (
-            <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-6 text-center">
-                <p>Cargando objetivos...</p>
-            </div>
-        );
-    }
-
-    // Si no hay objetivos calculados, mostrar un mensaje
     if (!objetivos.length) {
-        return (
-            <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-6 text-center">
-                <p>No hay datos de objetivos disponibles.</p>
-            </div>
-        );
+        return <div className="bg-zinc-800 text-white rounded p-2 text-xs text-center">Sin datos</div>;
     }
 
     return (
-        <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white">
-            <table className="w-full">
-                <thead>
-                    <tr className="border-b border-gray-500 dark:border-zinc-600">
-                        <th className="px-6 py-4 text-md text-start text-gray-700 dark:text-white">
-                            Objetivos de Trading
-                        </th>
-                        <th className="px-6 py-4 text-md text-start text-gray-700 dark:text-white">
-                            Resultados
-                        </th>
-                        <th className="px-6 py-4 text-md text-start text-gray-700 dark:text-white">
-                            Estado
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {objetivos.map((obj, index) => (
-                        <React.Fragment key={index}>
-                            <tr
-                                className={`cursor-pointer dark:hover:bg-zinc-700 hover:bg-gray-100 ${index === objetivos.length - 1 ? "" : "border-b border-gray-500 dark:border-zinc-600"
-                                    }`}
-                                onClick={() => toggleExpand(index)}
-                            >
-                                <td className="px-6 py-4 text-amber-400 font-semibold">
-                                    {expandedIndex === index ? `- ${obj.nombre}` : `+ ${obj.nombre}`}
-                                </td>
-                                <td className="px-6 py-4 bg-gray-100 dark:bg-zinc-900">{obj.resultado}</td>
-                                <td className="px-6 py-4">
-                                    {obj.estado ? (
-                                        <div className="flex items-center">
-                                            <CheckIcon />
-                                            <span>Aprobado</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center">
-                                            <XMarkIcon />
-                                            <span>No aprobado</span>
-                                        </div>
-                                    )}
-                                </td>
-                            </tr>
-                            {expandedIndex === index && (
-                                <tr>
-                                    <td colSpan="3" className="text-center align-middle px-6 py-6">
-                                        <div className="flex flex-col items-center">
-                                            <p>{obj.descripcion}</p>
-                                            <div className="mt-4 flex justify-center">
-                                                <iframe
-                                                    width="200"
-                                                    src={obj.videoUrl.replace("watch?v=", "embed/")}
-                                                    title="YouTube video"
-                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                    referrerPolicy="strict-origin-when-cross-origin"
-                                                    allowFullScreen
-                                                ></iframe>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-                        </React.Fragment>
-                    ))}
-                </tbody>
-            </table>
+        <div className="space-y-1.5">
+            {objetivos.map((obj, idx) => (
+                <div key={idx} className="bg-zinc-800 text-white rounded text-xs overflow-hidden">
+                    <div className="p-1.5">
+                        <div className="flex justify-between items-center">
+                            <span className="text-amber-400 font-medium">{obj.nombre}</span>
+                            <button onClick={() => setExpanded(expanded === idx ? null : idx)} className="text-gray-400">
+                                <Icon.Info />
+                            </button>
+                        </div>
+                        <div className="flex justify-between items-center mt-1">
+                            <span className={obj.estado ? "text-green-200" : "text-red-200"}>{obj.resultado}</span>
+                            {obj.estado ? <Icon.Check /> : <Icon.X />}
+                        </div>
+                    </div>
+
+                    {expanded === idx && (
+                        <div className="border-t border-gray-700 p-1.5">
+                            <p className="text-gray-300 mb-1.5">{obj.descripcion}</p>
+                            <div className="flex justify-center">
+                                <iframe
+                                    width="140"
+                                    height="80"
+                                    src={obj.videoUrl.replace("watch?v=", "embed/")}
+                                    title="Video"
+                                    allowFullScreen
+                                ></iframe>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            ))}
         </div>
     );
 }

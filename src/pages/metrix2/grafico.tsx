@@ -43,6 +43,7 @@ export default function MyPage({
     profitTarget: null,
   });
 
+
   // Formateador del eje Y para moneda
   const yFormatter = (tick: number): string => {
     if (typeof tick === "number") {

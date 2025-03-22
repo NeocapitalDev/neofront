@@ -14,6 +14,7 @@ import MyPage from "./grafico";
 import Dashboard from "src/pages/metrix2/barrascircular";
 import Objetivos from "./objetivos";
 import RelatedChallenges from "../../components/challenges/RelatedChallenges";
+import { BarChart, Landmark, FileChartColumn, ChartCandlestick, FileChartPie } from "lucide-react";
 
 /**
  * Fetcher simplificado para GET requests
@@ -437,95 +438,210 @@ const Metrix = () => {
 
   return (
     <Layout>
-      <h1 className="flex p-6 pl-12 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-        <ChartBarIcon className="w-6 h-6 mr-2 text-gray-700 dark:text-white" />
-        Account Metrix {currentChallenge?.broker_account?.login || "Sin nombre"}
-      </h1>
 
-      <div className="flex justify-start gap-3 my-6">
-        {currentChallenge?.broker_account && <CredencialesModal {...currentChallenge.broker_account} />}
 
-        <Link
-          href="/support"
-          className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500"
-        >
-          <PhoneIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-          <span className="text-xs lg:text-sm dark:text-zinc-200">Contacte con nosotros</span>
-        </Link>
-        <button
-          onClick={() => router.reload()}
-          className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 border-gray-300 dark:border-zinc-500"
-        >
-          <ArrowPathIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-          <span className="text-xs lg:text-sm dark:text-zinc-200">Actualizar</span>
-        </button>
-      </div>
 
-      {/* Componente de Barras Circulares */}
-      <Dashboard
-        // Balance inicial
-        brokerInitialBalance={initialBalance}
-        // maxDrawdown permitido (porcentaje)
-        maxAllowedDrawdownPercent={ddPercent}
-        // profitTarget (porcentaje)
-        profitTargetPercent={profitTargetPercent}
-        // métricas reales (balance actual, maxDrawdown real, etc.)
-        metricsData={metadataStats}
-      />
+      {/* Nueva estructura similar a la imagen - más compacta */}
+      <div className="flex flex-col lg:flex-row gap-4 mt-4">
+        {/* Columna izquierda con gráfico principal */}
+        <div className="w-full lg:w-8/12">
 
+      <div className="">
+                <div className="flex justify-between items-center mb-2 bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+                  <div className="flex items-center">
+                  <Landmark className="w-5 h-5 mr-2 text-[var(--app-primary)]" />
+                  <h2 className="text-lg font-semibold">Saldo de la Cuenta</h2>
+                  </div>
+                   <div className="text-right">
+                  <div className="text-lg font-bold">{initialBalance || "$10000"}</div>
+                  <div className="flex items-center justify-end text-xs">
+                    <span className="mr-2">Equity: ${metadataStats?.equity || initialBalance}</span>
+                    <span className={`${metadataStats?.profitPercent >= 0 ? 'text-green-500' : 'text-red-500'} font-medium`}>
+                    {metadataStats?.profitPercent >= 0 ? '+' : ''}{metadataStats?.profitPercent || '0'}%
+                    </span>
+                  </div>
+                  </div> 
+                </div>
+
+                {/* Gráfico principal */}
+            <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
       {/* Gráfica de líneas */}
-      <div className="mt-6">
         <MyPage
           statisticsData={metadataStats?.equityChart || []}
           maxDrawdownAbsolute={maxDrawdownAbsolute || (initialBalance ? initialBalance * 0.9 : 9000)}
           profitTargetAbsolute={profitTargetAbsolute || (initialBalance ? initialBalance * 1.1 : 11000)}
         />
-      </div>
-
-      {/* Componente de WinLoss */}
-      <WinLoss data={metadataStats || {}} />
-
-      {/* Objetivos */}
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold pb-4">Objetivo</h2>
-        {challengeConfig ? (
-          <Objetivos
-            // Pasar la configuración del desafío
-            challengeConfig={challengeConfig}
-            // Pasar los datos de métricas reales
-            metricsData={metadataStats}
-            // Balance inicial para cálculos
-            initBalance={initialBalance}
-            // Fase actual
-            pase={currentChallenge?.phase}
-          />
-        ) : (
-          <div className="border-gray-500 dark:border-zinc-800 dark:shadow-black bg-white rounded-md shadow-md dark:bg-zinc-800 dark:text-white p-6 text-center">
-            <p>Cargando objetivos...</p>
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* Estadísticas */}
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="w-full md:w-1/1 rounded-lg">
-          <h2 className="text-lg font-bold mb-4 pt-5">Estadísticas</h2>
-          <Statistics
+          {/* Resto de componentes en la columna izquierda */}
+          <div className="grid grid-cols-1 gap-4 mt-4">
+            {/* Historial de ganancias/pérdidas */}
+            <h2 className="text-lg font-semibold flex items-center">
+              <BarChart className="w-5 h-5 mr-2 text-[var(--app-primary)]" />
+              Win/Loss Rates
+            </h2>
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+            <WinLoss data={metadataStats || {}} />
+
+            </div>
+
+            {/* Estadísticas */}
+            <h2 className="text-lg font-semibold flex items-center">
+              <FileChartColumn className="w-5 h-5 mr-2 text-[var(--app-primary)]" />
+              Estadisticas
+            </h2>
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+            <Statistics
             data={{
               ...metadataStats,
               phase: currentChallenge?.phase || "Desconocida",
               brokerInitialBalance: initialBalance // Pasar el balance inicial
             }}
           />
+            </div>
+
+
+                      {/* Resumen por instrumentos (si existe) */}
+                      {metadataStats?.currencySummary && metadataStats?.currencySummary.length > 0 && (
+                        <div className="flex flex-col gap-4 mt-4">
+                          <h2 className="text-lg font-semibold flex items-center">
+                            <ChartCandlestick className="w-5 h-5 mr-2 text-[var(--app-primary)]" />
+                            Resumen por Instrumentos
+                          </h2>
+                          <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {metadataStats.currencySummary.slice(0, 4).map((currency, index) => (
+                                <div key={index} className="bg-gray-50 dark:bg-zinc-900 p-3 rounded-md">
+                                  <h3 className="text-sm font-semibold mb-1">{currency.currency}</h3>
+                                  <div className="grid grid-cols-2 gap-1 text-sm">
+                                    <div>Total trades: <span className="font-medium">{currency.total.trades}</span></div>
+                                    <div>Ganancia: <span className={`font-medium ${currency.total.profit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                      ${currency.total.profit?.toFixed(2)}
+                                    </span></div>
+                                    <div>Ganados: <span className="font-medium text-green-500">
+                                      {currency.total.wonTrades || 0} ({currency.total.wonTradesPercent?.toFixed(1) || 0}%)
+                                    </span></div>
+                                    <div>Perdidos: <span className="font-medium text-red-500">
+                                      {currency.total.lostTrades || 0} ({currency.total.lostTradesPercent?.toFixed(1) || 0}%)
+                                    </span></div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+          </div>
+
+
+
+        </div>
+
+        {/* Columna derecha con métricas y objetivos */}
+        <div className="w-full lg:w-4/12">
+          <div className="grid grid-cols-1 gap-2 text-sm">
+            <div className="flex justify-between items-center bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <div className="flex items-center">
+                <FileChartPie className="w-5 h-5 mr-2 text-[var(--app-primary)]" />
+                Historial CH{currentChallenge?.id || "Sin nombre"}
+              </div>
+            </div>
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black space-y-4">
+              {/* Plataforma */}
+              <div className="">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-medium">Plataforma</h3>
+                  <span className="bg-[var(--app-primary)] text-white text-xs px-2 py-1 rounded">METATRADER 4</span>
+                </div>
+              </div>
+
+              {/* Tipo de cuenta */}
+              <div className="">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-medium">Tipo de cuenta</h3>
+                  <span className="bg-amber-100 text-[var(--app-secondary)] text-xs px-2 py-1 rounded">{currentStage?.name || "2 PASOS PRO"}</span>
+                </div>
+              </div>
+
+              {/* Fase */}
+              <div className="">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-medium">Fase</h3>
+                  <span className="font-medium">{currentChallenge?.phase || "3"}</span>
+                </div>
+              </div>
+
+              {/* Tamaño de la cuenta */}
+              <div className="">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-medium">Tamaño de la cuenta:</h3>
+                  <span className="font-bold">{initialBalance || "$10000"}</span>
+                </div>
+              </div>
+
+              {/* Periodo de inicio */}
+              <div className="">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-medium">Periodo de inicio:</h3>
+                  <span className="font-medium">
+                    {currentChallenge?.startDate
+                      ? new Date(currentChallenge.startDate).toLocaleDateString()
+                      : "21/3/2025"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Fin del periodo */}
+              <div className="">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-medium">Fin del periodo:</h3>
+                  <span className="font-medium">
+                    {currentChallenge?.endDate
+                      ? new Date(currentChallenge.endDate).toLocaleDateString()
+                      : "21/3/2025"}
+                  </span>
+                </div>
+              </div>
+
+                      <div className="">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-sm font-medium">Recompensas totales</h3>
+                        <span className="font-bold">${ metadataStats?.profit }</span>
+                        
+                      </div>
+                      </div>
+                    </div>
+
+                    {/* Objetivos comerciales */}
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <h2 className="text-base font-semibold mb-2">Objetivos comerciales</h2>
+
+              {/* Componente Objetivos */}
+              {currentStage ? (
+                <Objetivos
+                  challengeConfig={currentStage}
+                  metricsData={metadataStats}
+                  initBalance={initialBalance}
+                  phase={currentChallenge?.phase}
+                />
+              ) : (
+                <div className="text-center p-3">
+                  <p className="text-sm">No hay información de objetivos disponible.</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-      
-      {/* Componente para mostrar los challenges relacionados */}
+      {/* Challenges relacionados (si existen) */}
       {userData?.challenges && (
-          <RelatedChallenges 
-            currentChallenge={currentChallenge} 
+        <div className="mt-4">
+          <RelatedChallenges
+            currentChallenge={currentChallenge}
             userChallenges={userData.challenges}
           />
+        </div>
       )}
     </Layout>
   );
