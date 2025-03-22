@@ -10,13 +10,13 @@ export const navigation = [
     { icon: ChatBubbleLeftEllipsisIcon, name: 'Sociales', id: 'social', href: '/social' }, // Representa interacciones sociales.
     { icon: LifebuoyIcon, name: 'Soporte', id: 'support', href: '/support' }, // Icono clásico de soporte.
     { icon: ArrowRightOnRectangleIcon, name: 'Volver a la web', id: 'website', href: 'https://neocapitalfunding.com/' }, // Icono clásico de salir.
-    
-    
+
+
 ];
 
 export const userNavigation = [
     { name: 'Tu perfil', href: '/profile' },
-    { name: 'Facturación', href: '/billing'},
+    { name: 'Facturación', href: '/billing' },
     { name: 'Cerrar sesión', href: '/', signOut: true },
 ];
 

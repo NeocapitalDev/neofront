@@ -43,7 +43,7 @@ export default function Layout({ children }) {
             <main className="text-black dark:text-white">
                 {/* Estructura central */}
                 <div className="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-col lg:flex-row gap-8">
+                    <div className="flex flex-col lg:flex-row gap-2">
                         {/* Contenedor para mantener el espacio del sidebar */}
                         <div className="hidden lg:block" style={{ width: '300px', flexShrink: 0 }}>
                             {/* Este div es solo un espacio reservado */}
