@@ -101,7 +101,7 @@ export default function Historial() {
     if (error) {
         return (
             <Layout>
-                <div className="p-6 text-red-600 dark:text-red-400">
+                <div className="p-4 text-red-600 dark:text-red-400">
                     Error al cargar los datos: {error.message}
                 </div>
             </Layout>
@@ -204,17 +204,12 @@ export default function Historial() {
                 )}
             </div>
 
-            {/* Título de la sección de challenges */}
-            <div className="mt-4">
-                {/* <p className="text-base font-semibold mb-3">Lista de Challenges</p> */}
-            </div>
-
-            {/* Contenedor principal de challenges */}
-            <div className="bg-white p-5 rounded-lg shadow-md dark:bg-black dark:border-zinc-700 dark:shadow-black dark:text-white mt-4">
+            {/* Contenedor principal de challenges - REDUCIDO */}
+            <div className="bg-white p-3 rounded-lg shadow-md dark:bg-black dark:border-zinc-700 dark:shadow-black dark:text-white mt-4">
                 {/* Grupos de Challenges */}
-                <div className="space-y-4">
+                <div className="space-y-2">
                     {Object.entries(filteredGroups).length === 0 ? (
-                        <div className="bg-gray-50 p-8 rounded-lg text-center dark:bg-zinc-800">
+                        <div className="bg-gray-50 p-6 rounded-lg text-center dark:bg-zinc-800">
                             <p className="text-gray-500 dark:text-gray-400">No hay challenges que coincidan con los filtros.</p>
                         </div>
                     ) : (
@@ -230,49 +225,49 @@ export default function Historial() {
                                     key={parentId}
                                     className={`bg-gradient-to-b ${statusGradients[status] || 'from-gray-500/10'} to-zinc-800 rounded-lg shadow-md dark:border-zinc-700 overflow-hidden relative`}
                                 >
-                                    {/* Cabecera del Challenge (siempre visible) */}
-                                    <div className="flex flex-col p-4 lg:p-6 relative z-10">
+                                    {/* Cabecera del Challenge (siempre visible) - REDUCIDO */}
+                                    <div className="flex flex-col p-3 relative z-10">
                                         {/* Identificador del challenge y botón de expansión en una fila */}
-                                        <div className="flex justify-between items-center mb-4">
-                                            <div className="bg-[var(--app-primary)] rounded-lg shadow-md text-black text-center text-lg font-bold px-3 py-2">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <div className="bg-[var(--app-primary)] rounded-lg shadow-md text-black text-center text-base font-bold px-2 py-1">
                                                 <span className="block" title={parentId}>CH-{challenges[0].id}</span>
                                             </div>
                                             <div className="flex items-center">
                                                 <button
                                                     onClick={() => toggleGroup(parentId)}
-                                                    className="p-2 rounded-full dark:hover:bg-zinc-600/70 hover:bg-gray-200 mr-2 transition-colors"
+                                                    className="p-1 rounded-full dark:hover:bg-zinc-600/70 hover:bg-gray-200 mr-2 transition-colors"
                                                     aria-label={isExpanded ? "Collapse" : "Expand"}
                                                 >
                                                     {isExpanded ? (
-                                                        <ChevronUpIcon className="h-6 text-gray-600 w-6 dark:text-gray-300" />
+                                                        <ChevronUpIcon className="h-5 text-gray-600 w-5 dark:text-gray-300" />
                                                     ) : (
-                                                        <ChevronDownIcon className="h-6 text-gray-600 w-6 dark:text-gray-300" />
+                                                        <ChevronDownIcon className="h-5 text-gray-600 w-5 dark:text-gray-300" />
                                                     )}
                                                 </button>
 
                                                 {/* Botón de metrix */}
                                                 <Link href={lastChallenge.result === 'progress' ? `/metrix2/${lastChallenge.documentId}` : `/historial/${lastChallenge.documentId}`}>
-                                                    <button className="flex bg-gray-200 border border-gray-300 justify-center rounded-lg shadow-md dark:bg-zinc-700/90 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-300 items-center px-4 py-2 space-x-2">
-                                                        <ChartBarIcon className="h-5 w-5 mr-2" />
+                                                    <button className="flex bg-gray-200 border border-gray-300 justify-center rounded-lg shadow-md dark:bg-zinc-700/90 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-300 items-center px-3 py-1 space-x-1 text-sm">
+                                                        <ChartBarIcon className="h-4 w-4 mr-1" />
                                                         <span>Metrix</span>
                                                     </button>
                                                 </Link>
                                             </div>
                                         </div>
 
-                                        {/* Información principal */}
+                                        {/* Información principal - REDUCIDO */}
                                         <div className="pl-1">
                                             {/* Estado y fase actual */}
-                                            <div className="flex flex-wrap gap-3 items-center mb-3">
-                                                <div className="gap-2 inline-flex items-center">
-                                                    <span className={`inline-block w-3 h-3 rounded-full ${status === 'approved' ? 'bg-green-600' :
+                                            <div className="flex flex-wrap gap-2 items-center mb-2">
+                                                <div className="gap-1 inline-flex items-center">
+                                                    <span className={`inline-block w-2 h-2 rounded-full ${status === 'approved' ? 'bg-green-600' :
                                                         status === 'progress' ? 'bg-yellow-500' :
                                                             status === 'disapproved' ? 'bg-red-600' :
                                                                 status === 'init' ? 'bg-blue-500' :
                                                                     status === 'withdrawal' ? 'bg-purple-500' :
                                                                         'bg-orange-500'
                                                         }`} />
-                                                    <span className={`font-semibold ${statusColors[status] || 'text-gray-600 dark:text-gray-300'}`}>
+                                                    <span className={`font-semibold text-sm ${statusColors[status] || 'text-gray-600 dark:text-gray-300'}`}>
                                                         {status === 'approved' ? 'Aprobado' :
                                                             status === 'progress' ? 'En progreso' :
                                                                 status === 'disapproved' ? 'Desaprobado' :
@@ -282,46 +277,46 @@ export default function Historial() {
                                                     </span>
                                                 </div>
                                                 <span className="text-gray-500 dark:text-gray-400 hidden md:inline">|</span>
-                                                <span className="bg-gray-100/20 backdrop-blur-sm rounded-md text-gray-600 dark:text-gray-300 px-3 py-1 dark:bg-zinc-700/60">
+                                                <span className="bg-gray-100/20 backdrop-blur-sm rounded-md text-gray-600 text-xs dark:text-gray-300 px-2 py-0.5 dark:bg-zinc-700/60">
                                                     Fase {lastChallenge.phase}
                                                 </span>
                                             </div>
 
                                             {/* Período */}
-                                            <div className="flex text-gray-500 text-sm dark:text-gray-400 items-center mb-3">
-                                                <span className="font-medium mr-2">Período:</span>
-                                                <span className="bg-gray-100/20 backdrop-blur-sm rounded-md text-gray-700 dark:text-gray-300 px-3 py-1 dark:bg-zinc-700/60">{startDateFormatted} - {endDateFormatted}</span>
+                                            <div className="flex text-gray-500 text-xs dark:text-gray-400 items-center mb-2">
+                                                <span className="font-medium mr-1">Período:</span>
+                                                <span className="bg-gray-100/20 backdrop-blur-sm rounded-md text-gray-700 dark:text-gray-300 px-2 py-0.5 dark:bg-zinc-700/60 text-xs">{startDateFormatted} - {endDateFormatted}</span>
                                             </div>
 
                                             {/* Última actualización */}
-                                            <div className="flex text-sm gap-2 items-center">
+                                            <div className="flex text-xs gap-1 items-center">
                                                 <span className="text-black dark:text-white font-semibold">Última actualización:</span>
-                                                <span className="bg-gray-100/20 backdrop-blur-sm rounded-md text-gray-600 dark:text-gray-300 px-3 py-1 dark:bg-zinc-700/60">
+                                                <span className="bg-gray-100/20 backdrop-blur-sm rounded-md text-gray-600 dark:text-gray-300 px-2 py-0.5 dark:bg-zinc-700/60">
                                                     {formatDate(lastChallenge.endDate ? lastChallenge.endDate : lastChallenge.startDate)}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Detalles del Challenge (expandible) */}
+                                    {/* Detalles del Challenge (expandible) - REDUCIDO */}
                                     {isExpanded && (
-                                        <div className="bg-zinc-900/60 border-gray-200 border-t dark:border-zinc-700/70 px-6 py-4">
-                                            <h3 className="text-gray-800 text-sm dark:text-gray-300 font-semibold mb-3">Historial de fases</h3>
-                                            <div className="space-y-3">
+                                        <div className="bg-zinc-900/60 border-gray-200 border-t dark:border-zinc-700/70 px-3 py-2">
+                                            <h3 className="text-gray-800 text-xs dark:text-gray-300 font-semibold mb-2">Historial de fases</h3>
+                                            <div className="space-y-2">
                                                 {challenges.map((challenge, index) => {
                                                     return (
                                                         <div
                                                             key={index}
-                                                            className={`p-4 rounded-lg shadow-sm border bg-gradient-to-b ${statusGradients[challenge.result] || 'from-gray-500/10'} to-zinc-800 border-gray-200 dark:border-zinc-700/70 relative overflow-hidden`}
+                                                            className={`p-2 rounded-lg shadow-sm border bg-gradient-to-b ${statusGradients[challenge.result] || 'from-gray-500/10'} to-zinc-800 border-gray-200 dark:border-zinc-700/70 relative overflow-hidden`}
                                                         >
                                                             <div className="flex flex-col justify-between sm:flex-row relative z-10">
                                                                 {/* Info de la fase */}
-                                                                <div className="mb-3 sm:mb-0">
+                                                                <div className="mb-2 sm:mb-0">
                                                                     <div className="flex items-center mb-1">
-                                                                        <span className="text-gray-800 text-lg dark:text-white font-semibold">
+                                                                        <span className="text-gray-800 text-sm dark:text-white font-semibold">
                                                                             Fase {challenge.phase}
                                                                         </span>
-                                                                        <span className={`ml-3 px-3 py-1 rounded-full text-xs font-medium ${statusColors[challenge.result]} backdrop-blur-sm ${challenge.result === 'approved' ? 'bg-green-900/30' : 
+                                                                        <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[challenge.result]} backdrop-blur-sm ${challenge.result === 'approved' ? 'bg-green-900/30' : 
                                                                             challenge.result === 'progress' ? 'bg-yellow-900/30' : 
                                                                             challenge.result === 'disapproved' ? 'bg-red-900/30' :
                                                                             challenge.result === 'init' ? 'bg-blue-900/30' :
@@ -335,8 +330,8 @@ export default function Historial() {
                                                                                                 challenge.result === 'retry' ? 'Rechazado' : challenge.result}
                                                                         </span>
                                                                     </div>
-                                                                    <div className="flex text-gray-600 text-sm dark:text-gray-300 items-center mt-2">
-                                                                        <CalendarIcon className="h-4 text-gray-500 w-4 mr-1" />
+                                                                    <div className="flex text-gray-600 text-xs dark:text-gray-300 items-center mt-1">
+                                                                        <CalendarIcon className="h-3 text-gray-500 w-3 mr-1" />
                                                                         <span>
                                                                             {formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}
                                                                         </span>
@@ -347,8 +342,8 @@ export default function Historial() {
                                                                 <Link
                                                                     href={challenge.result === 'progress' ? `/metrix2/${challenge.documentId}` : `/historial/${challenge.documentId}`}
                                                                 >
-                                                                    <button className="flex bg-gray-200/20 backdrop-blur-sm border border-gray-300/30 justify-center rounded-lg shadow-md dark:bg-zinc-700/70 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-300/30 items-center px-4 py-2 space-x-2">
-                                                                        <ChartBarIcon className="h-4 w-4 mr-2" />
+                                                                    <button className="flex bg-gray-200/20 backdrop-blur-sm border border-gray-300/30 justify-center rounded-lg shadow-md dark:bg-zinc-700/70 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-300/30 items-center px-3 py-1 space-x-1 text-xs">
+                                                                        <ChartBarIcon className="h-3 w-3 mr-1" />
                                                                         <span>Ver detalles</span>
                                                                     </button>
                                                                 </Link>
