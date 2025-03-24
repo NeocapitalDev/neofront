@@ -17,9 +17,9 @@ export default function ModalRoullete() {
         <img 
           src="/images/sorteo.svg" 
           alt="Sorteo" 
-          width={40} 
-          height={40}
-          className="w-28 h-28"
+          width={30} 
+          height={30}
+          className="w-24 h-24"
         />
       </DialogTrigger>
       <DialogContent className="bg-black text-[var(--app-primary)] p-0 rounded-lg border-2 border-[var(--app-primary)] shadow-[0_0_20px_rgba(255,215,0,0.3)] max-w-md w-full max-h-[90vh] overflow-hidden">
