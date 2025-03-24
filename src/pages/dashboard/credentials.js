@@ -2,41 +2,35 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, ClipboardDocumentIcon, PencilIcon, KeyIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-import ButtonInit from 'src/pages/dashboard/button_init';
 
-export default function CredencialesModal({ login, password, server, platform, inversorPass
-}) {
+export default function CredencialesModal({ login, password, server, platform, inversorPass }) {
     const [open, setOpen] = useState(false);
-    const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar la contraseña
-    const [copied, setCopied] = useState({}); // Estado para el mensaje de "Copiado" para cada item
+    const [showPassword, setShowPassword] = useState(false);
+    const [copied, setCopied] = useState({});
 
-    // Elimino la "Contraseña de solo lectura" del array de datos
     const data = [
         { label: 'Login', value: login },
         { label: 'Contraseña', value: password },
         { label: 'InversorPass', value: inversorPass },
-
         { label: 'Servidor', value: server },
         { label: 'Plataforma', value: platform },
-
     ];
 
     const handleCopy = (label, value) => {
-        navigator.clipboard.writeText(value); // Copia el valor al portapapeles sin alertas
-        setCopied(prev => ({ ...prev, [label]: true })); // Muestra el mensaje de copiado para el ítem
-        setTimeout(() => setCopied(prev => ({ ...prev, [label]: false })), 2000); // El mensaje desaparece después de 2 segundos
+        navigator.clipboard.writeText(value);
+        setCopied(prev => ({ ...prev, [label]: true }));
+        setTimeout(() => setCopied(prev => ({ ...prev, [label]: false })), 2000);
     };
 
     return (
-        <div className='flex items-center space-x-4'>
-
-            {/* Botón para abrir el modal */}
+        <>
+            {/* Botón adaptado al estilo existente */}
             <button
-                className="flex items-center justify-center space-x-2 px-4 py-2 border rounded-lg shadow-md bg-gray-200 hover:bg-gray-300 w-auto dark:bg-zinc-700 dark:hover:bg-zinc-600 dark:border-zinc-500"
+                className="flex items-center justify-center space-x-1 px-3 py-1 rounded-lg transition-all duration-200 bg-white hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 shadow-sm hover:shadow text-sm"
                 onClick={() => setOpen(true)}
             >
-                <KeyIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                <span className="text-xs lg:text-sm dark:text-zinc-200">Credenciales</span>
+                <KeyIcon className="h-7 w-6 text-[var(--app-primary)]" />
+                <span className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Credenciales</span>
             </button>
 
             {/* Modal */}
@@ -156,13 +150,12 @@ export default function CredencialesModal({ login, password, server, platform, i
                                             })}
                                         </div>
                                     </div>
-
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>
                     </div>
                 </Dialog>
             </Transition.Root>
-        </div>
+        </>
     );
 }

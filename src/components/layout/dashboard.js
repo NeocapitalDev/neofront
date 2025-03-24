@@ -9,21 +9,21 @@ import { useEffect, useState } from 'react';
 export default function Layout({ children }) {
     // Estado para almacenar la altura de la navbar
     const [navbarHeight, setNavbarHeight] = useState(64); // Valor inicial aproximado
-    
+
     // Efecto para medir la altura de la navbar después de que el componente se monte
     useEffect(() => {
         const navbar = document.querySelector('nav'); // Ajusta el selector según la estructura de tu navbar
         if (navbar) {
             setNavbarHeight(navbar.offsetHeight);
         }
-        
+
         // Actualizar la altura si cambia el tamaño de la ventana
         const handleResize = () => {
             if (navbar) {
                 setNavbarHeight(navbar.offsetHeight);
             }
         };
-        
+
         window.addEventListener('resize', handleResize);
         return () => {
             window.removeEventListener('resize', handleResize);
@@ -36,10 +36,10 @@ export default function Layout({ children }) {
             <div className="fixed top-0 left-0 right-0 z-50">
                 <Navbar />
             </div>
-            
+
             {/* Espacio en blanco para compensar la altura del navbar fijo */}
             <div style={{ height: navbarHeight }}></div>
-            
+
             <main className="text-black dark:text-white">
                 {/* Estructura central */}
                 <div className="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8">
@@ -48,11 +48,11 @@ export default function Layout({ children }) {
                         <div className="hidden lg:block" style={{ width: '300px', flexShrink: 0 }}>
                             {/* Este div es solo un espacio reservado */}
                         </div>
-                        
+
                         {/* Sidebar fijo */}
-                        <div className="hidden lg:block fixed" style={{ 
-                            width: '300px', 
-                            top: navbarHeight, 
+                        <div className="hidden lg:block fixed" style={{
+                            width: '300px',
+                            top: navbarHeight,
                             paddingTop: '1.5rem', // py-12 equivalente
                             paddingLeft: '1rem',  // Ajusta según sea necesario
                             paddingRight: '1rem', // Ajusta según sea necesario
@@ -62,7 +62,7 @@ export default function Layout({ children }) {
                                 <Sidebar />
                             </div>
                         </div>
-                        
+
                         {/* Columna de contenido que se desplaza */}
                         <div className="flex-1">
                             <Breadcrumb />
@@ -70,11 +70,12 @@ export default function Layout({ children }) {
                             <FooterInfo />
                         </div>
                     </div>
+                    <div style={{ position: 'fixed', bottom: '10px', right: '10px', zIndex: 1000 }} className='flex flex-col gap-4'>
+                        <ModalRoullete />
+                        {/* <ChatwootWidget /> */}
+                    </div>
                 </div>
-                <div style={{ position: 'fixed', bottom: '10px', right: '10px', zIndex: 1000 }} className='flex flex-col gap-4'>
-                    <ModalRoullete />
-                    {/* <ChatwootWidget /> */}
-                </div>
+
             </main>
         </div>
     );
