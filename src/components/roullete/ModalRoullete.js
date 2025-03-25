@@ -35,7 +35,6 @@ export default function ModalRoullete() {
         {/* Scrollable content area with improved styling */}
         <div className="overflow-y-auto max-h-[calc(80vh-140px)] py-4 px-4 bg-black">
           <TicketsList />
-
           {/* Hidden gradient at bottom to fade out scrollable content */}
           <div className="sticky bottom-0 left-0 right-0 h-4 bg-gradient-to-t to-transparent pointer-events-none -mt-4"></div>
         </div>

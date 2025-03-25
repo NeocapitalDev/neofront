@@ -8,6 +8,7 @@ import {
 import RuletaSorteo from './RoulleteWo';
 import { useStrapiData } from '@/services/strapiService';
 import { useSession } from "next-auth/react";
+import { createPortal } from 'react-dom';
 
 // Minimalistic TicketCard component
 const TicketCard = ({ ticket, onOpenRoulette }) => {
@@ -91,6 +92,78 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
   );
 };
 
+// Independent RouletteModal Component
+const RouletteModal = ({ isOpen, onClose, ticket }) => {
+  if (!isOpen || typeof document === 'undefined') return null;
+  
+  // Using portal to render the modal outside of the parent DOM hierarchy
+  // This ensures the modal size is completely independent
+  return createPortal(
+    <div 
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]"
+      style={{
+        position: 'fixed',
+        top: 0, left: 0, right: 0, bottom: 0,
+        zIndex: 9999,
+        pointerEvents: 'auto'
+      }}
+      onClick={(e) => {
+        // Close when clicking outside the modal content
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      {/* Contenido del modal con dimensiones responsivas */}
+      <div 
+        className="relative z-10 bg-black rounded-lg w-full max-w-md mx-auto flex flex-col items-center overflow-hidden"
+        style={{
+          border: '2px solid #FFD700',
+          boxShadow: '0 0 20px rgba(255, 215, 0, 0.5)',
+          height: '500px',
+          maxHeight: '90vh'
+        }}
+        onClick={(e) => e.stopPropagation()} // Prevent clicks from reaching the backdrop
+      >
+        {/* Botón de cerrar */}
+        <div className="absolute top-4 right-4 z-20">
+          <button
+            onClick={onClose}
+            className="text-yellow-500 hover:text-white bg-black/80 rounded-full p-1 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Header text - Mejor centrado */}
+        <div className="relative z-10 text-center pt-4 pb-2">
+          <h3 className="text-2xl font-bold text-yellow-400">¡Gira la Ruleta!</h3>
+        </div>
+
+        {/* Sección para la ruleta - Centrada verticalmente */}
+        <div className="flex-grow flex flex-col justify-center items-center w-full px-2 py-4">
+          <RuletaSorteo
+            documentId={ticket?.documentId}
+            onClose={onClose}
+            width={240}
+            height={240}
+            customStyle={{
+              background: 'transparent',
+              boxShadow: 'none',
+              margin: '0 auto',
+              padding: 0
+            }}
+          />
+        </div>
+
+        {/* Espacio para que el botón de "Girar" del componente RuletaSorteo tenga suficiente espacio */}
+        <div className="h-4 md:h-6 w-full"></div>
+      </div>
+    </div>,
+    document.body // Mount the portal directly to the body element
+  );
+};
+
 // Main TicketsList component
 export default function TicketsList() {
   const [isRouletteOpen, setIsRouletteOpen] = useState(false);
@@ -106,47 +179,6 @@ export default function TicketsList() {
   const handleOpenRoulette = (ticket) => {
     setSelectedTicket(ticket);
     setIsRouletteOpen(true);
-  };
-
-  // Roulette modal component
-  const RouletteModal = ({ isOpen, onClose, ticket }) => {
-    if (!isOpen) return null;
-
-    return (
-      <div className="fixed inset-0 flex items-center justify-center z-[100]">
-        {/* Full screen overlay to prevent seeing content underneath */}
-        <div className="absolute inset-0 bg-black opacity-95"></div>
-
-        {/* Actual modal content */}
-        <div className="relative z-10 mx-auto bg-black rounded-lg overflow-hidden max-w-sm w-full">
-          {/* Custom border with glow effect */}
-          <div className="absolute inset-0 rounded-lg border-2 border-[var(--app-primary)] shadow-[0_0_15px_rgba(255,215,0,0.5)]"></div>
-
-          {/* Close button */}
-          <div className="absolute top-2 right-2 z-20">
-            <button
-              onClick={onClose}
-              className="text-[var(--app-primary)] hover:text-white bg-black/80 rounded-full p-1.5 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Header text */}
-          <div className="relative z-10 text-center pt-6 pb-2 px-4">
-            <h3 className="text-2xl font-bold text-[var(--app-primary)]">¡Gira la Ruleta!</h3>
-            <p className="text-gray-400 text-sm">Ticket: {ticket?.codigo}</p>
-          </div>
-
-          {/* Roulette component container */}
-          <div className="relative z-10 p-4">
-            <RuletaSorteo documentId={ticket?.documentId} />
-          </div>
-        </div>
-      </div>
-    );
   };
 
   // Loading state
@@ -195,7 +227,7 @@ export default function TicketsList() {
         ))}
       </div>
 
-      {/* Roulette modal */}
+      {/* Roulette modal - rendered outside the DOM hierarchy */}
       <RouletteModal
         isOpen={isRouletteOpen}
         onClose={() => setIsRouletteOpen(false)}
