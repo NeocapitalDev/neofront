@@ -228,28 +228,36 @@ const SocialsPage = () => {
                                             </p>
                                         )}
 
-                                        <div className="flex space-x-4">
-                                            <Button
-                                                className="bg-[#1F6263] hover:bg-[#29716c] text-white text-sm font-medium px-6 py-5 rounded-md"
-                                                onClick={handleDownload}
-                                            >
-                                                Descargar PDF
-                                            </Button>
-                                            <input
-                                                type="file"
-                                                accept="application/pdf"
-                                                onChange={handleFileChange}
-                                                className="mb-4"
-                                                disabled={loading || isUploadDisabled}
-                                            />
-                                            <Button
-                                                className="bg-[#1F6263] hover:bg-[#29716c] text-white text-sm font-medium px-6 py-5 rounded-md"
-                                                disabled={!pdfFile || loading || isUploadDisabled}
-                                                onClick={handlePdf}
-                                            >
-                                                {loading ? "Subiendo..." : isSigned ? "Actualizar PDF" : "Subir PDF"}
-                                            </Button>
-                                        </div>
+<div className="flex flex-col items-center space-y-6">
+    {/* Botón de Descargar PDF con ancho completo */}
+    <Button
+        className="w-full bg-[#1F6263] hover:bg-[#29716c] text-white text-lg font-semibold px-6 py-4 rounded-lg shadow-md transition-all"
+        onClick={handleDownload}
+    >
+        Descargar PDF
+    </Button>
+
+    {/* Contenedor para el input y el botón de subida */}
+    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0 w-full">
+        <input
+            type="file"
+            accept="application/pdf"
+            onChange={handleFileChange}
+            className="file:cursor-pointer file:border-none file:rounded-lg file:bg-[#1F6263] file:text-white file:px-4 file:py-2 file:font-medium hover:file:bg-[#29716c] disabled:opacity-50 w-full sm:w-auto"
+            disabled={loading || isUploadDisabled}
+        />
+        <Button
+            className={`w-full sm:w-auto bg-[#1F6263] hover:bg-[#29716c] text-white text-lg font-semibold px-6 py-4 rounded-lg shadow-md transition-all ${
+                (!pdfFile || loading || isUploadDisabled) ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={!pdfFile || loading || isUploadDisabled}
+            onClick={handlePdf}
+        >
+            {loading ? "Subiendo..." : isSigned ? "Subir PDF" : "Subir PDF"}
+        </Button>
+    </div>
+</div>
+
                                     </div>
                                 )}
                             </div>
