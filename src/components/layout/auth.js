@@ -40,13 +40,16 @@ const Layout = ({ children }) => {
                 width={236}
                 height={60}
               />
-              <Image
-                className="h-10 w-auto hidden dark:block"
-                src="/images/logo-dark.png"
-                alt="Logo"
-                width={236}
-                height={60}
-              />
+<div className="flex justify-center md:block">
+  <Image
+    className="h-10 w-auto hidden dark:block md:inline"
+    src="/images/logo-dark.png"
+    alt="Logo"
+    width={236}
+    height={60}
+  />
+</div>
+
             </Link>
             <main className="mt-6">{children}</main>
           </div>
