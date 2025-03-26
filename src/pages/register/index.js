@@ -115,16 +115,20 @@ export default function SignUp() {
 
 
             <div className="flex justify-center mt-2">
-      <button
-        className="flex items-center justify-center gap-2 w-full sm:w-auto border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded-md shadow-md hover:shadow-lg transition-shadow duration-300"
-      >
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-          alt="Google"
-          className="h-5 w-5"
-        />
-        <span className="text-sm text-zinc-700 dark:text-zinc-300 font-medium"> Google</span>
-        </button>
+            <button
+  className="flex items-center justify-center gap-2 w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded-md shadow-md hover:shadow-lg transition-shadow duration-300"
+>
+  <img
+    src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+    alt="Google"
+    className="h-5 w-5"
+  />
+  <span className="text-sm text-zinc-700 dark:text-zinc-300 font-medium">Google</span>
+</button>
+
+
+
+
     </div>
 
 <h2 className="text-sm font-semibold  text-center text-white">o</h2>
