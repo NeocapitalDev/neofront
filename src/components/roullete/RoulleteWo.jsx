@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useStrapiData } from "src/services/strapiService";
 import { useSession } from "next-auth/react";
+import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/outline';
 
 export default function RuletaSorteo({
   customOptions,
@@ -25,7 +26,7 @@ export default function RuletaSorteo({
   const centerImageRef = useRef(null);
   const [hasSpun, setHasSpun] = useState(false); // New state to track if wheel has been spun successfully
   const [ticketError, setTicketError] = useState("");
-
+  const [codigoCopiad, setCodigoCopiad] = useState(false);
   // Refs para controlar la animación
   const animationRef = useRef(null);
   const celebrationRef = useRef(null);
@@ -69,6 +70,22 @@ export default function RuletaSorteo({
     // Añadimos vueltas extras para efecto visual (por ejemplo, 5 vueltas completas)
     const extraSpins = 5 * 2 * Math.PI;
     return currentAngle + extraSpins + delta;
+  };
+
+  const copiarCodigoAlPortapapeles = () => {
+    if (codigoRef.current) {
+      navigator.clipboard.writeText(codigoRef.current)
+        .then(() => {
+          setCodigoCopiad(true);
+          // Reinicia el estado después de 2 segundos
+          setTimeout(() => {
+            setCodigoCopiad(false);
+          }, 2000);
+        })
+        .catch(err => {
+          console.error('Error al copiar el código: ', err);
+        });
+    }
   };
 
   // ---------------------------
@@ -568,6 +585,7 @@ export default function RuletaSorteo({
         // borderRadius: "10px",
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.8)",
         maxWidth: "400px",
+        width: "100%", // Added width: 100% for full width
         margin: "auto",
       }}
     >
@@ -639,8 +657,7 @@ export default function RuletaSorteo({
           {/* Resultado del giro mostrado debajo de la flecha */}
           {selectedOption && !isSpinning && (
             <>
-              {/* <div className="my-10"></div> */}
-              <motion.p
+              <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
@@ -651,12 +668,46 @@ export default function RuletaSorteo({
                   color: "#FFEB3B",
                   fontWeight: "bold",
                   textAlign: "center",
+                  width: "100%"
                 }}
               >
-                ¡Ganaste un descuento de: {selectedOption.name}% !
-                <br />
-                Código: {codigoRef.current}
-              </motion.p>
+                <p>¡Ganaste un descuento de: {selectedOption.name}%!</p>
+
+                <div className="flex items-center justify-center mt-2 w-full">
+                  <span className="mr-2">Código: {codigoRef.current}</span>
+                  <motion.button
+                    onClick={copiarCodigoAlPortapapeles}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "5px",
+                    }}
+                  >
+                    {codigoCopiad ? (
+                      <CheckIcon className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <ClipboardDocumentIcon className="h-5 w-5 text-[#FFEB3B]" />
+                    )}
+                  </motion.button>
+                </div>
+
+                {codigoCopiad && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="text-xs text-green-500 mt-1"
+                  >
+                    ¡Código copiado!
+                  </motion.div>
+                )}
+              </motion.div>
             </>
           )}
 
@@ -686,11 +737,13 @@ export default function RuletaSorteo({
             </>
           )}
 
+          {/* Only render the button if the wheel hasn't been spun yet */}
           {!hasSpun && (
-            <div className="flex justify-center gap-4 items-center">
+            <div className="flex justify-center gap-4 items-center w-full">
               <motion.button
                 onClick={spinWheel}
                 disabled={isSpinning}
+                className="w-full"
                 whileHover={!isSpinning ? { scale: 1.05 } : {}}
                 whileTap={!isSpinning ? { scale: 0.95 } : {}}
                 style={{

@@ -118,7 +118,7 @@ const RouletteModal = ({ isOpen, onClose, ticket }) => {
         style={{
           border: '2px solid #FFD700',
           boxShadow: '0 0 20px rgba(255, 215, 0, 0.5)',
-          height: '500px',
+          height: '520px',
           maxHeight: '90vh'
         }}
         onClick={(e) => e.stopPropagation()} // Prevent clicks from reaching the backdrop
