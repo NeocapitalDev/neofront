@@ -8,11 +8,11 @@ import Loader from "../../components/loaders/loader";
 import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import CredencialesModal from "../dashboard/credentials";
 import Link from "next/link";
-import WinLoss from "./winloss";
-import Statistics from './statistics';
-import MyPage from "./grafico";
-import Dashboard from "src/pages/metrix2/barrascircular";
-import Objetivos from "./objetivos";
+import WinLoss from "../../components/metrix/winloss";
+import Statistics from '../../components/metrix/statistics';
+import MyPage from "../../components/metrix/grafico";
+import Dashboard from "@/components/metrix/barrascircular";
+import Objetivos from "../../components/metrix/objetivos";
 import RelatedChallenges from "../../components/challenges/RelatedChallenges";
 import { BarChart, Landmark, FileChartColumn, ChartCandlestick, FileChartPie } from "lucide-react";
 

@@ -645,7 +645,7 @@ export default function RuletaSorteo({
                 src="/images/icon-dark.png"
                 alt=""
                 style={{
-                  width: "100%",
+                  width: "80%",
                   maxWidth: "80px",
                   display: "block"
                 }}
@@ -739,7 +739,7 @@ export default function RuletaSorteo({
 
           {/* Only render the button if the wheel hasn't been spun yet */}
           {!hasSpun && (
-            <div className="flex justify-center gap-4 items-center w-full">
+            <div className="flex justify-center gap-4 items-center ">
               <motion.button
                 onClick={spinWheel}
                 disabled={isSpinning}

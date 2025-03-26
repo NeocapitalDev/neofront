@@ -15,7 +15,7 @@ import Objetivos from "./objetivos";
 import WinRates from "./winlossrates";
 import { useStrapiData } from "src/services/strapiServiceId";
 
-import Index from "../metrix2/barrascircular";
+import Index from "../../components/metrix/barrascircular";
 
 // const fetcher = (url) =>
 //   fetch(url, {

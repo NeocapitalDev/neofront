@@ -8,14 +8,15 @@ import Loader from "../../components/loaders/loader";
 import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { BarChart, Landmark, FileChartColumn, ChartCandlestick, FileChartPie } from "lucide-react";
+import RelatedChallenges from "@/components/challenges/RelatedChallenges";
+import ChartMetadata from "../admin/challenges/ChartMetadata";
+import WinLossHistorical from "../admin/challenges/WinLossHistorical";
+import StatisticsHistorical from "../admin/challenges/StatisticsHistorical";
+import Objetivos from "../../components/metrix/objetivos";
 
 // Componentes importados
-import CircularProgressMetadata from "./CircularProgressMetadata";
-import ChartMetadata from "./ChartMetadata";
-import WinLossHistorical from "./WinLossHistorical";
-import StatisticsHistorical from "./StatisticsHistorical";
-import RelatedChallenges from "../../components/challenges/RelatedChallenges";
-import Objetivos from "./objetivos";
+//import CircularProgressMetadata from "./CircularProgressMetadata";
+
 
 // Fetcher simplificado sin Content-Type para GET requests
 const fetcher = (url, token) =>
@@ -416,7 +417,7 @@ const HistorialMetrix = () => {
           {metadataStats.currencySummary && metadataStats.currencySummary.length > 0 && (
             <div className="flex flex-col gap-4 mt-4">
               <h2 className="text-lg font-semibold flex items-center">
-                <ChartCandlestick className="w-5 h-5 mr-2 text-[var(--app-primary)]" />
+                <ChartCandlestick   className="w-5 h-5 mr-2 text-[var(--app-primary)]" />
                 Resumen por Instrumentos
               </h2>
               <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">

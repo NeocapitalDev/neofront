@@ -9,7 +9,7 @@ import RuletaSorteo from './RoulleteWo';
 import { useStrapiData } from '@/services/strapiService';
 import { useSession } from "next-auth/react";
 import { createPortal } from 'react-dom';
-
+import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/outline';
 // Minimalistic TicketCard component
 const TicketCard = ({ ticket, onOpenRoulette }) => {
   const formatDate = (dateString) => {
@@ -20,7 +20,19 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
       year: 'numeric',
     });
   };
-
+  const copiarCodigo = () => {
+    if (ticket.codigo) {
+      navigator.clipboard.writeText(ticket.codigo)
+        .then(() => {
+          setCopiado(true);
+          setTimeout(() => setCopiado(false), 2000);
+        })
+        .catch(err => {
+          console.error('Error al copiar el código: ', err);
+        });
+    }
+  };
+  const [copiado, setCopiado] = useState(false);
   return (
     <div className="mb-3 hover:transform hover:scale-[1.01] transition-all duration-300">
       <div className="bg-black/70 border border-[var(--app-primary)]/30 rounded-lg p-4 hover:border-[var(--app-primary)]/70 transition-colors">
@@ -45,9 +57,29 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
                 </div>
               </div>
 
-              <h3 className="font-bold text-lg text-[var(--app-primary)] truncate mt-1">
-                {ticket.codigo || 'No definido'}
-              </h3>
+              <div className="flex items-center justify-between mt-1">
+                <h3 className="font-bold text-lg text-[var(--app-primary)] truncate mr-2">
+                  {ticket.codigo || 'No definido'}
+                </h3>
+                <div className="relative flex-shrink-0 flex items-center">
+                  <button
+                    onClick={copiarCodigo}
+                    className="p-1 rounded-full hover:bg-black/30 transition-colors"
+                    title="Copiar código"
+                  >
+                    {copiado ? (
+                      <CheckIcon className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <ClipboardDocumentIcon className="h-5 w-5 text-[var(--app-primary)]" />
+                    )}
+                  </button>
+                  {copiado && (
+                    <div className="ml-2 text-xs text-green-500 bg-black/70 py-1 px-2 rounded whitespace-nowrap">
+                      ¡Copiado!
+                    </div>
+                  )}
+                </div>
+              </div>
 
               <div className="flex items-center text-xs text-gray-400 mt-1">
                 <ClockIcon className="h-3 w-3 mr-1" />
@@ -80,7 +112,7 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
                 <span>Girar Ruleta</span>
               </button>
             ) : (
-              <div className="w-full bg-red-900/50 border border-red-700/50 text-white text-sm font-medium py-2 px-4 rounded-md flex items-center justify-center gap-2">
+              <div className="w-full bg-red-700/50 border border-red-500/50 text-white text-sm font-medium py-2 px-4 rounded-md flex items-center justify-center gap-2">
                 <XCircleIcon className="h-4 w-4" />
                 <span>Ticket Utilizado</span>
               </div>
@@ -93,13 +125,12 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
 };
 
 // Independent RouletteModal Component
-const RouletteModal = ({ isOpen, onClose, ticket }) => {
+const RouletteModal = ({ isOpen, onClose, ticket, onTicketUsed }) => { // Añadido onTicketUsed
   if (!isOpen || typeof document === 'undefined') return null;
-  
+
   // Using portal to render the modal outside of the parent DOM hierarchy
-  // This ensures the modal size is completely independent
   return createPortal(
-    <div 
+    <div
       className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]"
       style={{
         position: 'fixed',
@@ -113,7 +144,7 @@ const RouletteModal = ({ isOpen, onClose, ticket }) => {
       }}
     >
       {/* Contenido del modal con dimensiones responsivas */}
-      <div 
+      <div
         className="relative z-10 bg-black rounded-lg w-full max-w-md mx-auto flex flex-col items-center overflow-hidden"
         style={{
           border: '2px solid #FFD700',
@@ -145,6 +176,13 @@ const RouletteModal = ({ isOpen, onClose, ticket }) => {
           <RuletaSorteo
             documentId={ticket?.documentId}
             onClose={onClose}
+            // Añadido: callback para cuando se recibe un premio
+            onPrizeReceived={() => {
+              // Llamar a onTicketUsed con el ID del ticket cuando se recibe un premio
+              if (ticket && ticket.id) {
+                onTicketUsed(ticket.id);
+              }
+            }}
             width={240}
             height={240}
             customStyle={{
@@ -170,6 +208,9 @@ export default function TicketsList() {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const { data: session } = useSession();
 
+  // Nuevo: estado para rastrear tickets utilizados mediante la ruleta
+  const [usedTickets, setUsedTickets] = useState(new Set());
+
   // Fetch tickets data
   const { data: tickets, error, isLoading } = useStrapiData(
     `tickets?populate=users_permissions_user&filters[users_permissions_user][email][$eq]=${session?.user?.email || ''}`
@@ -179,6 +220,21 @@ export default function TicketsList() {
   const handleOpenRoulette = (ticket) => {
     setSelectedTicket(ticket);
     setIsRouletteOpen(true);
+  };
+
+  // Nuevo: función para marcar un ticket como utilizado después de un giro exitoso
+  const handleTicketUsed = (ticketId) => {
+    // Actualiza el estado local para marcar este ticket como utilizado
+    setUsedTickets(prev => {
+      const newSet = new Set(prev);
+      newSet.add(ticketId);
+      return newSet;
+    });
+  };
+
+  // Nuevo: función auxiliar para verificar si un ticket está utilizado (ya sea desde API o estado local)
+  const isTicketUsed = (ticket) => {
+    return !ticket.habilitado || usedTickets.has(ticket.id);
   };
 
   // Loading state
@@ -221,17 +277,19 @@ export default function TicketsList() {
         {tickets.map((ticket) => (
           <TicketCard
             key={ticket.id}
-            ticket={ticket}
+            // Modificado: Sobreescribe la propiedad habilitado basado en estado local
+            ticket={{ ...ticket, habilitado: !isTicketUsed(ticket) }}
             onOpenRoulette={handleOpenRoulette}
           />
         ))}
       </div>
 
-      {/* Roulette modal - rendered outside the DOM hierarchy */}
+      {/* Roulette modal - Modificado para pasar onTicketUsed */}
       <RouletteModal
         isOpen={isRouletteOpen}
         onClose={() => setIsRouletteOpen(false)}
         ticket={selectedTicket}
+        onTicketUsed={handleTicketUsed} // Nuevo: pasa el callback para marcar tickets como usados
       />
     </div>
   );
