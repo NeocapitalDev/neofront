@@ -46,30 +46,30 @@ const determineCorrectStage = (currentPhase, stages) => {
   const totalStages = stages.length;
   let stageIndex;
 
-  console.log(`Determinando stage: Fase actual=${currentPhase}, Total stages=${totalStages}`);
+  // console.log(`Determinando stage: Fase actual=${currentPhase}, Total stages=${totalStages}`);
 
   // Si tenemos 2 o 3 stages totales, aplicamos la lógica inversa
   if (totalStages === 2 || totalStages === 3) {
     if (currentPhase === 2) {
       // Si la fase es 2 (con 2 fases totales), seleccionamos el primer stage (índice 0)
       stageIndex = 0;
-      console.log(`Caso especial: Fase 2 con ${totalStages} stages totales -> Seleccionando índice 0`);
+      // console.log(`Caso especial: Fase 2 con ${totalStages} stages totales -> Seleccionando índice 0`);
     } else if (currentPhase === 3) {
       // Si la fase es 3 (con 1 fase total), seleccionamos el único stage
       stageIndex = 0;
-      console.log(`Caso especial: Fase 3 con ${totalStages} stages totales -> Seleccionando índice 0`);
+      // console.log(`Caso especial: Fase 3 con ${totalStages} stages totales -> Seleccionando índice 0`);
     } else {
       // Para otras fases, calculamos el índice correspondiente sin pasarnos del total
       stageIndex = Math.min(currentPhase - 1, totalStages - 1);
-      console.log(`Caso normal con ${totalStages} stages: Calculando índice ${stageIndex} (min(${currentPhase}-1, ${totalStages}-1))`);
+      // console.log(`Caso normal con ${totalStages} stages: Calculando índice ${stageIndex} (min(${currentPhase}-1, ${totalStages}-1))`);
     }
   } else {
     // Para otros casos de cantidad de stages, simplemente usamos la fase actual - 1 como índice
     stageIndex = Math.min(currentPhase - 1, totalStages - 1);
-    console.log(`Caso estándar: Calculando índice ${stageIndex} (min(${currentPhase}-1, ${totalStages}-1))`);
+    // console.log(`Caso estándar: Calculando índice ${stageIndex} (min(${currentPhase}-1, ${totalStages}-1))`);
   }
 
-  console.log(`Stage seleccionado con índice ${stageIndex}:`, stages[stageIndex]);
+  // console.log(`Stage seleccionado con índice ${stageIndex}:`, stages[stageIndex]);
   return stages[stageIndex];
 };
 
@@ -94,7 +94,7 @@ const HistorialMetrix = () => {
       ]
       : null,
     ([url, token]) => {
-      console.log("Consultando URL:", url);
+      // console.log("Consultando URL:", url);
       return fetcher(url, token);
     }
   );
@@ -107,7 +107,7 @@ const HistorialMetrix = () => {
       );
 
       if (basicChallenge && basicChallenge.id) {
-        console.log('Challenge básico encontrado:', basicChallenge);
+        // console.log('Challenge básico encontrado:', basicChallenge);
 
         // Obtener detalles completos del challenge en una consulta separada
         fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${basicChallenge.documentId}?populate[broker_account]=*&populate[challenge_relation][populate][challenge_stages]=*`, {
@@ -121,7 +121,7 @@ const HistorialMetrix = () => {
           })
           .then(response => {
             const detailedChallenge = response.data || response;
-            console.log('Detalles completos del challenge:', detailedChallenge);
+            // console.log('Detalles completos del challenge:', detailedChallenge);
 
             // Extraer broker_account considerando diferentes estructuras posibles
             let brokerAccount = null;
@@ -141,7 +141,7 @@ const HistorialMetrix = () => {
               brokerAccount = detailedChallenge.attributes.broker_account.data.attributes;
             }
 
-            console.log('Broker account extraído:', brokerAccount);
+            // console.log('Broker account extraído:', brokerAccount);
 
             // Combinar datos básicos con detalles y broker_account procesado
             setCurrentChallenge({
@@ -165,21 +165,21 @@ const HistorialMetrix = () => {
   useEffect(() => {
     // Verificar si hay un desafío actual seleccionado
     if (!currentChallenge) {
-      console.log('No hay desafío actual seleccionado aún');
+      // console.log('No hay desafío actual seleccionado aún');
       return;
     }
 
     // Console log para verificar los datos completos recibidos
-    console.log('Datos del challenge recibidos:', {
-      documentId,
-      phase: currentChallenge.phase,
-      hasMetadata: !!currentChallenge.metadata,
-      metadataType: typeof currentChallenge.metadata
-    });
+    // console.log('Datos del challenge recibidos:', {
+    //   documentId,
+    //     phase: currentChallenge.phase,
+    //       hasMetadata: !!currentChallenge.metadata,
+    //         metadataType: typeof currentChallenge.metadata
+    // });
 
     // Extraer el phase
     const phase = currentChallenge.phase;
-    console.log('Phase extraído:', phase);
+    // console.log('Phase extraído:', phase);
 
     // Verificar si existe el campo metadata
     if (currentChallenge.metadata) {
@@ -189,15 +189,15 @@ const HistorialMetrix = () => {
           ? JSON.parse(currentChallenge.metadata)
           : currentChallenge.metadata;
 
-        console.log('Metadata parseada correctamente');
-        console.log('Estructura de la metadata:', {
-          tieneMetaId: !!metadata.metaId,
-          tieneMetrics: !!metadata.metrics,
-          tieneEquityChart: !!metadata.equityChart,
-          tieneBrokerAccount: !!metadata.broker_account,
-          tieneChallengeStages: Array.isArray(metadata.challenge_stages),
-          cantidadDeStages: metadata.challenge_stages?.length
-        });
+        // console.log('Metadata parseada correctamente');
+        // console.log('Estructura de la metadata:', {
+        //   tieneMetaId: !!metadata.metaId,
+        //     tieneMetrics: !!metadata.metrics,
+        //       tieneEquityChart: !!metadata.equityChart,
+        //         tieneBrokerAccount: !!metadata.broker_account,
+        //           tieneChallengeStages: Array.isArray(metadata.challenge_stages),
+        //             cantidadDeStages: metadata.challenge_stages?.length
+        // });
 
         // Extraer el balance inicial del broker_account
         let balanceInicial = null;
@@ -205,16 +205,16 @@ const HistorialMetrix = () => {
         // Intentar obtener el balance de diferentes ubicaciones posibles
         if (metadata.broker_account && metadata.broker_account.balance) {
           balanceInicial = metadata.broker_account.balance;
-          console.log('Balance inicial encontrado en metadata.broker_account:', balanceInicial);
+          // console.log('Balance inicial encontrado en metadata.broker_account:', balanceInicial);
         } else if (metadata.deposits) {
           balanceInicial = metadata.deposits;
-          console.log('Balance inicial encontrado en metadata.deposits:', balanceInicial);
+          // console.log('Balance inicial encontrado en metadata.deposits:', balanceInicial);
         } else if (metadata.metrics && metadata.metrics.deposits) {
           balanceInicial = metadata.metrics.deposits;
-          console.log('Balance inicial encontrado en metadata.metrics.deposits:', balanceInicial);
+          // console.log('Balance inicial encontrado en metadata.metrics.deposits:', balanceInicial);
         } else if (currentChallenge.broker_account && currentChallenge.broker_account.balance) {
           balanceInicial = currentChallenge.broker_account.balance;
-          console.log('Balance inicial encontrado en currentChallenge.broker_account:', balanceInicial);
+          // console.log('Balance inicial encontrado en currentChallenge.broker_account:', balanceInicial);
         }
 
         // Guardar el balance inicial en el estado
@@ -244,7 +244,7 @@ const HistorialMetrix = () => {
           const selectedStage = determineCorrectStage(challengePhase, stages);
 
           if (selectedStage) {
-            console.log('Stage seleccionado correctamente:', selectedStage);
+            // console.log('Stage seleccionado correctamente:', selectedStage);
           } else {
             console.warn('No se pudo seleccionar un stage válido para la fase:', challengePhase);
           }
@@ -256,17 +256,17 @@ const HistorialMetrix = () => {
           setMetadataStats(statsToUse);
 
           // Log final de los datos procesados
-          console.log('Datos procesados correctamente:', {
-            phase: challengePhase,
-            balanceInicial: balanceInicial,
-            stageSeleccionado: selectedStage?.name,
-            metadataStats: {
-              trades: statsToUse.trades,
-              wonTradesPercent: statsToUse.wonTradesPercent,
-              profit: statsToUse.profit,
-              balance: statsToUse.balance
-            }
-          });
+          //   console.log('Datos procesados correctamente:', {
+          //   phase: challengePhase,
+          //     balanceInicial: balanceInicial,
+          //       stageSeleccionado: selectedStage?.name,
+          //         metadataStats: {
+          //     trades: statsToUse.trades,
+          //       wonTradesPercent: statsToUse.wonTradesPercent,
+          //         profit: statsToUse.profit,
+          //           balance: statsToUse.balance
+          //   }
+          // });
         } else {
           console.warn('La metadata no contiene datos válidos:', metadata);
           setMetadataStats(null);

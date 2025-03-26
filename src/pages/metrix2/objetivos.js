@@ -32,10 +32,10 @@ const formatDays = (days, minimumDays) => {
 // Utility function to format profit/loss
 const formatProfit = (initialBalance, currentProfit, profitTarget) => {
     const profit = Math.max(0, currentProfit);
-    
+
     // Calcular el porcentaje con respecto al objetivo, no al balance inicial
     const percentage = profit === 0 ? 0 : (profit / profitTarget) * 100;
-    
+
     return {
         displayProfit: profit.toFixed(2),
         displayPercentage: percentage.toFixed(2),
@@ -49,14 +49,14 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
 
     // Asegúrate de que phase esté disponible (puede venir como 'pase' o 'phase')
     const currentPhase = phase;
-    
+
     // Establecer un valor por defecto para el balance
     const balance = initBalance || 10000;
 
     useEffect(() => {
         if (!challengeConfig || !metricsData) return;
 
-        console.log("Datos para Objetivos:", { challengeConfig, metricsData, balance, currentPhase });
+        // console.log("Datos para Objetivos:", { challengeConfig, metricsData, balance, currentPhase });
 
         // Extraer los datos reales del trading desde metricsData
         const tradeDayCount = Math.max(0, metricsData.daysSinceTradingStarted || 0);
@@ -80,7 +80,7 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
                     }
                 }
             });
-            console.log("Pérdida máxima diaria encontrada en dailyGrowth:", maxDailyDrawdown);
+            // console.log("Pérdida máxima diaria encontrada en dailyGrowth:", maxDailyDrawdown);
         }
         // Método 2: Verificar en openTradesByHour para ver pérdidas por hora 
         else if (metricsData.openTradesByHour && metricsData.openTradesByHour.length > 0) {
@@ -93,38 +93,38 @@ export default function Objetivos({ challengeConfig, metricsData, initBalance, p
                     }
                 }
             });
-            console.log("Pérdida máxima diaria encontrada en openTradesByHour:", maxDailyDrawdown);
+            // console.log("Pérdida máxima diaria encontrada en openTradesByHour:", maxDailyDrawdown);
         }
         // Método 3: Usar worstTrade como aproximación (es una sola operación pero puede ser indicativo)
         else if (metricsData.worstTrade !== undefined && metricsData.worstTrade < 0) {
             maxDailyDrawdown = Math.abs(metricsData.worstTrade);
-            console.log("Usando worstTrade como aproximación de pérdida diaria:", maxDailyDrawdown);
+            // console.log("Usando worstTrade como aproximación de pérdida diaria:", maxDailyDrawdown);
         }
         // Método 4: Usar periods.today.profit si es negativo
-        else if (metricsData.periods && 
-                metricsData.periods.today && 
-                metricsData.periods.today.profit !== undefined && 
-                metricsData.periods.today.profit < 0) {
+        else if (metricsData.periods &&
+            metricsData.periods.today &&
+            metricsData.periods.today.profit !== undefined &&
+            metricsData.periods.today.profit < 0) {
             maxDailyDrawdown = Math.abs(metricsData.periods.today.profit);
-            console.log("Usando periods.today.profit como pérdida diaria:", maxDailyDrawdown);
+            // console.log("Usando periods.today.profit como pérdida diaria:", maxDailyDrawdown);
         }
         // Método 5: Fallback a la pérdida total solo si no tenemos otra opción
         else if (metricsData.profit < 0) {
             maxDailyDrawdown = Math.abs(metricsData.profit);
-            console.log("ADVERTENCIA: Usando profit total como fallback para pérdida diaria:", maxDailyDrawdown);
+            // console.log("ADVERTENCIA: Usando profit total como fallback para pérdida diaria:", maxDailyDrawdown);
         }
 
         // Para la pérdida máxima total (maxAbsoluteDrawdown), calcular basado en datos disponibles
         let maxAbsoluteDrawdown = 0;
-        
+
         if (typeof metricsData.maxDrawdown === 'number') {
             // Si tenemos maxDrawdown como porcentaje, convertir a valor monetario
             maxAbsoluteDrawdown = (balance * metricsData.maxDrawdown) / 100;
-            console.log("Pérdida máxima calculada a partir de maxDrawdown (%):", maxAbsoluteDrawdown);
+            // console.log("Pérdida máxima calculada a partir de maxDrawdown (%):", maxAbsoluteDrawdown);
         } else if (metricsData.profit < 0) {
             // Si no hay dato específico, usar el profit negativo como approximación
             maxAbsoluteDrawdown = Math.abs(metricsData.profit);
-            console.log("Usando profit total como aproximación de pérdida máxima:", maxAbsoluteDrawdown);
+            // console.log("Usando profit total como aproximación de pérdida máxima:", maxAbsoluteDrawdown);
         }
 
         // Para maxRelativeProfit, usamos profit del SDK (solo si es positivo)

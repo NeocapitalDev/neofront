@@ -46,13 +46,13 @@ const SocialsPage = () => {
 
     const route = token ? "users/me?populate[challenges][populate]=broker_account" : null;
     const { data, error, isLoading, mutate } = useStrapiData(route, token);
-    console.log("data: ", data);
+    // console.log("data: ", data);
 
 
 
 
     const { isVerified, statusSign, challenges = [] } = data || {};
-    console.log("challenges: ", challenges);
+    // console.log("challenges: ", challenges);
     const { hasPhase3Challenge, hasPhase1Or2Challenge, newAccount } = useMemo(() => ({
         hasPhase3Challenge: challenges.some(challenge => challenge.phase === 3),
         hasPhase1Or2Challenge: challenges.some(challenge => [1, 2].includes(challenge.phase)),
@@ -72,7 +72,7 @@ const SocialsPage = () => {
                 },
                 body: JSON.stringify({ statusSign: true, isVerified: true }),
             });
-            console.log("token: ", token);
+            // console.log("token: ", token);
             if (!response.ok) {
                 const errorData = await response.json();
                 toast.error(errorData?.error?.message || "Error en la firma del contrato");

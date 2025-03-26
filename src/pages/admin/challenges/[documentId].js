@@ -50,38 +50,38 @@ const determineCorrectStage = (currentPhase, stages) => {
   const totalStages = stages.length;
   let stageIndex;
 
-  console.log(`Determinando stage: Fase actual=${phaseNum}, Total stages=${totalStages}`);
+  // console.log(`Determinando stage: Fase actual=${phaseNum}, Total stages=${totalStages}`);
 
   // Si tenemos 2 o 3 stages totales, aplicamos la lógica especial
   if (totalStages === 2 || totalStages === 3) {
     if (phaseNum === 2) {
       // Si la fase es 2 (con 2 fases totales), seleccionamos el primer stage (índice 0)
       stageIndex = 0;
-      console.log(`Caso especial: Fase ${phaseNum} con ${totalStages} stages totales -> Seleccionando índice 0`);
+      // console.log(`Caso especial: Fase ${phaseNum} con ${totalStages} stages totales -> Seleccionando índice 0`);
     } else if (phaseNum === 3) {
       // Si la fase es 3 (con 1 fase total), seleccionamos el único stage
       stageIndex = 0;
-      console.log(`Caso especial: Fase ${phaseNum} con ${totalStages} stages totales -> Seleccionando índice 0`);
+      // console.log(`Caso especial: Fase ${phaseNum} con ${totalStages} stages totales -> Seleccionando índice 0`);
     } else {
       // Para otras fases, calculamos el índice correspondiente sin pasarnos del total
       stageIndex = Math.min(phaseNum - 1, totalStages - 1);
-      console.log(`Caso normal con ${totalStages} stages: Calculando índice ${stageIndex} (min(${phaseNum}-1, ${totalStages}-1))`);
+      // console.log(`Caso normal con ${totalStages} stages: Calculando índice ${stageIndex} (min(${phaseNum}-1, ${totalStages}-1))`);
     }
   } else {
     // Para otros casos de cantidad de stages, simplemente usamos la fase actual - 1 como índice
     stageIndex = Math.min(phaseNum - 1, totalStages - 1);
-    console.log(`Caso estándar: Calculando índice ${stageIndex} (min(${phaseNum}-1, ${totalStages}-1))`);
+    // console.log(`Caso estándar: Calculando índice ${stageIndex} (min(${phaseNum}-1, ${totalStages}-1))`);
   }
 
   // Verificación adicional
   if (stageIndex < 0 || stageIndex >= totalStages) {
     console.warn(`Índice calculado (${stageIndex}) fuera de rango para ${totalStages} stages disponibles.`);
     stageIndex = 0; // Usar el primer stage como fallback
-    console.log(`Usando stage 0 como fallback.`);
+    // console.log(`Usando stage 0 como fallback.`);
   }
 
   const selectedStage = stages[stageIndex];
-  console.log(`Stage seleccionado con índice ${stageIndex}:`, selectedStage);
+  // console.log(`Stage seleccionado con índice ${stageIndex}:`, selectedStage);
 
   // Verificación de la estructura del stage
   if (!selectedStage) {
@@ -119,7 +119,7 @@ const AdminChallengeDetail = () => {
 
   // Extraer documentId de la URL
   const { documentId } = router.query;
-  console.log("documentId", documentId);
+  // console.log("documentId", documentId);
 
   // Usar el servicio con el token JWT
   const route = documentId && session?.jwt ? `challenges/${documentId}?populate=*` : null;
@@ -127,7 +127,7 @@ const AdminChallengeDetail = () => {
 
   // Extraer challengeData de la estructura anidada
   const challengeData = data?.data;
-  console.log("challengeData", challengeData);
+  // console.log("challengeData", challengeData);
 
   // Función para volver a la lista de challenges
   const handleBack = () => {
@@ -138,7 +138,7 @@ const AdminChallengeDetail = () => {
   useEffect(() => {
     // Verificar si los datos del challenge están disponibles
     if (!challengeData) {
-      console.log('No hay datos del challenge disponibles aún');
+      // console.log('No hay datos del challenge disponibles aún');
       return;
     }
 
@@ -146,21 +146,22 @@ const AdminChallengeDetail = () => {
     setCurrentChallenge(challengeData);
 
     // Console log para verificar los datos completos recibidos
-    console.log('Datos del challenge recibidos:', {
-      documentId,
-      phase: challengeData.phase,
-      hasMetadata: !!challengeData.metadata,
-      metadataType: typeof challengeData.metadata
-    });
+    // console.log('Datos del challenge recibidos:', 
+    // {
+    //   documentId,
+    //     phase: challengeData.phase,
+    //       hasMetadata: !!challengeData.metadata,
+    //         metadataType: typeof challengeData.metadata
+    // });
 
     // Extraer el phase
     const phase = challengeData.phase;
-    console.log('Phase extraído:', phase);
+    // console.log('Phase extraído:', phase);
 
     // Obtener y establecer el balance inicial
     const brokerInitialBalance = challengeData.broker_account?.balance;
     setInitialBalance(brokerInitialBalance);
-    console.log('Balance inicial:', brokerInitialBalance);
+    // console.log('Balance inicial:', brokerInitialBalance);
 
     // Verificar si existe el campo metadata
     if (challengeData.metadata) {
@@ -169,20 +170,21 @@ const AdminChallengeDetail = () => {
         const metadata = typeof challengeData.metadata === 'string'
           ? JSON.parse(challengeData.metadata)
           : challengeData.metadata;
-        
-        console.log('Metadata parseada correctamente');
-        console.log('Estructura de la metadata:', {
-          tieneMetaId: !!metadata.metaId,
-          tieneMetrics: !!metadata.metrics,
-          tieneEquityChart: !!metadata.equityChart,
-          tieneBrokerAccount: !!metadata.broker_account,
-          tieneChallengeStages: Array.isArray(metadata.challenge_stages),
-          cantidadDeStages: metadata.challenge_stages?.length
-        });
+
+        // console.log('Metadata parseada correctamente');
+        // console.log('Estructura de la metadata:', 
+        // {
+        //   tieneMetaId: !!metadata.metaId,
+        //     tieneMetrics: !!metadata.metrics,
+        //       tieneEquityChart: !!metadata.equityChart,
+        //         tieneBrokerAccount: !!metadata.broker_account,
+        //           tieneChallengeStages: Array.isArray(metadata.challenge_stages),
+        //             cantidadDeStages: metadata.challenge_stages?.length
+        // });
 
         // Verificar si la metadata tiene las propiedades necesarias
         if (metadata && (metadata.metrics || metadata.trades)) {
-          console.log('La metadata contiene datos válidos:');
+          // console.log('La metadata contiene datos válidos:');
           // Dar prioridad a metrics si existe, sino usar toda la metadata
           const statsToUse = { ...metadata.metrics || metadata };
 
@@ -198,29 +200,29 @@ const AdminChallengeDetail = () => {
 
           // Obtener los stages disponibles de la metadata
           const stages = metadata.challenge_stages ||
-            (challengeData.challenge_relation && 
-             challengeData.challenge_relation.challenge_stages);
+            (challengeData.challenge_relation &&
+              challengeData.challenge_relation.challenge_stages);
 
           // Aplicar la lógica especial para determinar el stage correcto
           const selectedStage = determineCorrectStage(challengePhase, stages);
 
           if (selectedStage) {
-            console.log('Stage seleccionado correctamente:', selectedStage);
-            
+            // console.log('Stage seleccionado correctamente:', selectedStage);
+
             // Extraer los valores de configuración
-            const profitTarget = selectedStage.profitTarget || 
-                                 selectedStage.targets?.profit_target || 10;
-            const maxLoss = selectedStage.maximumTotalLoss || 
-                           selectedStage.targets?.max_loss || 10;
-            const maxDailyLoss = selectedStage.maximumDailyLoss || 
-                                selectedStage.targets?.max_daily_loss || 5;
-            const minTradingDays = selectedStage.minimumTradingDays || 
-                                  selectedStage.targets?.minimum_trading_days || 0;
-            
+            const profitTarget = selectedStage.profitTarget ||
+              selectedStage.targets?.profit_target || 10;
+            const maxLoss = selectedStage.maximumTotalLoss ||
+              selectedStage.targets?.max_loss || 10;
+            const maxDailyLoss = selectedStage.maximumDailyLoss ||
+              selectedStage.targets?.max_daily_loss || 5;
+            const minTradingDays = selectedStage.minimumTradingDays ||
+              selectedStage.targets?.minimum_trading_days || 0;
+
             // Guardar valores
             setDdPercent(maxLoss);
             setProfitTargetPercent(profitTarget);
-            
+
             // Configuración para el componente Objetivos
             setChallengeConfig({
               minimumTradingDays: minTradingDays,
@@ -228,16 +230,16 @@ const AdminChallengeDetail = () => {
               maxDrawdownPercent: maxLoss,
               profitTargetPercent: profitTarget
             });
-            
+
             // Calcular valores absolutos
             if (brokerInitialBalance) {
               const ddAbsolute = brokerInitialBalance - (maxLoss / 100) * brokerInitialBalance;
               setMaxDrawdownAbsolute(ddAbsolute);
-              
+
               const ptAbsolute = brokerInitialBalance + (profitTarget / 100) * brokerInitialBalance;
               setProfitTargetAbsolute(ptAbsolute);
             }
-            
+
             setCurrentStage(selectedStage);
           }
 
@@ -245,17 +247,17 @@ const AdminChallengeDetail = () => {
           setMetadataStats(statsToUse);
 
           // Log final de los datos procesados
-          console.log('Datos procesados correctamente:', {
-            phase: challengePhase,
-            balanceInicial: brokerInitialBalance,
-            stageSeleccionado: selectedStage?.name,
-            metadataStats: {
-              trades: statsToUse.trades,
-              wonTradesPercent: statsToUse.wonTradesPercent,
-              profit: statsToUse.profit,
-              balance: statsToUse.balance
-            }
-          });
+          // console.log('Datos procesados correctamente:', {
+          //   phase: challengePhase,
+          //   balanceInicial: brokerInitialBalance,
+          //   stageSeleccionado: selectedStage?.name,
+          //   metadataStats: {
+          //     trades: statsToUse.trades,
+          //     wonTradesPercent: statsToUse.wonTradesPercent,
+          //     profit: statsToUse.profit,
+          //     balance: statsToUse.balance
+          //   }
+          // });
         } else {
           console.warn('La metadata no contiene datos válidos:');
           setMetadataStats(null);
@@ -478,7 +480,7 @@ const AdminChallengeDetail = () => {
         stageConfig={currentStage}
         initialBalance={initialBalance}
       />
-      
+
       <ChartMetadata
         metadata={metadataStats}
         stageConfig={currentStage}

@@ -58,7 +58,7 @@ export default function ChallengesTable() {
 
   // const route = session?.jwt ? "challenges?populate=*" : null;
   const { data, error, isLoading } = useStrapiData("challenges?populate=*");
-  console.log("data", data);
+  // console.log("data", data);
 
   const formatCurrency = (amount) =>
     amount ? `$${parseFloat(amount).toLocaleString("es-ES", { minimumFractionDigits: 2 })}` : "N/A";
@@ -105,7 +105,7 @@ export default function ChallengesTable() {
   };
 
   const filteredData = useMemo(() => {
-    console.log(data);
+    // console.log(data);
     if (!data) return [];
 
     return data.map((challenge) => ({

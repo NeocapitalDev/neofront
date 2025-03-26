@@ -56,7 +56,7 @@ const PayoutsPage = () => {
 
   // Log para ver la respuesta
   useEffect(() => {
-    console.log("Respuesta JSON de orders:", orders);
+    // console.log("Respuesta JSON de orders:", orders);
   }, [orders]);
 
   return (

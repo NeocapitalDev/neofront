@@ -11,7 +11,7 @@ const createWooCommerceApi = (url, consumerKey, consumerSecret, version = 'wc/v3
     console.error('Error: Credenciales de WooCommerce no proporcionadas (consumerKey o consumerSecret)');
   }
 
-  // console.log(`Creando API con URL: ${url}, Key: ${consumerKey ? '✓ presente' : '❌ falta'}, Secret: ${consumerSecret ? '✓ presente' : '❌ falta'}`);
+  // // console.log(`Creando API con URL: ${url}, Key: ${consumerKey ? '✓ presente' : '❌ falta'}, Secret: ${consumerSecret ? '✓ presente' : '❌ falta'}`);
 
   return new WooCommerceRestApi({
     url,
@@ -48,12 +48,12 @@ const wooFetcher = async ([endpoint, config]) => {
       throw new Error('Credenciales de WooCommerce no configuradas (consumer key/secret)');
     }
 
-    console.log(`Configuración WooCommerce:
-      URL: ${url}
-      Endpoint: ${endpoint}
-      Consumer Key: ${consumerKey.substring(0, 3)}...${consumerKey.substring(consumerKey.length - 3)}
-      Params: ${JSON.stringify(config.params || {})}
-    `);
+    // // console.log(`Configuración WooCommerce:
+    //   URL: ${url}
+    //   Endpoint: ${endpoint}
+    //   Consumer Key: ${consumerKey.substring(0, 3)}...${consumerKey.substring(consumerKey.length - 3)}
+    //   Params: ${JSON.stringify(config.params || {})}
+    // `);
 
     const api = createWooCommerceApi(
       url,
@@ -62,7 +62,7 @@ const wooFetcher = async ([endpoint, config]) => {
       config.version || 'wc/v3'
     );
 
-    // console.log(`Fetching WooCommerce endpoint: ${endpoint}`);
+    // // console.log(`Fetching WooCommerce endpoint: ${endpoint}`);
 
     // Asegurarse de que el endpoint no comienza con '/' (la biblioteca lo añade)
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
@@ -74,7 +74,7 @@ const wooFetcher = async ([endpoint, config]) => {
       throw new Error('Respuesta vacía de WooCommerce');
     }
 
-    // console.log(`WooCommerce respuesta recibida:`, typeof response.data, Array.isArray(response.data) ? `Array con ${response.data.length} elementos` : 'Objeto');
+    // // console.log(`WooCommerce respuesta recibida:`, typeof response.data, Array.isArray(response.data) ? `Array con ${response.data.length} elementos` : 'Objeto');
     return response.data;
   } catch (error) {
     // Mejor manejo de errores específicos de WooCommerce
@@ -145,7 +145,7 @@ const wpFetcher = async ([url, params = {}, headers = {}]) => {
     const queryString = new URLSearchParams(params).toString();
     const fullUrl = queryString ? `${url}?${queryString}` : url;
 
-    console.log(`Fetching WordPress endpoint: ${fullUrl}`);
+    // // console.log(`Fetching WordPress endpoint: ${fullUrl}`);
 
     const response = await fetch(fullUrl, {
       headers: {
@@ -160,7 +160,7 @@ const wpFetcher = async ([url, params = {}, headers = {}]) => {
     }
 
     const data = await response.json();
-    console.log('WordPress response:', typeof data, Array.isArray(data) ? `Array con ${data.length} elementos` : 'Objeto');
+    // console.log('WordPress response:', typeof data, Array.isArray(data) ? `Array con ${data.length} elementos` : 'Objeto');
     return data;
   } catch (error) {
     console.error('Error fetching from WordPress:', error);
@@ -195,7 +195,7 @@ export function useWordPress(endpoint, params = {}, options = {}) {
 
   const apiUrl = `${baseUrl}/${apiEndpoint}`;
 
-  console.log(`WordPress URL configurada: ${apiUrl}`);
+  // console.log(`WordPress URL configurada: ${apiUrl}`);
 
   const { data, error, mutate } = useSWR(
     baseUrl ? [apiUrl, params, options.headers] : null,

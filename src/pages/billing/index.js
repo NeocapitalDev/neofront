@@ -12,7 +12,7 @@ const WithdrawalsPage = () => {
 
     // Updated API call to include challenge_relation and challenge_stages
     const { data, error, isLoading } = useStrapiData('users/me?populate[challenges][populate][withdraw]=*&populate[challenges][populate][challenge_relation][populate][challenge_stages]=*', token);
-    console.log(data);
+    // console.log(data);
     if (isLoading) {
         return (
             <Layout>
@@ -48,7 +48,7 @@ const WithdrawalsPage = () => {
             }
         });
     }
-    console.log(withdrawals);
+    // console.log(withdrawals);
     // Función para formatear la fecha
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
