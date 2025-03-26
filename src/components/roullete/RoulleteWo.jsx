@@ -6,8 +6,8 @@ import { useSession } from "next-auth/react";
 
 export default function RuletaSorteo({
   customOptions,
-  width = 300,
-  height = 300,
+  width = 200,
+  height = 200,
   centerImage = null, // Prop para la imagen central
   documentId,
   onClose, // Added onClose prop for the Exit button
@@ -612,18 +612,29 @@ export default function RuletaSorteo({
               }}
               style={{
                 position: "absolute",
-                bottom: "-45px",
-                left: "34%",
+                bottom: "-65px",
+                left: "34%", // 
                 transform: "translateX(-50%)",
-                width: 100,
-                height: 10,
+                width: 80,
+                height: 30, // Increased height for the icon container
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 zIndex: 10,
               }}
             >
-              <img src="/images/icon-dark.png" alt="" />
+              <img
+                src="/images/icon-dark.png"
+                alt=""
+                style={{
+                  width: "100%",
+                  maxWidth: "80px",
+                  display: "block"
+                }}
+              />
             </motion.div>
           </div>
-          <div className="my-10"></div>
+          <div className="mt-10"></div>
 
           {/* Resultado del giro mostrado debajo de la flecha */}
           {selectedOption && !isSpinning && (
@@ -675,29 +686,31 @@ export default function RuletaSorteo({
             </>
           )}
 
-          <div className="flex justify-center gap-4 items-center">
-            <motion.button
-              onClick={spinWheel}
-              disabled={isSpinning || hasSpun} // Disable if spinning or has already spun
-              whileHover={!isSpinning && !hasSpun ? { scale: 1.05 } : {}}
-              whileTap={!isSpinning && !hasSpun ? { scale: 0.95 } : {}}
-              style={{
-                marginTop: "20px",
-                padding: "12px 30px",
-                background: isSpinning || hasSpun ? "#777" : "#FFEB3B", // Gray if disabled
-                color: "#000",
-                fontSize: "16px",
-                fontWeight: "bold",
-                border: "none",
-                borderRadius: "30px",
-                cursor: isSpinning || hasSpun ? "not-allowed" : "pointer",
-                transition: "background 0.3s, transform 0.3s",
-                boxShadow: "0 4px 8px rgba(255,235,59,0.6)",
-              }}
-            >
-              {isSpinning ? "Girando..." : hasSpun ? "Ya Girado" : "Girar"}
-            </motion.button>
-          </div>
+          {!hasSpun && (
+            <div className="flex justify-center gap-4 items-center">
+              <motion.button
+                onClick={spinWheel}
+                disabled={isSpinning}
+                whileHover={!isSpinning ? { scale: 1.05 } : {}}
+                whileTap={!isSpinning ? { scale: 0.95 } : {}}
+                style={{
+                  marginTop: "20px",
+                  padding: "12px 30px",
+                  background: isSpinning ? "#777" : "#FFEB3B",
+                  color: "#000",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  border: "none",
+                  borderRadius: "30px",
+                  cursor: isSpinning ? "not-allowed" : "pointer",
+                  transition: "background 0.3s, transform 0.3s",
+                  boxShadow: "0 4px 8px rgba(255,235,59,0.6)",
+                }}
+              >
+                {isSpinning ? "Girando..." : "Girar"}
+              </motion.button>
+            </div>
+          )}
         </>
       )}
     </motion.div>

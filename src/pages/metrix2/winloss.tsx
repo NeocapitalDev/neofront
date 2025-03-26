@@ -63,12 +63,8 @@ export default function WinLoss({ data }) {
   };
 
   return (
-    <div className="mt-6 w-full ">
-      <h2 className="text-lg font-semibold flex items-center">
-        <BarChart className="w-5 h-5 mr-2" />
-        Win/Loss Rates
-      </h2>
-      <Card className="mt-4 dark:bg-zinc-800">
+    <div className="w-full">
+      <Card className="bg-white dark:bg-zinc-900">
         <CardContent className="pt-6">
           {noTrades ? (
             <div className="text-center py-8 text-muted-foreground">
@@ -81,11 +77,17 @@ export default function WinLoss({ data }) {
                 <div className="flex justify-between mb-2 text-sm">
                   <div className="flex items-center">
                     <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                    <span>Win Rate: {chartData.wonTradesPercent.toFixed(1)}% ({chartData.wonTrades} trades)</span>
+                    <span>
+                      Win Rate: {chartData.wonTradesPercent.toFixed(1)}% (
+                      {chartData.wonTrades} trades)
+                    </span>
                   </div>
                   <div className="flex items-center">
                     <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
-                    <span>Loss Rate: {chartData.lostTradesPercent.toFixed(1)}% ({chartData.lostTrades} trades)</span>
+                    <span>
+                      Loss Rate: {chartData.lostTradesPercent.toFixed(1)}% (
+                      {chartData.lostTrades} trades)
+                    </span>
                   </div>
                 </div>
 
@@ -96,10 +98,13 @@ export default function WinLoss({ data }) {
                       className="absolute top-0 left-0 h-full bg-green-500 text-xs font-medium text-center text-white flex items-center justify-center"
                       style={{
                         width: `${chartData.wonTradesPercent}%`,
-                        minWidth: chartData.wonTradesPercent < 10 ? "40px" : "auto"
+                        minWidth:
+                          chartData.wonTradesPercent < 10 ? "40px" : "auto",
                       }}
                     >
-                      {chartData.wonTradesPercent > 5 ? `${chartData.wonTradesPercent.toFixed(1)}%` : ""}
+                      {chartData.wonTradesPercent > 5
+                        ? `${chartData.wonTradesPercent.toFixed(1)}%`
+                        : ""}
                     </div>
                   )}
 
@@ -110,10 +115,13 @@ export default function WinLoss({ data }) {
                       style={{
                         left: `${chartData.wonTradesPercent}%`,
                         width: `${chartData.lostTradesPercent}%`,
-                        minWidth: chartData.lostTradesPercent < 10 ? "40px" : "auto"
+                        minWidth:
+                          chartData.lostTradesPercent < 10 ? "40px" : "auto",
                       }}
                     >
-                      {chartData.lostTradesPercent > 5 ? `${chartData.lostTradesPercent.toFixed(1)}%` : ""}
+                      {chartData.lostTradesPercent > 5
+                        ? `${chartData.lostTradesPercent.toFixed(1)}%`
+                        : ""}
                     </div>
                   )}
                 </div>
@@ -122,7 +130,9 @@ export default function WinLoss({ data }) {
               {/* Estadísticas de ganancia/pérdida promedio */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-900">
-                  <div className="text-green-700 dark:text-green-400 font-semibold mb-1">Average Win</div>
+                  <div className="text-green-700 dark:text-green-400 font-semibold mb-1">
+                    Average Win
+                  </div>
                   <div className="text-2xl font-bold text-green-600 dark:text-green-300">
                     ${formatCurrency(chartData.averageWin)}
                   </div>
@@ -132,7 +142,9 @@ export default function WinLoss({ data }) {
                 </div>
 
                 <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-900">
-                  <div className="text-red-700 dark:text-red-400 font-semibold mb-1">Average Loss</div>
+                  <div className="text-red-700 dark:text-red-400 font-semibold mb-1">
+                    Average Loss
+                  </div>
                   <div className="text-2xl font-bold text-red-600 dark:text-red-300">
                     ${formatCurrency(chartData.averageLoss)}
                   </div>
@@ -146,7 +158,9 @@ export default function WinLoss({ data }) {
               <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-900">
                 <div className="flex justify-between">
                   <div>
-                    <div className="text-amber-700 dark:text-amber-400 font-semibold mb-1">Profit Factor</div>
+                    <div className="text-amber-700 dark:text-amber-400 font-semibold mb-1">
+                      Profit Factor
+                    </div>
                     <div className="text-2xl font-bold text-amber-600 dark:text-amber-300">
                       {chartData.profitFactor.toFixed(2)}
                     </div>
@@ -156,11 +170,16 @@ export default function WinLoss({ data }) {
                   </div>
 
                   <div>
-                    <div className="text-amber-700 dark:text-amber-400 font-semibold mb-1">Beneficio Neto</div>
-                    <div className={`text-2xl font-bold ${chartData.netProfit >= 0
-                        ? "text-green-600 dark:text-green-300"
-                        : "text-red-600 dark:text-red-300"
-                      }`}>
+                    <div className="text-amber-700 dark:text-amber-400 font-semibold mb-1">
+                      Beneficio Neto
+                    </div>
+                    <div
+                      className={`text-2xl font-bold ${
+                        chartData.netProfit >= 0
+                          ? "text-green-600 dark:text-green-300"
+                          : "text-red-600 dark:text-red-300"
+                      }`}
+                    >
                       ${formatCurrency(chartData.netProfit)}
                     </div>
                     <div className="text-sm text-amber-600 dark:text-amber-400 mt-1">

@@ -2,7 +2,8 @@
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { ChartBarIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon, KeyIcon } from '@heroicons/react/24/outline';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Loader from '../../components/loaders/loader';
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -12,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import NeoChallengeCard from './neoCard';
 import BilleteraCripto from '../../components/wallet/crypto-wallet';
+import CredencialesModal from './credentials';
 
 const fetcher = async (url, token) => {
     const response = await fetch(url, {
@@ -160,10 +162,9 @@ export default function Index() {
                 sortedStages.map((stageName) => {
                     const stageChallengers = groupedChallengesByStage[stageName];
                     return (
-                        <div key={stageName} className="mb-8">
-                            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+                        <div key={stageName} className="mb-4">
+                            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">
                                 {stageName}
-                                {/* ({stageChallengers.length} {stageChallengers.length === 1 ? 'challenge' : 'challenges'}) */}
                             </h2>
 
                             {stageChallengers.map((challenge, index) => {
@@ -179,15 +180,14 @@ export default function Index() {
                                 return (
                                     <div
                                         key={index}
-                                        className="relative p-6 mb-6 bg-white dark:bg-zinc-800 shadow-lg rounded-xl border border-gray-100 dark:border-zinc-700 transition-all duration-300 hover:shadow-xl dark:hover:shadow-md dark:shadow-zinc-900/30 overflow-hidden"
+                                        className="relative p-3 mb-3 bg-white dark:bg-zinc-800 shadow-md rounded-lg border border-gray-100 dark:border-zinc-700 transition-all duration-300 hover:shadow-lg dark:hover:shadow-md dark:shadow-zinc-900/30 overflow-hidden max-w-7xl mx-auto"
                                     >
                                         {/* Accent border on left side */}
                                         <div className="absolute left-0 top-0 w-1 h-full bg-[var(--app-primary)]"></div>
 
                                         <div className="flex justify-between items-start">
-                                            <p className="font-semibold text-zinc-800 mb-3 dark:text-zinc-200 text-lg flex items-center">
-                                                <span className='font-bold text-[var(--app-primary)] mr-2'>Login:</span>
-                                                {/* <span className="bg-gray-50 dark:bg-zinc-700/50 py-1 px-3 rounded-md transition-colors"> */}
+                                            <p className="font-semibold text-zinc-800 mb-2 dark:text-zinc-200 text-base flex items-center">
+                                                <span className='font-bold text-[var(--app-primary)] mr-1'>Login:</span>
                                                 <span className="">
                                                     {challenge.broker_account?.login || "-"}
                                                 </span>
@@ -218,46 +218,54 @@ export default function Index() {
 
                                         {isVisible && (
                                             <>
-                                                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                                    <div className="p-3 bg-gray-50 dark:bg-zinc-700/30 rounded-lg transition-colors flex items-center justify-between">
-                                                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
+                                                    <div className="p-2 bg-gray-50 dark:bg-zinc-700/30 rounded-lg transition-colors flex items-center justify-between">
+                                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
                                                             Balance
                                                         </p>
-                                                        <p className="font-bold text-zinc-800 dark:text-zinc-200">
+                                                        <p className="font-bold text-sm text-zinc-800 dark:text-zinc-200">
                                                             {typeof balanceDisplay === "number" ? `$${balanceDisplay.toLocaleString()}` : balanceDisplay}
                                                         </p>
                                                     </div>
 
-                                                    <div className="p-3 bg-gray-50 dark:bg-zinc-700/30 rounded-lg transition-colors flex items-center justify-between">
-                                                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <div className="p-2 bg-gray-50 dark:bg-zinc-700/30 rounded-lg transition-colors flex items-center justify-between">
+                                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
                                                             Inicio
                                                         </p>
-                                                        <p className="font-bold text-zinc-800 dark:text-zinc-200">
+                                                        <p className="font-bold text-sm text-zinc-800 dark:text-zinc-200">
                                                             {challenge.startDate ? new Date(challenge.startDate).toLocaleDateString() : "-"}
                                                         </p>
                                                     </div>
 
-                                                    <div className="p-3 bg-gray-50 dark:bg-zinc-700/30 rounded-lg transition-colors flex items-center justify-between">
-                                                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <div className="p-2 bg-gray-50 dark:bg-zinc-700/30 rounded-lg transition-colors flex items-center justify-between">
+                                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
                                                             Fin
                                                         </p>
-                                                        <p className="font-bold text-zinc-800 dark:text-zinc-200">
+                                                        <p className="font-bold text-sm text-zinc-800 dark:text-zinc-200">
                                                             {challenge.endDate ? new Date(challenge.endDate).toLocaleDateString() : "-"}
                                                         </p>
                                                     </div>
                                                 </div>
 
-                                                <div className="mt-5 flex flex-wrap gap-3 items-center">
+                                                <div className="mt-3 flex flex-wrap gap-2 items-center">
                                                     <Link href={`/metrix2/${challenge.documentId}`}>
-                                                        <button className="flex items-center justify-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 bg-white hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 shadow-sm hover:shadow">
-                                                            <ChartBarIcon className="h-5 w-5 text-[var(--app-primary)]" />
-                                                            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Metrix</span>
+                                                        <button className="flex items-center justify-center space-x-1 px-3 py-1 rounded-lg transition-all duration-200 bg-white hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 shadow-sm hover:shadow text-sm">
+                                                            <ChartBarIcon className="h-7 w-6 text-[var(--app-primary)]" />
+                                                            <span className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Metrix</span>
                                                         </button>
                                                     </Link>
+                                                    
+                                                    <CredencialesModal 
+                                                        login={challenge.broker_account?.login || "-"}
+                                                        password={challenge.broker_account?.password || "-"}
+                                                        server={challenge.broker_account?.server || "-"}
+                                                        platform={challenge.broker_account?.platform || "MT4"}
+                                                        inversorPass={challenge.broker_account?.inversorPass || "-"}
+                                                    />
 
                                                     {!isVerified && challenge.phase === 3 &&
                                                         challenge.result === "approved" && (
-                                                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 border-l-2 border-[var(--app-primary)]/30 pl-3">
+                                                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 border-l-2 border-[var(--app-primary)]/30 pl-2">
                                                                 Debes estar verificado para retirar tus ganancias
                                                             </p>
                                                         )}
@@ -267,7 +275,7 @@ export default function Index() {
                                                         challenge.result === "approved" && (
                                                             <div className="flex gap-2 items-center">
                                                                 <BilleteraCripto
-                                                                    balance={ba.pahselances[challenge.id] || 1000000}
+                                                                    balance={balances[challenge.id] || 1000000}
                                                                     brokerBalance={challenge.broker_account?.balance || "0"}
                                                                     userId={data?.id}
                                                                     challengeId={challenge.documentId}
@@ -278,12 +286,12 @@ export default function Index() {
                                             </>
                                         )}
 
-                                        <div className="mt-5 flex flex-wrap items-center justify-end gap-4 pt-4 border-t border-gray-100 dark:border-zinc-700/50">
+                                        <div className="mt-3 flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-gray-100 dark:border-zinc-700/50">
                                             <ButtonInit
                                                 documentId={challenge.documentId}
                                                 result={challenge.result}
                                                 phase={challenge.phase}
-                                                className="bg-[var(--app-primary)]/10 hover:bg-[var(--app-primary)]/20 text-[var(--app-primary)] border-[var(--app-primary)]/20"
+                                                className="bg-[var(--app-primary)]/10 hover:bg-[var(--app-primary)]/20 text-[var(--app-primary)] border-[var(--app-primary)]/20 text-sm py-1 px-3"
                                             />
 
                                             <div className="flex items-center space-x-2">

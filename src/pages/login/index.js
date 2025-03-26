@@ -73,9 +73,29 @@ export default function SignIn() {
     <Layout className="min-h-screen bg-white dark:bg-black">
       <div className="max-w-md mx-auto">
         {/* Título */}
-        <h2 className="text-xl font-semibold text-left text-white">Iniciar sesión 👋</h2>
+        <h2 className="text-2xl font-semibold text-center text-white">Iniciar sesión</h2>
 
         <form className="space-y-6 mt-4" onSubmit={onSubmit}>
+
+
+
+        <div className="flex justify-center mt-2">
+      <button
+        className="flex items-center justify-center gap-2 w-full sm:w-auto border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded-md shadow-md hover:shadow-lg transition-shadow duration-300"
+      >
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+          alt="Google"
+          className="h-5 w-5"
+        />
+        <span className="text-sm text-zinc-700 dark:text-zinc-300 font-medium"> Google</span>
+      </button>
+    </div>
+
+<h2 className="text-sm font-semibold  text-center text-white">o</h2>
+
+
+
           {/* Campo de Correo Electrónico */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-300">
@@ -133,7 +153,7 @@ export default function SignIn() {
           </div>
 
           {/* Captcha */}
-          <Recaptcha onVerify={setCaptchaToken} />
+          <Recaptcha  onVerify={setCaptchaToken} />
 
           {/* Botón de Enviar */}
           <div>
@@ -149,6 +169,9 @@ export default function SignIn() {
               {isSubmitting ? "Ingresando..." : "Ingresar"}
             </button>
           </div>
+
+
+
         </form>
 
         {/* Enlace de Registro */}
