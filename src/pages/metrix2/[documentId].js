@@ -3,15 +3,10 @@ import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
-import Layout from "../../components/layout/dashboard";
 import Loader from "../../components/loaders/loader";
-import { PhoneIcon, ChartBarIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
-import CredencialesModal from "../dashboard/credentials";
-import Link from "next/link";
 import WinLoss from "../../components/metrix/winloss";
 import Statistics from '../../components/metrix/statistics';
 import MyPage from "../../components/metrix/grafico";
-import Dashboard from "@/components/metrix/barrascircular";
 import Objetivos from "../../components/metrix/objetivos";
 import RelatedChallenges from "../../components/challenges/RelatedChallenges";
 import { BarChart, Landmark, FileChartColumn, ChartCandlestick, FileChartPie } from "lucide-react";
@@ -398,15 +393,15 @@ const Metrix = () => {
   // Loading y Error
   if (isLoading || !session) {
     return (
-      <Layout>
+      <div>
         <Loader />
-      </Layout>
+      </div>
     );
   }
 
   if (error || !userData) {
     return (
-      <Layout>
+      <div>
         <div className="flex flex-col items-center justify-center py-20 text-center text-white">
           <div className="p-8 bg-white dark:bg-zinc-800 rounded-lg shadow-lg w-full">
             <h1 className="text-2xl font-bold text-red-600">🚧 Error de conexión 🚧</h1>
@@ -420,14 +415,14 @@ const Metrix = () => {
             )}
           </div>
         </div>
-      </Layout>
+      </div>
     );
   }
 
   // No challenge data
   if (!currentChallenge) {
     return (
-      <Layout>
+      <div>
         <div className="flex flex-col items-center justify-center py-20 text-center text-white">
           <div className="p-8 bg-white dark:bg-zinc-800 rounded-lg shadow-lg w-full">
             <h1 className="text-2xl font-bold text-yellow-600">⚠️ Challenge no encontrado ⚠️</h1>
@@ -437,12 +432,12 @@ const Metrix = () => {
             </p>
           </div>
         </div>
-      </Layout>
+      </div>
     );
   }
 
   return (
-    <Layout>
+    <div>
 
 
 
@@ -451,31 +446,31 @@ const Metrix = () => {
         {/* Columna izquierda con gráfico principal */}
         <div className="w-full lg:w-8/12">
 
-      <div className="">
-                <div className="flex justify-between items-center mb-2 bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
-                  <div className="flex items-center">
-                  <Landmark className="w-5 h-5 mr-2 text-[var(--app-primary)]" />
-                  <h2 className="text-lg font-semibold">Saldo de la Cuenta</h2>
-                  </div>
-                   <div className="text-right">
-                  <div className="text-lg font-bold">{initialBalance || "$10000"}</div>
-                  <div className="flex items-center justify-end text-xs">
-                    <span className="mr-2">Equity: ${metadataStats?.equity || initialBalance}</span>
-                    <span className={`${metadataStats?.profitPercent >= 0 ? 'text-green-500' : 'text-red-500'} font-medium`}>
+          <div className="">
+            <div className="flex justify-between items-center mb-2 bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <div className="flex items-center">
+                <Landmark className="w-5 h-5 mr-2 text-[var(--app-primary)]" />
+                <h2 className="text-lg font-semibold">Saldo de la Cuenta</h2>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-bold">{initialBalance || "$10000"}</div>
+                <div className="flex items-center justify-end text-xs">
+                  <span className="mr-2">Equity: ${metadataStats?.equity || initialBalance}</span>
+                  <span className={`${metadataStats?.profitPercent >= 0 ? 'text-green-500' : 'text-red-500'} font-medium`}>
                     {metadataStats?.profitPercent >= 0 ? '+' : ''}{metadataStats?.profitPercent || '0'}%
-                    </span>
-                  </div>
-                  </div> 
+                  </span>
                 </div>
+              </div>
+            </div>
 
-                {/* Gráfico principal */}
+            {/* Gráfico principal */}
             <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
-      {/* Gráfica de líneas */}
-        <MyPage
-          statisticsData={metadataStats?.equityChart || []}
-          maxDrawdownAbsolute={maxDrawdownAbsolute || (initialBalance ? initialBalance * 0.9 : 9000)}
-          profitTargetAbsolute={profitTargetAbsolute || (initialBalance ? initialBalance * 1.1 : 11000)}
-        />
+              {/* Gráfica de líneas */}
+              <MyPage
+                statisticsData={metadataStats?.equityChart || []}
+                maxDrawdownAbsolute={maxDrawdownAbsolute || (initialBalance ? initialBalance * 0.9 : 9000)}
+                profitTargetAbsolute={profitTargetAbsolute || (initialBalance ? initialBalance * 1.1 : 11000)}
+              />
             </div>
           </div>
 
@@ -487,7 +482,7 @@ const Metrix = () => {
               Win/Loss Rates
             </h2>
             <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
-            <WinLoss data={metadataStats || {}} />
+              <WinLoss data={metadataStats || {}} />
 
             </div>
 
@@ -497,46 +492,46 @@ const Metrix = () => {
               Estadisticas
             </h2>
             <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
-            <Statistics
-            data={{
-              ...metadataStats,
-              phase: currentChallenge?.phase || "Desconocida",
-              brokerInitialBalance: initialBalance // Pasar el balance inicial
-            }}
-          />
+              <Statistics
+                data={{
+                  ...metadataStats,
+                  phase: currentChallenge?.phase || "Desconocida",
+                  brokerInitialBalance: initialBalance // Pasar el balance inicial
+                }}
+              />
             </div>
 
 
-                      {/* Resumen por instrumentos (si existe) */}
-                      {metadataStats?.currencySummary && metadataStats?.currencySummary.length > 0 && (
-                        <div className="flex flex-col gap-4 mt-4">
-                          <h2 className="text-lg font-semibold flex items-center">
-                            <ChartCandlestick className="w-5 h-5 mr-2 text-[var(--app-primary)]" />
-                            Resumen por Instrumentos
-                          </h2>
-                          <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {metadataStats.currencySummary.slice(0, 4).map((currency, index) => (
-                                <div key={index} className="bg-gray-50 dark:bg-zinc-900 p-3 rounded-md">
-                                  <h3 className="text-sm font-semibold mb-1">{currency.currency}</h3>
-                                  <div className="grid grid-cols-2 gap-1 text-sm">
-                                    <div>Total trades: <span className="font-medium">{currency.total.trades}</span></div>
-                                    <div>Ganancia: <span className={`font-medium ${currency.total.profit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                      ${currency.total.profit?.toFixed(2)}
-                                    </span></div>
-                                    <div>Ganados: <span className="font-medium text-green-500">
-                                      {currency.total.wonTrades || 0} ({currency.total.wonTradesPercent?.toFixed(1) || 0}%)
-                                    </span></div>
-                                    <div>Perdidos: <span className="font-medium text-red-500">
-                                      {currency.total.lostTrades || 0} ({currency.total.lostTradesPercent?.toFixed(1) || 0}%)
-                                    </span></div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+            {/* Resumen por instrumentos (si existe) */}
+            {metadataStats?.currencySummary && metadataStats?.currencySummary.length > 0 && (
+              <div className="flex flex-col gap-4 mt-4">
+                <h2 className="text-lg font-semibold flex items-center">
+                  <ChartCandlestick className="w-5 h-5 mr-2 text-[var(--app-primary)]" />
+                  Resumen por Instrumentos
+                </h2>
+                <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {metadataStats.currencySummary.slice(0, 4).map((currency, index) => (
+                      <div key={index} className="bg-gray-50 dark:bg-zinc-900 p-3 rounded-md">
+                        <h3 className="text-sm font-semibold mb-1">{currency.currency}</h3>
+                        <div className="grid grid-cols-2 gap-1 text-sm">
+                          <div>Total trades: <span className="font-medium">{currency.total.trades}</span></div>
+                          <div>Ganancia: <span className={`font-medium ${currency.total.profit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                            ${currency.total.profit?.toFixed(2)}
+                          </span></div>
+                          <div>Ganados: <span className="font-medium text-green-500">
+                            {currency.total.wonTrades || 0} ({currency.total.wonTradesPercent?.toFixed(1) || 0}%)
+                          </span></div>
+                          <div>Perdidos: <span className="font-medium text-red-500">
+                            {currency.total.lostTrades || 0} ({currency.total.lostTradesPercent?.toFixed(1) || 0}%)
+                          </span></div>
                         </div>
-                      )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
 
@@ -611,18 +606,18 @@ const Metrix = () => {
                 </div>
               </div>
 
-                      <div className="">
-                      <div className="flex justify-between items-center">
-                        <h3 className="text-sm font-medium">Recompensas totales</h3>
-                        <span className="font-bold">${ metadataStats?.profit }</span>
-                        
-                      </div>
-                      </div>
-                    </div>
+              <div className="">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-medium">Recompensas totales</h3>
+                  <span className="font-bold">${metadataStats?.profit}</span>
+
+                </div>
+              </div>
+            </div>
 
 
 
-                    {/* Objetivos comerciales */}
+            {/* Objetivos comerciales */}
             <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
               <h2 className="text-base font-semibold mb-2">Objetivos comerciales</h2>
 
@@ -642,59 +637,59 @@ const Metrix = () => {
             </div>
 
             <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
-              <h2 className="text-base font-semibold mb-2">Certificado</h2>
+              <h2 className="text-base font-semibold mb-2">Certificados</h2>
 
-{/* Componente Objetivos */}
-{currentChallenge?.result === "approved" && (
-        <>
-          {currentChallenge?.certificates ? (
-            (currentChallenge?.phase === 1 || currentChallenge?.phase === 2 || 
-              (currentChallenge?.phase === 3 && currentChallenge?.result === "withdrawal")) ? (
-                <button
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
-                onClick={() => setIsModalPdfOpen(true)}
-              >
-                <BadgeCheck size={20} /> Ver Certificado
-              </button>
-            ) : (
-              <div className="text-center p-3">
-                <p className="text-sm">No hay información de certificados disponibles</p>
-              </div>
-            )
-          ) : (
-            <p className="text-sm">No hay información de certificados disponibles</p>
-          )}
-        </>
-      )}
+              {/* Componente Objetivos */}
+              {currentChallenge?.result === "approved" && (
+                <>
+                  {currentChallenge?.certificates ? (
+                    (currentChallenge?.phase === 1 || currentChallenge?.phase === 2 ||
+                      (currentChallenge?.phase === 3 && currentChallenge?.result === "withdrawal")) ? (
+                      <button
+                        className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
+                        onClick={() => setIsModalPdfOpen(true)}
+                      >
+                        <BadgeCheck size={20} /> Ver Certificado
+                      </button>
+                    ) : (
+                      <div className="text-center p-3">
+                        <p className="text-sm">No hay información de certificados disponibles</p>
+                      </div>
+                    )
+                  ) : (
+                    <p className="text-sm">No hay información de certificados disponibles</p>
+                  )}
+                </>
+              )}
 
-{/* Modal */}
-{isModalPdfOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-    <div className="bg-black p-6 rounded-lg shadow-lg w-full max-w-5xl h-auto max-h-[70vh] overflow-y-auto">
-      <h2 className="text-lg font-bold mb-4">Certificado</h2>
-      <Certificates certificates={currentChallenge.certificates} /> 
+              {/* Modal */}
+              {isModalPdfOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                  <div className="bg-black p-6 rounded-lg shadow-lg w-full max-w-5xl h-auto max-h-[70vh] overflow-y-auto">
+                    <h2 className="text-lg font-bold mb-4">Certificado</h2>
+                    <Certificates certificates={currentChallenge.certificates} />
 
-      <div className="mt-4 flex justify-end">
-        <button 
-          className="px-4 py-2 bg-gray-400 text-black rounded-md hover:bg-gray-500"
-          onClick={() => setIsModalPdfOpen(false)}
-        >
-          Cerrar
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+                    <div className="mt-4 flex justify-end">
+                      <button
+                        className="px-4 py-2 bg-gray-400 text-black rounded-md hover:bg-gray-500"
+                        onClick={() => setIsModalPdfOpen(false)}
+                      >
+                        Cerrar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
 
-      
+
 
             </div>
 
           </div>
         </div>
       </div>
-      
+
       {/* Componente para mostrar los challenges relacionados */}
       {userData?.challenges && (
         <div className="mt-4">
@@ -704,13 +699,15 @@ const Metrix = () => {
           />
         </div>
       )}
-    </Layout>
+
+
+    </div>
 
 
 
 
   );
-  
+
 };
 
 export default Metrix;
