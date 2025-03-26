@@ -15,7 +15,7 @@ import {
 import DashboardLayout from "../..";
 
 const fetcher = async (url, token) => {
-    console.log("Fetching data from:", url); // Depuración
+    // console.log("Fetching data from:", url); // Depuración
 
     const res = await fetch(url, {
         headers: {
@@ -29,7 +29,7 @@ const fetcher = async (url, token) => {
     }
 
     const json = await res.json();
-    console.log("Datos recibidos de la API:", json); // Ver datos en consola
+    // console.log("Datos recibidos de la API:", json); // Ver datos en consola
     return json;
 };
 
@@ -45,9 +45,9 @@ export default function UserProfile() {
             : null,
         ([url, token]) => fetcher(url, token)
     );
-    console.log("ID de Usuario:", id); // Depuración
+    // console.log("ID de Usuario:", id); // Depuración
 
-    console.log("Datos en UserProfile:", data); // Depuración
+    // console.log("Datos en UserProfile:", data); // Depuración
 
     const [resultFilter, setResultFilter] = useState("");
     const [phaseFilter, setPhaseFilter] = useState("");
@@ -154,8 +154,8 @@ export default function UserProfile() {
                         </TableHeader>
                         <TableBody>
                             {filteredChallenges.map((challenge) => {
-                                console.log("Challenge ID:", challenge.id);
-                                console.log("Broker Account:", challenge.broker_account);
+                                // console.log("Challenge ID:", challenge.id);
+                                // console.log("Broker Account:", challenge.broker_account);
 
                                 // Verificamos si `broker_account` existe antes de acceder a sus atributos
                                 const broker = challenge.broker_account

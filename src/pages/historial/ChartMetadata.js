@@ -22,9 +22,9 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
 
     useEffect(() => {
         // Log para depuración
-        console.log('Metadata recibida en ChartMetadata:', metadata);
-        console.log('StageConfig recibido en ChartMetadata:', stageConfig);
-        console.log('InitialBalance recibido en ChartMetadata:', initialBalance);
+        // console.log('Metadata recibida en ChartMetadata:', metadata);
+        // console.log('StageConfig recibido en ChartMetadata:', stageConfig);
+        // console.log('InitialBalance recibido en ChartMetadata:', initialBalance);
 
         if (!metadata) {
             setLoading(false)
@@ -40,7 +40,7 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
             // Obtener el balance inicial
             // Prioridad: 1. valor pasado como prop, 2. valor en metrics.deposits, 3. valor por defecto
             const baseBalance = initialBalance || metrics.deposits || 10000
-            console.log('Balance base para cálculos:', baseBalance);
+            // console.log('Balance base para cálculos:', baseBalance);
 
             // Obtener los valores de profit target y max drawdown del stageConfig
             // Si no están disponibles, usar valores por defecto
@@ -61,19 +61,19 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
                 }
             }
 
-            console.log('Porcentajes utilizados:', {
-                profitTargetPercent,
-                maxDrawdownPercent
-            });
+            // console.log('Porcentajes utilizados:', {
+            //     profitTargetPercent,
+            //         maxDrawdownPercent
+            // });
 
             // Cálculo de valores absolutos para líneas horizontales
             const maxDrawdownAbsolute = baseBalance * (1 - maxDrawdownPercent / 100);
             const profitTargetAbsolute = baseBalance * (1 + profitTargetPercent / 100);
 
-            console.log('Valores absolutos calculados:', {
-                maxDrawdownAbsolute,
-                profitTargetAbsolute
-            });
+            //     // console.log('Valores absolutos calculados:', {
+            //     maxDrawdownAbsolute,
+            //         profitTargetAbsolute
+            // });
 
             // Guardar los valores para las líneas horizontales
             setHorizontalLines({
@@ -85,12 +85,12 @@ const ChartMetadata = ({ metadata, stageConfig, initialBalance }) => {
 
             // Priorizar el uso de equityChart si está disponible
             if (metadata.equityChart && metadata.equityChart.length > 0) {
-                console.log('Usando datos de equityChart para la gráfica');
+                // console.log('Usando datos de equityChart para la gráfica');
                 balanceData = transformEquityChartData(metadata.equityChart);
             }
             // Si no hay equityChart pero hay dailyGrowth, usarlo
             else if (metrics.dailyGrowth && metrics.dailyGrowth.length > 0) {
-                console.log('Usando datos de dailyGrowth para la gráfica');
+                // console.log('Usando datos de dailyGrowth para la gráfica');
                 balanceData = transformDailyGrowthData(metrics.dailyGrowth);
             }
             // Si no hay suficientes datos, generar datos de ejemplo

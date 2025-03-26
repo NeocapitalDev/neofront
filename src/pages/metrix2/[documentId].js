@@ -44,30 +44,30 @@ const determineCorrectStage = (currentPhase, stages) => {
   const totalStages = stages.length;
   let stageIndex;
 
-  console.log(`Determinando stage: Fase actual=${currentPhase}, Total stages=${totalStages}`);
+  // console.log(`Determinando stage: Fase actual=${currentPhase}, Total stages=${totalStages}`);
 
   // Si tenemos 2 o 3 stages totales, aplicamos la lógica inversa
   if (totalStages === 2 || totalStages === 3) {
     if (currentPhase === 2) {
       // Si la fase es 2 (con 2 fases totales), seleccionamos el primer stage (índice 0)
       stageIndex = 0;
-      console.log(`Caso especial: Fase 2 con ${totalStages} stages totales -> Seleccionando índice 0`);
+      // console.log(`Caso especial: Fase 2 con ${totalStages} stages totales -> Seleccionando índice 0`);
     } else if (currentPhase === 3) {
       // Si la fase es 3 (con 1 fase total), seleccionamos el único stage
       stageIndex = 0;
-      console.log(`Caso especial: Fase 3 con ${totalStages} stages totales -> Seleccionando índice 0`);
+      // console.log(`Caso especial: Fase 3 con ${totalStages} stages totales -> Seleccionando índice 0`);
     } else {
       // Para otras fases, calculamos el índice correspondiente sin pasarnos del total
       stageIndex = Math.min(currentPhase - 1, totalStages - 1);
-      console.log(`Caso normal con ${totalStages} stages: Calculando índice ${stageIndex} (min(${currentPhase}-1, ${totalStages}-1))`);
+      // console.log(`Caso normal con ${totalStages} stages: Calculando índice ${stageIndex} (min(${currentPhase}-1, ${totalStages}-1))`);
     }
   } else {
     // Para otros casos de cantidad de stages, simplemente usamos la fase actual - 1 como índice
     stageIndex = Math.min(currentPhase - 1, totalStages - 1);
-    console.log(`Caso estándar: Calculando índice ${stageIndex} (min(${currentPhase}-1, ${totalStages}-1))`);
+    // console.log(`Caso estándar: Calculando índice ${stageIndex} (min(${currentPhase}-1, ${totalStages}-1))`);
   }
 
-  console.log(`Stage seleccionado con índice ${stageIndex}:`, stages[stageIndex]);
+  // console.log(`Stage seleccionado con índice ${stageIndex}:`, stages[stageIndex]);
   return stages[stageIndex];
 };
 
@@ -75,14 +75,14 @@ const Metrix = () => {
   const router = useRouter();
   const { documentId } = router.query;
   const { data: session } = useSession();
-  
+
   // Estados para almacenar datos procesados
   const [metadataStats, setMetadataStats] = useState(null);
   const [currentStage, setCurrentStage] = useState(null);
   const [initialBalance, setInitialBalance] = useState(null);
   const [currentChallenge, setCurrentChallenge] = useState(null);
   const [challengeConfig, setChallengeConfig] = useState(null);
-  
+
   // Estados para valores monetarios para la gráfica
   const [ddPercent, setDdPercent] = useState(10);       // fallback
   const [profitTargetPercent, setProfitTargetPercent] = useState(10); // fallback
@@ -98,7 +98,7 @@ const Metrix = () => {
       ]
       : null,
     ([url, token]) => {
-      console.log("Consultando URL:", url);
+      // console.log("Consultando URL:", url);
       return fetcher(url, token);
     }
   );
@@ -112,7 +112,7 @@ const Metrix = () => {
       );
 
       if (basicChallenge && basicChallenge.id) {
-        console.log('Challenge básico encontrado:', basicChallenge);
+        // console.log('Challenge básico encontrado:', basicChallenge);
 
         // Obtener detalles completos del challenge encontrado
         fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${basicChallenge.documentId}?populate[broker_account]=*&populate[challenge_relation][populate][challenge_stages]=*`, {
@@ -126,7 +126,7 @@ const Metrix = () => {
           })
           .then(response => {
             const detailedChallenge = response.data || response;
-            console.log('Detalles completos del challenge:', detailedChallenge);
+            // console.log('Detalles completos del challenge:', detailedChallenge);
 
             // Extraer broker_account considerando diferentes estructuras posibles
             let brokerAccount = null;
@@ -146,7 +146,7 @@ const Metrix = () => {
               brokerAccount = detailedChallenge.attributes.broker_account.data.attributes;
             }
 
-            console.log('Broker account extraído:', brokerAccount);
+            // console.log('Broker account extraído:', brokerAccount);
 
             // Combinar datos básicos con detalles y broker_account procesado
             setCurrentChallenge({
@@ -170,23 +170,23 @@ const Metrix = () => {
   useEffect(() => {
     // Verificar si hay un desafío actual seleccionado
     if (!currentChallenge) {
-      console.log('No hay desafío actual seleccionado aún');
+      // console.log('No hay desafío actual seleccionado aún');
       return;
     }
-    
+
     // Console log para verificar los datos completos recibidos
-    console.log('Datos del challenge recibidos:', {
-      documentId,
-      phase: currentChallenge.phase,
-      hasMetadata: !!currentChallenge.metadata,
-      metadataType: typeof currentChallenge.metadata
-    });
+    // console.log('Datos del challenge recibidos:', {
+    //   documentId,
+    //     phase: currentChallenge.phase,
+    //       hasMetadata: !!currentChallenge.metadata,
+    //         metadataType: typeof currentChallenge.metadata
+    // });
 
     // Obtener el balance inicial del broker
     const brokerInitialBalance = currentChallenge.broker_account?.balance;
-    console.log("Balance inicial del broker_account:", brokerInitialBalance);
+    // console.log("Balance inicial del broker_account:", brokerInitialBalance);
     setInitialBalance(brokerInitialBalance);
-    
+
     // Procesar metadata si existe
     if (currentChallenge.metadata) {
       try {
@@ -194,35 +194,35 @@ const Metrix = () => {
         const metadata = typeof currentChallenge.metadata === 'string'
           ? JSON.parse(currentChallenge.metadata)
           : currentChallenge.metadata;
-        
-        console.log('Metadata parseada correctamente:', metadata);
-        
+
+        // console.log('Metadata parseada correctamente:', metadata);
+
         // Extraer datos relevantes
         if (metadata && (metadata.metrics || metadata.trades)) {
           // Dar prioridad a metrics si existe, sino usar toda la metadata
           const statsToUse = { ...metadata.metrics || metadata };
-          
+
           // Verificar si hay equityChart en metadata o en metrics
           if (metadata.equityChart) {
-            console.log("equityChart encontrado en metadata principal");
+            // console.log("equityChart encontrado en metadata principal");
             statsToUse.equityChart = metadata.equityChart;
           } else if (metadata.metrics && metadata.metrics.equityChart) {
-            console.log("equityChart encontrado en metadata.metrics");
+            // console.log("equityChart encontrado en metadata.metrics");
             statsToUse.equityChart = metadata.metrics.equityChart;
           }
-          
+
           // Verificar si hay datos en equityChart
           if (statsToUse.equityChart) {
-            console.log("Datos de equityChart disponibles:", {
-              length: Array.isArray(statsToUse.equityChart) ? statsToUse.equityChart.length : 'No es array',
-              muestra: Array.isArray(statsToUse.equityChart) ? statsToUse.equityChart.slice(0, 2) : statsToUse.equityChart
-            });
+            // console.log("Datos de equityChart disponibles:", {
+            //   length: Array.isArray(statsToUse.equityChart) ? statsToUse.equityChart.length : 'No es array',
+            //     muestra: Array.isArray(statsToUse.equityChart) ? statsToUse.equityChart.slice(0, 2) : statsToUse.equityChart
+            // });
           } else {
             console.warn("No se encontraron datos de equityChart");
-            
+
             // Si no hay equityChart, intentar crear uno básico con datos disponibles
             if (statsToUse.balance && statsToUse.equity) {
-              console.log("Creando equityChart básico con balance y equity");
+              // console.log("Creando equityChart básico con balance y equity");
               statsToUse.equityChart = [
                 {
                   timestamp: new Date().getTime() - 86400000, // Ayer
@@ -237,11 +237,11 @@ const Metrix = () => {
               ];
             }
           }
-          
+
           // Agregar propiedades adicionales
           statsToUse.broker_account = metadata.broker_account || currentChallenge.broker_account;
           statsToUse.initialBalance = brokerInitialBalance;
-          
+
           // Si llega hasta aquí sin equityChart, intentamos darle un formato básico para que no falle
           if (!statsToUse.equityChart) {
             statsToUse.equityChart = [
@@ -249,32 +249,32 @@ const Metrix = () => {
               { timestamp: new Date().getTime(), equity: brokerInitialBalance || 10000, balance: brokerInitialBalance || 10000 }
             ];
           }
-          
+
           // Obtener la fase actual del challenge
           const challengePhase = currentChallenge.phase;
-          
+
           // Obtener los stages disponibles de la metadata o de challenge_relation
           const stages = metadata.challenge_stages ||
             (currentChallenge.challenge_relation &&
               currentChallenge.challenge_relation.challenge_stages);
-          
+
           // Aplicar la lógica para determinar el stage correcto
           const selectedStage = determineCorrectStage(challengePhase, stages);
-          
+
           if (selectedStage) {
-            console.log('Stage seleccionado correctamente:', selectedStage);
+            // console.log('Stage seleccionado correctamente:', selectedStage);
             setCurrentStage(selectedStage);
-            
+
             // Extraer parámetros importantes para los objetivos
             const maxLoss = selectedStage.maximumTotalLoss || 10;
             const profitTarget = selectedStage.profitTarget || 10;
             const maxDailyLoss = selectedStage.maximumDailyLoss || 5;
             const minTradingDays = selectedStage.minimumTradingDays || 0;
-            
+
             // Guardar valores para maxDrawdown y profitTarget
             setDdPercent(maxLoss);
             setProfitTargetPercent(profitTarget);
-            
+
             // Guardar configuración para el componente Objetivos
             setChallengeConfig({
               minimumTradingDays: minTradingDays,
@@ -282,20 +282,20 @@ const Metrix = () => {
               maxDrawdownPercent: maxLoss,
               profitTargetPercent: profitTarget
             });
-            
+
             // 1) Calcular maxDrawdownAbsolute en valor monetario (resta)
             if (brokerInitialBalance) {
               const ddAbsolute = brokerInitialBalance - (maxLoss / 100) * brokerInitialBalance;
-              console.log("maxDrawdown en valor monetario (resta):", ddAbsolute);
+              // console.log("maxDrawdown en valor monetario (resta):", ddAbsolute);
               setMaxDrawdownAbsolute(ddAbsolute);
-              
+
               // 2) Calcular profitTargetAbsolute en valor monetario (suma)
               const ptAbsolute = brokerInitialBalance + (profitTarget / 100) * brokerInitialBalance;
-              console.log("profitTarget en valor monetario (suma):", ptAbsolute);
+              // console.log("profitTarget en valor monetario (suma):", ptAbsolute);
               setProfitTargetAbsolute(ptAbsolute);
             }
           }
-          
+
           // Añadir valores calculados si faltan
           if (!statsToUse.maxDrawdown && (statsToUse.balance || statsToUse.equity) && brokerInitialBalance) {
             const currentBalance = statsToUse.balance || statsToUse.equity;
@@ -308,17 +308,17 @@ const Metrix = () => {
             statsToUse.profit = statsToUse.balance - brokerInitialBalance;
             statsToUse.profitPercent = (statsToUse.profit / brokerInitialBalance) * 100;
           }
-          
+
           // Establecer las estadísticas
-          console.log("Estableciendo metadataStats con:", {
-            balance: statsToUse.balance,
-            equity: statsToUse.equity,
-            profit: statsToUse.profit,
-            maxDrawdown: statsToUse.maxDrawdown,
-            tieneEquityChart: !!statsToUse.equityChart,
-            equityChartLength: statsToUse.equityChart ? statsToUse.equityChart.length : 0
-          });
-          
+          // console.log("Estableciendo metadataStats con:", {
+          // balance: statsToUse.balance,
+          //     equity: statsToUse.equity,
+          //       profit: statsToUse.profit,
+          //         maxDrawdown: statsToUse.maxDrawdown,
+          //           tieneEquityChart: !!statsToUse.equityChart,
+          //             equityChartLength: statsToUse.equityChart ? statsToUse.equityChart.length : 0
+          // });
+
           setMetadataStats(statsToUse);
         } else {
           console.warn('La metadata no contiene datos válidos de métricas');
@@ -351,38 +351,38 @@ const Metrix = () => {
           { timestamp: new Date().getTime(), equity: brokerInitialBalance, balance: brokerInitialBalance }
         ]
       };
-      
+
       setMetadataStats(basicStats);
     }
-    
+
     // Si no hay metadata, intentamos obtener los parámetros básicos del stage al menos
     if (challenge.challenge_relation && challenge.challenge_relation.challenge_stages) {
       const stages = challenge.challenge_relation.challenge_stages;
       const selectedStage = determineCorrectStage(challenge.phase, stages);
-      
+
       if (selectedStage) {
         setCurrentStage(selectedStage);
-        
+
         // Extraer parámetros para los objetivos
         const maxLoss = selectedStage.maximumTotalLoss || 10;
         const profitTarget = selectedStage.profitTarget || 10;
         const maxDailyLoss = selectedStage.maximumDailyLoss || 5;
         const minTradingDays = selectedStage.minimumTradingDays || 0;
-        
+
         setDdPercent(maxLoss);
         setProfitTargetPercent(profitTarget);
-        
+
         setChallengeConfig({
           minimumTradingDays: minTradingDays,
           maximumDailyLossPercent: maxDailyLoss,
           maxDrawdownPercent: maxLoss,
           profitTargetPercent: profitTarget
         });
-        
+
         if (brokerInitialBalance) {
           const ddAbsolute = brokerInitialBalance - (maxLoss / 100) * brokerInitialBalance;
           setMaxDrawdownAbsolute(ddAbsolute);
-          
+
           const ptAbsolute = brokerInitialBalance + (profitTarget / 100) * brokerInitialBalance;
           setProfitTargetAbsolute(ptAbsolute);
         }
@@ -634,7 +634,8 @@ const Metrix = () => {
           </div>
         </div>
       </div>
-      {/* Challenges relacionados (si existen) */}
+      
+      {/* Componente para mostrar los challenges relacionados */}
       {userData?.challenges && (
         <div className="mt-4">
           <RelatedChallenges

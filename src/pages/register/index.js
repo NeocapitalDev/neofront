@@ -8,7 +8,7 @@ import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 import Layout from '../../components/layout/auth';
-import {PhoneInput} from '@/components/phone-input';
+import { PhoneInput } from '@/components/phone-input';
 
 
 const strapiUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -87,7 +87,7 @@ export default function SignUp() {
           },
         }
       );
-      console.log('Registration successful:', response.data);
+      // console.log('Registration successful:', response.data);
       toast.success('Registro exitoso.');
       router.replace('/email-confirmation');
     } catch (error) {
@@ -168,16 +168,16 @@ export default function SignUp() {
               <div>
                 <label htmlFor="lastName" className="block text-sm font-medium text-gray-300">Telefono</label>
                 <div className="mt-2">
-                <PhoneInput
-                      value={formData.phone}
-                      onChange={(value) => setFormData({ ...formData, phone: value })}
-                      defaultCountry="US"
-                      />
+                  <PhoneInput
+                    value={formData.phone}
+                    onChange={(value) => setFormData({ ...formData, phone: value })}
+                    defaultCountry="US"
+                  />
                 </div>
               </div>
-              
+
               {/* Correo Electrónico */}
-              
+
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-300">Correo electrónico</label>
                 <div className="mt-2">
@@ -248,8 +248,8 @@ export default function SignUp() {
                   type="submit"
                   disabled={isSubmitting || !isPasswordValid()}
                   className={`w-full rounded-md p-3 text-sm font-semibold transition ${isSubmitting || !isPasswordValid()
-                      ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                      : "bg-[var(--app-primary)] text-black hover:bg-[var(--app-secondary)] focus:ring-2 focus:ring-[var(--app-primary)]"
+                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    : "bg-[var(--app-primary)] text-black hover:bg-[var(--app-secondary)] focus:ring-2 focus:ring-[var(--app-primary)]"
                     }`}
                 >
                   {isSubmitting ? (

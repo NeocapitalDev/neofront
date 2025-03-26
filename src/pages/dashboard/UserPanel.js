@@ -25,7 +25,7 @@ const fetcher = async (url, token) => {
 
 export default function Index() {
     const { data: session } = useSession();
-    console.log('Session:', session);
+    // // console.log('Session:', session);
     const router = useRouter();
 
     // URL modificada para incluir challenge_relation y sus stages
@@ -38,7 +38,7 @@ export default function Index() {
             : null,
         ([url, token]) => fetcher(url, token)
     );
-    console.log('Data:', data);
+    // console.log('Data:', data);
 
     const [balances, setBalances] = useState({});
     const [isLoadingBalances, setIsLoadingBalances] = useState(true);
@@ -106,16 +106,16 @@ export default function Index() {
     // Filtrar challenges que están "en curso" o "por iniciar"
     const activeChallenges = data?.challenges
         ?.map((challenge) => {
-            console.log('Full Challenge Object:', JSON.stringify(challenge, null, 2));
-            console.log('Challenge Withdraw:', challenge.withdraw);
-            console.log('Challenge Details:', {
-                documentId: challenge.documentId,
-                phase: challenge.phase,
-                result: challenge.result,
-                hasWithdraw: !!challenge.withdraw,
-                withdrawDetails: challenge.withdraw,
-                stageInfo: challenge.challenge_relation?.challenge_stages
-            });
+            // console.log('Full Challenge Object:', JSON.stringify(challenge, null, 2));
+            // console.log('Challenge Withdraw:', challenge.withdraw);
+            // console.log('Challenge Details:', {
+            //     documentId: challenge.documentId,
+            //         phase: challenge.phase,
+            //             result: challenge.result,
+            //                 hasWithdraw: !!challenge.withdraw,
+            //                     withdrawDetails: challenge.withdraw,
+            //                         stageInfo: challenge.challenge_relation?.challenge_stages
+            // });
             return challenge;
         })
         .filter((challenge) => {
@@ -136,7 +136,7 @@ export default function Index() {
             return false;
         }) || [];
 
-    console.log('Active Challenges:', activeChallenges);
+    // console.log('Active Challenges:', activeChallenges);
 
     // Agrupar los challenges por stage (fase)
     const groupedChallengesByStage = activeChallenges.reduce((acc, challenge) => {

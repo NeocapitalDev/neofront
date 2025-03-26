@@ -64,15 +64,15 @@ const wooFetcher = async ([endpoint, config]) => {
 };
 
 const ChallengeRelations = () => {
-  console.log('ChallengeRelations');
+  // console.log('ChallengeRelations');
   const { data: relations, error, isLoading } = useStrapiData('challenge-relations?populate=*');
-  console.log('relations', relations);
+  // console.log('relations', relations);
   const { data: allproducts, error: allproductserror, isLoading: allproductsisLoading } = useStrapiData('challenge-products');
 
   const { data: session, status } = useSession();
-  console.log('session', session);
+  // console.log('session', session);
   const { data: user, status: statusUser } = strapiJWT('users/me', session?.jwt || '');
-  console.log('user', user);
+  // console.log('user', user);
   // Estados para manejar las selecciones, cupón y términos
   const [selectedStep, setSelectedStep] = useState(null);
   const [selectedRelationId, setSelectedRelationId] = useState(null);
@@ -122,7 +122,7 @@ const ChallengeRelations = () => {
   }, [stepsData]);
 
   // WooCommerce variations fetching logic
-  console.log("Selected Product:", selectedProduct);
+  // console.log("Selected Product:", selectedProduct);
 
   // Set the endpoint only if selectedProduct and WoocomerceId are valid (fixed typo)
   const endpoint = selectedProduct && selectedProduct.WoocomerceId
@@ -135,9 +135,9 @@ const ChallengeRelations = () => {
   const hasCredentials = !!consumerKey;
   const shouldFetch = endpoint && hasCredentials;
 
-  console.log("consumerKey", consumerKey)
-  console.log("hasCredentials", hasCredentials)
-  console.log("shouldFetch", shouldFetch)
+  // console.log("consumerKey", consumerKey)
+  // console.log("hasCredentials", hasCredentials)
+  // console.log("shouldFetch", shouldFetch)
 
   // Use useSWR unconditionally to fetch variations
   const {
@@ -153,7 +153,7 @@ const ChallengeRelations = () => {
     }
   );
 
-  console.log("Productos variaciones:", productsvariations);
+  // console.log("Productos variaciones:", productsvariations);
 
   // Find the matching variation based on selectedStep and selectedRelation.challenge_subcategory.name
   const matchingVariation = productsvariations?.find(variation =>
@@ -161,7 +161,7 @@ const ChallengeRelations = () => {
     variation.attributes.some(attr => attr.name === "subcategory" && attr.option.toLowerCase() === selectedRelation?.challenge_subcategory.name.toLowerCase())
   );
 
-  console.log("Matching Variation:", matchingVariation);
+  // console.log("Matching Variation:", matchingVariation);
 
   if (isLoading) {
     return (
@@ -178,7 +178,7 @@ const ChallengeRelations = () => {
       <p className="text-red-500">Error: {error.message}</p>
     </Layout>
   );
-  
+
   if (allproductserror) return (
     <Layout>
       <p className="text-red-500">Error: {allproductserror.message}</p>
@@ -222,7 +222,7 @@ const ChallengeRelations = () => {
     setSelectedRelationId(relationId);
     const stepRelations = stepsData.find(item => item.step === selectedStep).relations;
     const relation = stepRelations.find(r => r.id === relationId);
-    console.log('Relación seleccionada:', relation);
+    // console.log('Relación seleccionada:', relation);
     setSelectedRelation(relation);
 
     // Check if the current product exists in the new relation
@@ -257,7 +257,7 @@ const ChallengeRelations = () => {
 
   // Función para manejar el clic en un stage
   const handleStageClick = (stage) => {
-    console.log('Stage seleccionado:', stage);
+    // console.log('Stage seleccionado:', stage);
     setSelectedStage(stage);
   };
 
@@ -265,16 +265,16 @@ const ChallengeRelations = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (selectedProduct) {
-      console.log('Producto seleccionado:', selectedProduct);
-      console.log('Variación seleccionada:', matchingVariation);
-      console.log('Stage seleccionado:', selectedStage);
+      // console.log('Producto seleccionado:', selectedProduct);
+      // console.log('Variación seleccionada:', matchingVariation);
+      // console.log('Stage seleccionado:', selectedStage);
     }
   };
 
   // Función para aplicar el cupón
   const applyCoupon = () => {
     if (couponCode) {
-      console.log('Cupón aplicado:', couponCode);
+      // console.log('Cupón aplicado:', couponCode);
     }
   };
 
@@ -575,7 +575,7 @@ const ChallengeRelations = () => {
                     {selectedRelation && (
                       <div className="p-5">
                         <div className="grid grid-cols-1 gap-6">
-                         {/*  <div>
+                          {/*  <div>
                             <section>
                               <h3 className="text-lg font-medium text-[var(--app-primary)] mb-4">Características:</h3>
                               <ul className="space-y-3">
@@ -653,11 +653,10 @@ const ChallengeRelations = () => {
                         onClick={handleContinue}
                         type="submit"
                         disabled={!selectedProduct}
-                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${
-                          selectedProduct
+                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct
                             ? "bg-[var(--app-primary)] hover:bg-[var(--app-secondary)] text-black font-bold"
                             : "bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-zinc-700 dark:text-zinc-500"
-                        }`}
+                          }`}
                       >
                         <span className="uppercase">Continuar</span>
                         <ChevronRightIcon className="h-5 w-5 ml-2" />

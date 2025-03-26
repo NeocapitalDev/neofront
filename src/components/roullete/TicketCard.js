@@ -99,6 +99,8 @@ export default function TicketCards() {
   // State for modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
+  const { data: session } = useSession();
+  
 
   // This is a placeholder - you would use your actual data fetching method
   const { data: tickets, error, isLoading } = useStrapiData(`tickets?populate=users_permissions_user&filters[users_permissions_user][email][$eq]=${session?.user?.email || ''}`);
