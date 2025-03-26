@@ -15,6 +15,8 @@ import Dashboard from "@/components/metrix/barrascircular";
 import Objetivos from "../../components/metrix/objetivos";
 import RelatedChallenges from "../../components/challenges/RelatedChallenges";
 import { BarChart, Landmark, FileChartColumn, ChartCandlestick, FileChartPie } from "lucide-react";
+import Certificates from "./certificates";
+import { BadgeCheck } from "lucide-react"; // Ícono similar a un certificado
 
 /**
  * Fetcher simplificado para GET requests
@@ -89,11 +91,15 @@ const Metrix = () => {
   const [maxDrawdownAbsolute, setMaxDrawdownAbsolute] = useState(null);
   const [profitTargetAbsolute, setProfitTargetAbsolute] = useState(null);
 
+  const [isModalPdfOpen, setIsModalPdfOpen] = useState(false);
+
+
+
   // Obtener datos básicos del usuario con sus challenges
   const { data: userData, error, isLoading } = useSWR(
     session?.jwt && documentId
       ? [
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges]=*`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate]=*`,
         session.jwt
       ]
       : null,
@@ -389,7 +395,6 @@ const Metrix = () => {
       }
     }
   };
-
   // Loading y Error
   if (isLoading || !session) {
     return (
@@ -547,6 +552,8 @@ const Metrix = () => {
                 Historial CH{currentChallenge?.id || "Sin nombre"}
               </div>
             </div>
+
+
             <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black space-y-4">
               {/* Plataforma */}
               <div className="">
@@ -613,6 +620,8 @@ const Metrix = () => {
                       </div>
                     </div>
 
+
+
                     {/* Objetivos comerciales */}
             <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
               <h2 className="text-base font-semibold mb-2">Objetivos comerciales</h2>
@@ -631,6 +640,57 @@ const Metrix = () => {
                 </div>
               )}
             </div>
+
+            <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <h2 className="text-base font-semibold mb-2">Certificado</h2>
+
+{/* Componente Objetivos */}
+{currentChallenge?.result === "approved" && (
+        <>
+          {currentChallenge?.certificates ? (
+            (currentChallenge?.phase === 1 || currentChallenge?.phase === 2 || 
+              (currentChallenge?.phase === 3 && currentChallenge?.result === "withdrawal")) ? (
+                <button
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
+                onClick={() => setIsModalPdfOpen(true)}
+              >
+                <BadgeCheck size={20} /> Ver Certificado
+              </button>
+            ) : (
+              <div className="text-center p-3">
+                <p className="text-sm">No hay información de certificados disponibles</p>
+              </div>
+            )
+          ) : (
+            <p className="text-sm">No hay información de certificados disponibles</p>
+          )}
+        </>
+      )}
+
+{/* Modal */}
+{isModalPdfOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-black p-6 rounded-lg shadow-lg w-full max-w-5xl h-auto max-h-[70vh] overflow-y-auto">
+      <h2 className="text-lg font-bold mb-4">Certificado</h2>
+      <Certificates certificates={currentChallenge.certificates} /> 
+
+      <div className="mt-4 flex justify-end">
+        <button 
+          className="px-4 py-2 bg-gray-400 text-black rounded-md hover:bg-gray-500"
+          onClick={() => setIsModalPdfOpen(false)}
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+      
+
+            </div>
+
           </div>
         </div>
       </div>
@@ -645,7 +705,12 @@ const Metrix = () => {
         </div>
       )}
     </Layout>
+
+
+
+
   );
+  
 };
 
 export default Metrix;
