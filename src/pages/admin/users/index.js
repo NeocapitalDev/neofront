@@ -414,7 +414,7 @@ const RedirectButton = ({ userdocumentId }) => {
       onClick={handleRedirect}
       className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
     >
-      Ver Detalles
+      Detalles
     </button>
   );
 };
@@ -455,7 +455,7 @@ const ViewPdfButton = ({ user, onViewPdf }) => {
       className="ml-2 px-3 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 flex items-center space-x-1"
     >
       <Eye className="w-5 h-5" />
-      <span>Ver PDF</span>
+      <span>PDF</span>
     </button>
   );
 };

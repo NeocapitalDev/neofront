@@ -133,7 +133,7 @@ export default function CredencialesModal({ login, password, server, platform, i
                                                                         <div className="text-sm text-green-500 mt-1">¡Copiado!</div>
                                                                     )}
 
-                                                                    {/* Botón de cambio (solo para Contraseña) */}
+                                                                    {/* Botón de cambio (solo para Contraseña)
                                                                     {item.label === 'Contraseña' && (
                                                                         <div className="flex items-center space-x-3">
                                                                             <button className="p-2 border bg-zinc-100 rounded hover:bg-gray-200 dark:bg-zinc-800 w-12 h-12 flex items-center justify-center">
@@ -141,7 +141,7 @@ export default function CredencialesModal({ login, password, server, platform, i
                                                                             </button>
                                                                             <span className="text-sm text-gray-600 dark:text-white truncate">Cambio</span>
                                                                         </div>
-                                                                    )}
+                                                                    )} */}
                                                                 </div>
                                                             )}
                                                         </div>

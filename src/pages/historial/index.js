@@ -20,7 +20,10 @@ export default function Historial() {
     const token = session?.jwt;
 
     // Obtener datos del usuario con challenges poblados usando useStrapiData
-    const { data, error, isLoading } = useStrapiData('users/me?populate[challenges][populate]=broker_account', token);
+    const { data, error, isLoading } = useStrapiData(
+        token ? 'users/me?populate[challenges][populate]=broker_account' : null,
+        token
+    );
 
     const [searchParentId, setSearchParentId] = useState("");
     const [startDate, setStartDate] = useState("");
@@ -31,31 +34,31 @@ export default function Historial() {
 
     // Definir colores para los estados
     const statusColors = {
-        approved: 'text-green-600 dark:text-green-300',
-        disapproved: 'text-red-600 dark:text-red-300',
-        progress: 'text-yellow-600 dark:text-yellow-300',
-        init: 'text-blue-600 dark:text-blue-300',
-        withdrawal: 'text-purple-600 dark:text-purple-300',
-        retry: 'text-orange-600 dark:text-orange-300',
+        approved: 'text-green-600 dark:text-green-400',
+        disapproved: 'text-red-600 dark:text-red-400',
+        progress: 'text-yellow-600 dark:text-yellow-400',
+        init: 'text-blue-600 dark:text-blue-400',
+        withdrawal: 'text-purple-600 dark:text-purple-400',
+        retry: 'text-orange-600 dark:text-orange-400',
     };
 
-    const statusBgColors = {
-        approved: 'bg-green-100 dark:bg-green-900/40',
-        disapproved: 'bg-red-100 dark:bg-red-900/40',
-        progress: 'bg-yellow-100 dark:bg-yellow-900/40',
-        init: 'bg-blue-100 dark:bg-blue-900/40',
-        withdrawal: 'bg-purple-100 dark:bg-purple-900/40',
-        retry: 'bg-orange-100 dark:bg-orange-900/40',
-    };
-
-    // Definir colores para los gradientes
+    // Definir colores para los gradientes con mejores gradientes para ambos modos
     const statusGradients = {
-        approved: 'from-green-600/30 dark:from-green-500/20',
-        disapproved: 'from-red-600/30 dark:from-red-500/20',
-        progress: 'from-yellow-600/30 dark:from-yellow-500/20',
-        init: 'from-blue-600/30 dark:from-blue-500/20',
-        withdrawal: 'from-purple-600/30 dark:from-purple-500/20',
-        retry: 'from-orange-600/30 dark:from-orange-500/20',
+        approved: 'from-green-200 via-green-100/80 to-white dark:from-green-900/40 dark:via-green-800/20 dark:to-zinc-900',
+        disapproved: 'from-red-200 via-red-100/80 to-white dark:from-red-900/40 dark:via-red-800/20 dark:to-zinc-900',
+        progress: 'from-amber-200 via-amber-100/80 to-white dark:from-amber-900/40 dark:via-amber-800/20 dark:to-zinc-900',
+        init: 'from-blue-200 via-blue-100/80 to-white dark:from-blue-900/40 dark:via-blue-800/20 dark:to-zinc-900',
+        withdrawal: 'from-purple-200 via-purple-100/80 to-white dark:from-purple-900/40 dark:via-purple-800/20 dark:to-zinc-900',
+        retry: 'from-orange-200 via-orange-100/80 to-white dark:from-orange-900/40 dark:via-orange-800/20 dark:to-zinc-900',
+    };
+    
+    const statusBorderColors = {
+        approved: 'border-green-300 dark:border-green-800',
+        disapproved: 'border-red-300 dark:border-red-800',
+        progress: 'border-yellow-300 dark:border-yellow-800',
+        init: 'border-blue-300 dark:border-blue-800',
+        withdrawal: 'border-purple-300 dark:border-purple-800',
+        retry: 'border-orange-300 dark:border-orange-800',
     };
 
     // Filtrar y agrupar challenges
@@ -101,7 +104,7 @@ export default function Historial() {
     if (error) {
         return (
             <Layout>
-                <div className="p-4 text-red-600 dark:text-red-400">
+                <div className="p-4 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800/50">
                     Error al cargar los datos: {error.message}
                 </div>
             </Layout>
@@ -140,16 +143,16 @@ export default function Historial() {
 
     return (
         <Layout>
-            {/* Cabecera del historial - siguiendo estilo de profile */}
-            <div className="bg-white p-4 rounded-lg shadow-md dark:bg-zinc-800 dark:border-zinc-700 dark:shadow-black dark:text-white">
+            {/* Cabecera del historial - Mejorada para ambos modos */}
+            <div className="bg-gradient-to-r from-white to-gray-50 p-5 rounded-lg shadow-md border border-gray-100 dark:border-zinc-700/50 dark:bg-gradient-to-r dark:from-zinc-800 dark:to-zinc-900 dark:shadow-black dark:text-white transition-all duration-200">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-2">
-                        <ClockIcon className="h-5 text-gray-600 w-5 dark:text-gray-200" />
-                        <h1 className="text-lg font-semibold">Historial de Challenges</h1>
+                        <ClockIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+                        <h1 className="text-xl font-semibold">Historial de Challenges</h1>
                     </div>
                     <button
                         onClick={() => setIsFilterOpen(!isFilterOpen)}
-                        className="bg-[var(--app-primary)] rounded-lg text-black font-medium hover:bg-[var(--app-secondary)] inline-flex items-center px-4 py-2 space-x-2 transition"
+                        className="bg-gradient-to-r from-[var(--app-primary)] to-[var(--app-primary)]/90 rounded-lg text-black font-medium hover:from-[var(--app-secondary)] hover:to-[var(--app-secondary)]/90 inline-flex items-center px-4 py-2 space-x-2 transition-all duration-200 shadow-sm"
                     >
                         <FunnelIcon className="h-5 w-5" />
                         <span className="font-medium">Filtros</span>
@@ -157,10 +160,10 @@ export default function Historial() {
                 </div>
             </div>
 
-            {/* Sección de filtros */}
+            {/* Sección de filtros - Mejorada */}
             <div className="mt-4">
                 {isFilterOpen && (
-                    <div className="bg-white p-5 rounded-lg shadow-md dark:bg-black dark:border-zinc-700 dark:shadow-black dark:text-white">
+                    <div className="bg-white p-5 rounded-lg shadow-md border border-gray-100 dark:border-zinc-700/50 dark:bg-gradient-to-b dark:from-zinc-800 dark:to-zinc-900 dark:shadow-black dark:text-white transition-all duration-200">
                         <p className="text-base font-semibold mb-3">Opciones de filtrado</p>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                             <div className="relative">
@@ -172,7 +175,7 @@ export default function Historial() {
                                     placeholder="Buscar por ID"
                                     value={searchParentId}
                                     onChange={(e) => setSearchParentId(e.target.value)}
-                                    className="border p-2 rounded-lg w-full dark:bg-zinc-800 dark:border-zinc-600 dark:text-white focus:border-transparent focus:ring-[var(--app-primary)] focus:ring-2 pl-10"
+                                    className="border p-2 rounded-lg w-full bg-gray-50 border-gray-200 text-gray-800 dark:bg-zinc-800/80 dark:border-zinc-600 dark:text-white focus:border-transparent focus:ring-[var(--app-primary)] focus:ring-2 pl-10 transition-all duration-200"
                                 />
                             </div>
                             <div className="relative">
@@ -183,7 +186,7 @@ export default function Historial() {
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    className="border p-2 rounded-lg w-full dark:bg-zinc-800 dark:border-zinc-600 dark:text-white focus:border-transparent focus:ring-[var(--app-primary)] focus:ring-2 pl-10"
+                                    className="border p-2 rounded-lg w-full bg-gray-50 border-gray-200 text-gray-800 dark:bg-zinc-800/80 dark:border-zinc-600 dark:text-white focus:border-transparent focus:ring-[var(--app-primary)] focus:ring-2 pl-10 transition-all duration-200"
                                     placeholder="Fecha inicio"
                                 />
                             </div>
@@ -195,7 +198,7 @@ export default function Historial() {
                                     type="date"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                    className="border p-2 rounded-lg w-full dark:bg-zinc-800 dark:border-zinc-600 dark:text-white focus:border-transparent focus:ring-[var(--app-primary)] focus:ring-2 pl-10"
+                                    className="border p-2 rounded-lg w-full bg-gray-50 border-gray-200 text-gray-800 dark:bg-zinc-800/80 dark:border-zinc-600 dark:text-white focus:border-transparent focus:ring-[var(--app-primary)] focus:ring-2 pl-10 transition-all duration-200"
                                     placeholder="Fecha fin"
                                 />
                             </div>
@@ -204,12 +207,12 @@ export default function Historial() {
                 )}
             </div>
 
-            {/* Contenedor principal de challenges - REDUCIDO */}
-            <div className="bg-white p-3 rounded-lg shadow-md dark:bg-black dark:border-zinc-700 dark:shadow-black dark:text-white mt-4">
+            {/* Contenedor principal de challenges - Mejorado para ambos modos */}
+            <div className="bg-gradient-to-b from-white to-gray-50 p-4 rounded-lg shadow-md border border-gray-100 dark:border-zinc-700/50 dark:bg-gradient-to-b dark:from-zinc-800 dark:to-black dark:shadow-black dark:text-white mt-4 transition-all duration-200">
                 {/* Grupos de Challenges */}
-                <div className="space-y-2">
+                <div className="space-y-4">
                     {Object.entries(filteredGroups).length === 0 ? (
-                        <div className="bg-gray-50 p-6 rounded-lg text-center dark:bg-zinc-800">
+                        <div className="bg-white p-8 rounded-lg text-center dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700/70 shadow-sm transition-all duration-200">
                             <p className="text-gray-500 dark:text-gray-400">No hay challenges que coincidan con los filtros.</p>
                         </div>
                     ) : (
@@ -223,19 +226,19 @@ export default function Historial() {
                             return (
                                 <div
                                     key={parentId}
-                                    className={`bg-gradient-to-b ${statusGradients[status] || 'from-gray-500/10'} to-zinc-800 rounded-lg shadow-md dark:border-zinc-700 overflow-hidden relative`}
+                                    className={`bg-gradient-to-b ${statusGradients[status]} rounded-lg shadow-md border ${statusBorderColors[status]} overflow-hidden relative transition-all duration-200`}
                                 >
-                                    {/* Cabecera del Challenge (siempre visible) - REDUCIDO */}
-                                    <div className="flex flex-col p-3 relative z-10">
+                                    {/* Cabecera del Challenge - Mejorada para ambos modos */}
+                                    <div className="flex flex-col p-4 relative z-10">
                                         {/* Identificador del challenge y botón de expansión en una fila */}
-                                        <div className="flex justify-between items-center mb-2">
-                                            <div className="bg-[var(--app-primary)] rounded-lg shadow-md text-black text-center text-base font-bold px-2 py-1">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <div className="bg-gradient-to-r from-[var(--app-primary)] to-[var(--app-primary)]/90 rounded-lg shadow-md text-black text-center text-base font-bold px-3 py-1.5 transition-all duration-200">
                                                 <span className="block" title={parentId}>CH-{challenges[0].id}</span>
                                             </div>
                                             <div className="flex items-center">
                                                 <button
                                                     onClick={() => toggleGroup(parentId)}
-                                                    className="p-1 rounded-full dark:hover:bg-zinc-600/70 hover:bg-gray-200 mr-2 transition-colors"
+                                                    className="p-1.5 rounded-full hover:bg-gray-200/70 dark:hover:bg-zinc-600/70 mr-2 transition-all duration-200"
                                                     aria-label={isExpanded ? "Collapse" : "Expand"}
                                                 >
                                                     {isExpanded ? (
@@ -247,7 +250,7 @@ export default function Historial() {
 
                                                 {/* Botón de metrix */}
                                                 <Link href={lastChallenge.result === 'progress' ? `/metrix2/${lastChallenge.documentId}` : `/metrix2/${lastChallenge.documentId}`}>
-                                                    <button className="flex bg-gray-200 border border-gray-300 justify-center rounded-lg shadow-md dark:bg-zinc-700/90 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-300 items-center px-3 py-1 space-x-1 text-sm">
+                                                    <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-sm transition-all duration-200">
                                                         <ChartBarIcon className="h-4 w-4 mr-1" />
                                                         <span>Metrix</span>
                                                     </button>
@@ -255,29 +258,30 @@ export default function Historial() {
                                             </div>
                                         </div>
 
-                                        {/* Información principal - REDUCIDO */}
+                                        {/* Información principal - Mejorada para ambos modos */}
                                         <div className="pl-1">
                                             {/* Estado y fase actual */}
                                             <div className="flex flex-wrap gap-2 items-center mb-2">
                                                 <div className="gap-1 inline-flex items-center">
-                                                    <span className={`inline-block w-2 h-2 rounded-full ${status === 'approved' ? 'bg-green-600' :
-                                                        status === 'progress' ? 'bg-yellow-500' :
-                                                            status === 'disapproved' ? 'bg-red-600' :
-                                                                status === 'init' ? 'bg-blue-500' :
-                                                                    status === 'withdrawal' ? 'bg-purple-500' :
-                                                                        'bg-orange-500'
-                                                        }`} />
-                                                    <span className={`font-semibold text-sm ${statusColors[status] || 'text-gray-600 dark:text-gray-300'}`}>
+                                                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${
+                                                        status === 'approved' ? 'bg-green-500 dark:bg-green-400' :
+                                                        status === 'progress' ? 'bg-yellow-500 dark:bg-yellow-400' :
+                                                        status === 'disapproved' ? 'bg-red-500 dark:bg-red-400' :
+                                                        status === 'init' ? 'bg-blue-500 dark:bg-blue-400' :
+                                                        status === 'withdrawal' ? 'bg-purple-500 dark:bg-purple-400' :
+                                                        'bg-orange-500 dark:bg-orange-400'
+                                                    }`} />
+                                                    <span className={`font-semibold text-sm ${statusColors[status]}`}>
                                                         {status === 'approved' ? 'Aprobado' :
-                                                            status === 'progress' ? 'En progreso' :
-                                                                status === 'disapproved' ? 'Desaprobado' :
-                                                                    status === 'init' ? 'Por Iniciar' :
-                                                                        status === 'withdrawal' ? 'Retirado' :
-                                                                            status === 'retry' ? 'Rechazado' : 'Desconocido'}
+                                                         status === 'progress' ? 'En progreso' :
+                                                         status === 'disapproved' ? 'Desaprobado' :
+                                                         status === 'init' ? 'Por Iniciar' :
+                                                         status === 'withdrawal' ? 'Retirado' :
+                                                         status === 'retry' ? 'Rechazado' : 'Desconocido'}
                                                     </span>
                                                 </div>
                                                 <span className="text-gray-500 dark:text-gray-400 hidden md:inline">|</span>
-                                                <span className="bg-gray-100/20 backdrop-blur-sm rounded-md text-gray-600 text-xs dark:text-gray-300 px-2 py-0.5 dark:bg-zinc-700/60">
+                                                <span className="bg-white/90 backdrop-blur-sm rounded-md text-gray-600 text-xs dark:text-gray-300 px-2 py-0.5 dark:bg-zinc-700/60 border border-gray-200 dark:border-zinc-600/30 shadow-sm transition-all duration-200">
                                                     Fase {lastChallenge.phase}
                                                 </span>
                                             </div>
@@ -285,29 +289,31 @@ export default function Historial() {
                                             {/* Período */}
                                             <div className="flex text-gray-500 text-xs dark:text-gray-400 items-center mb-2">
                                                 <span className="font-medium mr-1">Período:</span>
-                                                <span className="bg-gray-100/20 backdrop-blur-sm rounded-md text-gray-700 dark:text-gray-300 px-2 py-0.5 dark:bg-zinc-700/60 text-xs">{startDateFormatted} - {endDateFormatted}</span>
+                                                <span className="bg-white/90 backdrop-blur-sm rounded-md text-gray-700 dark:text-gray-300 px-2 py-0.5 dark:bg-zinc-700/60 text-xs border border-gray-200 dark:border-zinc-600/30 shadow-sm transition-all duration-200">
+                                                    {startDateFormatted} - {endDateFormatted}
+                                                </span>
                                             </div>
 
                                             {/* Última actualización */}
                                             <div className="flex text-xs gap-1 items-center">
                                                 <span className="text-black dark:text-white font-semibold">Última actualización:</span>
-                                                <span className="bg-gray-100/20 backdrop-blur-sm rounded-md text-gray-600 dark:text-gray-300 px-2 py-0.5 dark:bg-zinc-700/60">
+                                                <span className="bg-white/90 backdrop-blur-sm rounded-md text-gray-600 dark:text-gray-300 px-2 py-0.5 dark:bg-zinc-700/60 border border-gray-200 dark:border-zinc-600/30 shadow-sm transition-all duration-200">
                                                     {formatDate(lastChallenge.endDate ? lastChallenge.endDate : lastChallenge.startDate)}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Detalles del Challenge (expandible) - REDUCIDO */}
+                                    {/* Detalles del Challenge - Mejorados para ambos modos */}
                                     {isExpanded && (
-                                        <div className="bg-zinc-900/60 border-gray-200 border-t dark:border-zinc-700/70 px-3 py-2">
-                                            <h3 className="text-gray-800 text-xs dark:text-gray-300 font-semibold mb-2">Historial de fases</h3>
-                                            <div className="space-y-2">
+                                        <div className="bg-white/90 dark:bg-zinc-900/80 border-t border-gray-200 dark:border-zinc-700/60 px-4 py-3 transition-all duration-200">
+                                            <h3 className="text-gray-800 text-xs dark:text-gray-300 font-semibold mb-3">Historial de fases</h3>
+                                            <div className="space-y-3">
                                                 {challenges.map((challenge, index) => {
                                                     return (
                                                         <div
                                                             key={index}
-                                                            className={`p-2 rounded-lg shadow-sm border bg-gradient-to-b ${statusGradients[challenge.result] || 'from-gray-500/10'} to-zinc-800 border-gray-200 dark:border-zinc-700/70 relative overflow-hidden`}
+                                                            className={`p-3 rounded-lg shadow-sm border bg-gradient-to-b ${statusGradients[challenge.result]} ${statusBorderColors[challenge.result]} relative overflow-hidden transition-all duration-200`}
                                                         >
                                                             <div className="flex flex-col justify-between sm:flex-row relative z-10">
                                                                 {/* Info de la fase */}
@@ -316,12 +322,21 @@ export default function Historial() {
                                                                         <span className="text-gray-800 text-sm dark:text-white font-semibold">
                                                                             Fase {challenge.phase}
                                                                         </span>
-                                                                        <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[challenge.result]} backdrop-blur-sm ${challenge.result === 'approved' ? 'bg-green-900/30' : 
-                                                                            challenge.result === 'progress' ? 'bg-yellow-900/30' : 
-                                                                            challenge.result === 'disapproved' ? 'bg-red-900/30' :
-                                                                            challenge.result === 'init' ? 'bg-blue-900/30' :
-                                                                            challenge.result === 'withdrawal' ? 'bg-purple-900/30' :
-                                                                            'bg-orange-900/30'}`}>
+                                                                        <span className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[challenge.result]} backdrop-blur-sm ${
+                                                                            challenge.result === 'approved' ? 'bg-green-100 dark:bg-green-900/50' : 
+                                                                            challenge.result === 'progress' ? 'bg-yellow-100 dark:bg-yellow-900/50' : 
+                                                                            challenge.result === 'disapproved' ? 'bg-red-100 dark:bg-red-900/50' :
+                                                                            challenge.result === 'init' ? 'bg-blue-100 dark:bg-blue-900/50' :
+                                                                            challenge.result === 'withdrawal' ? 'bg-purple-100 dark:bg-purple-900/50' :
+                                                                            'bg-orange-100 dark:bg-orange-900/50'
+                                                                        } border ${
+                                                                            challenge.result === 'approved' ? 'border-green-200 dark:border-green-700/50' : 
+                                                                            challenge.result === 'progress' ? 'border-yellow-200 dark:border-yellow-700/50' : 
+                                                                            challenge.result === 'disapproved' ? 'border-red-200 dark:border-red-700/50' :
+                                                                            challenge.result === 'init' ? 'border-blue-200 dark:border-blue-700/50' :
+                                                                            challenge.result === 'withdrawal' ? 'border-purple-200 dark:border-purple-700/50' :
+                                                                            'border-orange-200 dark:border-orange-700/50'
+                                                                        } shadow-sm transition-all duration-200`}>
                                                                             {challenge.result === 'approved' ? 'Aprobado' :
                                                                                 challenge.result === 'progress' ? 'En progreso' :
                                                                                     challenge.result === 'disapproved' ? 'Desaprobado' :
@@ -342,7 +357,7 @@ export default function Historial() {
                                                                 <Link
                                                                     href={challenge.result === 'progress' ? `/metrix2/${challenge.documentId}` : `/historial/${challenge.documentId}`}
                                                                 >
-                                                                    <button className="flex bg-gray-200/20 backdrop-blur-sm border border-gray-300/30 justify-center rounded-lg shadow-md dark:bg-zinc-700/70 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-300/30 items-center px-3 py-1 space-x-1 text-xs">
+                                                                    <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
                                                                         <ChartBarIcon className="h-3 w-3 mr-1" />
                                                                         <span>Ver detalles</span>
                                                                     </button>

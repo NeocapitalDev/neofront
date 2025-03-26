@@ -231,7 +231,7 @@ const SocialsPage = () => {
 <div className="flex flex-col items-center space-y-6">
     {/* Botón de Descargar PDF con ancho completo */}
     <Button
-        className="w-full bg-[#1F6263] hover:bg-[#29716c] text-white text-lg font-semibold px-6 py-4 rounded-lg shadow-md transition-all"
+        className="w-full bg-[var(--app-primary)] hover:bg-amber-600 text-white text-lg font-semibold px-6 py-4 rounded-lg shadow-md transition-all"
         onClick={handleDownload}
     >
         Descargar PDF
@@ -243,11 +243,11 @@ const SocialsPage = () => {
             type="file"
             accept="application/pdf"
             onChange={handleFileChange}
-            className="file:cursor-pointer file:border-none file:rounded-lg file:bg-[#1F6263] file:text-white file:px-4 file:py-2 file:font-medium hover:file:bg-[#29716c] disabled:opacity-50 w-full sm:w-auto"
+            className="file:cursor-pointer file:border-none file:rounded-lg file:bg-[var(--app-primary)] file:text-white file:px-4 file:py-2 file:font-medium hover:file:bg-amber-600 disabled:opacity-50 w-full sm:w-auto"
             disabled={loading || isUploadDisabled}
         />
         <Button
-            className={`w-full sm:w-auto bg-[#1F6263] hover:bg-[#29716c] text-white text-lg font-semibold px-6 py-4 rounded-lg shadow-md transition-all ${
+            className={`w-full sm:w-auto bg-[var(--app-secondary)] hover:bg-[var(--app-primary)] text-white text-lg font-semibold px-6 py-4 rounded-lg shadow-md transition-all ${
                 (!pdfFile || loading || isUploadDisabled) ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={!pdfFile || loading || isUploadDisabled}
