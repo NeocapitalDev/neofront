@@ -23,9 +23,65 @@ const fetcher = async (url, token) => {
     return response.json();
 };
 
+// Componente para los títulos de fase mejorados
+const PhaseTitle = ({ stageName }) => {
+  // Determinar el color y el icono según la fase
+  const getPhaseStyles = (stageName) => {
+    switch (stageName) {
+      case "Fase 1":
+        return {
+          color: "from-blue-500 to-blue-700",
+          bgColor: "bg-blue-50 dark:bg-blue-900/20",
+          borderColor: "border-blue-200 dark:border-blue-700",
+          textColor: "text-blue-700 dark:text-blue-300",
+          number: "1"
+        };
+      case "Fase 2":
+        return {
+          color: "from-purple-500 to-purple-700",
+          bgColor: "bg-purple-50 dark:bg-purple-900/20",
+          borderColor: "border-purple-200 dark:border-purple-700",
+          textColor: "text-purple-700 dark:text-purple-300",
+          number: "2"
+        };
+      case "Fase Real":
+        return {
+          color: "from-[var(--app-primary)] to-yellow-600",
+          bgColor: "bg-yellow-50 dark:bg-yellow-900/10",
+          borderColor: "border-yellow-200 dark:border-yellow-700/50",
+          textColor: "text-[var(--app-primary)] dark:text-yellow-300",
+          number: "R"
+        };
+      default:
+        return {
+          color: "from-gray-500 to-gray-700",
+          bgColor: "bg-gray-50 dark:bg-gray-800/50",
+          borderColor: "border-gray-200 dark:border-gray-700",
+          textColor: "text-gray-700 dark:text-gray-300",
+          number: "•"
+        };
+    }
+  };
+
+  const { color, bgColor, borderColor, textColor, number } = getPhaseStyles(stageName);
+
+  return (
+    <div className="flex flex-col space-y-1 mb-4">
+      <div className="flex items-center">
+        <div className={`flex items-center ${bgColor} ${borderColor} border rounded-lg px-4 py-2`}>
+          <div className={`flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-r ${color} text-white mr-2 font-bold text-md shadow-sm`}>
+            {number}
+          </div>
+          <span className={`text-lg font-bold ${textColor}`}>{stageName}</span>
+        </div>
+        <div className="h-[2px] flex-grow ml-3 bg-gradient-to-r from-gray-300 to-transparent dark:from-zinc-700"></div>
+      </div>
+    </div>
+  );
+};
+
 export default function Index() {
     const { data: session } = useSession();
-    // // console.log('Session:', session);
     const router = useRouter();
 
     // URL modificada para incluir challenge_relation y sus stages
@@ -38,7 +94,6 @@ export default function Index() {
             : null,
         ([url, token]) => fetcher(url, token)
     );
-    // console.log('Data:', data);
 
     const [balances, setBalances] = useState({});
     const [isLoadingBalances, setIsLoadingBalances] = useState(true);
@@ -106,16 +161,6 @@ export default function Index() {
     // Filtrar challenges que están "en curso" o "por iniciar"
     const activeChallenges = data?.challenges
         ?.map((challenge) => {
-            // console.log('Full Challenge Object:', JSON.stringify(challenge, null, 2));
-            // console.log('Challenge Withdraw:', challenge.withdraw);
-            // console.log('Challenge Details:', {
-            //     documentId: challenge.documentId,
-            //         phase: challenge.phase,
-            //             result: challenge.result,
-            //                 hasWithdraw: !!challenge.withdraw,
-            //                     withdrawDetails: challenge.withdraw,
-            //                         stageInfo: challenge.challenge_relation?.challenge_stages
-            // });
             return challenge;
         })
         .filter((challenge) => {
@@ -135,8 +180,6 @@ export default function Index() {
 
             return false;
         }) || [];
-
-    // console.log('Active Challenges:', activeChallenges);
 
     // Agrupar los challenges por stage (fase)
     const groupedChallengesByStage = activeChallenges.reduce((acc, challenge) => {
@@ -162,10 +205,8 @@ export default function Index() {
                 sortedStages.map((stageName) => {
                     const stageChallengers = groupedChallengesByStage[stageName];
                     return (
-                        <div key={stageName} className="mb-4">
-                            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">
-                                {stageName}
-                            </h2>
+                        <div key={stageName} className="mb-8">
+                            <PhaseTitle stageName={stageName} />
 
                             {stageChallengers.map((challenge, index) => {
                                 const isVisible = visibility[challenge.id] ?? true;
