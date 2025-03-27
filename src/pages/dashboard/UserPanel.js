@@ -248,12 +248,15 @@ export default function Index() {
                                                 </div>
 
                                                 <div className="mt-3 flex flex-wrap gap-2 items-center">
-                                                    <Link href={`/metrix/${challenge.documentId}`}>
-                                                        <button className="flex items-center justify-center space-x-1 px-3 py-1 rounded-lg transition-all duration-200 bg-white hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 shadow-sm hover:shadow text-sm">
-                                                            <ChartBarIcon className="h-7 w-6 text-[var(--app-primary)]" />
-                                                            <span className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Metrix</span>
-                                                        </button>
-                                                    </Link>
+                                                    {/* Solo mostrar el botón de Metrix cuando el challenge NO esté en estado "init" */}
+                                                    {challenge.result !== "init" && (
+                                                        <Link href={`/metrix/${challenge.documentId}`}>
+                                                            <button className="flex items-center justify-center space-x-1 px-3 py-1 rounded-lg transition-all duration-200 bg-white hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 shadow-sm hover:shadow text-sm">
+                                                                <ChartBarIcon className="h-7 w-6 text-[var(--app-primary)]" />
+                                                                <span className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Metrix</span>
+                                                            </button>
+                                                        </Link>
+                                                    )}
                                                     
                                                     <CredencialesModal 
                                                         login={challenge.broker_account?.login || "-"}
@@ -261,6 +264,14 @@ export default function Index() {
                                                         server={challenge.broker_account?.server || "-"}
                                                         platform={challenge.broker_account?.platform || "MT4"}
                                                         inversorPass={challenge.broker_account?.inversorPass || "-"}
+                                                    />
+
+                                                    {/* Mover el botón ButtonInit a esta sección cuando sea necesario mostrarlo */}
+                                                    <ButtonInit
+                                                        documentId={challenge.documentId}
+                                                        result={challenge.result}
+                                                        phase={challenge.phase}
+                                                        className="text-sm"
                                                     />
 
                                                     {!isVerified && challenge.phase === 3 &&
@@ -287,13 +298,6 @@ export default function Index() {
                                         )}
 
                                         <div className="mt-3 flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-gray-100 dark:border-zinc-700/50">
-                                            <ButtonInit
-                                                documentId={challenge.documentId}
-                                                result={challenge.result}
-                                                phase={challenge.phase}
-                                                className="bg-[var(--app-primary)]/10 hover:bg-[var(--app-primary)]/20 text-[var(--app-primary)] border-[var(--app-primary)]/20 text-sm py-1 px-3"
-                                            />
-
                                             <div className="flex items-center space-x-2">
                                                 <Switch
                                                     id={`visible-mode-${challenge.id}-${index}`}

@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from 'sonner';
 
-const ButtonInit = ({ documentId, result, phase }) => {
+const ButtonInit = ({ documentId, result, phase, className }) => {
     const { data: session } = useSession();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -69,13 +69,13 @@ const ButtonInit = ({ documentId, result, phase }) => {
     }
 
     return (
-        <div className="flex items-center py-3 px-4 gap-3 mt-4 border border-[var(--app-primary)] bg-[var(--app-primary)] rounded-lg">
-            <p className="text-sm text-black font-medium">
-                ⚡ Tienes un challenge por iniciar
+        <div className="flex items-center py-3 px-4 gap-1 border border-[var(--app-primary)] bg-[var(--app-primary)] rounded-lg">
+            <p className="text-xs text-black font-medium">
+                Inicia tu challenge haciendo
             </p>
             <button
                 onClick={sendToWebhook}
-                className="text-sm text-black font-bold uppercase underline"
+                className="text-xs text-black font-bold uppercase underline"
                 disabled={isLoading}
             >
                 {isLoading ? "Cargando..." : "CLICK AQUÍ"}
