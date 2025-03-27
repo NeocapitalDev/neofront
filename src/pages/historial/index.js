@@ -152,7 +152,7 @@ export default function Historial() {
                     </div>
                     <button
                         onClick={() => setIsFilterOpen(!isFilterOpen)}
-                        className="bg-gradient-to-r from-[var(--app-primary)] to-[var(--app-primary)]/90 rounded-lg text-black font-medium hover:from-[var(--app-secondary)] hover:to-[var(--app-secondary)]/90 inline-flex items-center px-4 py-2 space-x-2 transition-all duration-200 shadow-sm"
+                        className="bg-[var(--app-primary)] rounded-lg text-black font-medium hover:bg-[var(--app-secondary)] inline-flex items-center px-4 py-2 space-x-2 transition-all duration-200 shadow-sm"
                     >
                         <FunnelIcon className="h-5 w-5" />
                         <span className="font-medium">Filtros</span>
@@ -232,7 +232,7 @@ export default function Historial() {
                                     <div className="flex flex-col p-4 relative z-10">
                                         {/* Identificador del challenge y botón de expansión en una fila */}
                                         <div className="flex justify-between items-center mb-3">
-                                            <div className="bg-gradient-to-r from-[var(--app-primary)] to-[var(--app-primary)]/90 rounded-lg shadow-md text-black text-center text-base font-bold px-3 py-1.5 transition-all duration-200">
+                                            <div className="bg-[var(--app-primary)] rounded-lg shadow-md text-black text-center text-base font-bold px-3 py-1.5 transition-all duration-200"                                            >
                                                 <span className="block" title={parentId}>CH-{challenges[0].id}</span>
                                             </div>
                                             <div className="flex items-center">
