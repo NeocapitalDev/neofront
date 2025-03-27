@@ -71,6 +71,7 @@ const Metrix = () => {
   const [profitTargetAbsolute, setProfitTargetAbsolute] = useState(null);
 
   const [isModalPdfOpen, setIsModalPdfOpen] = useState(false);
+  const [selectedCertificate, setSelectedCertificate] = useState(null);
 
   // Obtener datos básicos del usuario con sus challenges
   const { data: userData, error, isLoading } = useSWR(
@@ -358,6 +359,8 @@ const Metrix = () => {
       </div>
     );
   }
+  console.log(currentChallenge)
+  console.log(currentChallenge.certificates.length)
 
   return (
     <div>
@@ -539,38 +542,65 @@ const Metrix = () => {
               <div className="hidden lg:block">
                 <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
                   <h2 className="text-base font-semibold mb-2">Certificados</h2>
-                  {currentChallenge?.result === "approved" && (
-                    <>
-                      {currentChallenge?.certificates ? (
-                        currentChallenge?.phase === 1 ||
-                        currentChallenge?.phase === 2 ||
-                        (currentChallenge?.phase === 3 &&
-                          currentChallenge?.result === "withdrawal") ? (
-                          <button
-                            className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
-                            onClick={() => setIsModalPdfOpen(true)}
-                          >
-                            <BadgeCheck size={20} /> Ver Certificado
-                          </button>
-                        ) : (
-                          <div className="text-center p-3">
-                            <p className="text-sm">
-                              No hay información de certificados disponibles
-                            </p>
-                          </div>
-                        )
-                      ) : (
-                        <p className="text-sm">
-                          No hay información de certificados disponibles
-                        </p>
-                      )}
-                    </>
-                  )}
+
+
+
+                  {currentChallenge?.certificates && (
+  <>
+    {currentChallenge?.result === "approved" &&
+      (currentChallenge?.phase === 1 ||
+        currentChallenge?.phase === 2 ||
+        currentChallenge?.phase === 3) && (
+        <button
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
+          onClick={() => setIsModalPdfOpen(true)}
+        >
+          <BadgeCheck size={20} /> Ver Certificado
+        </button>
+      )}
+
+    {currentChallenge?.result === "withdrawal" &&
+      currentChallenge?.phase === 3 && (
+
+      <div>
+        <button
+          className="flex mt-5 items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
+          onClick={() => {
+            setSelectedCertificate(currentChallenge?.certificates?.[0]);
+            setIsModalPdfOpen(true);
+          }}>
+          <BadgeCheck size={20} /> Ver Certificados
+        </button>
+
+
+        <button
+          className="flex mt-5 items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
+          onClick={() => {
+            setSelectedCertificate(currentChallenge?.certificates?.[1]);
+            setIsModalPdfOpen(true);
+          }}>
+          <BadgeCheck size={20} /> Ver Certificados
+        </button>
+      </div>
+
+
+
+        
+      )}
+  </>
+)}
+
+{!currentChallenge?.certificates && (
+  <p className="text-sm text-center p-3">
+    No hay información de certificados disponibles
+  </p>
+)}
+
                   {isModalPdfOpen && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                      <div className="bg-black p-6 rounded-lg shadow-lg w-full max-w-5xl h-auto max-h-[70vh] overflow-y-auto">
-                        <h2 className="text-lg font-bold mb-4">Certificado</h2>
-                        <Certificates certificates={currentChallenge.certificates} />
+                      <div className="bg-black p-2 rounded-lg shadow-lg w-full max-w-5xl overflow-y-auto">
+                        <h2 className="text-lg font-bold mb-4 px-4">Certificado</h2>
+                        <Certificates certificates={selectedCertificate} />
                         <div className="mt-4 flex justify-end">
                           <button
                             className="px-4 py-2 bg-gray-400 text-black rounded-md hover:bg-gray-500"
@@ -582,6 +612,10 @@ const Metrix = () => {
                       </div>
                     </div>
                   )}
+
+
+
+                  
                 </div>
               </div>
             </div>
@@ -595,7 +629,7 @@ const Metrix = () => {
           <h2 className="text-base font-semibold mb-2">Certificados</h2>
           {currentChallenge?.result === "approved" && (
             <>
-              {currentChallenge?.certificates ? (
+              {currentChallenge?.certificates.length > 0 ? (
                 currentChallenge?.phase === 1 ||
                 currentChallenge?.phase === 2 ||
                 (currentChallenge?.phase === 3 &&
@@ -620,7 +654,7 @@ const Metrix = () => {
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
               <div className="bg-black p-6 rounded-lg shadow-lg w-full max-w-5xl h-auto max-h-[70vh] overflow-y-auto">
                 <h2 className="text-lg font-bold mb-4">Certificado</h2>
-                <Certificates certificates={currentChallenge.certificates} />
+                <Certificates certificates={[selectedCertificate]} />
                 <div className="mt-4 flex justify-end">
                   <button
                     className="px-4 py-2 bg-gray-400 text-black rounded-md hover:bg-gray-500"
