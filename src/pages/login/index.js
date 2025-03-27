@@ -14,7 +14,7 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Controla el campo de contraseña
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -71,31 +71,37 @@ export default function SignIn() {
 
   return (
     <Layout className="min-h-screen bg-white dark:bg-black">
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md mx-auto px-4 sm:px-0">
+        
         {/* Título */}
-        <h2 className="text-2xl font-semibold text-center text-white">Iniciar sesión</h2>
+        <h2 className="text-2xl font-semibold text-center text-white mb-6">Iniciar sesión</h2>
 
-        <form className="space-y-6 mt-4" onSubmit={onSubmit}>
+        <form className="space-y-6" onSubmit={onSubmit}>
+          {/* Botón de Google */}
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={() => signIn('google', { callbackUrl: router.query.callbackUrl || '/' })}
+              className="flex items-center justify-center gap-2 w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white px-4 py-2.5 rounded-md shadow-sm hover:shadow-md transition-shadow duration-300"
+            >
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+                alt="Google"
+                className="h-5 w-5"
+              />
+              <span className="text-sm text-zinc-700 dark:text-zinc-300 font-medium">Google</span>
+            </button>
+          </div>
 
-
-
-        <div className="flex justify-center mt-2">
-        <button
-  className="flex items-center justify-center gap-2 w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded-md shadow-md hover:shadow-lg transition-shadow duration-300"
->
-  <img
-    src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-    alt="Google"
-    className="h-5 w-5"
-  />
-  <span className="text-sm text-zinc-700 dark:text-zinc-300 font-medium">Google</span>
-</button>
-
-    </div>
-
-<h2 className="text-sm font-semibold  text-center text-white">o</h2>
-
-
+          {/* Separador */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-black px-3 text-sm text-gray-400">o</span>
+            </div>
+          </div>
 
           {/* Campo de Correo Electrónico */}
           <div>
@@ -154,7 +160,9 @@ export default function SignIn() {
           </div>
 
           {/* Captcha */}
-          <Recaptcha  onVerify={setCaptchaToken} />
+          <div className="">
+            <Recaptcha onVerify={setCaptchaToken} />
+          </div>
 
           {/* Botón de Enviar */}
           <div>
@@ -167,12 +175,19 @@ export default function SignIn() {
                   : "bg-[var(--app-primary)] text-black hover:bg-[var(--app-secondary)] focus:ring-2 focus:ring-[var(--app-primary)]"
               }`}
             >
-              {isSubmitting ? "Ingresando..." : "Ingresar"}
+              {isSubmitting ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <svg className="animate-spin h-4 w-4 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Ingresando...</span>
+                </div>
+              ) : (
+                "Ingresar"
+              )}
             </button>
           </div>
-
-
-
         </form>
 
         {/* Enlace de Registro */}

@@ -69,7 +69,7 @@ const ButtonInit = ({ documentId, result, phase, className }) => {
     }
 
     return (
-        <div className="flex items-center py-3 px-4 gap-1 border border-[var(--app-primary)] bg-[var(--app-primary)] rounded-lg">
+        <div className="flex items-center py-1 h-9 px-4 gap-1 border border-[var(--app-primary)] bg-[var(--app-primary)] rounded-lg">
             <p className="text-xs text-black font-medium">
                 Inicia tu challenge haciendo
             </p>

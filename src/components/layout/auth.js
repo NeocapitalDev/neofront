@@ -29,10 +29,10 @@ const Layout = ({ children }) => {
             unoptimized={true}
           />
         </div>
-        {/* Contenedor del formulario con altura dinámica */}
-        <div className="flex flex-1 w-full lg:w-1/2 flex-col justify-center px-8 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 min-h-full bg-black lg:bg-transparent">
-          <div className="mx-auto w-full max-w-sm lg:w-96">
-            <Link href="/">
+        {/* Contenedor del formulario con altura dinámica y centrado */}
+        <div className="flex flex-1 w-full lg:w-1/2 flex-col items-center justify-center px-8 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 min-h-full bg-black lg:bg-transparent">
+          <div className="mx-auto w-full max-w-sm lg:w-96 flex flex-col items-center">
+            <Link href="/" className="flex justify-center">
               <Image
                 className="h-10 w-auto dark:hidden"
                 src="/images/logo-light.png"
@@ -40,18 +40,15 @@ const Layout = ({ children }) => {
                 width={236}
                 height={60}
               />
-<div className="flex justify-center md:block">
-  <Image
-    className="h-10 w-auto hidden dark:block md:inline"
-    src="/images/logo-dark.png"
-    alt="Logo"
-    width={236}
-    height={60}
-  />
-</div>
-
+              <Image
+                className="h-10 w-auto hidden dark:block"
+                src="/images/logo-dark.png"
+                alt="Logo"
+                width={236}
+                height={60}
+              />
             </Link>
-            <main className="mt-6">{children}</main>
+            <main className="mt-6 w-full">{children}</main>
           </div>
         </div>
       </div>
