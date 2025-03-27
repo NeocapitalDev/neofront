@@ -330,17 +330,17 @@ const ChallengeRelations = () => {
             {/* Steps Section */}
             <section className="bg-white rounded-lg p-5 shadow-md border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
               <div className="flex items-center mb-3">
-                <h3 className="text-[var(--app-primary)] font-medium">Steps</h3>
+                <h3 className="text-[var(--app-primary)] font-medium">Challenge</h3>
                 <div className="relative ml-2 group">
                   <InformationCircleIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-300" />
                   <div className="absolute z-10 invisible group-hover:visible bg-zinc-800 text-xs text-zinc-200 p-2 rounded-md w-48 top-full left-0 mt-1">
-                    Selecciona el paso del proceso que deseas configurar
+                    Selecciona el Challenge que deseas Adquirir
                   </div>
                 </div>
               </div>
-              <p className="text-zinc-600 mb-4 text-sm dark:text-zinc-400">Selecciona el tipo de paso que deseas configurar.</p>
+              <p className="text-zinc-600 mb-4 text-sm dark:text-zinc-400">Selecciona el Challenge que deseas Adquirir.</p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                 {stepsData.map((item, index) => (
                   <div key={index} className="relative">
                     <input
@@ -362,9 +362,9 @@ const ChallengeRelations = () => {
                     >
                       <div className="product-info">
                         <span className="block font-medium">{item.step}</span>
-                        <span className={`block text-xs mt-1 ${selectedStep === item.step ? 'text-black/70' : 'text-zinc-500'}`}>
+                        {item.relations.length > 1 && (<span className={`block text-xs mt-1 ${selectedStep === item.step ? 'text-black/70' : 'text-zinc-500'}`}>
                           {item.relations.length} opciones
-                        </span>
+                        </span>)}
                       </div>
                       {selectedStep === item.step && (
                         <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-black" />
@@ -376,19 +376,19 @@ const ChallengeRelations = () => {
             </section>
 
             {/* Subcategorías Section */}
-            {selectedStep && stepsData.length > 0 && (
+            {/* {selectedStep && stepsData.length > 0 && (
               <section className="bg-white rounded-lg p-5 shadow-md border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
                 <div className="flex items-center mb-3">
-                  <h3 className="text-[var(--app-primary)] font-medium">Subcategorías</h3>
+                  <h3 className="text-[var(--app-primary)] font-medium">Tipo</h3>
                   <div className="relative ml-2 group">
                     <InformationCircleIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-300" />
                     <div className="absolute z-10 invisible group-hover:visible bg-zinc-800 text-xs text-zinc-200 p-2 rounded-md w-48 top-full left-0 mt-1">
-                      Elige la subcategoría para tu producto
+                      Elige el tipo de challenge
                     </div>
                   </div>
                 </div>
                 <p className="text-zinc-600 mb-4 text-sm dark:text-zinc-400">
-                  Selecciona la subcategoría para el paso {selectedStep}.
+                  Selecciona el tipo para el challenge {selectedStep}.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -422,25 +422,22 @@ const ChallengeRelations = () => {
                     ))}
                 </div>
               </section>
-            )}
+            )} */}
 
             {selectedRelationId && (
               <section className="bg-white rounded-lg p-5 shadow-md border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
                 <div className="flex items-center mb-3">
-                  <h3 className="text-[var(--app-primary)] font-medium">Productos</h3>
+                  <h3 className="text-[var(--app-primary)] font-medium">Saldo de la Cuenta</h3>
                   <div className="relative ml-2 group">
                     <InformationCircleIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-300" />
                     <div className="absolute z-10 invisible group-hover:visible bg-zinc-800 text-xs text-zinc-200 p-2 rounded-md w-48 top-full left-0 mt-1">
-                      Selecciona el producto que deseas adquirir
+                      Selecciona el Saldo de la cuenta que deseas adquirir
                     </div>
                   </div>
                 </div>
                 <p className="text-zinc-600 mb-4 text-sm dark:text-zinc-400">
-                  Elige el producto para{" "}
-                  {stepsData
-                    .find(item => item.step === selectedStep)
-                    .relations.find(r => r.id === selectedRelationId)
-                    ?.challenge_subcategory?.name}.
+                  Elige el Saldo de la cuenta para el challenge {" "}
+                  {selectedStep}.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -512,13 +509,13 @@ const ChallengeRelations = () => {
               <div className="bg-white rounded-lg shadow-md border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800 overflow-hidden">
                 <header className="p-5 border-b border-gray-200 dark:border-zinc-800">
                   <h3 className="text-[var(--app-primary)] font-medium text-xl flex gap-4 items-center">
-                    <span>Producto Seleccionado:</span>
+                    <span>Saldo de Cuenta Seleccionado:</span>
                     {selectedProduct ? (
                       <>
                         <span className="text-xl font-bold dark:text-white">{selectedProduct.name}</span>
                       </>
                     ) : (
-                      <p className="text-zinc-500">Ningún producto seleccionado</p>
+                      <p className="text-zinc-500">Ningún Saldo seleccionado</p>
                     )}
                   </h3>
                 </header>
@@ -654,8 +651,8 @@ const ChallengeRelations = () => {
                         type="submit"
                         disabled={!selectedProduct}
                         className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct
-                            ? "bg-[var(--app-primary)] hover:bg-[var(--app-secondary)] text-black font-bold"
-                            : "bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-zinc-700 dark:text-zinc-500"
+                          ? "bg-[var(--app-primary)] hover:bg-[var(--app-secondary)] text-black font-bold"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-zinc-700 dark:text-zinc-500"
                           }`}
                       >
                         <span className="uppercase">Continuar</span>
