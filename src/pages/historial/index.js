@@ -1,4 +1,4 @@
-/* src/pages/historial/index.js */
+// src/pages/historial/index.js
 import { useSession } from 'next-auth/react';
 import Layout from '../../components/layout/dashboard';
 import Loader from '../../components/loaders/loader';
@@ -12,6 +12,8 @@ import {
     MagnifyingGlassIcon,
     FunnelIcon,
     ClockIcon,
+    DocumentIcon,
+    XCircleIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
@@ -21,7 +23,7 @@ export default function Historial() {
 
     // Obtener datos del usuario con challenges poblados usando useStrapiData
     const { data, error, isLoading } = useStrapiData(
-        token ? 'users/me?populate[challenges][populate]=broker_account' : null,
+        token ? 'users/me?populate[challenges][populate][0]=broker_account&populate[challenges][populate][1]=certificates' : null,
         token
     );
 
@@ -139,6 +141,68 @@ export default function Historial() {
             month: 'short',
             day: 'numeric'
         });
+    };
+
+    // Verificar si un challenge tiene certificados
+    const hasCertificates = (challenge) => {
+        return challenge?.certificates && challenge.certificates.length > 0;
+    };
+
+    // Obtener los certificados del challenge
+    const getCertificates = (challenge) => {
+        return challenge?.certificates || [];
+    };
+
+    // Determinar si debe mostrarse el botón de certificado
+    const shouldShowCertificateButton = (challenge) => {
+        return challenge.result === 'approved' || challenge.result === 'withdrawal';
+    };
+
+    // Renderizar botones de certificados
+    const renderCertificateButtons = (challenge) => {
+        if (!shouldShowCertificateButton(challenge)) {
+            return null;
+        }
+
+        const certificates = getCertificates(challenge);
+        
+        // Si no hay certificados, mostrar botón de "Sin certificado"
+        if (certificates.length === 0) {
+            return (
+                <div className="flex bg-gray-200 border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/50 dark:border-zinc-600/50 items-center px-3 py-1.5 space-x-1 text-xs text-gray-500 dark:text-gray-400 transition-all duration-200 cursor-not-allowed">
+                    <XCircleIcon className="h-3 w-3 mr-1" />
+                    <span>Sin certificado</span>
+                </div>
+            );
+        }
+
+        // Organizar certificados por tipo
+        const phaseCertificates = certificates.filter(cert => cert.tipoChallenge.startsWith('fase'));
+        const withdrawalCertificates = certificates.filter(cert => cert.tipoChallenge === 'retirado');
+
+        return (
+            <div className="flex space-x-2">
+                {/* Certificados de fase */}
+                {phaseCertificates.map((cert, index) => (
+                    <Link key={`phase-${index}`} href={`/certificates/verify/${cert.documentId}`}>
+                        <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
+                            <DocumentIcon className="h-3 w-3 mr-1" />
+                            <span>Certificado Fase {cert.tipoChallenge.replace('fase', '')}</span>
+                        </button>
+                    </Link>
+                ))}
+                
+                {/* Certificados de retiro */}
+                {withdrawalCertificates.map((cert, index) => (
+                    <Link key={`withdrawal-${index}`} href={`/certificates/verify/${cert.documentId}`}>
+                        <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
+                            <DocumentIcon className="h-3 w-3 mr-1" />
+                            <span>Certificado de Retiro</span>
+                        </button>
+                    </Link>
+                ))}
+            </div>
+        );
     };
 
     return (
@@ -353,15 +417,21 @@ export default function Historial() {
                                                                     </div>
                                                                 </div>
 
-                                                                {/* Botón de detalles */}
-                                                                <Link
-                                                                    href={challenge.result === 'progress' ? `/metrix2/${challenge.documentId}` : `/historial/${challenge.documentId}`}
-                                                                >
-                                                                    <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
-                                                                        <ChartBarIcon className="h-3 w-3 mr-1" />
-                                                                        <span>Ver detalles</span>
-                                                                    </button>
-                                                                </Link>
+                                                                {/* Botones de acción */}
+                                                                <div className="flex space-x-2">
+                                                                    {/* Botones de certificado */}
+                                                                    {renderCertificateButtons(challenge)}
+
+                                                                    {/* Botón de detalles */}
+                                                                    <Link
+                                                                        href={challenge.result === 'progress' ? `/metrix2/${challenge.documentId}` : `/historial/${challenge.documentId}`}
+                                                                    >
+                                                                        <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
+                                                                            <ChartBarIcon className="h-3 w-3 mr-1" />
+                                                                            <span>Ver detalles</span>
+                                                                        </button>
+                                                                    </Link>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     );
