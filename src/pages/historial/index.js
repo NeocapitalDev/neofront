@@ -249,7 +249,7 @@ export default function Historial() {
                                                 </button>
 
                                                 {/* Botón de metrix */}
-                                                <Link href={lastChallenge.result === 'progress' ? `/metrix2/${lastChallenge.documentId}` : `/metrix2/${lastChallenge.documentId}`}>
+                                                <Link href={lastChallenge.result === 'progress' ? `/historial/${lastChallenge.documentId}` : `/historial/${lastChallenge.documentId}`}>
                                                     <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-sm transition-all duration-200">
                                                         <ChartBarIcon className="h-4 w-4 mr-1" />
                                                         <span>Metrix</span>

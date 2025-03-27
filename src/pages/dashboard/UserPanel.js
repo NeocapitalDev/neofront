@@ -248,7 +248,7 @@ export default function Index() {
                                                 </div>
 
                                                 <div className="mt-3 flex flex-wrap gap-2 items-center">
-                                                    <Link href={`/metrix2/${challenge.documentId}`}>
+                                                    <Link href={`/metrix/${challenge.documentId}`}>
                                                         <button className="flex items-center justify-center space-x-1 px-3 py-1 rounded-lg transition-all duration-200 bg-white hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 shadow-sm hover:shadow text-sm">
                                                             <ChartBarIcon className="h-7 w-6 text-[var(--app-primary)]" />
                                                             <span className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Metrix</span>
