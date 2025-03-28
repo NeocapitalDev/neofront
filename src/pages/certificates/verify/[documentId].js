@@ -3,6 +3,8 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+// Importamos el componente Certificates existente - ajusta la ruta según tu estructura de archivos
+import Certificates from "../../metrix2/certificates";
 
 export default function CertificateVerify() {
   const router = useRouter();
@@ -143,57 +145,64 @@ export default function CertificateVerify() {
 
         {/* Botones de descarga e imagen del certificado */}
         <div className="p-4">
-        <div className="flex justify-center space-x-4">
+          <div className="flex justify-center space-x-4">
             <a
-            href={certificate?.pngUrl || '#'} // Ajusta según tu API
-            download="certificate.png"
-            className="flex items-center rounded-xl bg-yellow-500 px-4 py-3 text-black hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-400"
+              href={certificate?.pngUrl || '#'} // Ajusta según tu API
+              download="certificate.png"
+              className="flex items-center rounded-xl bg-yellow-500 px-4 py-3 text-black hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-400"
             >
-            <svg
+              <svg
                 className="mr-2 h-6 w-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
-            >
+              >
                 <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                 />
-            </svg>
-            <h3 className="text-sm font-medium">Descargar PNG</h3>
+              </svg>
+              <h3 className="text-sm font-medium">Descargar PNG</h3>
             </a>
             <a
-            href={certificate?.pdfUrl || '#'} // Ajusta según tu API
-            download="certificate.pdf"
-            className="flex items-center rounded-xl bg-yellow-500 px-4 py-3 text-black hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-400"
+              href={certificate?.pdfUrl || '#'} // Ajusta según tu API
+              download="certificate.pdf"
+              className="flex items-center rounded-xl bg-yellow-500 px-4 py-3 text-black hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-400"
             >
-            <svg
+              <svg
                 className="mr-2 h-6 w-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
-            >
+              >
                 <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                 />
-            </svg>
-            <h3 className="text-sm font-medium">Descargar PDF</h3>
+              </svg>
+              <h3 className="text-sm font-medium">Descargar PDF</h3>
             </a>
-        </div>
-        {certificate?.imageUrl && (
+          </div>
+
+          {/* AQUÍ USAMOS EL COMPONENTE CERTIFICATES DIRECTAMENTE */}
+          <div className="mt-8 w-full rounded-lg ">
+            <Certificates certificates={certificate} />
+          </div>
+
+          {/* Imagen del certificado si es necesario */}
+          {certificate?.imageUrl && (
             <img
-            className="mt-10 rounded-xl w-full"
-            src={certificate.imageUrl}
-            alt="Certificate"
+              className="mt-10 rounded-xl w-full"
+              src={certificate.imageUrl}
+              alt="Certificate"
             />
-        )}
+          )}
         </div>
 
 
@@ -220,31 +229,6 @@ export default function CertificateVerify() {
                 </button>
               </Link>
             </div>
-          </div>
-        </div>
-
-        {/* Campo de debug */}
-        <div className="p-4">
-          <div className="bg-gray-100 p-4 rounded-lg dark:bg-gray-700">
-            <h3 className="text-lg font-semibold mb-2">
-              Datos del Certificado (Debug)
-            </h3>
-            <pre className="text-sm whitespace-pre-wrap">
-              {JSON.stringify(
-                {
-                  firstName: certificate?.firstName,
-                  lastName: certificate?.lastName,
-                  fechaFinChallenge: certificate?.fechaFinChallenge,
-                  tipoChallenge: certificate?.tipoChallenge,
-                  monto: certificate?.monto,
-                  producto: certificate?.producto,
-                  dataUser: certificate?.dataUser,
-                  dataChallenge: certificate?.dataChallenge,
-                },
-                null,
-                2
-              )}
-            </pre>
           </div>
         </div>
       </div>

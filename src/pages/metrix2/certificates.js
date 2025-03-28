@@ -103,14 +103,14 @@ const Certificados = ({ certificates }) => {
   }, [certificates]);
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex justify-center items-center w-full">
       {pdfUrl ? (
         <div className="flex justify-center items-center w-full">
           <iframe
             src={pdfUrl}
             width="90%"
             height="670px"
-            className="border rounded-lg shadow-lg max-w-[900px]"
+            className="border rounded-lg shadow-lg w-full"
           ></iframe>
         </div>
       ) : error ? (

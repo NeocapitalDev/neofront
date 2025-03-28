@@ -169,8 +169,8 @@ export default function Historial() {
         // Si no hay certificados, mostrar botón de "Sin certificado"
         if (certificates.length === 0) {
             return (
-                <div className="flex bg-gray-200 border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/50 dark:border-zinc-600/50 items-center px-3 py-1.5 space-x-1 text-xs text-gray-500 dark:text-gray-400 transition-all duration-200 cursor-not-allowed">
-                    <XCircleIcon className="h-3 w-3 mr-1" />
+                <div className="flex h-8 bg-gray-200 border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/50 dark:border-zinc-600/50 items-center px-3 space-x-1 text-xs text-gray-500 dark:text-gray-400 transition-all duration-200 cursor-not-allowed">
+                    <XCircleIcon className="h-4 w-4 mr-1" />
                     <span>Sin certificado</span>
                 </div>
             );
@@ -185,8 +185,8 @@ export default function Historial() {
                 {/* Certificados de fase */}
                 {phaseCertificates.map((cert, index) => (
                     <Link key={`phase-${index}`} href={`/certificates/verify/${cert.documentId}`}>
-                        <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
-                            <DocumentIcon className="h-3 w-3 mr-1" />
+                        <button className="flex h-8 bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
+                            <DocumentIcon className="h-4 w-4 mr-1" />
                             <span>Certificado Fase {cert.tipoChallenge.replace('fase', '')}</span>
                         </button>
                     </Link>
@@ -195,8 +195,8 @@ export default function Historial() {
                 {/* Certificados de retiro */}
                 {withdrawalCertificates.map((cert, index) => (
                     <Link key={`withdrawal-${index}`} href={`/certificates/verify/${cert.documentId}`}>
-                        <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
-                            <DocumentIcon className="h-3 w-3 mr-1" />
+                        <button className="flex h-8 bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
+                            <DocumentIcon className="h-4 w-4 mr-1" />
                             <span>Certificado de Retiro</span>
                         </button>
                     </Link>
@@ -423,8 +423,8 @@ export default function Historial() {
 
                                                                     {/* Botón de detalles - SEGUNDA MODIFICACIÓN */}
                                                                     <Link href={`/metrix/${challenge.documentId}`}>
-                                                                        <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
-                                                                            <ChartBarIcon className="h-3 w-3 mr-1" />
+                                                                        <button className="flex h-8 bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
+                                                                            <ChartBarIcon className="h-4 w-4 mr-1" />
                                                                             <span>Ver detalles</span>
                                                                         </button>
                                                                     </Link>
