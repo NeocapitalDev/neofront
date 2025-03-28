@@ -88,7 +88,7 @@ export default function Columns(
     {
       accessorKey: "challenge_step",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="challenge_step" />
+        <DataTableColumnHeader column={column} title="Step" />
       ),
       cell: ({ row }) => {
         const subcategories = row.getValue(
@@ -112,7 +112,7 @@ export default function Columns(
     {
       accessorKey: "challenge_subcategory",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="challenge_subcategory" />
+        <DataTableColumnHeader column={column} title="Categoría" />
       ),
       cell: ({ row }) => {
         const subcategories = row.getValue(
@@ -136,7 +136,7 @@ export default function Columns(
     {
       accessorKey: "challenge_products",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Productos" />
+        <DataTableColumnHeader column={column} title="Balances" />
       ),
       cell: ({ row }) => {
         const products = row.getValue(

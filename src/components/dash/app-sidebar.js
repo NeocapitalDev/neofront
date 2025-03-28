@@ -45,7 +45,7 @@ export function AppSidebar({ ...props }) {
       isActive: false,
     },
     {
-      title: "Users",
+      title: "Usuarios",
       url: "/admin/users",
       icon: Users,
       isActive: false,
@@ -56,14 +56,14 @@ export function AppSidebar({ ...props }) {
       icon: Award,
       isActive: false,
     },
+    // {
+    //   title: "Payouts",
+    //   url: "/admin/payouts",
+    //   icon: Award,
+    //   isActive: false,
+    // },
     {
-      title: "Payouts",
-      url: "/admin/payouts",
-      icon: Award,
-      isActive: false,
-    },
-    {
-      title: "Withdrawals",
+      title: "Retiros",
       url: "/admin/withdrawals",
       icon: UserCheck,
       isActive: false,
@@ -85,11 +85,11 @@ export function AppSidebar({ ...props }) {
           url: "/admin/steps",
         },
         {
-          title: "Manager",
+          title: "Fases, Categorias y Balances",
           url: "/admin/manager",
         },
         {
-          title: "Parameters",
+          title: "Condiciones",
           url: "/admin/parameters",
         },
       ],

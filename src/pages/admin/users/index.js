@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import EditUserModal from "./editUserModal";
+import { Switch } from "@/components/ui/switch";
 
 const fetcher = (url, token) =>
   fetch(url, {
@@ -49,6 +50,9 @@ export default function UsersTable() {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
+  // New state for edit modal
+  const [selectedUserForEdit, setSelectedUserForEdit] = useState(null);
+
   const openPdfModal = (user) => {
     setSelectedUser(user);
     setIsPdfModalOpen(true);
@@ -57,6 +61,11 @@ export default function UsersTable() {
   const closePdfModal = () => {
     setSelectedUser(null);
     setIsPdfModalOpen(false);
+  };
+
+  // Close edit modal
+  const closeEditModal = () => {
+    setSelectedUserForEdit(null);
   };
 
   const sendWebhook = async (user, statusSign) => {
@@ -152,6 +161,32 @@ export default function UsersTable() {
     }
   };
 
+
+  const handleVerfifiedChange = async (user, checked) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${user.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.jwt}`,
+          },
+          body: JSON.stringify({ isVerified: checked }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al actualizar verificación del usuario");
+      }
+
+      toast.success(`Usuario ${checked ? "verificado" : "desverificado"} correctamente`);
+      mutate(); // Refresh data
+    } catch (error) {
+      toast.error(`Error: ${error.message}`);
+      console.error(error);
+    }
+  }
   // Filter and paginate data
   const filteredData = useMemo(() => {
     if (!Array.isArray(data)) return [];
@@ -190,7 +225,12 @@ export default function UsersTable() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <p className="text-center text-zinc-500">Cargando datos...</p>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--app-secondary)] mb-4 mx-auto"></div>
+            <p className="text-zinc-600">Cargando datos...</p>
+          </div>
+        </div>
       </DashboardLayout>
     );
   }
@@ -198,16 +238,24 @@ export default function UsersTable() {
   if (error) {
     return (
       <DashboardLayout>
-        <p className="text-center text-red-500">Error al cargar los datos.</p>
+        <div className="flex items-center justify-center h-screen">
+          <div className="bg-white dark:bg-zinc-800 shadow-md rounded-lg p-6 border border-red-200 dark:border-red-900">
+            <div className="flex items-center text-red-500 mb-2">
+              <XCircle className="w-6 h-6 mr-2" />
+              <p className="font-medium">Error al cargar los datos.</p>
+            </div>
+            <p className="text-zinc-600 dark:text-zinc-400">Por favor, intenta nuevamente o contacta al administrador.</p>
+          </div>
+        </div>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <div className="p-6">
-        <h1 className="text-4xl font-bold mb-6">Users</h1>
-        <div className="bg-zinc-900 border border-zinc-700 p-4 rounded-lg mt-4 space-y-4">
+      <div className="p-6 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-white rounded-lg shadow-lg border-t-4 border-[var(--app-secondary)]">
+        <h1 className="text-4xl font-bold mb-6 text-zinc-800 dark:text-zinc-100">Usuarios</h1>
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-6 rounded-xl shadow-sm mt-4 space-y-6">
           {/* Filtros */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4">
             <div className="flex w-full md:w-auto gap-2 flex-col md:flex-row">
@@ -215,13 +263,13 @@ export default function UsersTable() {
                 placeholder="Buscar por nombre..."
                 value={nameSearch}
                 onChange={(e) => setNameSearch(e.target.value)}
-                className="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
+                className="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 shadow-sm"
               />
               <Input
                 placeholder="Buscar por email..."
                 value={emailSearch}
                 onChange={(e) => setEmailSearch(e.target.value)}
-                className="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
+                className="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 shadow-sm"
               />
             </div>
 
@@ -229,7 +277,7 @@ export default function UsersTable() {
               <select
                 value={verificationFilter}
                 onChange={(e) => setVerificationFilter(e.target.value)}
-                className="w-full py-2 px-3 rounded-md bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700"
+                className="w-full py-2 px-3 rounded-md bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 shadow-sm focus:border-[var(--app-secondary)] focus:ring-1 focus:ring-[var(--app-secondary)]"
               >
                 <option value="Todos">Estado de cuenta</option>
                 <option value="Verificado">Verificado</option>
@@ -239,37 +287,40 @@ export default function UsersTable() {
           </div>
 
           {/* Tabla */}
-          <div className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900">
+          <div className="rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
             <Table>
-              <TableHeader className="bg-zinc-200 dark:bg-zinc-800">
+              <TableHeader className="bg-zinc-100 dark:bg-zinc-800">
                 <TableRow>
-                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">Nombre Completo</TableHead>
-                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">Email</TableHead>
-                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">Teléfono</TableHead>
-                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">País</TableHead>
-                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">Verificado</TableHead>
-                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">Firma Aprobada</TableHead>
-                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">Acciones</TableHead>
+                  <TableHead className="text-zinc-800 dark:text-zinc-200 font-medium py-4">Nombre Completo</TableHead>
+                  <TableHead className="text-zinc-800 dark:text-zinc-200 font-medium py-4">Email</TableHead>
+                  <TableHead className="text-zinc-800 dark:text-zinc-200 font-medium py-4">Teléfono</TableHead>
+                  <TableHead className="text-zinc-800 dark:text-zinc-200 font-medium py-4">País</TableHead>
+                  <TableHead className="text-zinc-800 dark:text-zinc-200 font-medium py-4">Verificado</TableHead>
+                  <TableHead className="text-zinc-800 dark:text-zinc-200 font-medium py-4">Firma Aprobada</TableHead>
+                  <TableHead className="text-zinc-800 dark:text-zinc-200 font-medium py-4">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paginatedData.length > 0 ? (
                   paginatedData.map((user, index) => (
-                    <TableRow key={index} className="border-b border-zinc-300 dark:border-zinc-700">
-                      <TableCell className="py-3">{user.firstName + " " + user.lastName}</TableCell>
-                      <TableCell className="py-3">{user.email}</TableCell>
-                      <TableCell className="py-3">{user.phone}</TableCell>
-                      <TableCell className="py-3">
+                    <TableRow
+                      key={index}
+                      className={`border-b border-zinc-200 dark:border-zinc-700 ${index % 2 === 0 ? 'bg-white dark:bg-zinc-800' : 'bg-zinc-50 dark:bg-zinc-700/30'} hover:bg-zinc-100 dark:hover:bg-zinc-700/50 transition-colors`}
+                    >
+                      <TableCell className="py-3 text-zinc-700 dark:text-zinc-300">{user.firstName + " " + user.lastName}</TableCell>
+                      <TableCell className="py-3 text-zinc-700 dark:text-zinc-300">{user.email}</TableCell>
+                      <TableCell className="py-3 text-zinc-700 dark:text-zinc-300">{user.phone}</TableCell>
+                      <TableCell className="py-3 text-zinc-700 dark:text-zinc-300">
                         <div className="flex items-center space-x-2">
-                          {user.countryCode && <Flag country={user.countryCode.toLowerCase()} className="w-6 h-4" />}
+                          {user.countryCode && <Flag country={user.countryCode.toLowerCase()} className="w-6 h-4 shadow-sm" />}
                           <span>{user.country}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-3">
                         {user.isVerified ? (
                           <div className="flex items-center space-x-2">
-                            <CheckCircle className="text-green-500 w-5 h-5" />
-                            <span className="text-green-500 font-medium">Verificado</span>
+                            <CheckCircle className="text-green-600 w-5 h-5" />
+                            <span className="text-green-600 font-medium">Verificado</span>
                           </div>
                         ) : (
                           <div className="flex items-center space-x-2">
@@ -281,8 +332,8 @@ export default function UsersTable() {
                       <TableCell className="py-3">
                         {user.statusSign ? (
                           <div className="flex items-center space-x-2">
-                            <CheckCircle className="text-green-500 w-5 h-5" />
-                            <span className="text-green-500 font-medium">Aprobado</span>
+                            <CheckCircle className="text-green-600 w-5 h-5" />
+                            <span className="text-green-600 font-medium">Aprobado</span>
                           </div>
                         ) : (
                           <div className="flex items-center space-x-2">
@@ -295,37 +346,42 @@ export default function UsersTable() {
                         <div className="flex flex-wrap gap-2">
                           <Button
                             onClick={() => router.push(`/admin/users/${user.documentId}`)}
-                            className="px-3 py-1 h-9 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            className="px-3 py-1 h-9 bg-blue-600 text-white rounded-md hover:bg-blue-700 shadow-sm"
                           >
                             Detalles
                           </Button>
                           <Button
-                            onClick={() => {
-                              const editButton = document.getElementById(`edit-button-${user.id}`);
-                              if (editButton) editButton.click();
-                            }}
-                            className="px-3 py-1 h-9 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 flex items-center space-x-1"
+                            onClick={() => setSelectedUserForEdit(user)}
+                            className="px-3 py-1 h-9 bg-[var(--app-secondary)] text-black rounded-md hover:opacity-90 flex items-center space-x-1 shadow-sm"
                           >
                             <PencilSquareIcon className="w-5 h-5" />
                             <span>Editar</span>
                           </Button>
                           <Button
                             onClick={() => openPdfModal(user)}
-                            className="px-3 py-1 h-9 bg-gray-500 text-white rounded-md hover:bg-gray-600 flex items-center space-x-1"
+                            className="px-3 py-1 h-9 bg-zinc-200 dark:bg-zinc-600 text-zinc-800 dark:text-white rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-500 flex items-center space-x-1 shadow-sm"
                           >
                             <Eye className="w-5 h-5" />
                             <span>PDF</span>
                           </Button>
-                          <span id={`edit-button-${user.id}`} className="hidden">
-                            <EditButton user={user} />
-                          </span>
+                          <div className="flex items-center space-x-2 bg-white dark:bg-zinc-800 px-2 py-1 rounded-md border border-zinc-200 dark:border-zinc-700">
+                            <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                              {user.isVerified ? "Verificado" : "No verificado"}
+                            </span>
+                            <Switch
+                              id={`user-verified-${user.id}`}
+                              checked={user.isVerified || false}
+                              onCheckedChange={(checked) => handleVerfifiedChange(user, checked)}
+                              className="data-[state=checked]:bg-amber-500 data-[state=unchecked]:bg-zinc-300 dark:data-[state=unchecked]:bg-zinc-600"
+                            />
+                          </div>
                         </div>
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
-                  <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
+                  <TableRow className="hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                    <TableCell colSpan={7} className="h-24 text-center text-zinc-500 dark:text-zinc-400">
                       No se encontraron resultados.
                     </TableCell>
                   </TableRow>
@@ -336,32 +392,34 @@ export default function UsersTable() {
 
           {/* Paginación */}
           {filteredData.length > 0 && (
-            <div className="flex items-center justify-between px-2 mt-4">
-              <div className="flex-1 text-sm text-zinc-700 dark:text-zinc-400">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between px-2 mt-6 gap-4">
+              <div className="text-sm text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800 py-2 px-4 rounded-md border border-zinc-200 dark:border-zinc-700">
                 Mostrando {paginatedData.length} de {filteredData.length} registros
               </div>
-              <div className="flex items-center space-x-6 lg:space-x-8">
-                <div className="flex items-center space-x-2">
-                  <p className="text-sm font-medium">Filas por página</p>
+              <div className="flex items-center flex-wrap gap-4">
+                <div className="flex items-center space-x-2 bg-white dark:bg-zinc-800 py-2 px-4 rounded-md border border-zinc-200 dark:border-zinc-700">
+                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Filas por página</p>
                   <select
                     value={pageSize}
                     onChange={(e) => setPageSize(Number(e.target.value))}
-                    className="h-8 w-16 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2"
+                    className="h-8 w-16 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-1 text-zinc-800 dark:text-zinc-200 focus:border-[var(--app-secondary)] focus:ring-1 focus:ring-[var(--app-secondary)]"
                   >
                     {[10, 20, 30, 40, 50].map((size) => (
-                      <option key={size} value={size} className="flex items-start">
+                      <option key={size} value={size}>
                         {size}
                       </option>
                     ))}
                   </select>
                 </div>
-                <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                  Página {currentPage + 1} de {totalPages || 1}
+                <div className="flex items-center bg-white dark:bg-zinc-800 py-2 px-4 rounded-md border border-zinc-200 dark:border-zinc-700">
+                  <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Página {currentPage + 1} de {totalPages || 1}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300"
                     onClick={() => setCurrentPage(0)}
                     disabled={currentPage === 0}
                   >
@@ -370,7 +428,7 @@ export default function UsersTable() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300"
                     onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
                     disabled={currentPage === 0}
                   >
@@ -379,7 +437,7 @@ export default function UsersTable() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300"
                     onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
                     disabled={currentPage >= totalPages - 1}
                   >
@@ -388,7 +446,7 @@ export default function UsersTable() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300"
                     onClick={() => setCurrentPage(totalPages - 1)}
                     disabled={currentPage >= totalPages - 1}
                   >
@@ -403,32 +461,37 @@ export default function UsersTable() {
           {/* Modal para ver el PDF */}
           {selectedUser && (
             <Dialog open={isPdfModalOpen} onOpenChange={setIsPdfModalOpen}>
-              <DialogContent className="max-w-4xl">
+              <DialogContent className="max-w-4xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700">
                 <DialogHeader>
-                  <DialogTitle>Ver PDF de {selectedUser.firstName} {selectedUser.lastName}</DialogTitle>
+                  <DialogTitle className="text-zinc-800 dark:text-zinc-200">
+                    Ver PDF de {selectedUser.firstName} {selectedUser.lastName}
+                  </DialogTitle>
                 </DialogHeader>
                 <div className="mt-4">
                   {selectedUser.pdf?.[0]?.url ? (
                     <embed
                       src={`${selectedUser.pdf[0].url}#toolbar=0`}
                       type="application/pdf"
-                      className="w-full min-h-[calc(80vh)]"
+                      className="w-full min-h-[calc(80vh)] border border-zinc-200 dark:border-zinc-700 rounded-lg"
                     />
                   ) : (
-                    <p className="text-center text-red-500">No se ha subido un PDF para este usuario.</p>
+                    <div className="text-center bg-red-50 dark:bg-red-900/20 p-6 rounded-lg border border-red-200 dark:border-red-900">
+                      <XCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+                      <p className="text-red-500">No se ha subido un PDF para este usuario.</p>
+                    </div>
                   )}
                 </div>
-                <DialogFooter>
+                <DialogFooter className="gap-2 mt-4">
                   <Button
                     onClick={handleApprove}
-                    className="bg-green-500 hover:bg-green-600 text-white"
+                    className="bg-green-600 hover:bg-green-700 text-white shadow-sm"
                     disabled={!selectedUser.pdf?.[0]?.url}
                   >
                     Aprobar
                   </Button>
                   <Button
                     onClick={handleDisapprove}
-                    className="bg-red-500 hover:bg-red-600 text-white"
+                    className="bg-red-500 hover:bg-red-600 text-white shadow-sm"
                     disabled={!selectedUser.pdf?.[0]?.url}
                   >
                     Desaprobar
@@ -437,35 +500,17 @@ export default function UsersTable() {
               </DialogContent>
             </Dialog>
           )}
+
+          {/* Edit User Modal */}
+          {selectedUserForEdit && (
+            <EditUserModal
+              user={selectedUserForEdit}
+              isOpen={!!selectedUserForEdit}
+              onClose={closeEditModal}
+            />
+          )}
         </div>
       </div>
     </DashboardLayout>
   );
 }
-
-const EditButton = ({ user }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleEdit = () => {
-    setIsModalOpen(true);
-  };
-
-  return (
-    <>
-      <button
-        onClick={handleEdit}
-        className="hidden"
-      >
-        Editar
-      </button>
-
-      {isModalOpen && (
-        <EditUserModal
-          user={user}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
-    </>
-  );
-};

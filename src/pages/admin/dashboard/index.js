@@ -256,15 +256,16 @@ export default function Index() {
 
   return (
     <DashboardLayout>
-      <div className="p-8 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 rounded-lg shadow-lg min-h-screen">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex space-x-4">
+      <div className="p-8 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 rounded-xl shadow-xl min-h-screen border border-zinc-200 dark:border-zinc-800">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-wrap gap-2">
             {tabs.map((tab) => (
               <Button
                 key={tab}
-                className={`px-4 py-2 rounded-lg ${
-                  selectedTab === tab ? "bg-[var(--app-secondary)]" : "bg-zinc-800"
-                }`}
+                className={`px-5 py-2.5 rounded-lg font-medium transition-all duration-200 ${selectedTab === tab
+                  ? "bg-[var(--app-secondary)] text-black dark:text-white shadow-md"
+                  : "bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700"
+                  }`}
                 onClick={() => setSelectedTab(tab)}
               >
                 {tab}
@@ -273,35 +274,46 @@ export default function Index() {
           </div>
         </div>
 
-        <div className="flex gap-3 items-center mb-4">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <select
-            className="bg-zinc-700 text-white px-4 py-2 rounded-lg"
-            value={selectedTimeframe}
-            onChange={(e) => setSelectedTimeframe(e.target.value)}
-          >
-            {timeframes.map((timeframe) => (
-              <option key={timeframe} value={timeframe}>
-                {timeframe}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+          <h1 className="text-3xl font-bold text-zinc-800 dark:text-zinc-100">Panel de Control</h1>
+          <div className="flex items-center gap-3">
+            <span className="text-zinc-600 dark:text-zinc-400 font-medium">Periodo:</span>
+            <select
+              className="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-300 dark:border-zinc-600 px-4 py-2.5 rounded-lg shadow-sm focus:ring-2 focus:ring-[var(--app-secondary)] focus:border-transparent transition-all"
+              value={selectedTimeframe}
+              onChange={(e) => setSelectedTimeframe(e.target.value)}
+            >
+              {timeframes.map((timeframe) => (
+                <option key={timeframe} value={timeframe}>
+                  {timeframe}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           {[BanknotesIcon, FlagIcon, HandRaisedIcon].map((Icon, index) => (
-            <div key={index} className="bg-zinc-800 p-6 rounded-lg text-center">
-              <Icon className="w-11 text-[var(--app-secondary)] mx-auto" />
-              <p className="text-xl font-bold mt-2">{stats[index].label}</p>
-              <p className="text-zinc-400">{stats[index].subLabel}</p>
+            <div key={index} className="bg-white dark:bg-zinc-800 p-6 rounded-xl text-center shadow-md hover:shadow-lg transition-shadow duration-300 border border-zinc-200 dark:border-zinc-700 flex flex-col items-center">
+              <div className="bg-[var(--app-secondary)]/20 p-4 rounded-full mb-4">
+                <Icon className="w-10 h-10 text-[var(--app-secondary)]" />
+              </div>
+              <p className="text-xl font-bold text-zinc-900 dark:text-zinc-200">{stats[index].label}</p>
+              <p className="text-zinc-600 dark:text-zinc-400 mt-1">{stats[index].subLabel}</p>
             </div>
           ))}
         </div>
 
-        <h2 className="text-2xl font-bold mt-8">Cohort Stats ({selectedTimeframe})</h2>
+        <div className="mt-12 mb-6 pb-2 border-b border-zinc-200 dark:border-zinc-700">
+          <h2 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100">Estadísticas  <span className="text-zinc-500 dark:text-zinc-400 text-lg font-medium">({selectedTimeframe})</span></h2>
+        </div>
+
         {isLoading ? (
-          <div className="mt-4 p-4 bg-zinc-800 rounded-lg text-center">
-            <p>Loading data...</p>
+          <div className="mt-6 p-8 bg-white dark:bg-zinc-800 rounded-xl text-center border border-zinc-200 dark:border-zinc-700 shadow-md">
+            <div className="flex flex-col items-center justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--app-secondary)] mb-4"></div>
+              <p className="text-zinc-800 dark:text-zinc-200 font-medium">Cargando datos...</p>
+            </div>
           </div>
         ) : (
           <CohortStatsTable cohortStats={cohortStats} />
@@ -313,21 +325,24 @@ export default function Index() {
 
 export function CohortStatsTable({ cohortStats }) {
   return (
-    <div className="rounded-lg mt-4 border-zinc-800">
-      <table className="w-full text-left text-zinc-300 border border-zinc-800">
+    <div className="rounded-xl mt-4 border border-zinc-300 dark:border-zinc-800 overflow-hidden shadow-md bg-white dark:bg-zinc-800">
+      <table className="w-full text-left text-zinc-900 dark:text-zinc-300">
         <thead>
-          <tr className="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-b border-zinc-800">
-            <th className="p-3 border border-zinc-800">Metric</th>
-            <th className="p-3 border border-zinc-800">Value</th>
+          <tr className="bg-zinc-100 dark:bg-zinc-700 border-b border-zinc-300 dark:border-zinc-700">
+            <th className="px-6 py-4 font-semibold text-zinc-700 dark:text-zinc-200">Métrica</th>
+            <th className="px-6 py-4 font-semibold text-zinc-700 dark:text-zinc-200">Valor</th>
           </tr>
         </thead>
         <tbody>
           {cohortStats.map((stat, index) => (
-            <tr key={index} className="border-b border-zinc-600 bg-[var(--app-primary)]">
-              <td className="p-3 font-semibold text-black border border-zinc-800">
+            <tr
+              key={index}
+              className={`border-b border-zinc-200 dark:border-zinc-700 bg-[var(--app-primary)] hover:bg-[var(--app-primary)]/80 transition-colors duration-150`}
+            >
+              <td className="px-6 py-4 font-medium text-zinc-800 dark:text-zinc-200">
                 {stat.label}
               </td>
-              <td className="p-3 font-bold text-black border border-zinc-800">
+              <td className="px-6 py-4 font-bold text-zinc-900 dark:text-zinc-100">
                 {stat.value}
               </td>
             </tr>

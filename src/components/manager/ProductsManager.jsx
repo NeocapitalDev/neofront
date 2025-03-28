@@ -33,12 +33,13 @@ import { toast } from "sonner";
 // Validación
 const productSchema = z.object({
   name: z.string().nonempty("El nombre es requerido"),
-  precio: z.coerce.number({
-    required_error: "El precio es requerido",
-    invalid_type_error: "El precio debe ser un número",
-  }).min(0, "El precio debe ser mayor o igual a 0"),
+  precio: z.coerce
+    .number({
+      required_error: "El precio es requerido",
+      invalid_type_error: "El precio debe ser un número",
+    })
+    .min(0, "El precio debe ser mayor o igual a 0"),
 });
-
 
 export function ProductsManager({ pageSize }) {
   // Estado
@@ -51,7 +52,6 @@ export function ProductsManager({ pageSize }) {
     resolver: zodResolver(productSchema),
     defaultValues: { name: "", precio: 0 },
   });
-
 
   // --------------------------------------------------
   // 1. Helpers para consumir Strapi
@@ -131,7 +131,6 @@ export function ProductsManager({ pageSize }) {
     loadProducts();
   }, []);
 
-
   // --------------------------------------------------
   // 3. Crear / Editar
   // --------------------------------------------------
@@ -186,7 +185,6 @@ export function ProductsManager({ pageSize }) {
     }
   }
 
-
   // --------------------------------------------------
   // 4. Procesar datos para la tabla:
   //    - Eliminar productos con nombres duplicados.
@@ -201,29 +199,27 @@ export function ProductsManager({ pageSize }) {
     precio: item.precio,
   }));
 
-
   // --------------------------------------------------
   // 5. Render
   // --------------------------------------------------
   return (
     <div>
-      {/* <RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} /> */}
       <ChallengeTable
-        title="Challenge Product"
+        title="Balances de Cuenta"
         data={tableData}
         pageSize={pageSize}
         onCreate={handleOpenCreate}
         onEdit={handleOpenEdit}
-        showPrice={true} // o simplemente showPrice
+        showPrice={true}
       />
 
       <Dialog open={openModal} onOpenChange={setOpenModal}>
-        <DialogContent className="bg-black text-white border border-yellow-500 max-w-md mx-auto">
+        <DialogContent className="bg-white dark:bg-black text-zinc-800 dark:text-white border border-[var(--app-secondary)]/70 dark:border-yellow-500 max-w-md mx-auto shadow-lg">
           <DialogHeader>
-            <DialogTitle className="text-yellow-400 text-sm sm:text-base md:text-lg">
+            <DialogTitle className="text-[var(--app-secondary)] dark:text-yellow-400 text-sm sm:text-base md:text-lg font-semibold">
               {editItem ? "Editar" : "Crear"} Product
             </DialogTitle>
-            <DialogDescription className="text-xs sm:text-sm md:text-base">
+            <DialogDescription className="text-zinc-600 dark:text-gray-300 text-xs sm:text-sm md:text-base">
               {editItem
                 ? "Modifica el nombre y el precio y confirma para guardar cambios."
                 : "Ingresa el nombre y el precio para crear un nuevo registro."}
@@ -231,21 +227,26 @@ export function ProductsManager({ pageSize }) {
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 mt-3">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-3 mt-3"
+            >
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-yellow-500 text-sm">Nombre</FormLabel>
+                    <FormLabel className="text-[var(--app-secondary)] dark:text-yellow-500 text-sm">
+                      Nombre
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Nombre"
-                        className="bg-transparent border border-gray-700 text-white text-sm"
+                        className="bg-white dark:bg-transparent border border-zinc-300 dark:border-gray-700 text-zinc-800 dark:text-white text-sm focus:border-[var(--app-secondary)] focus:ring-1 focus:ring-[var(--app-secondary)]"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-600 dark:text-red-400" />
                   </FormItem>
                 )}
               />
@@ -256,32 +257,34 @@ export function ProductsManager({ pageSize }) {
                 name="precio"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-yellow-500 text-sm">Precio</FormLabel>
+                    <FormLabel className="text-[var(--app-secondary)] dark:text-yellow-500 text-sm">
+                      Precio
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Precio"
                         type="number"
-                        className="bg-transparent border border-gray-700 text-white text-sm"
+                        className="bg-white dark:bg-transparent border border-zinc-300 dark:border-gray-700 text-zinc-800 dark:text-white text-sm focus:border-[var(--app-secondary)] focus:ring-1 focus:ring-[var(--app-secondary)]"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-600 dark:text-red-400" />
                   </FormItem>
                 )}
               />
 
-              <DialogFooter className="mt-2">
+              <DialogFooter className="mt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setOpenModal(false)}
-                  className="px-3 py-1 text-sm"
+                  className="px-3 py-1 text-sm bg-white dark:bg-transparent border border-zinc-300 dark:border-gray-700 text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-yellow-500 text-black hover:bg-yellow-400 px-3 py-1 text-sm"
+                  className="bg-[var(--app-secondary)] dark:bg-yellow-500 text-black hover:bg-[var(--app-secondary)]/90 dark:hover:bg-yellow-400 px-3 py-1 text-sm shadow-sm"
                 >
                   {editItem ? "Guardar" : "Crear"}
                 </Button>
@@ -292,5 +295,4 @@ export function ProductsManager({ pageSize }) {
       </Dialog>
     </div>
   );
-
 }

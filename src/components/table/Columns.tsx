@@ -76,7 +76,7 @@ ColumnDef<Challenge>[] => [
   {
     accessorKey: "challenge_subcategories",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Subcategorias" />
+      <DataTableColumnHeader column={column} title="Categorías" />
     ),
     cell: ({ row }) => {
       const subcategories = row.getValue(
@@ -104,7 +104,7 @@ ColumnDef<Challenge>[] => [
   {
     accessorKey: "challenge_stages",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Etapas" />
+      <DataTableColumnHeader column={column} title="Fases" />
     ),
     cell: ({ row }) => {
       const stages = row.getValue(

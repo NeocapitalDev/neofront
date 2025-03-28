@@ -36,7 +36,7 @@ export function DataTableToolbar<TData>({
         />
 
         <Input
-          placeholder="Subcategoria "
+          placeholder="Categoría "
           value={
             (table
               .getColumn("challenge_subcategories")
@@ -53,7 +53,7 @@ export function DataTableToolbar<TData>({
         />
 
         <Input
-          placeholder="Stage "
+          placeholder="Fase "
           value={
             (table.getColumn("challenge_stages")?.getFilterValue() as string) ??
             ""

@@ -192,7 +192,7 @@ export function CreateStepFormC() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-yellow-500 text-lg">Nombrec</FormLabel>
+                <FormLabel className="text-yellow-500 text-lg">Nombre</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -214,7 +214,7 @@ export function CreateStepFormC() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-yellow-500 text-lg">
-                      Subcategorías
+                      Categorías
                     </FormLabel>
                     <Card className="bg-black border-none">
                       <div className="space-y-6">
@@ -234,7 +234,7 @@ export function CreateStepFormC() {
                           <PopoverContent className="p-0 bg-black border-yellow-500 w-full">
                             <Command className="bg-black">
                               <CommandInput
-                                placeholder="Buscar subcategorías..."
+                                placeholder="Buscar Categorías..."
                                 className="text-yellow-500"
                               />
                               <CommandList>
@@ -316,7 +316,7 @@ export function CreateStepFormC() {
 
                         <div className="flex gap-2 items-center">
                           <Input
-                            placeholder="Nueva Subcategoría"
+                            placeholder="Nueva Categoría"
                             value={customSubcatInput}
                             onChange={(e) => setCustomSubcatInput(e.target.value)}
                             className="border-gray-700 bg-transparent text-white"
@@ -374,7 +374,7 @@ export function CreateStepFormC() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-yellow-500 text-lg">
-                      Stages
+                      Fases
                     </FormLabel>
                     <Card className=" bg-black/50 border-none">
                       <div className="space-y-6">
@@ -394,7 +394,7 @@ export function CreateStepFormC() {
                           <PopoverContent className="p-0 bg-black border-yellow-500 w-full">
                             <Command className="bg-black">
                               <CommandInput
-                                placeholder="Buscar stages..."
+                                placeholder="Buscar Fases..."
                                 className="text-yellow-500"
                               />
                               <CommandList>
@@ -478,7 +478,7 @@ export function CreateStepFormC() {
                         </Popover>
                         <div className="flex gap-2 items-center">
                           <Input
-                            placeholder="Nuevo Stage"
+                            placeholder="Nueva Fase"
                             value={customStagesInput}
                             onChange={(e) => setCustomStagesInput(e.target.value)}
                             className="border-gray-700 bg-transparent text-white"

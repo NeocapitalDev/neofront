@@ -71,14 +71,21 @@ export default function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} />
-      <div className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900 ">
+      <div className="rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm">
         <Table>
-          <TableHeader className="bg-zinc-200 dark:bg-zinc-800 p-2">
+          <TableHeader className="bg-[var(--app-primary)]/5 dark:bg-zinc-800">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow
+                key={headerGroup.id}
+                className="border-b border-zinc-200 dark:border-zinc-700"
+              >
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className="py-3 px-4 text-zinc-700 dark:text-zinc-300 font-medium"
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -91,15 +98,33 @@ export default function DataTable<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="p-2">
+          <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row, index) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className={`
+                    ${
+                      index % 2 === 0
+                        ? "bg-white dark:bg-zinc-900"
+                        : "bg-[var(--app-primary)]/5 dark:bg-zinc-800/40"
+                    } 
+                    hover:bg-[var(--app-primary)]/10 dark:hover:bg-zinc-800 
+                    border-b border-zinc-200 dark:border-zinc-700
+                    ${
+                      row.getIsSelected()
+                        ? "bg-[var(--app-secondary)]/10 dark:bg-[var(--app-secondary)]/20 hover:bg-[var(--app-secondary)]/15 dark:hover:bg-[var(--app-secondary)]/25"
+                        : ""
+                    }
+                    transition-colors
+                  `}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className="py-3 px-4 text-zinc-700 dark:text-zinc-300"
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -112,9 +137,25 @@ export default function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-32 text-center"
                 >
-                  No results.
+                  <div className="flex flex-col items-center justify-center py-8 text-zinc-500 dark:text-zinc-400">
+                    <svg
+                      className="w-12 h-12 mb-3 text-zinc-300 dark:text-zinc-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                      />
+                    </svg>
+                    <p className="font-medium">No se encontraron resultados</p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

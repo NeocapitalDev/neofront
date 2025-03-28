@@ -40,7 +40,7 @@ export default function DataTableToolbar<TData>({
         />
 
         <Input
-          placeholder="Filtro por subcategoria"
+          placeholder="Filtro por Categoría"
           value={
             (table
               .getColumn("challenge_subcategory")
@@ -55,7 +55,7 @@ export default function DataTableToolbar<TData>({
         />
 
         <Input
-          placeholder="Filtro por producto"
+          placeholder="Filtro por Balance"
           value={
             (table
               .getColumn("challenge_products")

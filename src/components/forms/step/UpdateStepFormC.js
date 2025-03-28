@@ -243,7 +243,7 @@ export function UpdateStepFormC({ step, onStepChange }) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-yellow-500 text-lg">
-                      Subcategorías
+                      Categorías
                     </FormLabel>
                     <Card className="p-4 border border-gray-700 bg-black/50">
                       {subLoading ? (
@@ -271,7 +271,7 @@ export function UpdateStepFormC({ step, onStepChange }) {
                             <PopoverContent className="p-0 bg-black border-yellow-500 w-full">
                               <Command className="bg-black">
                                 <CommandInput
-                                  placeholder="Buscar subcategorías..."
+                                  placeholder="Buscar Categorías..."
                                   className="text-yellow-500"
                                 />
                                 <CommandList>
@@ -356,7 +356,7 @@ export function UpdateStepFormC({ step, onStepChange }) {
 
                           <div className="flex gap-2 items-center">
                             <Input
-                              placeholder="Nueva Subcategoría"
+                              placeholder="Nueva Categoría"
                               value={customSubcatInput}
                               onChange={(e) =>
                                 setCustomSubcatInput(e.target.value)
@@ -425,7 +425,7 @@ export function UpdateStepFormC({ step, onStepChange }) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-yellow-500 text-lg">
-                      Stages
+                      Fases
                     </FormLabel>
                     <Card className="p-4 border border-gray-700 bg-black/50">
                       {stageLoading ? (
@@ -453,7 +453,7 @@ export function UpdateStepFormC({ step, onStepChange }) {
                             <PopoverContent className="p-0 bg-black border-yellow-500 w-full">
                               <Command className="bg-black">
                                 <CommandInput
-                                  placeholder="Buscar stages..."
+                                  placeholder="Buscar Fases..."
                                   className="text-yellow-500"
                                 />
                                 <CommandList>
@@ -539,7 +539,7 @@ export function UpdateStepFormC({ step, onStepChange }) {
 
                           <div className="flex gap-2 items-center">
                             <Input
-                              placeholder="Nuevo Stage"
+                              placeholder="Nueva Fase"
                               value={customStagesInput}
                               onChange={(e) =>
                                 setCustomStagesInput(e.target.value)

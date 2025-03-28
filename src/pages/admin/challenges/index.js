@@ -117,8 +117,9 @@ export default function ChallengesTable() {
       brokerGroup: challenge.broker_account?.server ?? "N/A",
       actions: (
         <Button
-          variant="outline"
+          // variant="outline"
           size="sm"
+          className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black dark:text-white shadow-sm"
           onClick={() => handleButtonClick(challenge.documentId)}
         >
           Ver Detalles
@@ -136,62 +137,91 @@ export default function ChallengesTable() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 rounded-lg shadow-lg text-white">
-        <h1 className="text-4xl font-bold mb-6">Challenges</h1>
-        <div className="bg-zinc-900 border border-zinc-700 p-4 rounded-lg mt-4">
-          <Table>
-            <TableHeader className="bg-zinc-200 dark:bg-zinc-800">
-              <TableRow>
-                {tableColumns.map((column) => (
-                  <TableHead key={column.accessorKey} className="border-b border-zinc-300 text-zinc-900 dark:border-zinc-700 dark:text-zinc-200">
-                    {column.header}
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredData.length > 0 ? (
-                filteredData.map((challenge, index) => (
-                  <TableRow
-                    key={index}
-                    className="border-b border-zinc-300 dark:border-zinc-700"
-                  >
-                    <TableCell>{challenge.traderAccount}</TableCell>
-                    <TableCell>{challenge.traderEmail}</TableCell>
-                    <TableCell>{challenge.state}</TableCell>
-                    <TableCell>{challenge.step}</TableCell>
-                    <TableCell>{challenge.equity}</TableCell>
-                    <TableCell>{challenge.brokerGroup}</TableCell>
-                    <TableCell>{challenge.actions}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
+      <div className="p-6 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-white rounded-lg shadow-lg border-t-4 border-[var(--app-secondary)]">
+        <h1 className="text-4xl font-bold mb-6 text-zinc-800 dark:text-white">Challenges</h1>
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-4 rounded-lg mt-4 shadow-sm">
+          <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700">
+            <Table>
+              <TableHeader className="bg-zinc-100 dark:bg-zinc-800">
                 <TableRow>
-                  <TableCell colSpan={tableColumns.length} className="text-center text-zinc-500 py-6">
-                    No se encontraron datos.
-                  </TableCell>
+                  {tableColumns.map((column) => (
+                    <TableHead
+                      key={column.accessorKey}
+                      className="border-b border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 font-medium py-3 px-4"
+                    >
+                      {column.header}
+                    </TableHead>
+                  ))}
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="flex justify-end items-center mt-4 space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Anterior
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Siguiente
-          </Button>
+              </TableHeader>
+              <TableBody>
+                {filteredData.length > 0 ? (
+                  filteredData.map((challenge, index) => (
+                    <TableRow
+                      key={index}
+                      className={`border-b border-zinc-200 dark:border-zinc-700 ${index % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-zinc-50 dark:bg-zinc-800/50'
+                        } hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors`}
+                    >
+                      <TableCell className="py-3 px-4 text-zinc-700 dark:text-zinc-300">{challenge.traderAccount}</TableCell>
+                      <TableCell className="py-3 px-4 text-zinc-700 dark:text-zinc-300">{challenge.traderEmail}</TableCell>
+                      <TableCell className="py-3 px-4">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${challenge.state === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                          challenge.state === 'Pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                            challenge.state === 'Failed' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                              'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                          }`}>
+                          {challenge.state}
+                        </span>
+                      </TableCell>
+                      <TableCell className="py-3 px-4 text-zinc-700 dark:text-zinc-300">{challenge.step}</TableCell>
+                      <TableCell className="py-3 px-4 text-zinc-700 dark:text-zinc-300">{challenge.equity}</TableCell>
+                      <TableCell className="py-3 px-4 text-zinc-700 dark:text-zinc-300">{challenge.brokerGroup}</TableCell>
+                      <TableCell className="py-3 px-4">
+                        <div className="flex space-x-2">
+
+                          {challenge.actions}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow className="hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                    <TableCell colSpan={tableColumns.length} className="text-center text-zinc-500 dark:text-zinc-400 py-8">
+                      No se encontraron datos.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex justify-between items-center mt-6 px-2">
+            <div className="text-sm text-zinc-600 dark:text-zinc-400">
+              Mostrando {filteredData.length} resultados
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                className="bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+              >
+                Anterior
+              </Button>
+              <div className="bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-md px-3 py-1 text-sm text-zinc-700 dark:text-zinc-300">
+                Página {table.getState().pagination.pageIndex + 1}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                className="bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+              >
+                Siguiente
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </DashboardLayout>

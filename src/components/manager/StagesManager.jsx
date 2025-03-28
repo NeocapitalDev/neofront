@@ -180,8 +180,7 @@ export function StagesManager({ pageSize }) {
   //    - Enumerar secuencialmente (1,2,3,...) en lugar de usar el id real.
   // --------------------------------------------------
   const uniqueStages = stages.filter(
-    (item, index, self) =>
-      index === self.findIndex((t) => t.name === item.name)
+    (item, index, self) => index === self.findIndex((t) => t.name === item.name)
   );
   const tableData = uniqueStages.map((item, index) => ({
     ...item,
@@ -193,10 +192,8 @@ export function StagesManager({ pageSize }) {
   // --------------------------------------------------
   return (
     <div>
-      {/* <RowsPerPage pageSize={pageSize} onPageSizeChange={setPageSize} /> */}
-
       <ChallengeTable
-        title="Challenge Stage"
+        title="Fases"
         data={tableData}
         pageSize={pageSize}
         onCreate={handleOpenCreate}
@@ -204,12 +201,12 @@ export function StagesManager({ pageSize }) {
       />
 
       <Dialog open={openModal} onOpenChange={setOpenModal}>
-        <DialogContent className="bg-black text-white border border-yellow-500 max-w-md mx-auto">
+        <DialogContent className="bg-white dark:bg-black text-zinc-800 dark:text-white border border-[var(--app-secondary)]/70 dark:border-yellow-500 max-w-md mx-auto shadow-lg">
           <DialogHeader>
-            <DialogTitle className="text-yellow-400 text-sm sm:text-base md:text-lg">
+            <DialogTitle className="text-[var(--app-secondary)] dark:text-yellow-400 text-sm sm:text-base md:text-lg font-semibold">
               {editItem ? "Editar" : "Crear"} Stage
             </DialogTitle>
-            <DialogDescription className="text-xs sm:text-sm md:text-base">
+            <DialogDescription className="text-zinc-600 dark:text-gray-300 text-xs sm:text-sm md:text-base">
               {editItem
                 ? "Modifica el nombre y confirma para guardar cambios."
                 : "Ingresa el nombre para crear un nuevo registro."}
@@ -226,33 +223,33 @@ export function StagesManager({ pageSize }) {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-yellow-500 text-sm">
+                    <FormLabel className="text-[var(--app-secondary)] dark:text-yellow-500 text-sm">
                       Nombre
                     </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Nombre"
-                        className="bg-transparent border border-gray-700 text-white text-sm"
+                        className="bg-white dark:bg-transparent border border-zinc-300 dark:border-gray-700 text-zinc-800 dark:text-white text-sm focus:border-[var(--app-secondary)] focus:ring-1 focus:ring-[var(--app-secondary)]"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-600 dark:text-red-400" />
                   </FormItem>
                 )}
               />
 
-              <DialogFooter className="mt-2">
+              <DialogFooter className="mt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setOpenModal(false)}
-                  className="px-3 py-1 text-sm"
+                  className="px-3 py-1 text-sm bg-white dark:bg-transparent border border-zinc-300 dark:border-gray-700 text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-yellow-500 text-black hover:bg-yellow-400 px-3 py-1 text-sm"
+                  className="bg-[var(--app-secondary)] dark:bg-yellow-500 text-black hover:bg-[var(--app-secondary)]/90 dark:hover:bg-yellow-400 px-3 py-1 text-sm shadow-sm"
                 >
                   {editItem ? "Guardar" : "Crear"}
                 </Button>

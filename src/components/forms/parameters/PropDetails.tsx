@@ -68,22 +68,27 @@ export default function PropDetails({
   const { data: stepsdata } = useStrapiData("challenge-steps");
 
   const [editableProp, setEditableProp] = useState(prop);
-  const [selectedStageId, setSelectedStageId] = useState<string | number | null>(null);
+  const [selectedStageId, setSelectedStageId] = useState<
+    string | number | null
+  >(null);
 
   // Stage seleccionado para visualización o edición
-  const selectedStage = editableProp.challenge_stages.find(
-    (stage) => stage.id === selectedStageId
-  ) || null;
+  const selectedStage =
+    editableProp.challenge_stages.find(
+      (stage) => stage.id === selectedStageId
+    ) || null;
 
   // Filtrado de ítems disponibles
   const productavailable = productsData?.filter(
-    (product) => !editableProp.challenge_products.some((p) => p.id === product.id)
+    (product) =>
+      !editableProp.challenge_products.some((p) => p.id === product.id)
   );
   const stagesavailable = stagesdata?.filter(
     (stage) => !editableProp.challenge_stages.some((p) => p.id === stage.id)
   );
   const stepavailable =
-    stepsdata?.filter((step) => step.id !== editableProp.challenge_step?.id) || [];
+    stepsdata?.filter((step) => step.id !== editableProp.challenge_step?.id) ||
+    [];
   const subcategoriesavailable =
     subcategoriesData?.filter(
       (subcategory) => subcategory.id !== editableProp.challenge_subcategory?.id
@@ -100,7 +105,9 @@ export default function PropDetails({
   const removeProduct = (productId: string | number) => {
     setEditableProp((prev) => ({
       ...prev,
-      challenge_products: prev.challenge_products.filter((p) => p.id !== productId),
+      challenge_products: prev.challenge_products.filter(
+        (p) => p.id !== productId
+      ),
     }));
   };
 
@@ -143,7 +150,12 @@ export default function PropDetails({
         stage.id === stageId
           ? {
               ...stage,
-              [field]: field === "leverage" ? value : value === "" ? null : parseFloat(value as string),
+              [field]:
+                field === "leverage"
+                  ? value
+                  : value === ""
+                  ? null
+                  : parseFloat(value as string),
             }
           : stage
       ),
@@ -196,39 +208,47 @@ export default function PropDetails({
   };
 
   // Clases para inputs
-  const inputDarkClasses =
-    "bg-zinc-800 text-yellow-100 border-none focus:ring-0 focus:outline-none p-2 rounded w-full";
+  const inputClasses =
+    "bg-white dark:bg-zinc-800 text-zinc-800 dark:text-yellow-100 border border-zinc-300 dark:border-zinc-700 focus:border-[var(--app-secondary)] focus:ring-1 focus:ring-[var(--app-secondary)] p-2 rounded w-full transition-colors";
 
   // Render principal
   return (
-    <div className="bg-gradient-to-b from-black via-zinc-900 to-black h-max p-6 text-yellow-100">
+    <div className="bg-gradient-to-b from-white via-zinc-50 to-white dark:from-black dark:via-zinc-900 dark:to-black h-max p-6 text-zinc-800 dark:text-yellow-100">
       {modalType !== 2 ? (
         <div className="space-y-6">
-          <Card className="bg-zinc-900 shadow-md rounded-lg text-yellow-100">
+          <Card className="bg-white dark:bg-zinc-900 shadow-md rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-yellow-100">
             <CardContent className="space-y-6 w-full p-6">
               <div className="flex gap-4 flex-wrap">
                 <div className="flex-[2] min-w-[280px]">
-                  <h3 className="text-sm text-muted-foreground mb-3">
-                    <Badge>Categoría</Badge>
+                  <h3 className="text-sm text-zinc-600 dark:text-muted-foreground mb-3">
+                    <Badge className="bg-[var(--app-secondary)]/90 text-black">
+                      Categoría
+                    </Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2 mb-4">
                     {prop.challenge_step?.name && (
-                      <Card>
-                        <CardContent className="p-2 flex items-center justify-between">
-                          <span className="text-xs">{prop.challenge_step.name}</span>
+                      <Card className="border border-zinc-200 dark:border-transparent">
+                        <CardContent className="p-2 flex items-center justify-between bg-zinc-50 dark:bg-zinc-800">
+                          <span className="text-xs">
+                            {prop.challenge_step.name}
+                          </span>
                         </CardContent>
                       </Card>
                     )}
                   </div>
 
-                  <h3 className="text-sm text-muted-foreground mb-3">
-                    <Badge>Subcategoría</Badge>
+                  <h3 className="text-sm text-zinc-600 dark:text-muted-foreground mb-3">
+                    <Badge className="bg-[var(--app-secondary)]/90 text-black">
+                      Subcategoría
+                    </Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2 mb-4">
                     {prop.challenge_subcategory?.name && (
-                      <Card>
-                        <CardContent className="p-2 flex items-center justify-between">
-                          <span className="text-xs">{prop.challenge_subcategory.name}</span>
+                      <Card className="border border-zinc-200 dark:border-transparent">
+                        <CardContent className="p-2 flex items-center justify-between bg-zinc-50 dark:bg-zinc-800">
+                          <span className="text-xs">
+                            {prop.challenge_subcategory.name}
+                          </span>
                         </CardContent>
                       </Card>
                     )}
@@ -236,26 +256,31 @@ export default function PropDetails({
 
                   {selectedStage && (
                     <CardHeader className="px-0">
-                      <CardTitle className="text-amber-400">
+                      <CardTitle className="text-[var(--app-secondary)] dark:text-amber-400">
                         Parámetros para {selectedStage.name}
                       </CardTitle>
                       <div className="space-y-1 mt-2 text-sm">
-                        <CardDescription>
-                          Días mínimos de trading: {selectedStage.minimumTradingDays ?? "N/A"}
+                        <CardDescription className="text-zinc-700 dark:text-zinc-300">
+                          Días mínimos de trading:{" "}
+                          {selectedStage.minimumTradingDays ?? "N/A"}
                         </CardDescription>
-                        <CardDescription>
-                          Pérdida diaria máxima: {selectedStage.maximumDailyLoss ?? "N/A"}
+                        <CardDescription className="text-zinc-700 dark:text-zinc-300">
+                          Pérdida diaria máxima:{" "}
+                          {selectedStage.maximumDailyLoss ?? "N/A"}
                         </CardDescription>
-                        <CardDescription>
-                          Pérdida máxima total: {selectedStage.maximumTotalLoss ?? "N/A"}
+                        <CardDescription className="text-zinc-700 dark:text-zinc-300">
+                          Pérdida máxima total:{" "}
+                          {selectedStage.maximumTotalLoss ?? "N/A"}
                         </CardDescription>
-                        <CardDescription>
-                          Pérdida máxima por operación: {selectedStage.maximumLossPerTrade ?? "N/A"}
+                        <CardDescription className="text-zinc-700 dark:text-zinc-300">
+                          Pérdida máxima por operación:{" "}
+                          {selectedStage.maximumLossPerTrade ?? "N/A"}
                         </CardDescription>
-                        <CardDescription>
-                          Objetivo de ganancia: {selectedStage.profitTarget ?? "N/A"}
+                        <CardDescription className="text-zinc-700 dark:text-zinc-300">
+                          Objetivo de ganancia:{" "}
+                          {selectedStage.profitTarget ?? "N/A"}
                         </CardDescription>
-                        <CardDescription>
+                        <CardDescription className="text-zinc-700 dark:text-zinc-300">
                           Apalancamiento: {selectedStage.leverage ?? "N/A"}
                         </CardDescription>
                       </div>
@@ -264,16 +289,21 @@ export default function PropDetails({
                 </div>
 
                 <div className="flex-1 min-w-[200px]">
-                  <h3 className="text-sm text-muted-foreground mb-3">
-                    <Badge className="bg-amber-200 text-black">Fases</Badge>
+                  <h3 className="text-sm text-zinc-600 dark:text-muted-foreground mb-3">
+                    <Badge className="bg-[var(--app-secondary)] text-black">
+                      Fases
+                    </Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
                     {prop.challenge_stages.map((stage) => (
-                      <Card key={stage.id}>
-                        <CardContent className="p-2 flex items-center justify-between">
+                      <Card
+                        key={stage.id}
+                        className="border border-zinc-200 dark:border-transparent"
+                      >
+                        <CardContent className="p-2 flex items-center justify-between bg-zinc-50 dark:bg-zinc-800">
                           <Button
                             variant="link"
-                            className="text-xs text-yellow-100 p-0"
+                            className="text-xs text-zinc-800 dark:text-yellow-100 p-0"
                             onClick={() => setSelectedStageId(stage.id)}
                           >
                             {stage.name}
@@ -285,13 +315,18 @@ export default function PropDetails({
                 </div>
 
                 <div className="flex-1 min-w-[200px]">
-                  <h3 className="text-sm text-muted-foreground mb-3">
-                    <Badge className="bg-amber-200 text-black">Productos</Badge>
+                  <h3 className="text-sm text-zinc-600 dark:text-muted-foreground mb-3">
+                    <Badge className="bg-[var(--app-secondary)] text-black">
+                      Productos
+                    </Badge>
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
                     {prop.challenge_products.map((product) => (
-                      <Card key={product.id}>
-                        <CardContent className="p-2 flex items-center justify-between">
+                      <Card
+                        key={product.id}
+                        className="border border-zinc-200 dark:border-transparent"
+                      >
+                        <CardContent className="p-2 flex items-center justify-between bg-zinc-50 dark:bg-zinc-800">
                           <span className="text-xs">{product.name}</span>
                         </CardContent>
                       </Card>
@@ -304,20 +339,25 @@ export default function PropDetails({
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <Card className="bg-zinc-900 shadow-md rounded-lg text-yellow-100">
+          <Card className="bg-white dark:bg-zinc-900 shadow-md rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-yellow-100">
             <CardContent className="space-y-6 w-full p-6">
               <div className="mb-4">
                 <h3 className="text-sm mb-2">
-                  <Badge className="bg-amber-300 text-black">Categoría</Badge>
+                  <Badge className="bg-[var(--app-secondary)] text-black">
+                    Categoría
+                  </Badge>
                 </h3>
                 {editableProp.challenge_step?.name && (
-                  <Card className="bg-zinc-800 rounded-lg shadow-sm">
+                  <Card className="bg-zinc-50 dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-transparent">
                     <CardContent className="p-2 flex items-center justify-between">
-                      <span className="text-xs">{editableProp.challenge_step.name}</span>
+                      <span className="text-xs">
+                        {editableProp.challenge_step.name}
+                      </span>
                       <Button
                         variant="destructive"
                         size="xs"
                         onClick={() => changeCategory(null)}
+                        className="bg-red-500 hover:bg-red-600 text-white"
                       >
                         -
                       </Button>
@@ -328,16 +368,21 @@ export default function PropDetails({
 
               <div className="mb-4">
                 <h3 className="text-sm mb-2">
-                  <Badge className="bg-amber-300 text-black">Subcategoría</Badge>
+                  <Badge className="bg-[var(--app-secondary)] text-black">
+                    Subcategoría
+                  </Badge>
                 </h3>
                 {editableProp.challenge_subcategory?.name && (
-                  <Card className="bg-zinc-800 rounded-lg shadow-sm">
+                  <Card className="bg-zinc-50 dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-transparent">
                     <CardContent className="p-2 flex items-center justify-between">
-                      <span className="text-xs">{editableProp.challenge_subcategory.name}</span>
+                      <span className="text-xs">
+                        {editableProp.challenge_subcategory.name}
+                      </span>
                       <Button
                         variant="destructive"
                         size="xs"
                         onClick={() => changeSubcategory(null)}
+                        className="bg-red-500 hover:bg-red-600 text-white"
                       >
                         -
                       </Button>
@@ -348,11 +393,16 @@ export default function PropDetails({
 
               <div className="mb-4">
                 <h3 className="text-sm mb-2">
-                  <Badge className="bg-amber-300 text-black">Fases</Badge>
+                  <Badge className="bg-[var(--app-secondary)] text-black">
+                    Fases
+                  </Badge>
                 </h3>
                 <div className="grid grid-cols-1 gap-2">
                   {editableProp.challenge_stages.map((stage) => (
-                    <Card key={stage.id} className="bg-zinc-800 rounded-lg shadow-sm">
+                    <Card
+                      key={stage.id}
+                      className="bg-zinc-50 dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-transparent"
+                    >
                       <CardContent className="p-2 flex items-center justify-between">
                         <span className="text-xs">{stage.name}</span>
                         <div>
@@ -360,7 +410,7 @@ export default function PropDetails({
                             variant="default"
                             size="xs"
                             onClick={() => setSelectedStageId(stage.id)}
-                            className="bg-amber-500 hover:bg-amber-400 text-black mr-2"
+                            className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black mr-2"
                           >
                             Editar Métricas
                           </Button>
@@ -368,6 +418,7 @@ export default function PropDetails({
                             variant="destructive"
                             size="xs"
                             onClick={() => removeStage(stage.id)}
+                            className="bg-red-500 hover:bg-red-600 text-white"
                           >
                             -
                           </Button>
@@ -380,17 +431,23 @@ export default function PropDetails({
 
               <div className="mb-4">
                 <h3 className="text-sm mb-2">
-                  <Badge className="bg-amber-300 text-black">Productos</Badge>
+                  <Badge className="bg-[var(--app-secondary)] text-black">
+                    Productos
+                  </Badge>
                 </h3>
                 <div className="grid grid-cols-1 gap-2">
                   {editableProp.challenge_products.map((product) => (
-                    <Card key={product.id} className="bg-zinc-800 rounded-lg shadow-sm">
+                    <Card
+                      key={product.id}
+                      className="bg-zinc-50 dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-transparent"
+                    >
                       <CardContent className="p-2 flex items-center justify-between">
                         <span className="text-xs">{product.name}</span>
                         <Button
                           variant="destructive"
                           size="xs"
                           onClick={() => removeProduct(product.id)}
+                          className="bg-red-500 hover:bg-red-600 text-white"
                         >
                           -
                         </Button>
@@ -402,80 +459,104 @@ export default function PropDetails({
 
               {selectedStage && (
                 <CardHeader className="px-0">
-                  <CardTitle className="text-amber-400">
+                  <CardTitle className="text-[var(--app-secondary)] dark:text-amber-400">
                     Editar Parámetros para {selectedStage.name}
                   </CardTitle>
                   <div className="space-y-2 mt-2 text-sm">
-                    <CardDescription>
+                    <CardDescription className="text-zinc-700 dark:text-zinc-300">
                       Días mínimos de trading:
                       <input
                         type="number"
                         name="minimumTradingDays"
                         value={selectedStage.minimumTradingDays ?? ""}
                         onChange={(e) =>
-                          handleStageMetricChange(selectedStage.id, "minimumTradingDays", e.target.value)
+                          handleStageMetricChange(
+                            selectedStage.id,
+                            "minimumTradingDays",
+                            e.target.value
+                          )
                         }
-                        className={inputDarkClasses + " mt-1"}
+                        className={inputClasses + " mt-1"}
                       />
                     </CardDescription>
-                    <CardDescription>
+                    <CardDescription className="text-zinc-700 dark:text-zinc-300">
                       Pérdida diaria máxima:
                       <input
                         type="number"
                         name="maximumDailyLoss"
                         value={selectedStage.maximumDailyLoss ?? ""}
                         onChange={(e) =>
-                          handleStageMetricChange(selectedStage.id, "maximumDailyLoss", e.target.value)
+                          handleStageMetricChange(
+                            selectedStage.id,
+                            "maximumDailyLoss",
+                            e.target.value
+                          )
                         }
-                        className={inputDarkClasses + " mt-1"}
+                        className={inputClasses + " mt-1"}
                       />
                     </CardDescription>
-                    <CardDescription>
+                    <CardDescription className="text-zinc-700 dark:text-zinc-300">
                       Pérdida máxima total:
                       <input
                         type="number"
                         name="maximumTotalLoss"
                         value={selectedStage.maximumTotalLoss ?? ""}
                         onChange={(e) =>
-                          handleStageMetricChange(selectedStage.id, "maximumTotalLoss", e.target.value)
+                          handleStageMetricChange(
+                            selectedStage.id,
+                            "maximumTotalLoss",
+                            e.target.value
+                          )
                         }
-                        className={inputDarkClasses + " mt-1"}
+                        className={inputClasses + " mt-1"}
                       />
                     </CardDescription>
-                    <CardDescription>
+                    <CardDescription className="text-zinc-700 dark:text-zinc-300">
                       Pérdida máxima por operación:
                       <input
                         type="number"
                         name="maximumLossPerTrade"
                         value={selectedStage.maximumLossPerTrade ?? ""}
                         onChange={(e) =>
-                          handleStageMetricChange(selectedStage.id, "maximumLossPerTrade", e.target.value)
+                          handleStageMetricChange(
+                            selectedStage.id,
+                            "maximumLossPerTrade",
+                            e.target.value
+                          )
                         }
-                        className={inputDarkClasses + " mt-1"}
+                        className={inputClasses + " mt-1"}
                       />
                     </CardDescription>
-                    <CardDescription>
+                    <CardDescription className="text-zinc-700 dark:text-zinc-300">
                       Objetivo de ganancia:
                       <input
                         type="number"
                         name="profitTarget"
                         value={selectedStage.profitTarget ?? ""}
                         onChange={(e) =>
-                          handleStageMetricChange(selectedStage.id, "profitTarget", e.target.value)
+                          handleStageMetricChange(
+                            selectedStage.id,
+                            "profitTarget",
+                            e.target.value
+                          )
                         }
-                        className={inputDarkClasses + " mt-1"}
+                        className={inputClasses + " mt-1"}
                       />
                     </CardDescription>
-                    <CardDescription>
+                    <CardDescription className="text-zinc-700 dark:text-zinc-300">
                       Apalancamiento:
                       <input
-                        type="number"
+                        type="text"
                         name="leverage"
                         value={selectedStage.leverage ?? ""}
                         onChange={(e) =>
-                          handleStageMetricChange(selectedStage.id, "leverage", e.target.value)
+                          handleStageMetricChange(
+                            selectedStage.id,
+                            "leverage",
+                            e.target.value
+                          )
                         }
-                        className={inputDarkClasses + " mt-1"}
+                        className={inputClasses + " mt-1"}
                       />
                     </CardDescription>
                   </div>
@@ -484,7 +565,7 @@ export default function PropDetails({
 
               <Button
                 onClick={handleSave}
-                className="bg-amber-500 hover:bg-amber-400 text-black rounded-lg"
+                className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black rounded-lg shadow-sm"
               >
                 Guardar
               </Button>
@@ -492,21 +573,26 @@ export default function PropDetails({
           </Card>
 
           <div className="space-y-6">
-            <Card className="bg-zinc-900 shadow-md rounded-lg text-yellow-100">
+            <Card className="bg-white dark:bg-zinc-900 shadow-md rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-yellow-100">
               <CardContent className="p-4 space-y-4">
                 <h3 className="text-sm">
-                  <Badge className="bg-amber-300 text-black">Productos disponibles</Badge>
+                  <Badge className="bg-[var(--app-secondary)] text-black">
+                    Productos disponibles
+                  </Badge>
                 </h3>
                 <div className="grid grid-cols-1 gap-2">
                   {productavailable?.map((product) => (
-                    <Card key={product.id} className="bg-zinc-800 rounded-lg shadow-sm">
+                    <Card
+                      key={product.id}
+                      className="bg-zinc-50 dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-transparent"
+                    >
                       <CardContent className="p-2 flex items-center justify-between">
                         <span className="text-xs">{product.name}</span>
                         <Button
                           variant="default"
                           size="xs"
                           onClick={() => addProduct(product)}
-                          className="bg-amber-500 hover:bg-amber-400 text-black"
+                          className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black"
                         >
                           +
                         </Button>
@@ -517,21 +603,26 @@ export default function PropDetails({
               </CardContent>
             </Card>
 
-            <Card className="bg-zinc-900 shadow-md rounded-lg text-yellow-100">
+            <Card className="bg-white dark:bg-zinc-900 shadow-md rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-yellow-100">
               <CardContent className="p-4 space-y-4">
                 <h3 className="text-sm">
-                  <Badge className="bg-amber-300 text-black">Fases disponibles</Badge>
+                  <Badge className="bg-[var(--app-secondary)] text-black">
+                    Fases disponibles
+                  </Badge>
                 </h3>
                 <div className="grid grid-cols-1 gap-2">
                   {stagesavailable?.map((stage) => (
-                    <Card key={stage.id} className="bg-zinc-800 rounded-lg shadow-sm">
+                    <Card
+                      key={stage.id}
+                      className="bg-zinc-50 dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-transparent"
+                    >
                       <CardContent className="p-2 flex items-center justify-between">
                         <span className="text-xs">{stage.name}</span>
                         <Button
                           variant="default"
                           size="xs"
                           onClick={() => addStage(stage)}
-                          className="bg-amber-500 hover:bg-amber-400 text-black"
+                          className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black"
                         >
                           +
                         </Button>
@@ -542,21 +633,26 @@ export default function PropDetails({
               </CardContent>
             </Card>
 
-            <Card className="bg-zinc-900 shadow-md rounded-lg text-yellow-100">
+            <Card className="bg-white dark:bg-zinc-900 shadow-md rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-yellow-100">
               <CardContent className="p-4 space-y-4">
                 <h3 className="text-sm">
-                  <Badge className="bg-amber-300 text-black">Subcategorías disponibles</Badge>
+                  <Badge className="bg-[var(--app-secondary)] text-black">
+                    Subcategorías disponibles
+                  </Badge>
                 </h3>
                 <div className="grid grid-cols-1 gap-2">
                   {subcategoriesavailable?.map((subcategory) => (
-                    <Card key={subcategory.id} className="bg-zinc-800 rounded-lg shadow-sm">
+                    <Card
+                      key={subcategory.id}
+                      className="bg-zinc-50 dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-transparent"
+                    >
                       <CardContent className="p-2 flex items-center justify-between">
                         <span className="text-xs">{subcategory.name}</span>
                         <Button
                           variant="default"
                           size="xs"
                           onClick={() => changeSubcategory(subcategory)}
-                          className="bg-amber-500 hover:bg-amber-400 text-black"
+                          className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black"
                         >
                           +
                         </Button>
@@ -567,21 +663,26 @@ export default function PropDetails({
               </CardContent>
             </Card>
 
-            <Card className="bg-zinc-900 shadow-md rounded-lg text-yellow-100">
+            <Card className="bg-white dark:bg-zinc-900 shadow-md rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-yellow-100">
               <CardContent className="p-4 space-y-4">
                 <h3 className="text-sm">
-                  <Badge className="bg-amber-300 text-black">Categorías disponibles</Badge>
+                  <Badge className="bg-[var(--app-secondary)] text-black">
+                    Categorías disponibles
+                  </Badge>
                 </h3>
                 <div className="grid grid-cols-1 gap-2">
                   {stepavailable?.map((step) => (
-                    <Card key={step.id} className="bg-zinc-800 rounded-lg shadow-sm">
+                    <Card
+                      key={step.id}
+                      className="bg-zinc-50 dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-transparent"
+                    >
                       <CardContent className="p-2 flex items-center justify-between">
                         <span className="text-xs">{step.name}</span>
                         <Button
                           variant="default"
                           size="xs"
                           onClick={() => changeCategory(step)}
-                          className="bg-amber-500 hover:bg-amber-400 text-black"
+                          className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black"
                         >
                           +
                         </Button>

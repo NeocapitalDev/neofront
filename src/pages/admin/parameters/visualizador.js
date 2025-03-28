@@ -40,7 +40,7 @@ export default function StepsOrganizado() {
     async function loadData() {
       try {
         setLoading(true);
-        
+
         // Fetch 1: TODOS los Steps
         const stepsRes = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-steps?populate=*`,
@@ -49,7 +49,7 @@ export default function StepsOrganizado() {
         if (!stepsRes.ok) throw new Error("Error al cargar Steps");
         const stepsJson = await stepsRes.json();
         const stepsItems = stepsJson.data || [];
-        
+
         // Fetch 2: ChallengeRelation (para subcats, products)
         const relRes = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-relations?populate=*`,
@@ -58,7 +58,7 @@ export default function StepsOrganizado() {
         if (!relRes.ok) throw new Error("Error al cargar ChallengeRelation");
         const relJson = await relRes.json();
         const relItems = relJson.data || [];
-        
+
         // Fetch 3: ChallengeStage (para los parámetros de stages)
         const stageRes = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-stages?populate=*`,
@@ -67,27 +67,27 @@ export default function StepsOrganizado() {
         if (!stageRes.ok) throw new Error("Error al cargar ChallengeStage");
         const stageJson = await stageRes.json();
         const stageItems = stageJson.data || [];
-        
+
         // console.log("Steps =>", stepsItems);
         // console.log("ChallengeRelations =>", relItems);
         // console.log("ChallengeStages =>", stageItems);
-        
+
         // Estructura reorganizada
         const organizedData = organizarDatos(stepsItems, relItems, stageItems);
         setStepsData(organizedData);
-        
+
         // Seleccionar el primer step por defecto
         if (organizedData.length > 0) {
           setSelectedStepIndex(0);
         }
-        
+
         setLoading(false);
       } catch (error) {
         console.error("loadData error:", error);
         setLoading(false);
       }
     }
-    
+
     loadData();
   }, []);
 
@@ -95,10 +95,10 @@ export default function StepsOrganizado() {
   function organizarDatos(steps, relations, stages) {
     // Primero, agrupamos steps por nombre para combinar los que son iguales
     const stepsByName = {};
-    
+
     steps.forEach(step => {
       const stepName = step.name.trim();
-      
+
       if (!stepsByName[stepName]) {
         stepsByName[stepName] = {
           step: {
@@ -113,7 +113,7 @@ export default function StepsOrganizado() {
           relations: []
         };
       }
-      
+
       // Añadimos la relación de este step a todas las relaciones
       relations.forEach(rel => {
         if (rel.challenge_step && rel.challenge_step.documentId === step.documentId) {
@@ -121,17 +121,17 @@ export default function StepsOrganizado() {
           if (!stepsByName[stepName].relations.some(r => r.id === rel.id)) {
             stepsByName[stepName].relations.push(rel);
           }
-          
+
           // Procesamos subcategorías
           if (rel.challenge_subcategory) {
             const subcat = rel.challenge_subcategory;
             const subcatDoc = subcat.documentId;
-            
+
             // Verificamos si ya existe esta subcategoría
             let existingSubcat = stepsByName[stepName].subcategories.find(
               sc => sc.documentId === subcatDoc
             );
-            
+
             if (!existingSubcat) {
               existingSubcat = {
                 id: subcat.id,
@@ -142,13 +142,13 @@ export default function StepsOrganizado() {
               };
               stepsByName[stepName].subcategories.push(existingSubcat);
             }
-            
+
             // Procesamos los stages asociados a esta relación
             if (rel.challenge_stages && rel.challenge_stages.length > 0) {
               rel.challenge_stages.forEach(stageRef => {
                 // Buscamos los parámetros del stage en la tabla ChallengeStage
                 const stageParams = stages.find(s => s.documentId === stageRef.documentId);
-                
+
                 // Verificamos si este stage ya existe en esta subcategoría
                 if (!existingSubcat.stages.some(s => s.id === stageRef.id)) {
                   existingSubcat.stages.push({
@@ -179,7 +179,7 @@ export default function StepsOrganizado() {
                 }
               });
             }
-            
+
             // Procesamos productos relacionados con esta subcategoría
             if (rel.challenge_products && rel.challenge_products.length > 0) {
               rel.challenge_products.forEach(product => {
@@ -196,7 +196,7 @@ export default function StepsOrganizado() {
         }
       });
     });
-    
+
     // Convertimos a array para la salida final
     return Object.values(stepsByName);
   }
@@ -213,20 +213,23 @@ export default function StepsOrganizado() {
 
   // Obtener el step seleccionado
   const selectedStep = selectedStepIndex !== null ? stepsData[selectedStepIndex] : null;
-  
+
   // Obtener subcategorías del step seleccionado
   const subcatOptions = selectedStep ? selectedStep.subcategories : [];
-  
+
   // Obtener la subcategoría seleccionada
-  const selectedSubcat = selectedSubcatIndex !== null && subcatOptions.length > 0 
+  const selectedSubcat = selectedSubcatIndex !== null && subcatOptions.length > 0
     ? subcatOptions[selectedSubcatIndex] : null;
 
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="min-h-screen p-6 bg-gradient-to-b text-yellow-100">
+        <div className="min-h-screen p-6 bg-gradient-to-b from-white via-zinc-50 to-white dark:from-black dark:via-zinc-900 dark:to-black text-zinc-800 dark:text-yellow-100">
           <div className="flex items-center justify-center h-32">
-            <p className="text-amber-500">Cargando datos...</p>
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--app-secondary)] mb-3"></div>
+              <p className="text-[var(--app-secondary)]">Cargando datos...</p>
+            </div>
           </div>
         </div>
       </DashboardLayout>
@@ -235,19 +238,21 @@ export default function StepsOrganizado() {
 
   return (
     <DashboardLayout>
-      {/* Fondo general con un degradado oscuro */}
-      <div className="min-h-screen p-6 bg-gradient-to-b text-yellow-100">
+      {/* Fondo general con un degradado para modo claro y oscuro */}
+      <div className="min-h-screen p-6 bg-gradient-to-b from-white via-zinc-50 to-white dark:from-black dark:via-zinc-900 dark:to-black text-zinc-800 dark:text-yellow-100">
         <div className="max-w-7xl mx-auto space-y-8">
-          <h2 className="text-2xl font-bold text-center">Step → Subcategory → Products & Stages & Parameters</h2>
+          <h2 className="text-2xl font-bold text-center text-zinc-800 dark:text-yellow-100 border-b-2 border-[var(--app-secondary)] pb-2 w-fit mx-auto">
+            Step → Subcategory → Products & Stages & Parameters
+          </h2>
 
           {/* 1) STEPS */}
           <div className="flex items-center justify-center gap-4 flex-wrap">
             {stepsData.length === 0 ? (
               <>
-                <span className="text-gray-400">No hay Steps</span>
+                <span className="text-zinc-500 dark:text-gray-400">No hay Steps</span>
                 <Button
                   onClick={handlePlusClick}
-                  className="bg-amber-500 hover:bg-amber-400 text-black px-3 py-2 rounded-lg flex items-center gap-1"
+                  className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black dark:text-black px-3 py-2 rounded-lg flex items-center gap-1 shadow-sm"
                 >
                   <PlusIcon className="w-4 h-4" />
                 </Button>
@@ -259,10 +264,10 @@ export default function StepsOrganizado() {
                     key={stepObj.step.documentId}
                     onClick={() => setSelectedStepIndex(index)}
                     className={cn(
-                      "px-4 py-2 rounded-lg transition",
+                      "px-4 py-2 rounded-lg transition shadow-sm",
                       selectedStepIndex === index
-                        ? "bg-amber-500 text-black"
-                        : "bg-zinc-800 hover:bg-zinc-700 text-yellow-100"
+                        ? "bg-[var(--app-secondary)] text-black"
+                        : "bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-yellow-100 hover:bg-zinc-100 dark:hover:bg-zinc-700"
                     )}
                   >
                     {stepObj.step.name}
@@ -270,7 +275,7 @@ export default function StepsOrganizado() {
                 ))}
                 <Button
                   onClick={handlePlusClick}
-                  className="bg-amber-500 hover:bg-amber-400 text-black px-3 py-2 rounded-lg flex items-center gap-1"
+                  className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black dark:text-black px-3 py-2 rounded-lg flex items-center gap-1 shadow-sm"
                 >
                   <PlusIcon className="w-4 h-4" />
                 </Button>
@@ -283,10 +288,10 @@ export default function StepsOrganizado() {
             <div className="flex items-center justify-center gap-4 flex-wrap">
               {subcatOptions.length === 0 ? (
                 <>
-                  <span className="text-gray-400">No hay Subcategorías para este Step</span>
+                  <span className="text-zinc-500 dark:text-gray-400">No hay Subcategorías para este Step</span>
                   <Button
                     onClick={handlePlusClick}
-                    className="bg-amber-500 hover:bg-amber-400 text-black px-3 py-2 rounded-lg flex items-center gap-1"
+                    className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black dark:text-black px-3 py-2 rounded-lg flex items-center gap-1 shadow-sm"
                   >
                     <PlusIcon className="w-4 h-4" />
                   </Button>
@@ -298,10 +303,10 @@ export default function StepsOrganizado() {
                       key={sc.documentId}
                       onClick={() => setSelectedSubcatIndex(index)}
                       className={cn(
-                        "px-4 py-2 rounded-lg transition",
+                        "px-4 py-2 rounded-lg transition shadow-sm",
                         selectedSubcatIndex === index
-                          ? "bg-amber-500 text-black"
-                          : "bg-zinc-800 hover:bg-zinc-700 text-yellow-100"
+                          ? "bg-[var(--app-secondary)] text-black"
+                          : "bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-yellow-100 hover:bg-zinc-100 dark:hover:bg-zinc-700"
                       )}
                     >
                       {sc.name}
@@ -309,7 +314,7 @@ export default function StepsOrganizado() {
                   ))}
                   <Button
                     onClick={handlePlusClick}
-                    className="bg-amber-500 hover:bg-amber-400 text-black px-3 py-2 rounded-lg flex items-center gap-1"
+                    className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black dark:text-black px-3 py-2 rounded-lg flex items-center gap-1 shadow-sm"
                   >
                     <PlusIcon className="w-4 h-4" />
                   </Button>
@@ -330,34 +335,34 @@ export default function StepsOrganizado() {
             >
               {/* PRODUCTS */}
               <Card className={cn(
-                "bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100",
+                "bg-white dark:bg-zinc-900 rounded-lg shadow-md p-4 text-zinc-800 dark:text-yellow-100 border border-zinc-200 dark:border-zinc-700",
                 selectedSubcat.stages.length === 1 ? "w-full md:w-1/2" : "flex-1"
               )}>
                 <CardHeader>
-                  <CardTitle className="text-amber-400">Products Relacionados</CardTitle>
+                  <CardTitle className="text-[var(--app-secondary)] dark:text-amber-400">Products Relacionados</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-3 flex-wrap">
                     {selectedSubcat.products && selectedSubcat.products.length > 0 ? (
                       <>
                         {selectedSubcat.products.map((p) => (
-                          <div key={p.id} className="px-4 py-2 bg-zinc-800 rounded-lg">
+                          <div key={p.id} className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-yellow-100">
                             {p.name}
                           </div>
                         ))}
                         <Button
                           onClick={handlePlusClick}
-                          className="bg-amber-500 hover:bg-amber-400 text-black px-2 py-1 rounded-lg flex items-center gap-1"
+                          className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black dark:text-black px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm"
                         >
                           <PlusIcon className="w-4 h-4" />
                         </Button>
                       </>
                     ) : (
                       <>
-                        <span className="text-gray-400">No hay Products en esta Subcat</span>
+                        <span className="text-zinc-500 dark:text-gray-400">No hay Products en esta Subcat</span>
                         <Button
                           onClick={handlePlusClick}
-                          className="bg-amber-500 hover:bg-amber-400 text-black px-2 py-1 rounded-lg flex items-center gap-1"
+                          className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black dark:text-black px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm"
                         >
                           <PlusIcon className="w-4 h-4" />
                         </Button>
@@ -369,34 +374,34 @@ export default function StepsOrganizado() {
 
               {/* STAGES */}
               <Card className={cn(
-                "bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100",
+                "bg-white dark:bg-zinc-900 rounded-lg shadow-md p-4 text-zinc-800 dark:text-yellow-100 border border-zinc-200 dark:border-zinc-700",
                 selectedSubcat.stages.length === 1 ? "w-full md:w-1/2" : "flex-1"
               )}>
                 <CardHeader>
-                  <CardTitle className="text-amber-400">Stages Relacionados</CardTitle>
+                  <CardTitle className="text-[var(--app-secondary)] dark:text-amber-400">Stages Relacionados</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-3 flex-wrap">
                     {selectedSubcat.stages.length > 0 ? (
                       <>
                         {selectedSubcat.stages.map((sg) => (
-                          <div key={sg.id} className="px-4 py-2 bg-zinc-800 rounded-lg">
+                          <div key={sg.id} className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-yellow-100">
                             {sg.name}
                           </div>
                         ))}
                         <Button
                           onClick={handlePlusClick}
-                          className="bg-amber-500 hover:bg-amber-400 text-black px-2 py-1 rounded-lg flex items-center gap-1"
+                          className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black dark:text-black px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm"
                         >
                           <PlusIcon className="w-4 h-4" />
                         </Button>
                       </>
                     ) : (
                       <>
-                        <span className="text-gray-400">No hay Stages para este Step</span>
+                        <span className="text-zinc-500 dark:text-gray-400">No hay Stages para este Step</span>
                         <Button
                           onClick={handlePlusClick}
-                          className="bg-amber-500 hover:bg-amber-400 text-black px-2 py-1 rounded-lg flex items-center gap-1"
+                          className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black dark:text-black px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm"
                         >
                           <PlusIcon className="w-4 h-4" />
                         </Button>
@@ -414,46 +419,46 @@ export default function StepsOrganizado() {
               {selectedSubcat.stages.length === 1 ? (
                 <div className="flex justify-center">
                   <div className="w-full md:w-1/2">
-                    <Card className="bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100 w-full">
+                    <Card className="bg-white dark:bg-zinc-900 rounded-lg shadow-md p-4 text-zinc-800 dark:text-yellow-100 border border-zinc-200 dark:border-zinc-700 w-full">
                       <CardHeader>
-                        <CardTitle className="text-amber-400">{selectedSubcat.stages[0].name}</CardTitle>
+                        <CardTitle className="text-[var(--app-secondary)] dark:text-amber-400">{selectedSubcat.stages[0].name}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-2 text-sm">
                           <div>
-                            <span className="font-medium text-amber-300">Sub Categoría: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Sub Categoría: </span>
                             {selectedSubcat.name ?? "—"}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Min Trading Days: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Min Trading Days: </span>
                             {selectedSubcat.stages[0].parametros.minimumTradingDays ?? "—"}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Max Daily Loss: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Max Daily Loss: </span>
                             {formatPercentage(selectedSubcat.stages[0].parametros.maximumDailyLoss)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Profit Target: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Profit Target: </span>
                             {formatPercentage(selectedSubcat.stages[0].parametros.profitTarget)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Leverage: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Leverage: </span>
                             {selectedSubcat.stages[0].parametros.leverage ?? "—"}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Maximum Total Loss: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Maximum Total Loss: </span>
                             {formatPercentage(selectedSubcat.stages[0].parametros.maximumTotalLoss)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Maximum Loss Per Trade: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Maximum Loss Per Trade: </span>
                             {formatPercentage(selectedSubcat.stages[0].parametros.maximumLossPerTrade)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Creado: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Creado: </span>
                             {formatDate(selectedSubcat.stages[0].parametros.createdAt)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Actualizado: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Actualizado: </span>
                             {formatDate(selectedSubcat.stages[0].parametros.updatedAt)}
                           </div>
                         </div>
@@ -466,47 +471,47 @@ export default function StepsOrganizado() {
                   {selectedSubcat.stages.map((sg) => (
                     <Card
                       key={sg.id}
-                      className="bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100 w-full"
+                      className="bg-white dark:bg-zinc-900 rounded-lg shadow-md p-4 text-zinc-800 dark:text-yellow-100 border border-zinc-200 dark:border-zinc-700 w-full"
                     >
                       <CardHeader>
-                        <CardTitle className="text-amber-400">{sg.name}</CardTitle>
+                        <CardTitle className="text-[var(--app-secondary)] dark:text-amber-400">{sg.name}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-2 text-sm">
                           <div>
-                            <span className="font-medium text-amber-300">Sub Categoría: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Sub Categoría: </span>
                             {selectedSubcat.name ?? "—"}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Min Trading Days: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Min Trading Days: </span>
                             {sg.parametros.minimumTradingDays ?? "—"}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Max Daily Loss: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Max Daily Loss: </span>
                             {formatPercentage(sg.parametros.maximumDailyLoss)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Profit Target: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Profit Target: </span>
                             {formatPercentage(sg.parametros.profitTarget)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Leverage: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Leverage: </span>
                             {sg.parametros.leverage ?? "—"}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Maximum Total Loss: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Maximum Total Loss: </span>
                             {formatPercentage(sg.parametros.maximumTotalLoss)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Maximum Loss Per Trade: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Maximum Loss Per Trade: </span>
                             {formatPercentage(sg.parametros.maximumLossPerTrade)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Creado: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Creado: </span>
                             {formatDate(sg.parametros.createdAt)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Actualizado: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Actualizado: </span>
                             {formatDate(sg.parametros.updatedAt)}
                           </div>
                         </div>
@@ -519,47 +524,47 @@ export default function StepsOrganizado() {
                   {selectedSubcat.stages.map((sg) => (
                     <Card
                       key={sg.id}
-                      className="bg-zinc-900 rounded-lg shadow-md p-4 text-yellow-100 w-full"
+                      className="bg-white dark:bg-zinc-900 rounded-lg shadow-md p-4 text-zinc-800 dark:text-yellow-100 border border-zinc-200 dark:border-zinc-700 w-full"
                     >
                       <CardHeader>
-                        <CardTitle className="text-amber-400">{sg.name}</CardTitle>
+                        <CardTitle className="text-[var(--app-secondary)] dark:text-amber-400">{sg.name}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-2 text-sm">
                           <div>
-                            <span className="font-medium text-amber-300">Sub Categoría: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Sub Categoría: </span>
                             {selectedSubcat.name ?? "—"}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Min Trading Days: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Min Trading Days: </span>
                             {sg.parametros.minimumTradingDays ?? "—"}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Max Daily Loss: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Max Daily Loss: </span>
                             {formatPercentage(sg.parametros.maximumDailyLoss)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Profit Target: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Profit Target: </span>
                             {formatPercentage(sg.parametros.profitTarget)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Leverage: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Leverage: </span>
                             {sg.parametros.leverage ?? "—"}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Maximum Total Loss: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Maximum Total Loss: </span>
                             {formatPercentage(sg.parametros.maximumTotalLoss)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Maximum Loss Per Trade: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Maximum Loss Per Trade: </span>
                             {formatPercentage(sg.parametros.maximumLossPerTrade)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Creado: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Creado: </span>
                             {formatDate(sg.parametros.createdAt)}
                           </div>
                           <div>
-                            <span className="font-medium text-amber-300">Actualizado: </span>
+                            <span className="font-medium text-[var(--app-secondary)]/90 dark:text-amber-300">Actualizado: </span>
                             {formatDate(sg.parametros.updatedAt)}
                           </div>
                         </div>
