@@ -22,74 +22,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { toast } from "sonner";
 import EditUserModal from "./editUserModal";
 
-const userColumns = (router, openPdfModal) => [
-  { accessorKey: "fullName", header: "Nombre Completo" },
-  { accessorKey: "email", header: "Email" },
-  { accessorKey: "phone", header: "Teléfono" },
-  {
-    accessorKey: "country",
-    header: "País",
-    cell: ({ row }) => {
-      const countryCode = row.original.countryCode?.toLowerCase();
-      return (
-        <div className="flex items-center space-x-2">
-          {countryCode && <Flag country={countryCode} className="w-6 h-4" />}
-          <span>{row.getValue("country")}</span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "isVerified",
-    header: "Verificado",
-    cell: ({ row }) => (
-      <div className="flex items-center space-x-2">
-        {row.getValue("isVerified") ? (
-          <div className="flex items-center space-x-2">
-            <CheckCircle className="text-green-500 w-5 h-5" />
-            <span className="text-green-500 font-medium">Verificado</span>
-          </div>
-        ) : (
-          <div className="flex items-center space-x-2">
-            <XCircle className="text-red-500 w-5 h-5" />
-            <span className="text-red-500 font-medium">No Verificado</span>
-          </div>
-        )}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "statusSign",
-    header: "Firma Aprobada",
-    cell: ({ row }) => (
-      <div className="flex items-center space-x-2">
-        {row.getValue("statusSign") ? (
-          <div className="flex items-center space-x-2">
-            <CheckCircle className="text-green-500 w-5 h-5" />
-            <span className="text-green-500 font-medium">Aprobado</span>
-          </div>
-        ) : (
-          <div className="flex items-center space-x-2">
-            <XCircle className="text-red-500 w-5 h-5" />
-            <span className="text-red-500 font-medium">No Aprobado</span>
-          </div>
-        )}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "id",
-    header: "Acciones",
-    cell: ({ row }) => (
-      <div className="flex space-x-2">
-        <RedirectButton userdocumentId={row.original.documentId} />
-        <EditButton user={row.original} />
-        <ViewPdfButton user={row.original} onViewPdf={openPdfModal} />
-      </div>
-    ),
-  },
-];
-
 const fetcher = (url, token) =>
   fetch(url, {
     headers: {
@@ -114,23 +46,8 @@ export default function UsersTable() {
   const [verificationFilter, setVerificationFilter] = useState("Todos");
   const [selectedUser, setSelectedUser] = useState(null);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
-
-  const filteredData = useMemo(() => {
-    if (!Array.isArray(data)) return [];
-
-    return data
-      .filter((user) => {
-        const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-        return fullName.includes(nameSearch.toLowerCase());
-      })
-      .filter((user) => user.email.toLowerCase().includes(emailSearch.toLowerCase()))
-      .filter((user) => {
-        if (verificationFilter === "Todos") return true;
-        return verificationFilter === "Verificado"
-          ? user.isVerified
-          : !user.isVerified;
-      });
-  }, [data, nameSearch, emailSearch, verificationFilter]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   const openPdfModal = (user) => {
     setSelectedUser(user);
@@ -235,6 +152,41 @@ export default function UsersTable() {
     }
   };
 
+  // Filter and paginate data
+  const filteredData = useMemo(() => {
+    if (!Array.isArray(data)) return [];
+
+    return data
+      .filter((user) => {
+        const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+        return fullName.includes(nameSearch.toLowerCase());
+      })
+      .filter((user) => user.email.toLowerCase().includes(emailSearch.toLowerCase()))
+      .filter((user) => {
+        if (verificationFilter === "Todos") return true;
+        return verificationFilter === "Verificado"
+          ? user.isVerified
+          : !user.isVerified;
+      });
+  }, [data, nameSearch, emailSearch, verificationFilter]);
+
+  // Paginate data
+  const paginatedData = useMemo(() => {
+    const start = currentPage * pageSize;
+    const end = start + pageSize;
+    return filteredData.slice(start, end);
+  }, [filteredData, currentPage, pageSize]);
+
+  // Calculate total pages
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredData.length / pageSize);
+  }, [filteredData, pageSize]);
+
+  // Reset page when filters change
+  React.useEffect(() => {
+    setCurrentPage(0);
+  }, [nameSearch, emailSearch, verificationFilter]);
+
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -253,171 +205,243 @@ export default function UsersTable() {
 
   return (
     <DashboardLayout>
-      <div className="p-8 bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 rounded-lg shadow-lg">
-        {/* Filtros */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4">
-          <Input
-            placeholder="Buscar por nombre..."
-            value={nameSearch}
-            onChange={(e) => setNameSearch(e.target.value)}
-            className="max-w-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
-          />
-          <Input
-            placeholder="Buscar por email..."
-            value={emailSearch}
-            onChange={(e) => setEmailSearch(e.target.value)}
-            className="max-w-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
-          />
-          <Select
-            value={verificationFilter}
-            onChange={(e) => setVerificationFilter(e.target.value)}
-          />
-        </div>
+      <div className="p-6">
+        <h1 className="text-4xl font-bold mb-6">Users</h1>
+        <div className="bg-zinc-900 border border-zinc-700 p-4 rounded-lg mt-4 space-y-4">
+          {/* Filtros */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4">
+            <div className="flex w-full md:w-auto gap-2 flex-col md:flex-row">
+              <Input
+                placeholder="Buscar por nombre..."
+                value={nameSearch}
+                onChange={(e) => setNameSearch(e.target.value)}
+                className="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
+              />
+              <Input
+                placeholder="Buscar por email..."
+                value={emailSearch}
+                onChange={(e) => setEmailSearch(e.target.value)}
+                className="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
+              />
+            </div>
 
-        {/* Tabla */}
-        <div className="border border-zinc-300 dark:border-zinc-700 rounded-md overflow-hidden">
-          <Table>
-            <TableHeader className="bg-zinc-200 dark:bg-zinc-800">
-              <TableRow>
-                {userColumns(router, openPdfModal).map((column) => (
-                  <TableHead
-                    key={column.accessorKey}
-                    className="text-zinc-900 dark:text-zinc-200 border-b border-zinc-300 dark:border-zinc-700"
-                  >
-                    {column.header}
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredData.length > 0 ? (
-                filteredData.map((user, index) => (
-                  <TableRow key={index} className="border-b border-zinc-300 dark:border-zinc-700">
-                    <TableCell>{user.firstName + " " + user.lastName}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.phone}</TableCell>
-                    <TableCell>{user.country}</TableCell>
-                    <TableCell>
-                      {user.isVerified ? (
+            <div className="relative w-full md:w-48">
+              <select
+                value={verificationFilter}
+                onChange={(e) => setVerificationFilter(e.target.value)}
+                className="w-full py-2 px-3 rounded-md bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700"
+              >
+                <option value="Todos">Estado de cuenta</option>
+                <option value="Verificado">Verificado</option>
+                <option value="No Verificado">No Verificado</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Tabla */}
+          <div className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900">
+            <Table>
+              <TableHeader className="bg-zinc-200 dark:bg-zinc-800">
+                <TableRow>
+                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">Nombre Completo</TableHead>
+                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">Email</TableHead>
+                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">Teléfono</TableHead>
+                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">País</TableHead>
+                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">Verificado</TableHead>
+                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">Firma Aprobada</TableHead>
+                  <TableHead className="text-zinc-900 dark:text-zinc-200 font-medium">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((user, index) => (
+                    <TableRow key={index} className="border-b border-zinc-300 dark:border-zinc-700">
+                      <TableCell className="py-3">{user.firstName + " " + user.lastName}</TableCell>
+                      <TableCell className="py-3">{user.email}</TableCell>
+                      <TableCell className="py-3">{user.phone}</TableCell>
+                      <TableCell className="py-3">
                         <div className="flex items-center space-x-2">
-                          <CheckCircle className="text-green-500 w-5 h-5" />
-                          <span className="text-green-500 font-medium">Verificado</span>
+                          {user.countryCode && <Flag country={user.countryCode.toLowerCase()} className="w-6 h-4" />}
+                          <span>{user.country}</span>
                         </div>
-                      ) : (
-                        <div className="flex items-center space-x-2">
-                          <XCircle className="text-red-500 w-5 h-5" />
-                          <span className="text-red-500 font-medium">No Verificado</span>
+                      </TableCell>
+                      <TableCell className="py-3">
+                        {user.isVerified ? (
+                          <div className="flex items-center space-x-2">
+                            <CheckCircle className="text-green-500 w-5 h-5" />
+                            <span className="text-green-500 font-medium">Verificado</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2">
+                            <XCircle className="text-red-500 w-5 h-5" />
+                            <span className="text-red-500 font-medium">No Verificado</span>
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="py-3">
+                        {user.statusSign ? (
+                          <div className="flex items-center space-x-2">
+                            <CheckCircle className="text-green-500 w-5 h-5" />
+                            <span className="text-green-500 font-medium">Aprobado</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2">
+                            <XCircle className="text-red-500 w-5 h-5" />
+                            <span className="text-red-500 font-medium">No Aprobado</span>
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="py-3">
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            onClick={() => router.push(`/admin/users/${user.documentId}`)}
+                            className="px-3 py-1 h-9 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                          >
+                            Detalles
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              const editButton = document.getElementById(`edit-button-${user.id}`);
+                              if (editButton) editButton.click();
+                            }}
+                            className="px-3 py-1 h-9 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 flex items-center space-x-1"
+                          >
+                            <PencilSquareIcon className="w-5 h-5" />
+                            <span>Editar</span>
+                          </Button>
+                          <Button
+                            onClick={() => openPdfModal(user)}
+                            className="px-3 py-1 h-9 bg-gray-500 text-white rounded-md hover:bg-gray-600 flex items-center space-x-1"
+                          >
+                            <Eye className="w-5 h-5" />
+                            <span>PDF</span>
+                          </Button>
+                          <span id={`edit-button-${user.id}`} className="hidden">
+                            <EditButton user={user} />
+                          </span>
                         </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {user.statusSign ? (
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle className="text-green-500 w-5 h-5" />
-                          <span className="text-green-500 font-medium">Aprobado</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center space-x-2">
-                          <XCircle className="text-red-500 w-5 h-5" />
-                          <span className="text-red-500 font-medium">No Aprobado</span>
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <RedirectButton userdocumentId={user.documentId} />
-                        <EditButton user={user} />
-                        <ViewPdfButton user={user} onViewPdf={openPdfModal} />
-                      </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                      No se encontraron resultados.
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={userColumns(router, openPdfModal).length} className="text-center">
-                    No se encontraron resultados.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        {/* Modal para ver el PDF */}
-        {selectedUser && (
-          <Dialog open={isPdfModalOpen} onOpenChange={setIsPdfModalOpen}>
-            <DialogContent className="max-w-4xl">
-              <DialogHeader>
-                <DialogTitle>Ver PDF de {selectedUser.firstName} {selectedUser.lastName}</DialogTitle>
-              </DialogHeader>
-              <div className="mt-4">
-                {selectedUser.pdf?.[0]?.url ? (
-                  <embed
-                    src={`${selectedUser.pdf[0].url}#toolbar=0`}
-                    type="application/pdf"
-                    className="w-full min-h-[calc(80vh)]"
-                  />
-                ) : (
-                  <p className="text-center text-red-500">No se ha subido un PDF para este usuario.</p>
                 )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Paginación */}
+          {filteredData.length > 0 && (
+            <div className="flex items-center justify-between px-2 mt-4">
+              <div className="flex-1 text-sm text-zinc-700 dark:text-zinc-400">
+                Mostrando {paginatedData.length} de {filteredData.length} registros
               </div>
-              <DialogFooter>
-                <Button
-                  onClick={handleApprove}
-                  className="bg-green-500 hover:bg-green-600 text-white"
-                  disabled={!selectedUser.pdf?.[0]?.url}
-                >
-                  Aprobar
-                </Button>
-                <Button
-                  onClick={handleDisapprove}
-                  className="bg-red-500 hover:bg-red-600 text-white"
-                  disabled={!selectedUser.pdf?.[0]?.url}
-                >
-                  Desaprobar
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
+              <div className="flex items-center space-x-6 lg:space-x-8">
+                <div className="flex items-center space-x-2">
+                  <p className="text-sm font-medium">Filas por página</p>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => setPageSize(Number(e.target.value))}
+                    className="h-8 w-16 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2"
+                  >
+                    {[10, 20, 30, 40, 50].map((size) => (
+                      <option key={size} value={size} className="flex items-start">
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+                  Página {currentPage + 1} de {totalPages || 1}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0"
+                    onClick={() => setCurrentPage(0)}
+                    disabled={currentPage === 0}
+                  >
+                    <span className="sr-only">Ir a la primera página</span>
+                    <span className="h-4 w-4">{"⟪"}</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0"
+                    onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                    disabled={currentPage === 0}
+                  >
+                    <span className="sr-only">Ir a la página anterior</span>
+                    <span className="h-4 w-4">{"<"}</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0"
+                    onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
+                    disabled={currentPage >= totalPages - 1}
+                  >
+                    <span className="sr-only">Ir a la página siguiente</span>
+                    <span className="h-4 w-4">{">"}</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0"
+                    onClick={() => setCurrentPage(totalPages - 1)}
+                    disabled={currentPage >= totalPages - 1}
+                  >
+                    <span className="sr-only">Ir a la última página</span>
+                    <span className="h-4 w-4">{"⟫"}</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Modal para ver el PDF */}
+          {selectedUser && (
+            <Dialog open={isPdfModalOpen} onOpenChange={setIsPdfModalOpen}>
+              <DialogContent className="max-w-4xl">
+                <DialogHeader>
+                  <DialogTitle>Ver PDF de {selectedUser.firstName} {selectedUser.lastName}</DialogTitle>
+                </DialogHeader>
+                <div className="mt-4">
+                  {selectedUser.pdf?.[0]?.url ? (
+                    <embed
+                      src={`${selectedUser.pdf[0].url}#toolbar=0`}
+                      type="application/pdf"
+                      className="w-full min-h-[calc(80vh)]"
+                    />
+                  ) : (
+                    <p className="text-center text-red-500">No se ha subido un PDF para este usuario.</p>
+                  )}
+                </div>
+                <DialogFooter>
+                  <Button
+                    onClick={handleApprove}
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                    disabled={!selectedUser.pdf?.[0]?.url}
+                  >
+                    Aprobar
+                  </Button>
+                  <Button
+                    onClick={handleDisapprove}
+                    className="bg-red-500 hover:bg-red-600 text-white"
+                    disabled={!selectedUser.pdf?.[0]?.url}
+                  >
+                    Desaprobar
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
       </div>
     </DashboardLayout>
   );
 }
-
-/* Componente Select */
-const Select = ({ value, onChange }) => {
-  return (
-    <div className="relative w-full md:w-48">
-      <select
-        value={value}
-        onChange={onChange}
-        className="max-w-sm py-1 bg-white dark:bg-zinc-800 text-zinc-700 rounded-md dark:text-zinc-200 border-zinc-300 dark:border-zinc-700"
-      >
-        <option value="Todos">Estado de cuenta</option>
-        <option value="Verificado">Verificado</option>
-        <option value="No Verificado">No Verificado</option>
-      </select>
-    </div>
-  );
-};
-
-const RedirectButton = ({ userdocumentId }) => {
-  const router = useRouter();
-
-  const handleRedirect = () => {
-    router.push(`/admin/users/${userdocumentId}`);
-  };
-
-  return (
-    <button
-      onClick={handleRedirect}
-      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-    >
-      Detalles
-    </button>
-  );
-};
 
 const EditButton = ({ user }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -430,10 +454,9 @@ const EditButton = ({ user }) => {
     <>
       <button
         onClick={handleEdit}
-        className="ml-2 px-3 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 flex items-center space-x-1"
+        className="hidden"
       >
-        <PencilSquareIcon className="w-5 h-5" />
-        <span>Editar</span>
+        Editar
       </button>
 
       {isModalOpen && (
@@ -444,18 +467,5 @@ const EditButton = ({ user }) => {
         />
       )}
     </>
-  );
-};
-
-const ViewPdfButton = ({ user, onViewPdf }) => {
-  console.log(user);
-  return (
-    <button
-      onClick={() => onViewPdf(user)}
-      className="ml-2 px-3 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 flex items-center space-x-1"
-    >
-      <Eye className="w-5 h-5" />
-      <span>PDF</span>
-    </button>
   );
 };

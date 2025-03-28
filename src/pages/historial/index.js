@@ -53,12 +53,12 @@ export default function Historial() {
         withdrawal: 'from-purple-200 via-purple-100/80 to-white dark:from-purple-900/40 dark:via-purple-800/20 dark:to-zinc-900',
         retry: 'from-orange-200 via-orange-100/80 to-white dark:from-orange-900/40 dark:via-orange-800/20 dark:to-zinc-900',
     };
-    
+
     const statusBorderColors = {
         approved: 'border-green-300 dark:border-green-800',
         disapproved: 'border-red-300 dark:border-red-800',
         progress: 'border-yellow-300 dark:border-yellow-800',
-        init: 'border-blue-300 dark:border-blue-800',
+        init: '',
         withdrawal: 'border-purple-300 dark:border-purple-800',
         retry: 'border-orange-300 dark:border-orange-800',
     };
@@ -165,7 +165,7 @@ export default function Historial() {
         }
 
         const certificates = getCertificates(challenge);
-        
+
         // Si no hay certificados, mostrar botón de "Sin certificado"
         if (certificates.length === 0) {
             return (
@@ -191,7 +191,7 @@ export default function Historial() {
                         </button>
                     </Link>
                 ))}
-                
+
                 {/* Certificados de retiro */}
                 {withdrawalCertificates.map((cert, index) => (
                     <Link key={`withdrawal-${index}`} href={`/certificates/verify/${cert.documentId}`}>
@@ -327,21 +327,20 @@ export default function Historial() {
                                             {/* Estado y fase actual */}
                                             <div className="flex flex-wrap gap-2 items-center mb-2">
                                                 <div className="gap-1 inline-flex items-center">
-                                                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${
-                                                        status === 'approved' ? 'bg-green-500 dark:bg-green-400' :
+                                                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${status === 'approved' ? 'bg-green-500 dark:bg-green-400' :
                                                         status === 'progress' ? 'bg-yellow-500 dark:bg-yellow-400' :
-                                                        status === 'disapproved' ? 'bg-red-500 dark:bg-red-400' :
-                                                        status === 'init' ? 'bg-blue-500 dark:bg-blue-400' :
-                                                        status === 'withdrawal' ? 'bg-purple-500 dark:bg-purple-400' :
-                                                        'bg-orange-500 dark:bg-orange-400'
-                                                    }`} />
+                                                            status === 'disapproved' ? 'bg-red-500 dark:bg-red-400' :
+                                                                status === 'init' ? 'bg-blue-500 dark:bg-blue-400' :
+                                                                    status === 'withdrawal' ? 'bg-purple-500 dark:bg-purple-400' :
+                                                                        'bg-orange-500 dark:bg-orange-400'
+                                                        }`} />
                                                     <span className={`font-semibold text-sm ${statusColors[status]}`}>
                                                         {status === 'approved' ? 'Aprobado' :
-                                                         status === 'progress' ? 'En progreso' :
-                                                         status === 'disapproved' ? 'Desaprobado' :
-                                                         status === 'init' ? 'Por Iniciar' :
-                                                         status === 'withdrawal' ? 'Retirado' :
-                                                         status === 'retry' ? 'Rechazado' : 'Desconocido'}
+                                                            status === 'progress' ? 'En progreso' :
+                                                                status === 'disapproved' ? 'Desaprobado' :
+                                                                    status === 'init' ? 'Por Iniciar' :
+                                                                        status === 'withdrawal' ? 'Retirado' :
+                                                                            status === 'retry' ? 'Rechazado' : 'Desconocido'}
                                                     </span>
                                                 </div>
                                                 <span className="text-gray-500 dark:text-gray-400 hidden md:inline">|</span>
@@ -386,21 +385,21 @@ export default function Historial() {
                                                                         <span className="text-gray-800 text-sm dark:text-white font-semibold">
                                                                             Fase {challenge.phase}
                                                                         </span>
-                                                                        <span className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[challenge.result]} backdrop-blur-sm ${
-                                                                            challenge.result === 'approved' ? 'bg-green-100 dark:bg-green-900/50' : 
-                                                                            challenge.result === 'progress' ? 'bg-yellow-100 dark:bg-yellow-900/50' : 
-                                                                            challenge.result === 'disapproved' ? 'bg-red-100 dark:bg-red-900/50' :
-                                                                            challenge.result === 'init' ? 'bg-blue-100 dark:bg-blue-900/50' :
-                                                                            challenge.result === 'withdrawal' ? 'bg-purple-100 dark:bg-purple-900/50' :
-                                                                            'bg-orange-100 dark:bg-orange-900/50'
-                                                                        } border ${
-                                                                            challenge.result === 'approved' ? 'border-green-200 dark:border-green-700/50' : 
-                                                                            challenge.result === 'progress' ? 'border-yellow-200 dark:border-yellow-700/50' : 
-                                                                            challenge.result === 'disapproved' ? 'border-red-200 dark:border-red-700/50' :
-                                                                            challenge.result === 'init' ? 'border-blue-200 dark:border-blue-700/50' :
-                                                                            challenge.result === 'withdrawal' ? 'border-purple-200 dark:border-purple-700/50' :
-                                                                            'border-orange-200 dark:border-orange-700/50'
-                                                                        } shadow-sm transition-all duration-200`}>
+                                                                        <span className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[challenge.result]} backdrop-blur-sm ${challenge.result === 'approved' ? 'bg-green-100 dark:bg-green-900/50' :
+                                                                            challenge.result === 'progress' ? 'bg-yellow-100 dark:bg-yellow-900/50' :
+                                                                                challenge.result === 'disapproved' ? 'bg-red-100 dark:bg-red-900/50' :
+                                                                                    challenge.result === 'init' ? 'bg-blue-100 dark:bg-blue-900/50' :
+                                                                                        challenge.result === 'withdrawal' ? 'bg-purple-100 dark:bg-purple-900/50' :
+                                                                                            'bg-orange-100 dark:bg-orange-900/50'
+                                                                            } 
+                                                                        border ${challenge.result === 'approved' ? 'border-green-200 dark:border-green-700/50' :
+                                                                                challenge.result === 'progress' ? 'border-yellow-200 dark:border-yellow-700/50' :
+                                                                                    challenge.result === 'disapproved' ? 'border-red-200 dark:border-red-700/50' :
+                                                                                        challenge.result === 'init' ? 'border-blue-200 dark:border-blue-700/50' :
+                                                                                            challenge.result === 'withdrawal' ? 'border-purple-200 dark:border-purple-700/50' :
+                                                                                                'border-orange-200 dark:border-orange-700/50'
+                                                                            } 
+                                                                        shadow-sm transition-all duration-200`}>
                                                                             {challenge.result === 'approved' ? 'Aprobado' :
                                                                                 challenge.result === 'progress' ? 'En progreso' :
                                                                                     challenge.result === 'disapproved' ? 'Desaprobado' :
