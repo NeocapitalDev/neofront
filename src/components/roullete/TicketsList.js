@@ -33,6 +33,7 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
     }
   };
   const [copiado, setCopiado] = useState(false);
+  console.log(ticket)
   return (
     <div className="mb-3 hover:transform hover:scale-[1.01] transition-all duration-300">
       <div className="bg-black/70 border border-[var(--app-primary)]/30 rounded-lg p-4 hover:border-[var(--app-primary)]/70 transition-colors">
@@ -45,48 +46,63 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
           </div>
 
           {/* Center: Ticket info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-col">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--app-primary)]/70">#{ticket.id}</span>
-                <div className="flex items-center text-xs">
-                  <div className={`w-2 h-2 rounded-full mr-1 ${ticket.habilitado ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                  <span className={ticket.habilitado ? 'text-green-400' : 'text-red-400'}>
-                    {ticket.habilitado ? 'Disponible' : 'Utilizado'}
-                  </span>
-                </div>
-              </div>
+          <div className="flex-1 min-w-0 p-3  rounded-lg shadow-md ">
+  <div className="flex flex-col">
+    {/* Encabezado con ID, porcentaje y estado */}
+    <div className="flex justify-between items-center">
+      <span className="text-sm font-medium text-gray-600">#{ticket.id}</span>
+      <div className="flex items-center text-xs">
+        <div className={`w-3 h-3 rounded-full mr-2 ${ticket.habilitado ? 'bg-green-500' : 'bg-red-500'}`}></div>
+        <span className={`font-medium ${ticket.habilitado ? 'text-green-600' : 'text-red-500'}`}>
+          {ticket.habilitado ? 'Disponible' : 'Utilizado'}
+        </span>
+      </div>
+    </div>
 
-              <div className="flex items-center justify-between mt-1">
-                <h3 className="font-bold text-lg text-[var(--app-primary)] truncate mr-2">
-                  {ticket.codigo || 'No definido'}
-                </h3>
-                <div className="relative flex-shrink-0 flex items-center">
-                  <button
-                    onClick={copiarCodigo}
-                    className="p-1 rounded-full hover:bg-black/30 transition-colors"
-                    title="Copiar código"
-                  >
-                    {copiado ? (
-                      <CheckIcon className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <ClipboardDocumentIcon className="h-5 w-5 text-[var(--app-primary)]" />
-                    )}
-                  </button>
-                  {copiado && (
-                    <div className="ml-2 text-xs text-green-500 bg-black/70 py-1 px-2 rounded whitespace-nowrap">
-                      ¡Copiado!
-                    </div>
-                  )}
-                </div>
-              </div>
 
-              <div className="flex items-center text-xs text-gray-400 mt-1">
-                <ClockIcon className="h-3 w-3 mr-1" />
-                <span>Hasta: {formatDate(ticket.fechaExpiracionTicket)}</span>
-              </div>
-            </div>
+
+    {/* Código y botón de copiar */}
+    <div className="flex items-center justify-between mt-2">
+
+  <span className="text-2xl font-semibold text-amber-500">{ticket.porcentaje}%</span>
+
+ <div className='flex'>
+ <h3 className="font-bold text-xl text-gray-400 truncate">
+    {ticket.codigo || 'No definido'}
+  </h3>
+      
+      <div className="relative flex-shrink-0 flex items-center">
+        <button
+          onClick={copiarCodigo}
+          className="p-2 rounded-full transition-all"
+          title="Copiar código"
+        >
+          {copiado ? (
+            <CheckIcon className="h-5 w-5 text-green-500" />
+          ) : (
+            <ClipboardDocumentIcon className="h-5 w-5 text-gray-600" />
+          )}
+        </button>
+        {copiado && (
+          <div className="ml-2 text-xs text-green-600 bg-gray-800/80 py-1 px-2 rounded-md whitespace-nowrap">
+            ¡Copiado!
           </div>
+        )}
+      </div>
+
+ </div>
+
+
+    </div>
+
+    {/* Fecha de expiración */}
+    <div className="flex items-center text-xs text-gray-500 mt-2">
+      <ClockIcon className="h-4 w-4 mr-1" />
+      <span>Válido hasta: {formatDate(ticket.fechaExpiracionTicket)}</span>
+    </div>
+  </div>
+</div>
+
         </div>
 
         {/* Bottom action section */}
@@ -97,6 +113,7 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
               <div className="flex-1 truncate">
                 <span className="text-xs text-gray-400">Premio:</span>
                 <p className="font-medium text-[var(--app-primary)] truncate">{ticket.premio}</p>
+                
               </div>
             </div>
           ) : (
