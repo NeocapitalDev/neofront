@@ -145,8 +145,8 @@ export default function CertificateVerify() {
 
         {/* Botones de descarga e imagen del certificado */}
         <div className="p-4">
-          <div className="flex justify-center space-x-4">
-            <a
+          {/* <div className="flex justify-center space-x-4">
+            {/* <a
               href={certificate?.pngUrl || '#'} // Ajusta según tu API
               download="certificate.png"
               className="flex items-center rounded-xl bg-yellow-500 px-4 py-3 text-black hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-400"
@@ -187,11 +187,11 @@ export default function CertificateVerify() {
                 />
               </svg>
               <h3 className="text-sm font-medium">Descargar PDF</h3>
-            </a>
-          </div>
+            </a> }
+          </div> */}
 
           {/* AQUÍ USAMOS EL COMPONENTE CERTIFICATES DIRECTAMENTE */}
-          <div className="mt-8 w-full rounded-lg ">
+          <div className=" w-full rounded-lg ">
             <Certificates certificates={certificate} />
           </div>
 
