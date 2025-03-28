@@ -4,7 +4,7 @@
 import * as React from "react";
 import { useSession } from "next-auth/react";
 
-import { Users, Award, UserCheck, Activity, FileCode } from "lucide-react";
+import { Users, Award, UserCheck, Activity, FileCode ,Trophy } from "lucide-react";
 
 import { NavMain } from "@/components/dash/nav-main";
 import { NavUser } from "@/components/dash/nav-user";
@@ -93,6 +93,12 @@ export function AppSidebar({ ...props }) {
           url: "/admin/parameters",
         },
       ],
+    },
+    {
+      title: "Premios",
+      url: "/admin/awards",
+      icon: Trophy ,
+      isActive: false,
     },
   ];
 

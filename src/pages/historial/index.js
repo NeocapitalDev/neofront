@@ -418,7 +418,7 @@ export default function Historial() {
                                                                 </div>
 
                                                                 {/* Botones de acción */}
-                                                                <div className="flex space-x-2">
+                                                                <div className="flex space-x-2 overflow-x-auto overflow-y-hidden">
                                                                     {/* Botones de certificado */}
                                                                     {renderCertificateButtons(challenge)}
 
