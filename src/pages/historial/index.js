@@ -54,13 +54,14 @@ export default function Historial() {
         retry: 'from-orange-200 via-orange-100/80 to-white dark:from-orange-900/40 dark:via-orange-800/20 dark:to-zinc-900',
     };
 
+    // Quitar los bordes de color basados en el estado
     const statusBorderColors = {
-        approved: 'border-green-300 dark:border-green-800',
-        disapproved: 'border-red-300 dark:border-red-800',
-        progress: 'border-yellow-300 dark:border-yellow-800',
+        approved: '',
+        disapproved: '',
+        progress: '',
         init: '',
-        withdrawal: 'border-purple-300 dark:border-purple-800',
-        retry: 'border-orange-300 dark:border-orange-800',
+        withdrawal: '',
+        retry: '',
     };
 
     // Filtrar y agrupar challenges
@@ -290,7 +291,7 @@ export default function Historial() {
                             return (
                                 <div
                                     key={parentId}
-                                    className={`bg-gradient-to-b ${statusGradients[status]} rounded-lg shadow-md border ${statusBorderColors[status]} overflow-hidden relative transition-all duration-200`}
+                                    className={`bg-gradient-to-b ${statusGradients[status]} rounded-lg shadow-md border overflow-hidden relative transition-all duration-200`}
                                 >
                                     {/* Cabecera del Challenge - Mejorada para ambos modos */}
                                     <div className="flex flex-col p-4 relative z-10">
@@ -376,7 +377,7 @@ export default function Historial() {
                                                     return (
                                                         <div
                                                             key={index}
-                                                            className={`p-3 rounded-lg shadow-sm border bg-gradient-to-b ${statusGradients[challenge.result]} ${statusBorderColors[challenge.result]} relative overflow-hidden transition-all duration-200`}
+                                                            className={`p-3 rounded-lg shadow-sm border bg-gradient-to-b ${statusGradients[challenge.result]} relative overflow-hidden transition-all duration-200`}
                                                         >
                                                             <div className="flex flex-col justify-between sm:flex-row relative z-10">
                                                                 {/* Info de la fase */}
