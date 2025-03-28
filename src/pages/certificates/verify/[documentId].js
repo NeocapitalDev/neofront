@@ -204,17 +204,21 @@ export default function CertificateVerify() {
               ¡Obtén el tuyo hoy!
             </div>
             <div className="text-md mt-1 text-center font-light">
-              Te recomendamos revisar nuestras{' '}
-              <span className="font-medium">Reglas de Trading</span> antes de
+              Te recomendamos revisar nuestro{' '}
+              <span className="font-medium">FAQ</span> antes de
               comenzar un challenge.
             </div>
             <div className="mt-10 flex flex-row justify-center gap-4">
-              <button className="rounded-lg bg-yellow-600 px-6 py-2 text-center text-black hover:bg-yellow-800 focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:bg-slate-200 dark:text-black dark:hover:bg-yellow-900 dark:hover:text-slate-200">
-                Reglas de Trading
-              </button>
-              <button className="rounded-lg bg-yellow-600 px-6 py-2 text-center text-black hover:bg-yellow-800 focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:bg-slate-200 dark:text-black dark:hover:bg-yellow-900 dark:hover:text-slate-200">
-                Crear Cuenta
-              </button>
+              <Link href="https://neocapitalfunding.com/faq"> 
+                <button className="rounded-lg bg-yellow-600 px-6 py-2 text-center text-black hover:bg-yellow-800 focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:bg-slate-200 dark:text-black dark:hover:bg-yellow-900 dark:hover:text-slate-200">
+                  FAQ
+                </button>
+              </Link>
+              <Link href="/register">
+                <button className="rounded-lg bg-yellow-600 px-6 py-2 text-center text-black hover:bg-yellow-800 focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:bg-slate-200 dark:text-black dark:hover:bg-yellow-900 dark:hover:text-slate-200">
+                  Crear Cuenta
+                </button>
+              </Link>
             </div>
           </div>
         </div>

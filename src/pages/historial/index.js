@@ -312,8 +312,8 @@ export default function Historial() {
                                                     )}
                                                 </button>
 
-                                                {/* Botón de metrix */}
-                                                <Link href={lastChallenge.result === 'progress' ? `/historial/${lastChallenge.documentId}` : `/historial/${lastChallenge.documentId}`}>
+                                                {/* Botón de metrix - PRIMERA MODIFICACIÓN */}
+                                                <Link href={`/metrix/${lastChallenge.documentId}`}>
                                                     <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-sm transition-all duration-200">
                                                         <ChartBarIcon className="h-4 w-4 mr-1" />
                                                         <span>Metrix</span>
@@ -421,10 +421,8 @@ export default function Historial() {
                                                                     {/* Botones de certificado */}
                                                                     {renderCertificateButtons(challenge)}
 
-                                                                    {/* Botón de detalles */}
-                                                                    <Link
-                                                                        href={challenge.result === 'progress' ? `/metrix2/${challenge.documentId}` : `/historial/${challenge.documentId}`}
-                                                                    >
+                                                                    {/* Botón de detalles - SEGUNDA MODIFICACIÓN */}
+                                                                    <Link href={`/metrix/${challenge.documentId}`}>
                                                                         <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
                                                                             <ChartBarIcon className="h-3 w-3 mr-1" />
                                                                             <span>Ver detalles</span>
