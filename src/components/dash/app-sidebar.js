@@ -4,7 +4,7 @@
 import * as React from "react";
 import { useSession } from "next-auth/react";
 
-import { Users, Award, UserCheck, Activity } from "lucide-react";
+import { Users, Award, UserCheck, Activity, FileCode } from "lucide-react";
 
 import { NavMain } from "@/components/dash/nav-main";
 import { NavUser } from "@/components/dash/nav-user";
@@ -19,10 +19,6 @@ import md5 from 'md5';
 export function AppSidebar({ ...props }) {
   const { data: session, status } = useSession();
   const [userData, setUserData] = React.useState(null);
-
-
-
-
 
   // Efecto para actualizar el estado cuando session esté disponible
   React.useEffect(() => {
@@ -53,16 +49,6 @@ export function AppSidebar({ ...props }) {
       url: "/admin/users",
       icon: Users,
       isActive: false,
-      //   items: [
-      //     {
-      //       title: "History",
-      //       url: "/admin/users/history",
-      //     },
-      //     {
-      //       title: "Settings",
-      //       url: "/admin/users/settings",
-      //     },
-      //   ],
     },
     {
       title: "Challenges",
@@ -89,25 +75,25 @@ export function AppSidebar({ ...props }) {
       isActive: false,
     },
     {
-      title: "Steps",
-      url: "/admin/steps",
-      icon: Activity,
+      title: "Creador de challenges",
+      url: "#",
+      icon: FileCode,
       isActive: false,
+      items: [
+        {
+          title: "Steps",
+          url: "/admin/steps",
+        },
+        {
+          title: "Manager",
+          url: "/admin/manager",
+        },
+        {
+          title: "Parameters",
+          url: "/admin/parameters",
+        },
+      ],
     },
-    {
-      title: "Manager",
-      url: "/admin/manager",
-      icon: Activity,
-      isActive: false,
-    },
-    {
-      title: "Parameters",
-      url: "/admin/parameters",
-      icon: Activity,
-      isActive: false,
-    },
-
-
   ];
 
   return (
