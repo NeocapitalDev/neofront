@@ -50,6 +50,16 @@ const Certificados = ({ certificates }) => {
             color: rgb(0.8, 0.8, 0.8),
           });
 
+          // Dibujar fondo ámbar detrás del QR
+          firstPage.drawRectangle({
+            x: width / 2 + 865,
+            y: height / 2 - 455,
+            width: 250,
+            height: 250,
+            color: rgb(1, 0.8, 0),  // Color ámbar
+            borderWidth: 0,
+          });
+          
           firstPage.drawImage(qrImage, {
             x: width / 2 + 880,
             y: height / 2 - 440,
@@ -81,11 +91,22 @@ const Certificados = ({ certificates }) => {
             color: rgb(0.8, 0.8, 0.8),
           });
 
+          // Nuevo posicionamiento del QR para que aparezca a la derecha como en el certificado de retiro
+          // Dibujar fondo ámbar detrás del QR
+          firstPage.drawRectangle({
+            x: width / 2 + 865,
+            y: height / 2 - 455,
+            width: 250,
+            height: 250,
+            color: rgb(1, 0.8, 0),  // Color ámbar
+            borderWidth: 0,
+          });
+          
           firstPage.drawImage(qrImage, {
-            x: width / 2 - 450,
-            y: height / 2 - 700,
-            width: 150,
-            height: 150,
+            x: width / 2 + 880,
+            y: height / 2 - 440,
+            width: 220,
+            height: 220,
           });
         }
 
@@ -103,14 +124,14 @@ const Certificados = ({ certificates }) => {
   }, [certificates]);
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex justify-center items-center w-full">
       {pdfUrl ? (
         <div className="flex justify-center items-center w-full">
           <iframe
             src={pdfUrl}
             width="90%"
-            height="670px"
-            className="border rounded-lg shadow-lg max-w-[900px]"
+            height="610px"
+            className="border rounded-lg shadow-lg w-full"
           ></iframe>
         </div>
       ) : error ? (

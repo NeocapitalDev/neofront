@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
+import Link from "next/link"; // Añadido para los enlaces directos a certificados
 import Loader from "../../components/loaders/loader";
 import WinLoss from "../../components/metrix/winloss";
 import Statistics from "../../components/metrix/statistics";
@@ -10,7 +11,6 @@ import MyPage from "../../components/metrix/grafico";
 import Objetivos from "../../components/metrix/objetivos";
 import RelatedChallenges from "../../components/challenges/RelatedChallenges";
 import { BarChart, Landmark, FileChartColumn, ChartCandlestick, FileChartPie } from "lucide-react";
-import Certificates from "./certificates";
 import { BadgeCheck } from "lucide-react"; // Ícono similar a un certificado
 
 // Fetcher simplificado para GET requests
@@ -69,9 +69,6 @@ const Metrix = () => {
   const [profitTargetPercent, setProfitTargetPercent] = useState(10); // fallback
   const [maxDrawdownAbsolute, setMaxDrawdownAbsolute] = useState(null);
   const [profitTargetAbsolute, setProfitTargetAbsolute] = useState(null);
-
-  const [isModalPdfOpen, setIsModalPdfOpen] = useState(false);
-  const [selectedCertificate, setSelectedCertificate] = useState(null);
 
   // Obtener datos básicos del usuario con sus challenges
   const { data: userData, error, isLoading } = useSWR(
@@ -359,8 +356,8 @@ const Metrix = () => {
       </div>
     );
   }
-  console.log(currentChallenge)
-  console.log(currentChallenge.certificates.length)
+  console.log(currentChallenge);
+  console.log(currentChallenge.certificates?.length);
 
   return (
     <div>
@@ -389,10 +386,6 @@ const Metrix = () => {
                 Balance Inicial: $
                 {initialBalance != null ? initialBalance : "-"}
               </span>
-              {/* <span className={`${metadataStats?.profitPercent >= 0 ? "text-green-500" : "text-red-500"} font-medium`}>
-                {metadataStats?.profitPercent >= 0 ? "+" : ""}
-                {metadataStats?.profitPercent != null ? metadataStats.profitPercent : "-"}%
-              </span> */}
             </div>
           </div>
         </div>
@@ -538,84 +531,48 @@ const Metrix = () => {
                 </div>
               </div>
 
-              {/* Certificados para pantallas grandes */}
+              {/* Certificados para pantallas grandes - MODIFICADO para usar enlaces directos */}
               <div className="hidden lg:block">
                 <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
                   <h2 className="text-base font-semibold mb-2">Certificados</h2>
 
-
-
-                  {currentChallenge?.certificates && (
-  <>
-    {currentChallenge?.result === "approved" &&
-      (currentChallenge?.phase === 1 ||
-        currentChallenge?.phase === 2 ||
-        currentChallenge?.phase === 3) && (
-        <button
-          className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
-          onClick={() => setIsModalPdfOpen(true)}
-        >
-          <BadgeCheck size={20} /> Ver Certificado
-        </button>
-      )}
-
-    {currentChallenge?.result === "withdrawal" &&
-      currentChallenge?.phase === 3 && (
-
-      <div>
-        <button
-          className="flex mt-5 items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
-          onClick={() => {
-            setSelectedCertificate(currentChallenge?.certificates?.[0]);
-            setIsModalPdfOpen(true);
-          }}>
-          <BadgeCheck size={20} /> Ver Certificados
-        </button>
-
-
-        <button
-          className="flex mt-5 items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
-          onClick={() => {
-            setSelectedCertificate(currentChallenge?.certificates?.[1]);
-            setIsModalPdfOpen(true);
-          }}>
-          <BadgeCheck size={20} /> Ver Certificados
-        </button>
-      </div>
-
-
-
-        
-      )}
-  </>
-)}
-
-{!currentChallenge?.certificates && (
-  <p className="text-sm text-center p-3">
-    No hay información de certificados disponibles
-  </p>
-)}
-
-                  {isModalPdfOpen && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                      <div className="bg-black p-2 rounded-lg shadow-lg w-full max-w-5xl overflow-y-auto">
-                        <h2 className="text-lg font-bold mb-4 px-4">Certificado</h2>
-                        <Certificates certificates={selectedCertificate} />
-                        <div className="mt-4 flex justify-end">
-                          <button
-                            className="px-4 py-2 bg-gray-400 text-black rounded-md hover:bg-gray-500"
-                            onClick={() => setIsModalPdfOpen(false)}
-                          >
-                            Cerrar
+                  {currentChallenge?.certificates && currentChallenge?.certificates.length > 0 ? (
+                    <>
+                      {/* Caso 1: Fase 1, 2, o 3 con resultado "approved" */}
+                      {currentChallenge.result === "approved" && currentChallenge.certificates[0] && (
+                        <Link href={`/certificates/verify/${currentChallenge.certificates[0].documentId}`}>
+                          <button className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 w-full">
+                            <BadgeCheck size={20} /> Ver Certificado
                           </button>
+                        </Link>
+                      )}
+
+                      {/* Caso 2: Fase 3 con resultado "withdrawal" */}
+                      {currentChallenge.result === "withdrawal" && currentChallenge.phase === 3 && (
+                        <div className="space-y-3">
+                          {currentChallenge.certificates[0] && (
+                            <Link href={`/certificates/verify/${currentChallenge.certificates[0].documentId}`}>
+                              <button className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 w-full">
+                                <BadgeCheck size={20} /> Ver Certificado Fase 3
+                              </button>
+                            </Link>
+                          )}
+                          
+                          {currentChallenge.certificates[1] && (
+                            <Link href={`/certificates/verify/${currentChallenge.certificates[1].documentId}`}>
+                              <button className="flex mt-3 items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 w-full">
+                                <BadgeCheck size={20} /> Ver Certificado Retirado
+                              </button>
+                            </Link>
+                          )}
                         </div>
-                      </div>
-                    </div>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-sm text-center p-3">
+                      No hay información de certificados disponibles
+                    </p>
                   )}
-
-
-
-                  
                 </div>
               </div>
             </div>
@@ -623,48 +580,47 @@ const Metrix = () => {
         </div>
       </div>
 
-      {/* Certificados para pantallas chicas (se muestra al final de todo) */}
+      {/* Certificados para pantallas chicas - MODIFICADO para usar enlaces directos */}
       <div className="block lg:hidden mt-4">
         <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
           <h2 className="text-base font-semibold mb-2">Certificados</h2>
-          {currentChallenge?.result === "approved" && (
+
+          {currentChallenge?.certificates && currentChallenge?.certificates.length > 0 ? (
             <>
-              {currentChallenge?.certificates.length > 0 ? (
-                currentChallenge?.phase === 1 ||
-                currentChallenge?.phase === 2 ||
-                (currentChallenge?.phase === 3 &&
-                  currentChallenge?.result === "withdrawal") ? (
-                  <button
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
-                    onClick={() => setIsModalPdfOpen(true)}
-                  >
+              {/* Caso 1: Fase 1, 2, o 3 con resultado "approved" */}
+              {currentChallenge.result === "approved" && currentChallenge.certificates[0] && (
+                <Link href={`/certificates/verify/${currentChallenge.certificates[0].documentId}`}>
+                  <button className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 w-full">
                     <BadgeCheck size={20} /> Ver Certificado
                   </button>
-                ) : (
-                  <div className="text-center p-3">
-                    <p className="text-sm">No hay información de certificados disponibles</p>
-                  </div>
-                )
-              ) : (
-                <p className="text-sm">No hay información de certificados disponibles</p>
+                </Link>
+              )}
+
+              {/* Caso 2: Fase 3 con resultado "withdrawal" */}
+              {currentChallenge.result === "withdrawal" && currentChallenge.phase === 3 && (
+                <div className="space-y-3">
+                  {currentChallenge.certificates[0] && (
+                    <Link href={`/certificates/verify/${currentChallenge.certificates[0].documentId}`}>
+                      <button className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 w-full">
+                        <BadgeCheck size={20} /> Ver Certificado Fase 3
+                      </button>
+                    </Link>
+                  )}
+                  
+                  {currentChallenge.certificates[1] && (
+                    <Link href={`/certificates/verify/${currentChallenge.certificates[1].documentId}`}>
+                      <button className="flex mt-3 items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 w-full">
+                        <BadgeCheck size={20} /> Ver Certificado Retirado
+                      </button>
+                    </Link>
+                  )}
+                </div>
               )}
             </>
-          )}
-          {isModalPdfOpen && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-              <div className="bg-black p-6 rounded-lg shadow-lg w-full max-w-5xl h-auto max-h-[70vh] overflow-y-auto">
-                <h2 className="text-lg font-bold mb-4">Certificado</h2>
-                <Certificates certificates={[selectedCertificate]} />
-                <div className="mt-4 flex justify-end">
-                  <button
-                    className="px-4 py-2 bg-gray-400 text-black rounded-md hover:bg-gray-500"
-                    onClick={() => setIsModalPdfOpen(false)}
-                  >
-                    Cerrar
-                  </button>
-                </div>
-              </div>
-            </div>
+          ) : (
+            <p className="text-sm text-center p-3">
+              No hay información de certificados disponibles
+            </p>
           )}
         </div>
       </div>
