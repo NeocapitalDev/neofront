@@ -16,6 +16,7 @@ export const navigation = [
 
 export const userNavigation = [
     { name: 'Tu perfil', href: '/profile' },
+    { name: 'Administrador', href: '/admin/dashboard', adminOnly: true },
     { name: 'Retiros', href: '/billing' },
     { name: 'Cerrar sesión', href: '/', signOut: true },
 ];

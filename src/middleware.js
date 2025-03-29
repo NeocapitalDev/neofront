@@ -14,7 +14,7 @@ export default withAuth(
     }
     // Si el usuario intenta acceder a /admin y es admin, redirigir a /admin/users
     if (pathname === "/admin" && userRole === "Webmaster") {
-      return NextResponse.redirect(new URL("/admin/users", req.url));
+      return NextResponse.redirect(new URL("/admin/dashboard", req.url));
     }
 
     // Si la ruta es /admin y el usuario no es admin, redirigir a /403

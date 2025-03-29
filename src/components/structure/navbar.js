@@ -84,6 +84,21 @@ export default function Navbar() {
                 {/* Menú de usuario y notificaciones */}
                 {session && (
                   <div className="flex items-center gap-x-4">
+
+                    {/* Theme Toggle */}
+                    <ThemeToggle />
+
+                    {/* Notificaciones */}
+                    <Notifications />
+
+
+                    {/* Mostrar el ícono solo si el rol es 'admin'
+                    {session.roleName === 'Webmaster' && (
+                      <Link href="/admin">
+                        <PresentationChartBarIcon className="h-6 w-6 text-red-500 cursor-pointer" />
+                      </Link>
+                    )} */}
+
                     {/* Correo electrónico (visible solo en escritorio) */}
                     <p className="hidden lg:block text-white text-sm font-medium">
                       {session.firstName}
@@ -105,43 +120,41 @@ export default function Navbar() {
                         leaveTo="transform opacity-0 scale-95"
                       >
                         <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md shadow-lg bg-white dark:bg-black p-1 ring-1 ring-zinc-200 dark:ring-zinc-800 focus:outline-none">
-                          {userNavigation.map((item) => (
-                            <Menu.Item key={item.name}>
-                              {({ active }) => (
-                                <Link
-                                  href={item.href}
-                                  className={`block p-2 rounded-sm text-sm ${item.signOut ? 'text-red-600' : 'text-black dark:text-white'} ${active ? 'bg-zinc-100 dark:bg-zinc-800' : ''
-                                    }`}
-                                  onClick={item.signOut ? handleSignOut : undefined}
-                                  target={item.external ? '_blank' : undefined}
-                                >
-                                  <div className="flex items-center">
-                                    {item.name}
-                                    {item.external && (
-                                      <ArrowTopRightOnSquareIcon className="h-3.5 w-3.5 ml-2 text-white" />
-                                    )}
-                                  </div>
-                                </Link>
-                              )}
-                            </Menu.Item>
-                          ))}
+                          {userNavigation
+                            .filter((item) => {
+                              // Si el item es solo para administradores, se muestra solo si el usuario tiene el rol adecuado.
+                              if (item.adminOnly && session.roleName !== 'Webmaster') return false;
+                              return true;
+                            })
+                            .map((item) => (
+                              <Menu.Item key={item.name}>
+                                {({ active }) => (
+                                  <Link
+                                    href={item.href}
+                                    className={`block p-2 rounded-sm text-sm ${item.signOut
+                                        ? 'text-red-600'
+                                        : item.adminOnly
+                                          ? 'text-amber-500'
+                                          : 'text-black dark:text-white'
+                                      } ${active ? 'bg-zinc-100 dark:bg-zinc-800' : ''}`}
+                                    onClick={item.signOut ? handleSignOut : undefined}
+                                    target={item.external ? '_blank' : undefined}
+                                  >
+                                    <div className="flex items-center">
+                                      {item.name}
+                                      {item.external && (
+                                        <ArrowTopRightOnSquareIcon className="h-3.5 w-3.5 ml-2 text-white" />
+                                      )}
+                                    </div>
+                                  </Link>
+                                )}
+                              </Menu.Item>
+                            ))}
+
+
                         </Menu.Items>
                       </Transition>
                     </Menu>
-
-                    {/* Theme Toggle */}
-                    <ThemeToggle />
-
-                    {/* Notificaciones */}
-                    <Notifications />
-
-
-                    {/* Mostrar el ícono solo si el rol es 'admin' */}
-                    {session.roleName === 'Webmaster' && (
-                      <Link href="/admin">
-                        <PresentationChartBarIcon className="h-6 w-6 text-red-500 cursor-pointer" />
-                      </Link>
-                    )}
 
 
                   </div>
