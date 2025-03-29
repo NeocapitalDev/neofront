@@ -45,10 +45,16 @@ const Certificados = ({ certificates }) => {
         // independientemente del tamaño de pantalla
         let nameX, nameY, dateX, dateY, qrX, qrY, qrBgX, qrBgY, montoX, montoY, montoSize;
         
+        // Nombre completo para calcular centrado
+        const fullName = `${certificates.firstName} ${certificates.lastName}`;
+        
         if (isRetiro) {
           // Posiciones para certificado de retiro
-          nameX = width / 2 - (isMobile ? 300 : 420);
+          // Centramos el nombre en el certificado
+          const nameWidth = font.widthOfTextAtSize(fullName, nameFontSize);
+          nameX = width / 2 - nameWidth / 2;
           nameY = height / 2 - (isMobile ? 100 : 140);
+          
           dateX = width / 2 - (isMobile ? 300 : 420);
           dateY = height / 2 - (isMobile ? 500 : 540);
           qrBgX = width / 2 + (isMobile ? 700 : 865);
@@ -60,10 +66,15 @@ const Certificados = ({ certificates }) => {
           montoSize = isMobile ? 70 : 100;
         } else {
           // Posiciones para certificado normal
-          nameX = width / 2 - (isMobile ? 350 : 460);
-          nameY = height / 2 - (isMobile ? 100 : 130);
+          // Centramos el nombre en el certificado (usando la posición de la imagen como referencia)
+          const nameWidth = font.widthOfTextAtSize(fullName, nameFontSize);
+          nameX = width / 2 - nameWidth / 2;
+          nameY = height / 2 - (isMobile ? 60 : 80); // Ajustado para que esté en la posición correcta vertical
+          
+          // Mantenemos la posición original de la fecha
           dateX = width / 2 - (isMobile ? 350 : 450);
           dateY = height / 2 - (isMobile ? 500 : 530);
+          
           qrBgX = width / 2 + (isMobile ? 700 : 865);
           qrBgY = height / 2 - (isMobile ? 400 : 455);
           qrX = qrBgX + 15;
@@ -121,7 +132,7 @@ const Certificados = ({ certificates }) => {
             y: nameY,
             size: nameFontSize,
             font,
-            color: rgb(0.8, 0.8, 0.8),
+            color: rgb(0.8, 0.8, 0.8), // Color blanco/gris claro
           });
 
           firstPage.drawText(`${certificates.fechaFinChallenge}`, {
@@ -196,7 +207,7 @@ const Certificados = ({ certificates }) => {
   // Si está cargando, mostramos un spinner
   if (loading) {
     return (
-      <div className="flex justify-center items-center w-full h-64">
+      <div className="flex justify-center items-center w-full h-64 bg-gray-50 dark:bg-zinc-900 rounded-lg">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
       </div>
     );
@@ -208,40 +219,27 @@ const Certificados = ({ certificates }) => {
         <div className="flex flex-col w-full">
           {/* Contenedor responsivo para el PDF */}
           <div 
-            className="w-full overflow-auto bg-white dark:bg-zinc-900 rounded-lg shadow-lg"
-            style={{ 
-              maxHeight: 'calc(100vh - 200px)',
-              minHeight: '300px'
-            }}
+            className="w-full h-[350px] md:h-[600px] lg:h-[600px] overflow-hidden bg-gray-50 dark:bg-zinc-900 rounded-lg shadow-md dark:shadow-zinc-800/50"
           >
-            <div 
-              style={{ 
-                transform: `scale(${zoom/100})`, 
-                transformOrigin: 'top center',
-                width: `${100/(zoom/100)}%`,
-                margin: '0 auto'
-              }}
-            >
-              <iframe
-                src={pdfUrl}
-                width="100%"
-                className="border rounded-lg h-[500px] md:h-[600px] lg:h-[750px]"
-                title="Certificado PDF"
-              ></iframe>
-            </div>
+            <iframe
+              src={pdfUrl}
+              width="100%"
+              height="100%"
+              className="border-0"
+              title="Certificado PDF"
+              style={{ overflow: 'auto' }}
+            ></iframe>
           </div>
-          
-          
         </div>
       ) : error ? (
-        <div className="w-full p-6 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-lg">
+        <div className="w-full p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 rounded-lg shadow-sm">
           <p className="text-lg text-red-600 dark:text-red-400 flex items-center">
             <span className="mr-2">⚠️</span> 
             Error: {error}
           </p>
         </div>
       ) : (
-        <div className="w-full p-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 rounded-lg">
+        <div className="w-full p-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/30 rounded-lg shadow-sm">
           <p className="text-lg text-amber-600 dark:text-amber-400 flex items-center">
             <span className="mr-2">⚠️</span>
             No hay certificados disponibles
