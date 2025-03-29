@@ -3,8 +3,11 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Loader from '../../../components/loaders/loader';
 // Importamos el componente Certificates existente - ajusta la ruta según tu estructura de archivos
 import Certificates from "../../metrix2/certificates";
+// Importamos el componente Toaster y la función toast de sonner
+import { Toaster, toast } from 'sonner';
 
 export default function CertificateVerify() {
   const router = useRouter();
@@ -36,13 +39,18 @@ export default function CertificateVerify() {
   }, [documentId]);
 
   // Mostrar estado de carga
+  
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-black-light flex items-center justify-center">
-        <p className="text-gray-600 dark:text-gray-300">Cargando...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center">
+        <div className="dark:text-gray-600 text-gray-300">
+          <Loader />
+        </div>
       </div>
     );
   }
+  
+  //if (loading) return <Loader />;
 
   // Mostrar error si ocurre
   if (error) {
@@ -55,6 +63,12 @@ export default function CertificateVerify() {
 
   // URL actual para compartir
   const shareUrl = `https://web.neocapitalfunding.com/certificates/verify/${documentId}`;
+
+  // Función para copiar al portapapeles y mostrar la notificación
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shareUrl);
+    toast.success('Copiado al portapapeles');
+  };
 
   return (
     <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-4 md:p-8">
@@ -120,7 +134,7 @@ export default function CertificateVerify() {
             <div className="mt-4 text-yellow-500 break-all">{shareUrl}</div>
             <div className="mt-2 flex justify-center">
             <button
-                onClick={() => navigator.clipboard.writeText(shareUrl)}
+                onClick={copyToClipboard}
                 className="flex w-28 justify-center rounded-xl bg-yellow-100 p-2 hover:bg-yellow-200 focus:outline-none focus:ring-4 focus:ring-yellow-200 dark:bg-yellow-500"
             >
                 <svg
@@ -232,6 +246,8 @@ export default function CertificateVerify() {
           </div>
         </div>
       </div>
+      {/* Agregamos el componente Toaster al final del documento */}
+      <Toaster position="top-right" richColors />
     </div>
   );
 }
