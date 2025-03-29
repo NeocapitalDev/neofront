@@ -6,6 +6,19 @@ const Certificados = ({ certificates }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [zoom, setZoom] = useState(100);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Detectar si es dispositivo móvil
+    setIsMobile(window.innerWidth < 768);
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const loadPdf = async () => {
@@ -31,57 +44,55 @@ const Certificados = ({ certificates }) => {
         const firstPage = pages[0];
         const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
         const { width, height } = firstPage.getSize();
-
-        // Determinar si estamos en un dispositivo móvil
-        const isMobile = window.innerWidth < 768;
         
         // Ajustar tamaños y posiciones según el dispositivo
-        const nameFontSize = isMobile ? 60 : 90;
-        const dateFontSize = isMobile ? 30 : 45;
-        const qrSize = isMobile ? 150 : 220;
-        const qrBackgroundSize = isMobile ? 180 : 250;
+        const detected = window.innerWidth < 768;
         
-        // Calcular posiciones ajustadas que mantengan las proporciones
-        // independientemente del tamaño de pantalla
-        let nameX, nameY, dateX, dateY, qrX, qrY, qrBgX, qrBgY, montoX, montoY, montoSize;
+        // Escalar el tamaño de la fuente para móviles
+        const scaleFactor = detected ? 0.7 : 1;
+        const nameFontSize = 90 * scaleFactor;
+        const dateFontSize = 45 * scaleFactor;
+        const qrSize = 200 * scaleFactor;
+        const qrBackgroundSize = 230 * scaleFactor;
         
-        // Nombre completo para calcular centrado
+        // Calcular posiciones usando porcentajes del tamaño del PDF
         const fullName = `${certificates.firstName} ${certificates.lastName}`;
+        const nameWidth = font.widthOfTextAtSize(fullName, nameFontSize);
+        
+        // Posicionar usando porcentajes para mejor adaptabilidad
+        let nameX, nameY, dateX, dateY, qrX, qrY, qrBgX, qrBgY, montoX, montoY, montoSize;
         
         if (isRetiro) {
           // Posiciones para certificado de retiro
-          // Centramos el nombre en el certificado
-          const nameWidth = font.widthOfTextAtSize(fullName, nameFontSize);
-          nameX = width / 2 - nameWidth / 2;
-          nameY = height / 2 - (isMobile ? 100 : 140);
+          nameX = width / 2 - nameWidth / 2; // Centrado
+          nameY = height * 0.48; // Posición relativa
           
-          dateX = width / 2 - (isMobile ? 300 : 420);
-          dateY = height / 2 - (isMobile ? 500 : 540);
-          qrBgX = width / 2 + (isMobile ? 700 : 865);
-          qrBgY = height / 2 - (isMobile ? 400 : 455);
+          dateX = width * 0.25;
+          dateY = height * 0.2;
+          
+          qrBgX = width * 0.68;
+          qrBgY = height * 0.28;
           qrX = qrBgX + 15;
           qrY = qrBgY + 15;
-          montoX = width / 2 - (isMobile ? 150 : 190);
-          montoY = height / 2 - (isMobile ? 280 : 320);
-          montoSize = isMobile ? 70 : 100;
+          
+          montoX = width * 0.38;
+          montoY = height * 0.36;
+          montoSize = 100 * scaleFactor;
         } else {
           // Posiciones para certificado normal
-          // Centramos el nombre en el certificado (usando la posición de la imagen como referencia)
-          const nameWidth = font.widthOfTextAtSize(fullName, nameFontSize);
-          nameX = width / 2 - nameWidth / 2;
-          nameY = height / 2 - (isMobile ? 60 : 80); // Ajustado para que esté en la posición correcta vertical
+          nameX = width / 2 - nameWidth / 2; // Centrado
+          nameY = height * 0.46; // Posición relativa
           
-          // Mantenemos la posición original de la fecha
-          dateX = width / 2 - (isMobile ? 350 : 450);
-          dateY = height / 2 - (isMobile ? 500 : 530);
+          dateX = width * 0.25;
+          dateY = height * 0.2;
           
-          qrBgX = width / 2 + (isMobile ? 700 : 865);
-          qrBgY = height / 2 - (isMobile ? 400 : 455);
+          qrBgX = width * 0.68;
+          qrBgY = height * 0.28;
           qrX = qrBgX + 15;
           qrY = qrBgY + 15;
         }
 
-        // Usar directamente la imagen QR en base64
+        // Usar la imagen QR
         const qrImageBytes = await fetch(certificates.qrLink).then(res => res.arrayBuffer());
         const qrImage = await pdfDoc.embedPng(qrImageBytes);
 
@@ -132,7 +143,7 @@ const Certificados = ({ certificates }) => {
             y: nameY,
             size: nameFontSize,
             font,
-            color: rgb(0.8, 0.8, 0.8), // Color blanco/gris claro
+            color: rgb(0.8, 0.8, 0.8),
           });
 
           firstPage.drawText(`${certificates.fechaFinChallenge}`, {
@@ -195,15 +206,6 @@ const Certificados = ({ certificates }) => {
     document.body.removeChild(link);
   };
 
-  // Funciones para el zoom
-  const handleZoomIn = () => {
-    setZoom(prev => Math.min(prev + 20, 200));
-  };
-
-  const handleZoomOut = () => {
-    setZoom(prev => Math.max(prev - 20, 60));
-  };
-
   // Si está cargando, mostramos un spinner
   if (loading) {
     return (
@@ -219,16 +221,32 @@ const Certificados = ({ certificates }) => {
         <div className="flex flex-col w-full">
           {/* Contenedor responsivo para el PDF */}
           <div 
-            className="w-full h-[350px] md:h-[600px] lg:h-[600px] overflow-hidden bg-gray-50 dark:bg-zinc-900 rounded-lg shadow-md dark:shadow-zinc-800/50"
+            className="w-full rounded-lg shadow-md overflow-hidden"
+            style={{ 
+              height: isMobile ? "450px" : "600px",
+              backgroundColor: "#1c1c1c" // Fondo oscuro para mantener la estética
+            }}
           >
-            <iframe
-              src={pdfUrl}
-              width="100%"
-              height="100%"
-              className="border-0"
-              title="Certificado PDF"
-              style={{ overflow: 'auto' }}
-            ></iframe>
+            {isMobile ? (
+              // Para móviles, usamos embed para mantener los controles
+              <embed
+                src={pdfUrl}
+                type="application/pdf"
+                width="100%"
+                height="100%"
+                className="border-0"
+              />
+            ) : (
+              // Para desktop, mantenemos el iframe original
+              <iframe
+                src={pdfUrl}
+                width="100%"
+                height="100%"
+                className="border-0"
+                title="Certificado PDF"
+                style={{ overflow: 'auto' }}
+              ></iframe>
+            )}
           </div>
         </div>
       ) : error ? (

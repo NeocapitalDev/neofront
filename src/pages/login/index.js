@@ -18,14 +18,21 @@ export default function SignIn() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+  
+    // Verificar que el captcha haya sido completado
+    if (!captchaToken) {
+      toast.error("Por favor, completa el CAPTCHA.");
+      return; // Se detiene la ejecución si no se ha completado el CAPTCHA
+    }
+  
     setIsSubmitting(true);
-
+  
     const result = await signIn('credentials', {
       redirect: false,
       email: e.target.email.value,
       password: e.target.password.value,
     });
-
+  
     if (result.ok) {
       const callbackUrl = new URLSearchParams(window.location.search).get('callbackUrl');
       if (callbackUrl) {
@@ -45,6 +52,7 @@ export default function SignIn() {
       setIsSubmitting(false);
     }
   };
+  
 
   // Función para verificar el estado del usuario en Strapi
   const checkUserConfirmation = async (email) => {
@@ -129,7 +137,8 @@ export default function SignIn() {
               <label htmlFor="password" className="block text-sm font-medium text-gray-300">
                 Contraseña
               </label>
-              <Link href="/forgot-password" className="text-sm text-[var(--app-primary)] hover:text-[var(--app-secondary)] transition">
+              {/* Enlace visible solo en pantallas medianas y grandes */}
+              <Link href="/forgot-password" className="hidden sm:block text-sm text-[var(--app-primary)] hover:text-[var(--app-secondary)] transition">
                 ¿Has olvidado tu contraseña?
               </Link>
             </div>
@@ -156,6 +165,12 @@ export default function SignIn() {
                   <EyeIcon className="h-5 w-5" aria-hidden="true" />
                 )}
               </button>
+            </div>
+            {/* Enlace visible solo en móviles */}
+            <div className="mt-1 sm:hidden">
+              <Link href="/forgot-password" className="text-sm text-[var(--app-primary)] hover:text-[var(--app-secondary)] transition">
+                ¿Has olvidado tu contraseña?
+              </Link>
             </div>
           </div>
 
