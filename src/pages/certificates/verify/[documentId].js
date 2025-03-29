@@ -3,8 +3,11 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Loader from '../../../components/loaders/loader';
 // Importamos el componente Certificates existente - ajusta la ruta según tu estructura de archivos
 import Certificates from "../../metrix2/certificates";
+// Importamos el componente Toaster y la función toast de sonner
+import { Toaster, toast } from 'sonner';
 
 export default function CertificateVerify() {
   const router = useRouter();
@@ -36,16 +39,18 @@ export default function CertificateVerify() {
   }, [documentId]);
 
   // Mostrar estado de carga
+  
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-black-light flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
-          <p className="text-gray-600 dark:text-gray-300">Cargando...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center">
+        <div className="dark:text-gray-600 text-gray-300">
+          <Loader />
         </div>
       </div>
     );
   }
+  
+  //if (loading) return <Loader />;
 
   // Mostrar error si ocurre
   if (error) {
@@ -70,6 +75,12 @@ export default function CertificateVerify() {
 
   // URL actual para compartir
   const shareUrl = `https://web.neocapitalfunding.com/certificates/verify/${documentId}`;
+
+  // Función para copiar al portapapeles y mostrar la notificación
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shareUrl);
+    toast.success('Copiado al portapapeles');
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-zinc-900 flex flex-col items-center justify-center p-4 md:p-8">
@@ -139,15 +150,12 @@ export default function CertificateVerify() {
                 Comparte esta página con otros
               </h2>
             </div>
-            <div className="mt-4 text-amber-600 dark:text-yellow-500 break-all font-medium">{shareUrl}</div>
-            <div className="mt-4 flex justify-center">
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(shareUrl);
-                  // Opcional: Mostrar un mensaje de "Copiado" usando un estado
-                }}
-                className="flex w-32 justify-center rounded-xl bg-amber-100 dark:bg-yellow-500/80 p-2 text-amber-700 dark:text-black font-medium hover:bg-amber-200 dark:hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-4 focus:ring-amber-200 dark:focus:ring-yellow-600/50"
-              >
+            <div className="mt-4 text-yellow-500 break-all">{shareUrl}</div>
+            <div className="mt-2 flex justify-center">
+            <button
+                onClick={copyToClipboard}
+                className="flex w-28 justify-center rounded-xl bg-yellow-100 p-2 hover:bg-yellow-200 focus:outline-none focus:ring-4 focus:ring-yellow-200 dark:bg-yellow-500"
+            >
                 <svg
                   className="h-6 w-6 text-black dark:text-black"
                   viewBox="0 0 29 28"
@@ -209,12 +217,8 @@ export default function CertificateVerify() {
           </div>
         </div>
       </div>
-
-      {/* Footer con branding */}
-      <div className="mt-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-        <p>© {new Date().getFullYear()} NeoCapital Funding. Todos los derechos reservados.</p>
-        <p className="mt-1">Verificación segura de certificados</p>
-      </div>
+      {/* Agregamos el componente Toaster al final del documento */}
+      <Toaster position="top-right" richColors />
     </div>
   );
 }
