@@ -410,18 +410,16 @@ export default function Historial() {
                                                                         </span>
                                                                     </div>
                                                                     <div className="flex text-gray-600 text-xs dark:text-gray-300 items-center mt-1">
-                                                                        <CalendarIcon className="h-3 text-gray-500 w-3 mr-1" />
+                                                                        <CalendarIcon className="h-4 text-gray-500 w-3 mr-1" />
                                                                         <span>
                                                                             {formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}
                                                                         </span>
                                                                     </div>
                                                                 </div>
-
                                                                 {/* Botones de acción */}
                                                                 <div className="flex space-x-2 overflow-x-auto overflow-y-hidden">
                                                                     {/* Botones de certificado */}
                                                                     {renderCertificateButtons(challenge)}
-
                                                                     {/* Botón de detalles - SEGUNDA MODIFICACIÓN */}
                                                                     <Link href={`/metrix/${challenge.documentId}`}>
                                                                         <button className="flex h-8 bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
