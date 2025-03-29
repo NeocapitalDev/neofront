@@ -6,7 +6,7 @@ export const navigation = [
     { icon: UserCircleIcon, name: 'Perfil', id: 'profile', href: '/profile' }, // Icono más representativo para el perfil.
     { icon: ClockIcon, name: 'Historial', id: 'history', href: '/historial' }, // Representa historial de challenges.
     { icon: CheckBadgeIcon, name: 'Verificación', id: 'verification', href: '/verification' }, // Icono más representativo para el perfil.
-    { icon: CreditCardIcon, name: 'Facturación', id: 'billing', href: '/billing' }, // Representa pagos y facturación.
+    { icon: CreditCardIcon, name: 'Retiros', id: 'billing', href: '/billing' }, // Representa pagos y facturación.
     { icon: ChatBubbleLeftEllipsisIcon, name: 'Sociales', id: 'social', href: '/social' }, // Representa interacciones sociales.
     { icon: LifebuoyIcon, name: 'Soporte', id: 'support', href: '/support' }, // Icono clásico de soporte.
     { icon: ArrowRightOnRectangleIcon, name: 'Volver a la web', id: 'website', href: 'https://neocapitalfunding.com/' }, // Icono clásico de salir.
@@ -16,7 +16,7 @@ export const navigation = [
 
 export const userNavigation = [
     { name: 'Tu perfil', href: '/profile' },
-    { name: 'Facturación', href: '/billing' },
+    { name: 'Retiros', href: '/billing' },
     { name: 'Cerrar sesión', href: '/', signOut: true },
 ];
 
