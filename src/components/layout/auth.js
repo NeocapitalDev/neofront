@@ -22,7 +22,7 @@ const Layout = ({ children }) => {
           {/* Imagen de monedas superpuesta */}
           <Image
             className="absolute inset-0 m-auto w-[70%] h-auto object-contain"
-            src="/images/moneda.webp"
+            src="/images/animar-2_3.webp"
             alt="Moneda"
             width={960}
             height={1080}
