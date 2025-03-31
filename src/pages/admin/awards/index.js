@@ -94,7 +94,7 @@ export default function IndexPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [newReward, setNewReward] = useState({
     nombre: "",
-    procentaje: "",
+    porcentaje: "",
     type: "descuento",
     probabilidad: "",
     productos: [],
@@ -183,8 +183,8 @@ export default function IndexPage() {
       errors.nombre = "El nombre es requerido";
     }
 
-    if (!reward.procentaje || parseFloat(reward.procentaje) < 0 || parseFloat(reward.procentaje) > 100) {
-      errors.procentaje = "El porcentaje debe estar entre 0 y 100";
+    if (!reward.porcentaje || parseFloat(reward.porcentaje) < 0 || parseFloat(reward.porcentaje) > 100) {
+      errors.porcentaje = "El porcentaje debe estar entre 0 y 100";
     }
 
     if (!reward.type) {
@@ -282,7 +282,7 @@ export default function IndexPage() {
       // Resetear el estado del formulario
       setNewReward({
         nombre: "",
-        procentaje: "",
+        porcentaje: "",
         type: "descuento",
         probabilidad: "",
         productos: [],
@@ -436,7 +436,7 @@ export default function IndexPage() {
 
     setEditingReward({
       nombre: reward.nombre || "",
-      procentaje: reward.procentaje,
+      porcentaje: reward.porcentaje,
       type: reward.type || "descuento",
       probabilidad: reward.probabilidad || "",
       productos: productosArray,
@@ -524,7 +524,7 @@ export default function IndexPage() {
                         {paginatedRewards.map((reward) => (
                           <tr key={reward.documentId} className="hover:bg-gray-50 dark:hover:bg-zinc-800">
                             <td className="py-2 px-4 border-b dark:border-zinc-700">{reward.nombre}</td>
-                            <td className="py-2 px-4 border-b dark:border-zinc-700">{reward.procentaje}%</td>
+                            <td className="py-2 px-4 border-b dark:border-zinc-700">{reward.porcentaje}%</td>
                             <td className="py-2 px-4 border-b dark:border-zinc-700">{getTypeLabel(reward.type)}</td>
                             <td className="py-2 px-4 border-b dark:border-zinc-700">{reward.probabilidad}%</td>
                             <td className="py-2 px-4 border-b dark:border-zinc-700">
@@ -678,18 +678,18 @@ export default function IndexPage() {
                     </label>
                     <input
                       type="number"
-                      name="procentaje"
+                      name="porcentaje"
                       placeholder="Porcentaje"
-                      value={newReward.procentaje}
+                      value={newReward.porcentaje}
                       onChange={(e) => handleInputChange(e, setNewReward, newReward)}
-                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.procentaje ? "border-red-500" : ""
+                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.porcentaje ? "border-red-500" : ""
                         }`}
                       step="0.01"
                       min="0"
                       max="100"
                     />
-                    {formErrors.procentaje && (
-                      <p className="text-red-500 text-xs mt-1">{formErrors.procentaje}</p>
+                    {formErrors.porcentaje && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.porcentaje}</p>
                     )}
                   </div>
 
@@ -919,17 +919,17 @@ export default function IndexPage() {
                   </label>
                   <input
                     type="number"
-                    name="procentaje"
-                    value={editingReward.procentaje}
+                    name="porcentaje"
+                    value={editingReward.porcentaje}
                     onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
-                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.procentaje ? "border-red-500" : ""
+                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.porcentaje ? "border-red-500" : ""
                       }`}
                     step="0.01"
                     min="0"
                     max="100"
                   />
-                  {formErrors.procentaje && (
-                    <p className="text-red-500 text-xs mt-1">{formErrors.procentaje}</p>
+                  {formErrors.porcentaje && (
+                    <p className="text-red-500 text-xs mt-1">{formErrors.porcentaje}</p>
                   )}
                 </div>
 
