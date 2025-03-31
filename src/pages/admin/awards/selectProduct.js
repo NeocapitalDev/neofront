@@ -36,12 +36,10 @@ const wooFetcher = async ([endpoint, config]) => {
 
     const api = createWooCommerceApi(url, consumerKey, consumerSecret, config.version || 'wc/v3');
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
-
     const response = await api.get(cleanEndpoint, config.params || {});
     if (!response || !response.data) {
       throw new Error('Respuesta vacía de WooCommerce');
     }
-
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -68,7 +66,7 @@ const ProductSelector = ({
   const [expandedProducts, setExpandedProducts] = useState(new Set());
   const [productData, setProductData] = useState(new Map());
   const [variationData, setVariationData] = useState(new Map());
-  
+
   const consumerKey = process.env.NEXT_PUBLIC_WOOCOMMERCE_CONSUMER_KEY || process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
   const url = process.env.NEXT_PUBLIC_WOOCOMMERCE_URL || process.env.NEXT_PUBLIC_WP_URL;
   const hasCredentials = !!consumerKey && !!url;
@@ -98,7 +96,7 @@ const ProductSelector = ({
 
   const fetchVariations = useCallback(async (productId) => {
     if (!hasCredentials) return null;
-    
+
     try {
       const numericProductId = parseInt(productId);
       if (variationCache[numericProductId]) {
@@ -106,7 +104,7 @@ const ProductSelector = ({
       }
       const data = await wooFetcher([`products/${numericProductId}/variations?per_page=100`, {}]);
       variationCache[numericProductId] = data;
-      
+
       const newVariationData = new Map(variationData);
       data.forEach(variation => {
         const varId = parseInt(variation.id);
@@ -119,7 +117,7 @@ const ProductSelector = ({
           });
         }
       });
-      
+
       setVariationData(newVariationData);
       return data;
     } catch (error) {
@@ -136,9 +134,10 @@ const ProductSelector = ({
     });
   }, [expandedProducts, fetchVariations]);
 
+  // Efecto para sincronizar las variaciones seleccionadas a partir de los IDs
   useEffect(() => {
     if (!products) return;
-    
+
     const newSelectedVariations = new Map();
     selectedProductIds.forEach(async (id) => {
       const variationId = parseInt(id);
@@ -149,9 +148,7 @@ const ProductSelector = ({
           const variation = variations.find(v => parseInt(v.id) === variationId);
           if (variation) {
             const numericProductId = parseInt(productId);
-            if (!expandedProducts.has(numericProductId)) {
-              setExpandedProducts(prev => new Set([...prev, numericProductId]));
-            }
+            // Se elimina la línea que forzaba la expansión para permitir que el usuario controle el desplegable
             newSelectedVariations.set(variationId, {
               ...variation,
               productId: numericProductId,
@@ -164,10 +161,10 @@ const ProductSelector = ({
       }
     });
     setSelectedVariations(newSelectedVariations);
-  }, [products, selectedProductIds, variationData, expandedProducts, productData]);
+  }, [products, selectedProductIds, variationData, productData]); // Se elimina expandedProducts de las dependencias
 
   const filteredProducts = products
-    ? products.filter(product => 
+    ? products.filter(product =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
         product.variations && product.variations.length > 0
       )
@@ -192,7 +189,7 @@ const ProductSelector = ({
   const toggleVariation = (productId, variation) => {
     const numericProductId = parseInt(productId);
     const numericVariationId = parseInt(variation.id);
-    
+
     setSelectedVariations(prev => {
       const newSelectedVariations = new Map(prev);
       if (newSelectedVariations.has(numericVariationId)) {
@@ -231,7 +228,6 @@ const ProductSelector = ({
     }
     const stepAttr = variation.attributes.find(attr => attr.name.toLowerCase() === 'step');
     const subcategoryAttr = variation.attributes.find(attr => attr.name.toLowerCase() === 'subcategory');
-    
     if (stepAttr && subcategoryAttr) {
       return `step: ${stepAttr.option} - subcategory: ${subcategoryAttr.option}`;
     }
@@ -260,8 +256,8 @@ const ProductSelector = ({
           Productos Aplicables
         </div>
       </label>
-      
-      <div 
+
+      <div
         className={`w-full flex items-center justify-between p-2 border rounded cursor-pointer dark:bg-zinc-900 dark:border-zinc-700 ${error ? "border-red-500" : ""}`}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -269,14 +265,14 @@ const ProductSelector = ({
           {selectedVariations.size > 0 ? (
             Object.entries(getGroupedVariations()).map(([productId, variations]) => (
               variations.map(variation => (
-                <div 
-                  key={variation.id} 
+                <div
+                  key={variation.id}
                   className="bg-gray-900 text-white px-2 py-1 rounded-md flex items-center text-sm"
                 >
                   <span className="mr-1">
                     {variation.productName} ({variation.name})
                   </span>
-                  <button 
+                  <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -310,7 +306,7 @@ const ProductSelector = ({
               <Search className="absolute right-2 top-2 w-5 h-5 text-gray-400" />
             </div>
           </div>
-          
+
           {productsLoading ? (
             <div className="p-3 text-center text-gray-500">Cargando productos...</div>
           ) : productsError ? (
@@ -324,20 +320,16 @@ const ProductSelector = ({
                 const isExpanded = expandedProducts.has(productId);
                 const variations = variationCache[productId];
                 const variationsLoading = isExpanded && !variations;
-                
                 let selectedCount = 0;
                 selectedVariations.forEach(v => {
                   if (v.productId === productId) {
                     selectedCount++;
                   }
                 });
-                
                 return (
                   <li key={productId} className="border-b border-gray-100 dark:border-zinc-700 last:border-b-0">
-                    <div 
-                      className={`px-3 py-3 bg-gray-100 dark:bg-zinc-800 flex items-center justify-between cursor-pointer ${
-                        selectedCount > 0 ? 'border-l-4 border-amber-500' : ''
-                      }`}
+                    <div
+                      className={`px-3 py-3 bg-gray-100 dark:bg-zinc-800 flex items-center justify-between cursor-pointer ${selectedCount > 0 ? 'border-l-4 border-amber-500' : ''}`}
                       onClick={() => toggleProductExpand(productId)}
                     >
                       <div className="flex items-center flex-grow">
@@ -348,8 +340,8 @@ const ProductSelector = ({
                           </span>
                         )}
                       </div>
-                      
-                      <button 
+
+                      <button
                         type="button"
                         className="ml-2 p-1 text-gray-500 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700"
                       >
@@ -360,7 +352,7 @@ const ProductSelector = ({
                         )}
                       </button>
                     </div>
-                    
+
                     {isExpanded && (
                       <div className="bg-white dark:bg-zinc-900">
                         {variationsLoading ? (
@@ -373,18 +365,11 @@ const ProductSelector = ({
                               const variationId = parseInt(variation.id);
                               const isVariationSelected = selectedVariations.has(variationId);
                               const variationName = getVariationName(variation);
-                              
                               return (
-                                <li 
+                                <li
                                   key={variationId}
-                                  className={`px-3 py-2 pl-6 hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer ${
-                                    isVariationSelected ? 'bg-amber-100 dark:bg-amber-900/20 border-l-2 border-amber-500' : ''
-                                  }`}
-                                  // Cerramos el desplegable al seleccionar
-                                  onClick={() => {
-                                    toggleVariation(productId, variation);
-                                    setIsOpen(false);
-                                  }}
+                                  className={`px-3 py-2 pl-6 hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer ${isVariationSelected ? 'bg-amber-100 dark:bg-amber-900/20 border-l-2 border-amber-500' : ''}`}
+                                  onClick={() => toggleVariation(productId, variation)}
                                 >
                                   <div className="flex items-center justify-between">
                                     <span className="text-sm">{variationName}</span>
@@ -406,7 +391,7 @@ const ProductSelector = ({
           )}
         </div>
       )}
-      
+
       {error && (
         <p className="text-red-500 text-xs mt-1">{error}</p>
       )}
