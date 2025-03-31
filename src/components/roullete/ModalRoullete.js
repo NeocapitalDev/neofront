@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,19 +11,46 @@ import TicketsList from './TicketsList';
 import { useSession } from "next-auth/react";
 import { useStrapiData as strapiJWT } from 'src/services/strapiServiceJWT';
 
-
-
 export default function ModalRoulette() {
   const TICKET_ID = process.env.NEXT_PUBLIC_TICKET_ID || 0;
-  const { data: session, status } = useSession();
-  // console.log('session', session);
-  const { data: user, status: statusUser } = strapiJWT('users/me', session?.jwt || '');
+  const { data: session } = useSession();
+  const { data: user } = strapiJWT('users/me', session?.jwt || '');
+
+  const scrollableRef = useRef(null);
+
   const handleBuyTicket = () => {
-    // Aquí puedes agregar la lógica para comprar un ticket
+    // Lógica para comprar ticket
     console.log("Comprar ticket");
-    // const woocommerceId = matchingVariation?.id || selectedProduct.woocommerceId;
     window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${TICKET_ID}&quantity=1&user_id=${user.documentId}`;
   };
+
+  // Prevenir el scroll-chaining cuando se alcanza el tope o el final del contenedor scrollable
+  useEffect(() => {
+    const scrollableElement = scrollableRef.current;
+    if (!scrollableElement) return;
+
+    const handleWheel = (e) => {
+      const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
+
+      // Si se intenta hacer scroll hacia arriba estando en el tope
+      if (scrollTop === 0 && e.deltaY < 0) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      // Si se intenta hacer scroll hacia abajo estando al final
+      if (scrollTop + clientHeight >= scrollHeight && e.deltaY > 0) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    scrollableElement.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      scrollableElement.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
 
   return (
     <Dialog>
@@ -37,22 +64,22 @@ export default function ModalRoulette() {
         />
       </DialogTrigger>
 
-      {/* Forzamos que el contenido esté por encima con z-[9999] */}
+      {/* Forzamos que el contenido del modal se muestre por encima */}
       <DialogContent
         className="
-      z-[9999] 
-      bg-zinc-900 
-      text-white 
-      p-0 
-      rounded-lg 
-      border-2 
-      border-amber-400 
-      shadow-[0_0_20px_rgba(245,158,11,0.25)] 
-      max-w-sm 
-      w 
-      max-h-[90vh] 
-      overflow-hidden
-    "
+          z-[9999] 
+          bg-zinc-900 
+          text-white 
+          p-0 
+          rounded-lg 
+          border-2 
+          border-amber-400 
+          shadow-[0_0_20px_rgba(245,158,11,0.25)] 
+          max-w-sm 
+          w 
+          max-h-[90vh] 
+          overflow-hidden
+        "
       >
         <DialogHeader className="p-6 border-b border-amber-700 bg-gradient-to-b from-zinc-900 to-zinc-800">
           <DialogTitle className="text-2xl font-bold text-center flex flex-col items-center gap-3">
@@ -63,9 +90,7 @@ export default function ModalRoulette() {
           </DialogTitle>
         </DialogHeader>
 
-        {/* Scrollable content area */}
-
-        <div className=" flex justify-center p-4">
+        <div className="flex justify-center p-4">
           <button
             onClick={handleBuyTicket}
             className="px-6 py-3 bg-[var(--app-primary)] text-white font-bold rounded-lg hover:brightness-110 transition-all duration-300 shadow-md w-full"
@@ -73,13 +98,17 @@ export default function ModalRoulette() {
             Comprar Ticket
           </button>
         </div>
-        <div className="overflow-y-auto max-h-[calc(80vh-140px)] py-4 px-4 bg-zinc-900">
 
+        {/* Área scrollable con el comportamiento de scroll personalizado */}
+        <div
+          ref={scrollableRef}
+          className="overflow-y-auto max-h-[calc(80vh-140px)] py-4 px-4 bg-zinc-900 [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-amber-500 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-amber-600"
+          style={{ overscrollBehavior: 'contain' }}
+        >
           <TicketsList />
           <div className="sticky bottom-0 left-0 right-0 h-4 pointer-events-none -mt-4"></div>
         </div>
       </DialogContent>
     </Dialog>
-
   );
 }
