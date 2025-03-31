@@ -439,7 +439,7 @@ export default function RuletaSorteo({
     try {
       // Solicita al backend el índice ganador
       const response = await fetch(
-        "https://n8n.neocapitalfunding.com/webhook-test/roullete",
+        "https://n8n.neocapitalfunding.com/webhook/roullete",
         {
           method: "POST",
           headers: {
@@ -592,10 +592,10 @@ export default function RuletaSorteo({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        background: "#000",
+        background: "#18181b",
         padding: "10px",
         // borderRadius: "10px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.8)",
+        // boxShadow: "0 4px 12px rgba(0, 0, 0, 0.8)",
         maxWidth: "400px",
         width: "100%", // Added width: 100% for full width
         margin: "auto",
