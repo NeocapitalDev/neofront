@@ -73,6 +73,7 @@
     "sonner": "^1.4.41",
     "swr": "^2.2.5",
     "tailwind-merge": "^2.6.0",
+    "tailwind-scrollbar-hide": "^2.0.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.1"
   },

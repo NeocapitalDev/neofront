@@ -9,11 +9,9 @@ import ProductSelector from "./selectProduct";
 
 // Función para normalizar probabilidades
 function normalizarProbabilidades(productos) {
-  // Calcular la suma total de todas las probabilidades
   const sumaTotal = productos.reduce((suma, producto) =>
     suma + (parseFloat(producto.probabilidad) || 0), 0);
 
-  // Si la suma es 0, asignar probabilidades iguales a todos
   if (sumaTotal === 0) {
     const probabilidadIgual = 100 / productos.length;
     return productos.map(producto => ({
@@ -23,7 +21,6 @@ function normalizarProbabilidades(productos) {
     }));
   }
 
-  // Normalizar cada probabilidad para que la suma sea exactamente 100
   return productos.map(producto => ({
     ...producto,
     probabilidadOriginal: parseFloat(producto.probabilidad) || 0,
@@ -49,16 +46,13 @@ const fetcher = async (url, token) => {
 
     const data = await response.json();
 
-    // Formatear los datos cuando se obtienen - asegúrate que los productos sean del tipo correcto
     if (data && data.data && Array.isArray(data.data)) {
       data.data = data.data.map(reward => {
-        // Si productos es un string, intentar parsearlo como JSON
         if (typeof reward.productos === 'string' && reward.productos.trim() !== '') {
           try {
             reward.productos = JSON.parse(reward.productos);
           } catch (e) {
             console.warn(`No se pudo parsear productos para ${reward.documentId}:`, e);
-            // Si no se puede parsear, dejarlo como string pero mostrarlo formateado en la UI
             reward.productosDisplay = reward.productos;
           }
         }
@@ -73,7 +67,6 @@ const fetcher = async (url, token) => {
   }
 };
 
-// Opciones para el campo de unidad de tiempo
 const timeUnitOptions = [
   { value: "horas", label: "Horas" },
   { value: "dias", label: "Dias" },
@@ -82,7 +75,6 @@ const timeUnitOptions = [
   { value: "años", label: "Años" },
 ];
 
-// Opciones para el campo de tipo
 const typeOptions = [
   { value: "descuento", label: "Descuento" },
   { value: "regalo", label: "Regalo" },
@@ -109,7 +101,6 @@ export default function IndexPage() {
   const [formErrors, setFormErrors] = useState({});
   const [normalizedRewards, setNormalizedRewards] = useState([]);
   const { data: session } = useSession();
-  // Estados para duración ilimitada
   const [isDurationUnlimited, setIsDurationUnlimited] = useState(false);
   const [isEditDurationUnlimited, setIsEditDurationUnlimited] = useState(false);
 
@@ -126,7 +117,6 @@ export default function IndexPage() {
     }
   );
 
-  // Efecto para normalizar probabilidades cuando cambian los datos
   useEffect(() => {
     if (rewardsData?.data) {
       const normalized = normalizarProbabilidades(rewardsData.data);
@@ -134,28 +124,19 @@ export default function IndexPage() {
     }
   }, [rewardsData]);
 
-  // Función para formatear la visualización de productos en la tabla
   const formatProductDisplay = (productos) => {
     if (!productos) return "-";
 
-    // Si es un array
     if (Array.isArray(productos)) {
       if (productos.length === 0) return "-";
-
-      // Si son más de 3 productos, mostrar el número total
       if (productos.length > 3) {
         return `${productos.length} variaciones`;
       }
-
-      // De lo contrario, mostrar los IDs
       return productos.map(id => `#${id}`).join(", ");
     }
 
-    // Si es un string, puede ser un ID único o un JSON string
     if (typeof productos === 'string') {
       if (!productos.trim()) return "-";
-
-      // Intentar parsear como JSON
       try {
         const parsed = JSON.parse(productos);
         if (Array.isArray(parsed)) {
@@ -166,16 +147,12 @@ export default function IndexPage() {
         }
         return `#${productos}`;
       } catch (e) {
-        // No es un JSON válido, mostrar como texto plano
         return `#${productos}`;
       }
     }
-
-    // Para cualquier otro caso
     return String(productos);
   };
 
-  // Validación de campos con soporte para duración ilimitada
   const validateForm = (reward, isDurationUnlimited = false) => {
     const errors = {};
 
@@ -195,7 +172,6 @@ export default function IndexPage() {
       errors.probabilidad = "La probabilidad debe estar entre 0 y 100";
     }
 
-    // Solo validar duración si no es ilimitada
     if (!isDurationUnlimited) {
       if (!reward.duracionNumero || parseInt(reward.duracionNumero) < 1) {
         errors.duracionNumero = "El número de la duración debe ser al menos 1";
@@ -218,7 +194,6 @@ export default function IndexPage() {
     setter({ ...obj, [name]: value });
   };
 
-  // Función para manejar cambios en la selección de productos para crear
   const handleProductsChange = (selectedProductIds) => {
     setNewReward({
       ...newReward,
@@ -226,7 +201,6 @@ export default function IndexPage() {
     });
   };
 
-  // Función para manejar cambios en la selección de productos para editar
   const handleEditProductsChange = (selectedProductIds) => {
     setEditingReward({
       ...editingReward,
@@ -236,26 +210,21 @@ export default function IndexPage() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-
-    // Validar formulario considerando si la duración es ilimitada
     const errors = validateForm(newReward, isDurationUnlimited);
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
 
-    // Combinar los campos de duración para enviar a la API
     const formattedReward = {
       ...newReward,
       duracion: isDurationUnlimited ? "ilimitada" : `${newReward.duracionNumero}-${newReward.duracionUnidad}`,
-      productos: newReward.productos // Ya es un array de IDs
+      productos: newReward.productos
     };
 
-    // Eliminar los campos individuales que no se enviarán a la API
     delete formattedReward.duracionNumero;
     delete formattedReward.duracionUnidad;
 
-    // Crear un ID para el toast de carga
     const toastId = toast.loading('Creando premio...');
 
     try {
@@ -279,7 +248,6 @@ export default function IndexPage() {
       const result = await response.json();
       console.log('Creación exitosa:', result);
 
-      // Resetear el estado del formulario
       setNewReward({
         nombre: "",
         porcentaje: "",
@@ -295,37 +263,31 @@ export default function IndexPage() {
       setFormErrors({});
       await mutate();
 
-      // Actualizar el toast de carga a un toast de éxito
       toast.success('Premio creado exitosamente', { id: toastId });
     } catch (error) {
       console.error("Error creating reward:", error);
-      // Actualizar el toast de carga a un toast de error
       toast.error(`Error al crear el premio: ${error.message}`, { id: toastId });
     }
   };
 
   const handleUpdate = async (documentId) => {
-    // Validar formulario considerando si la duración es ilimitada
     const errors = validateForm(editingReward, isEditDurationUnlimited);
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
 
-    // Combinar los campos de duración para enviar a la API
     const formattedReward = {
       ...editingReward,
       duracion: isEditDurationUnlimited ? "ilimitada" : `${editingReward.duracionNumero}-${editingReward.duracionUnidad}`,
-      productos: editingReward.productos // Ya es un array de IDs
+      productos: editingReward.productos
     };
 
-    // Eliminar los campos individuales que no se enviarán a la API
     delete formattedReward.duracionNumero;
     delete formattedReward.duracionUnidad;
     delete formattedReward.probabilidadNormalizada;
     delete formattedReward.probabilidadOriginal;
 
-    // Crear un ID para el toast de carga
     const toastId = toast.loading('Actualizando premio...');
 
     try {
@@ -355,17 +317,14 @@ export default function IndexPage() {
       setFormErrors({});
       await mutate();
 
-      // Actualizar el toast de carga a un toast de éxito
       toast.success('Premio actualizado exitosamente', { id: toastId });
     } catch (error) {
       console.error("Error updating reward:", error);
-      // Actualizar el toast de carga a un toast de error
       toast.error(`Error al actualizar el premio: ${error.message}`, { id: toastId });
     }
   };
 
   const handleDelete = async (documentId) => {
-    // Crear un ID para el toast de carga
     const toastId = toast.loading('Eliminando premio...');
 
     try {
@@ -385,23 +344,17 @@ export default function IndexPage() {
       setIsDeleteModalOpen(null);
       await mutate();
 
-      // Actualizar el toast de carga a un toast de éxito
       toast.success('Premio eliminado exitosamente', { id: toastId });
     } catch (error) {
       console.error("Error deleting reward:", error);
-      // Actualizar el toast de carga a un toast de error
       toast.error(`Error al eliminar el premio: ${error.message}`, { id: toastId });
     }
   };
 
   const startEditing = (reward) => {
     setEditingId(reward.documentId);
-
-    // Verificar si la duración es ilimitada
     const isUnlimited = reward.duracion === "ilimitada";
     setIsEditDurationUnlimited(isUnlimited);
-
-    // Separar la duración en número y unidad, solo si no es ilimitada
     let duracionNumero = "2";
     let duracionUnidad = "dias";
 
@@ -413,7 +366,6 @@ export default function IndexPage() {
       }
     }
 
-    // Asegurar que productos sea un array 
     let productosArray = [];
     if (reward.productos) {
       if (Array.isArray(reward.productos)) {
@@ -425,7 +377,6 @@ export default function IndexPage() {
             productosArray = [reward.productos.toString()];
           }
         } catch (e) {
-          // Si no se puede parsear como JSON, intentar separar por comas
           productosArray = reward.productos
             .split(',')
             .map(id => id.trim())
@@ -450,7 +401,6 @@ export default function IndexPage() {
   const rewards = normalizedRewards || [];
   const totalItems = rewards.length;
   const totalPages = Math.ceil(totalItems / pageSize);
-
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedRewards = rewards.slice(startIndex, endIndex);
@@ -473,7 +423,6 @@ export default function IndexPage() {
     pageNumbers.push(i);
   }
 
-  // Función para obtener la etiqueta legible de un valor de tipo
   const getTypeLabel = (value) => {
     const option = typeOptions.find(opt => opt.value === value);
     return option ? option.label : value;
@@ -482,12 +431,12 @@ export default function IndexPage() {
   return (
     <DashboardLayout>
       <div className="p-6 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-white rounded-lg shadow-lg border border-zinc-200 dark:border-zinc-700 border-t-4 border-t-[var(--app-secondary)] flex justify-center">
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-7xl">
           <h1 className="text-4xl font-bold mb-8 text-zinc-800 dark:text-white text-center">
             <span className="border-b-2 border-[var(--app-secondary)] pb-1">Gestión de premios</span>
           </h1>
 
-          <div className="bg-white dark:bg-zinc-900 rounded-lg border border-[var(--app-primary)]/20 dark:border-zinc-700 shadow-sm overflow-hidden flex flex-col">
+          <div className="bg-white  dark:bg-zinc-900 rounded-lg border border-[var(--app-primary)]/20 dark:border-zinc-700 shadow-sm overflow-hidden flex flex-col">
             <div className="bg-[var(--app-primary)]/5 dark:bg-zinc-800 p-3 border-b border-[var(--app-primary)]/20 dark:border-zinc-700 flex items-center justify-between">
               <div className="flex items-center">
                 <Settings className="w-5 h-5 text-[var(--app-secondary)] mr-2" />
@@ -640,7 +589,8 @@ export default function IndexPage() {
         {/* Modal para Crear */}
         {isCreateModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+            {/* Se agrega max-h-[80vh] y overflow-y-auto para que el contenido sea scrollable */}
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-hide">
               <h3 className="text-xl font-semibold mb-4 text-zinc-800 dark:text-white">Crear Nuevo Premio</h3>
               <form onSubmit={handleCreate}>
                 <div className="space-y-4">
@@ -660,8 +610,7 @@ export default function IndexPage() {
                       placeholder="Nombre del premio"
                       value={newReward.nombre}
                       onChange={(e) => handleInputChange(e, setNewReward, newReward)}
-                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.nombre ? "border-red-500" : ""
-                        }`}
+                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.nombre ? "border-red-500" : ""}`}
                     />
                     {formErrors.nombre && (
                       <p className="text-red-500 text-xs mt-1">{formErrors.nombre}</p>
@@ -682,8 +631,7 @@ export default function IndexPage() {
                       placeholder="Porcentaje"
                       value={newReward.porcentaje}
                       onChange={(e) => handleInputChange(e, setNewReward, newReward)}
-                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.porcentaje ? "border-red-500" : ""
-                        }`}
+                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.porcentaje ? "border-red-500" : ""}`}
                       step="0.01"
                       min="0"
                       max="100"
@@ -705,8 +653,7 @@ export default function IndexPage() {
                       name="type"
                       value={newReward.type}
                       onChange={(e) => handleInputChange(e, setNewReward, newReward)}
-                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.type ? "border-red-500" : ""
-                        }`}
+                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.type ? "border-red-500" : ""}`}
                     >
                       {typeOptions.map(option => (
                         <option key={option.value} value={option.value}>
@@ -733,8 +680,7 @@ export default function IndexPage() {
                       placeholder="Probabilidad"
                       value={newReward.probabilidad}
                       onChange={(e) => handleInputChange(e, setNewReward, newReward)}
-                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.probabilidad ? "border-red-500" : ""
-                        }`}
+                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.probabilidad ? "border-red-500" : ""}`}
                       step="0.01"
                       min="0"
                       max="100"
@@ -772,20 +718,18 @@ export default function IndexPage() {
                         />
                         <div
                           className="
-      relative w-7 h-4 bg-gray-200 rounded-full transition-colors
-      peer-focus:outline-none dark:bg-gray-700
-      peer-checked:bg-gray-500
-      peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
-      peer-checked:after:border-white
-      after:content-[''] after:absolute after:top-[2px] after:start-[2px]
-      after:bg-white after:border-gray-300 after:border after:rounded-full
-      after:h-3 after:w-3 after:transition-all dark:border-gray-600
-      hover:bg-gray-300 peer-checked:hover:bg-gray-600
-    "
-                        >
-                        </div>
+                            relative w-7 h-4 bg-gray-200 rounded-full transition-colors
+                            peer-focus:outline-none dark:bg-gray-700
+                            peer-checked:bg-gray-500
+                            peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+                            peer-checked:after:border-white
+                            after:content-[''] after:absolute after:top-[2px] after:start-[2px]
+                            after:bg-white after:border-gray-300 after:border after:rounded-full
+                            after:h-3 after:w-3 after:transition-all dark:border-gray-600
+                            hover:bg-gray-300 peer-checked:hover:bg-gray-600
+                          "
+                        ></div>
 
-                        {/* Texto al lado del switch */}
                         <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                           Ilimitado
                         </span>
@@ -848,8 +792,7 @@ export default function IndexPage() {
                       placeholder="Número de usos"
                       value={newReward.usos}
                       onChange={(e) => handleInputChange(e, setNewReward, newReward)}
-                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.usos ? "border-red-500" : ""
-                        }`}
+                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.usos ? "border-red-500" : ""}`}
                       min="1"
                     />
                     {formErrors.usos && (
@@ -882,7 +825,7 @@ export default function IndexPage() {
         {/* Modal para Editar */}
         {editingId && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
               <h3 className="text-xl font-semibold mb-4 text-zinc-800 dark:text-white">Editar Premio</h3>
               <div className="space-y-4">
                 {/* Nombre */}
@@ -901,8 +844,7 @@ export default function IndexPage() {
                     placeholder="Nombre del premio"
                     value={editingReward.nombre}
                     onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
-                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.nombre ? "border-red-500" : ""
-                      }`}
+                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.nombre ? "border-red-500" : ""}`}
                   />
                   {formErrors.nombre && (
                     <p className="text-red-500 text-xs mt-1">{formErrors.nombre}</p>
@@ -922,8 +864,7 @@ export default function IndexPage() {
                     name="porcentaje"
                     value={editingReward.porcentaje}
                     onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
-                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.porcentaje ? "border-red-500" : ""
-                      }`}
+                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.porcentaje ? "border-red-500" : ""}`}
                     step="0.01"
                     min="0"
                     max="100"
@@ -945,8 +886,7 @@ export default function IndexPage() {
                     name="type"
                     value={editingReward.type}
                     onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
-                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.type ? "border-red-500" : ""
-                      }`}
+                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.type ? "border-red-500" : ""}`}
                   >
                     {typeOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -972,8 +912,7 @@ export default function IndexPage() {
                     name="probabilidad"
                     value={editingReward.probabilidad}
                     onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
-                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.probabilidad ? "border-red-500" : ""
-                      }`}
+                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.probabilidad ? "border-red-500" : ""}`}
                     step="0.01"
                     min="0"
                     max="100"
@@ -1010,20 +949,19 @@ export default function IndexPage() {
                         className="sr-only peer"
                       />
                       <div
-                        className="relative w-7 h-4 bg-gray-200 rounded-full transition-colors
-      peer-focus:outline-none dark:bg-gray-700
-      peer-checked:bg-gray-500
-      peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
-      peer-checked:after:border-white
-      after:content-[''] after:absolute after:top-[2px] after:start-[2px]
-      after:bg-white after:border-gray-300 after:border after:rounded-full
-      after:h-3 after:w-3 after:transition-all dark:border-gray-600
-      hover:bg-gray-300 peer-checked:hover:bg-gray-600
-    "
-                      >
-                      </div>
+                        className="
+                          relative w-7 h-4 bg-gray-200 rounded-full transition-colors
+                          peer-focus:outline-none dark:bg-gray-700
+                          peer-checked:bg-gray-500
+                          peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+                          peer-checked:after:border-white
+                          after:content-[''] after:absolute after:top-[2px] after:start-[2px]
+                          after:bg-white after:border-gray-300 after:border after:rounded-full
+                          after:h-3 after:w-3 after:transition-all dark:border-gray-600
+                          hover:bg-gray-300 peer-checked:hover:bg-gray-600
+                        "
+                      ></div>
 
-                      {/* Texto al lado del switch */}
                       <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                         Ilimitado
                       </span>
@@ -1085,8 +1023,7 @@ export default function IndexPage() {
                     name="usos"
                     value={editingReward.usos}
                     onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
-                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.usos ? "border-red-500" : ""
-                      }`}
+                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.usos ? "border-red-500" : ""}`}
                     min="1"
                   />
                   {formErrors.usos && (
@@ -1121,7 +1058,7 @@ export default function IndexPage() {
         {/* Modal para Eliminar */}
         {isDeleteModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-96">
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-96 max-h-[80vh] overflow-y-auto">
               <h3 className="text-xl font-semibold mb-4 text-zinc-800 dark:text-white">¿Eliminar Premio?</h3>
               <p className="mb-4 text-zinc-600 dark:text-zinc-300">¿Estás seguro de que quieres eliminar este premio? Esta acción no se puede deshacer.</p>
               <div className="flex justify-end gap-2">
