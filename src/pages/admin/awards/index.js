@@ -1,90 +1,373 @@
 "use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 import DashboardLayout from "..";
-import { Settings, ChevronLeft, ChevronRight, Trash2, Plus } from "lucide-react";
-import toast, { Toaster } from "react-hot-toast";
+import { Settings, ChevronLeft, ChevronRight, Trash2, Plus, Clock, Percent, Tag, PieChart, ShoppingBag, RefreshCw } from "lucide-react";
+import { toast } from 'sonner';
+import ProductSelector from "./selectProduct";
 
-const fetcher = (url, token) =>
-  fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  }).then((res) => res.json());
+// Función para normalizar probabilidades
+function normalizarProbabilidades(productos) {
+  // Calcular la suma total de todas las probabilidades
+  const sumaTotal = productos.reduce((suma, producto) =>
+    suma + (parseFloat(producto.probabilidad) || 0), 0);
+
+  // Si la suma es 0, asignar probabilidades iguales a todos
+  if (sumaTotal === 0) {
+    const probabilidadIgual = 100 / productos.length;
+    return productos.map(producto => ({
+      ...producto,
+      probabilidadOriginal: parseFloat(producto.probabilidad) || 0,
+      probabilidadNormalizada: probabilidadIgual.toFixed(2)
+    }));
+  }
+
+  // Normalizar cada probabilidad para que la suma sea exactamente 100
+  return productos.map(producto => ({
+    ...producto,
+    probabilidadOriginal: parseFloat(producto.probabilidad) || 0,
+    probabilidadNormalizada: (((parseFloat(producto.probabilidad) || 0) / sumaTotal) * 100).toFixed(2)
+  }));
+}
+
+const fetcher = async (url, token) => {
+  try {
+    console.log(`Fetching data from: ${url}`);
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Response error:', response.status, errorText);
+      throw new Error(`Error en la petición: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Formatear los datos cuando se obtienen - asegúrate que los productos sean del tipo correcto
+    if (data && data.data && Array.isArray(data.data)) {
+      data.data = data.data.map(reward => {
+        // Si productos es un string, intentar parsearlo como JSON
+        if (typeof reward.productos === 'string' && reward.productos.trim() !== '') {
+          try {
+            reward.productos = JSON.parse(reward.productos);
+          } catch (e) {
+            console.warn(`No se pudo parsear productos para ${reward.documentId}:`, e);
+            // Si no se puede parsear, dejarlo como string pero mostrarlo formateado en la UI
+            reward.productosDisplay = reward.productos;
+          }
+        }
+        return reward;
+      });
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Fetcher error:', error);
+    throw error;
+  }
+};
+
+// Opciones para el campo de unidad de tiempo
+const timeUnitOptions = [
+  { value: "horas", label: "Horas" },
+  { value: "dias", label: "Dias" },
+  { value: "semanas", label: "Semanas" },
+  { value: "meses", label: "Meses" },
+  { value: "años", label: "Años" },
+];
+
+// Opciones para el campo de tipo
+const typeOptions = [
+  { value: "descuento", label: "Descuento" },
+  { value: "regalo", label: "Regalo" },
+  { value: "envio_gratis", label: "Envío gratis" },
+];
 
 export default function IndexPage() {
   const [pageSize, setPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
-  const [newReward, setNewReward] = useState({ procentaje: "" });
+  const [newReward, setNewReward] = useState({
+    nombre: "",
+    procentaje: "",
+    type: "descuento",
+    probabilidad: "",
+    productos: [],
+    duracionNumero: "2",
+    duracionUnidad: "dias",
+    usos: "1"
+  });
   const [editingId, setEditingId] = useState(null);
-  const [editingValue, setEditingValue] = useState("");
+  const [editingReward, setEditingReward] = useState({});
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
+  const [normalizedRewards, setNormalizedRewards] = useState([]);
   const { data: session } = useSession();
+  // Estados para duración ilimitada
+  const [isDurationUnlimited, setIsDurationUnlimited] = useState(false);
+  const [isEditDurationUnlimited, setIsEditDurationUnlimited] = useState(false);
 
   const { data: rewardsData, error, mutate } = useSWR(
     session?.jwt
       ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rewards`, session.jwt]
       : null,
-    ([url, token]) => fetcher(url, token)
+    ([url, token]) => fetcher(url, token),
+    {
+      onError: (err) => {
+        console.error('SWR Error:', err);
+        toast.error('Error al cargar los premios: ' + err.message);
+      }
+    }
   );
+
+  // Efecto para normalizar probabilidades cuando cambian los datos
+  useEffect(() => {
+    if (rewardsData?.data) {
+      const normalized = normalizarProbabilidades(rewardsData.data);
+      setNormalizedRewards(normalized);
+    }
+  }, [rewardsData]);
+
+  // Función para formatear la visualización de productos en la tabla
+  const formatProductDisplay = (productos) => {
+    if (!productos) return "-";
+
+    // Si es un array
+    if (Array.isArray(productos)) {
+      if (productos.length === 0) return "-";
+
+      // Si son más de 3 productos, mostrar el número total
+      if (productos.length > 3) {
+        return `${productos.length} variaciones`;
+      }
+
+      // De lo contrario, mostrar los IDs
+      return productos.map(id => `#${id}`).join(", ");
+    }
+
+    // Si es un string, puede ser un ID único o un JSON string
+    if (typeof productos === 'string') {
+      if (!productos.trim()) return "-";
+
+      // Intentar parsear como JSON
+      try {
+        const parsed = JSON.parse(productos);
+        if (Array.isArray(parsed)) {
+          if (parsed.length > 3) {
+            return `${parsed.length} variaciones`;
+          }
+          return parsed.map(id => `#${id}`).join(", ");
+        }
+        return `#${productos}`;
+      } catch (e) {
+        // No es un JSON válido, mostrar como texto plano
+        return `#${productos}`;
+      }
+    }
+
+    // Para cualquier otro caso
+    return String(productos);
+  };
+
+  // Validación de campos con soporte para duración ilimitada
+  const validateForm = (reward, isDurationUnlimited = false) => {
+    const errors = {};
+
+    if (!reward.nombre) {
+      errors.nombre = "El nombre es requerido";
+    }
+
+    if (!reward.procentaje || parseFloat(reward.procentaje) < 0 || parseFloat(reward.procentaje) > 100) {
+      errors.procentaje = "El porcentaje debe estar entre 0 y 100";
+    }
+
+    if (!reward.type) {
+      errors.type = "El tipo es requerido";
+    }
+
+    if (!reward.probabilidad || parseFloat(reward.probabilidad) < 0 || parseFloat(reward.probabilidad) > 100) {
+      errors.probabilidad = "La probabilidad debe estar entre 0 y 100";
+    }
+
+    // Solo validar duración si no es ilimitada
+    if (!isDurationUnlimited) {
+      if (!reward.duracionNumero || parseInt(reward.duracionNumero) < 1) {
+        errors.duracionNumero = "El número de la duración debe ser al menos 1";
+      }
+
+      if (!reward.duracionUnidad) {
+        errors.duracionUnidad = "La unidad de tiempo es requerida";
+      }
+    }
+
+    if (!reward.usos || parseInt(reward.usos) < 1) {
+      errors.usos = "El número de usos debe ser al menos 1";
+    }
+
+    return errors;
+  };
+
+  const handleInputChange = (e, setter, obj) => {
+    const { name, value } = e.target;
+    setter({ ...obj, [name]: value });
+  };
+
+  // Función para manejar cambios en la selección de productos para crear
+  const handleProductsChange = (selectedProductIds) => {
+    setNewReward({
+      ...newReward,
+      productos: selectedProductIds
+    });
+  };
+
+  // Función para manejar cambios en la selección de productos para editar
+  const handleEditProductsChange = (selectedProductIds) => {
+    setEditingReward({
+      ...editingReward,
+      productos: selectedProductIds
+    });
+  };
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    const toastId = toast.loading("Creando premio...");
+
+    // Validar formulario considerando si la duración es ilimitada
+    const errors = validateForm(newReward, isDurationUnlimited);
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    // Combinar los campos de duración para enviar a la API
+    const formattedReward = {
+      ...newReward,
+      duracion: isDurationUnlimited ? "ilimitada" : `${newReward.duracionNumero}-${newReward.duracionUnidad}`,
+      productos: newReward.productos // Ya es un array de IDs
+    };
+
+    // Eliminar los campos individuales que no se enviarán a la API
+    delete formattedReward.duracionNumero;
+    delete formattedReward.duracionUnidad;
+
+    // Crear un ID para el toast de carga
+    const toastId = toast.loading('Creando premio...');
+
     try {
+      console.log('Datos a enviar:', JSON.stringify({ data: formattedReward }, null, 2));
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rewards`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${session.jwt}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ data: newReward }),
+        body: JSON.stringify({ data: formattedReward }),
       });
-      if (response.ok) {
-        setNewReward({ procentaje: "" });
-        setIsCreateModalOpen(false);
-        mutate();
-        toast.success("Premio creado exitosamente", { id: toastId });
-      } else {
-        toast.error("Error al crear el premio", { id: toastId });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', response.status, errorText);
+        throw new Error(`Error en la creación: ${response.status}`);
       }
+
+      const result = await response.json();
+      console.log('Creación exitosa:', result);
+
+      // Resetear el estado del formulario
+      setNewReward({
+        nombre: "",
+        procentaje: "",
+        type: "descuento",
+        probabilidad: "",
+        productos: [],
+        duracionNumero: "2",
+        duracionUnidad: "dias",
+        usos: "1"
+      });
+      setIsDurationUnlimited(false);
+      setIsCreateModalOpen(false);
+      setFormErrors({});
+      await mutate();
+
+      // Actualizar el toast de carga a un toast de éxito
+      toast.success('Premio creado exitosamente', { id: toastId });
     } catch (error) {
       console.error("Error creating reward:", error);
-      toast.error("Error al crear el premio", { id: toastId });
+      // Actualizar el toast de carga a un toast de error
+      toast.error(`Error al crear el premio: ${error.message}`, { id: toastId });
     }
   };
 
   const handleUpdate = async (documentId) => {
-    const toastId = toast.loading("Actualizando premio...");
+    // Validar formulario considerando si la duración es ilimitada
+    const errors = validateForm(editingReward, isEditDurationUnlimited);
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    // Combinar los campos de duración para enviar a la API
+    const formattedReward = {
+      ...editingReward,
+      duracion: isEditDurationUnlimited ? "ilimitada" : `${editingReward.duracionNumero}-${editingReward.duracionUnidad}`,
+      productos: editingReward.productos // Ya es un array de IDs
+    };
+
+    // Eliminar los campos individuales que no se enviarán a la API
+    delete formattedReward.duracionNumero;
+    delete formattedReward.duracionUnidad;
+    delete formattedReward.probabilidadNormalizada;
+    delete formattedReward.probabilidadOriginal;
+
+    // Crear un ID para el toast de carga
+    const toastId = toast.loading('Actualizando premio...');
+
     try {
+      console.log('Datos a enviar:', JSON.stringify({ data: formattedReward }, null, 2));
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rewards/${documentId}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${session.jwt}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ data: { procentaje: editingValue } }),
+        body: JSON.stringify({ data: formattedReward }),
       });
-      if (response.ok) {
-        setEditingId(null);
-        setEditingValue("");
-        mutate();
-        toast.success("Premio actualizado exitosamente", { id: toastId });
-      } else {
-        toast.error("Error al actualizar el premio", { id: toastId });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', response.status, errorText);
+        throw new Error(`Error en la actualización: ${response.status}`);
       }
+
+      const result = await response.json();
+      console.log('Actualización exitosa:', result);
+
+      setEditingId(null);
+      setEditingReward({});
+      setIsEditDurationUnlimited(false);
+      setFormErrors({});
+      await mutate();
+
+      // Actualizar el toast de carga a un toast de éxito
+      toast.success('Premio actualizado exitosamente', { id: toastId });
     } catch (error) {
       console.error("Error updating reward:", error);
-      toast.error("Error al actualizar el premio", { id: toastId });
+      // Actualizar el toast de carga a un toast de error
+      toast.error(`Error al actualizar el premio: ${error.message}`, { id: toastId });
     }
   };
 
   const handleDelete = async (documentId) => {
-    const toastId = toast.loading("Eliminando premio...");
+    // Crear un ID para el toast de carga
+    const toastId = toast.loading('Eliminando premio...');
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rewards/${documentId}`, {
         method: "DELETE",
@@ -92,26 +375,80 @@ export default function IndexPage() {
           Authorization: `Bearer ${session.jwt}`,
         },
       });
-      if (response.ok) {
-        setIsDeleteModalOpen(null);
-        mutate();
-        toast.success("Premio eliminado exitosamente", { id: toastId });
-      } else {
-        toast.error("Error al eliminar el premio", { id: toastId });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', response.status, errorText);
+        throw new Error(`Error en la eliminación: ${response.status}`);
       }
+
+      setIsDeleteModalOpen(null);
+      await mutate();
+
+      // Actualizar el toast de carga a un toast de éxito
+      toast.success('Premio eliminado exitosamente', { id: toastId });
     } catch (error) {
       console.error("Error deleting reward:", error);
-      toast.error("Error al eliminar el premio", { id: toastId });
+      // Actualizar el toast de carga a un toast de error
+      toast.error(`Error al eliminar el premio: ${error.message}`, { id: toastId });
     }
   };
 
   const startEditing = (reward) => {
     setEditingId(reward.documentId);
-    setEditingValue(reward.procentaje);
+
+    // Verificar si la duración es ilimitada
+    const isUnlimited = reward.duracion === "ilimitada";
+    setIsEditDurationUnlimited(isUnlimited);
+
+    // Separar la duración en número y unidad, solo si no es ilimitada
+    let duracionNumero = "2";
+    let duracionUnidad = "dias";
+
+    if (reward.duracion && !isUnlimited) {
+      const parts = reward.duracion.split("-");
+      if (parts.length === 2) {
+        duracionNumero = parts[0];
+        duracionUnidad = parts[1];
+      }
+    }
+
+    // Asegurar que productos sea un array 
+    let productosArray = [];
+    if (reward.productos) {
+      if (Array.isArray(reward.productos)) {
+        productosArray = reward.productos.map(id => id.toString());
+      } else if (typeof reward.productos === 'string' && reward.productos.trim() !== '') {
+        try {
+          productosArray = JSON.parse(reward.productos);
+          if (!Array.isArray(productosArray)) {
+            productosArray = [reward.productos.toString()];
+          }
+        } catch (e) {
+          // Si no se puede parsear como JSON, intentar separar por comas
+          productosArray = reward.productos
+            .split(',')
+            .map(id => id.trim())
+            .filter(id => id !== "");
+        }
+      }
+    }
+
+    setEditingReward({
+      nombre: reward.nombre || "",
+      procentaje: reward.procentaje,
+      type: reward.type || "descuento",
+      probabilidad: reward.probabilidad || "",
+      productos: productosArray,
+      duracionNumero: duracionNumero,
+      duracionUnidad: duracionUnidad,
+      usos: reward.usos || "1"
+    });
+    setFormErrors({});
   };
 
-  const rewards = rewardsData?.data || [];
-  const totalItems = rewardsData?.meta?.pagination?.total || 0;
+  const rewards = normalizedRewards || [];
+  const totalItems = rewards.length;
   const totalPages = Math.ceil(totalItems / pageSize);
 
   const startIndex = (currentPage - 1) * pageSize;
@@ -136,11 +473,16 @@ export default function IndexPage() {
     pageNumbers.push(i);
   }
 
+  // Función para obtener la etiqueta legible de un valor de tipo
+  const getTypeLabel = (value) => {
+    const option = typeOptions.find(opt => opt.value === value);
+    return option ? option.label : value;
+  };
+
   return (
     <DashboardLayout>
       <div className="p-6 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-white rounded-lg shadow-lg border border-zinc-200 dark:border-zinc-700 border-t-4 border-t-[var(--app-secondary)] flex justify-center">
-        <Toaster position="top-right" />
-        <div className="w-full max-w-3xl">
+        <div className="w-full max-w-4xl">
           <h1 className="text-4xl font-bold mb-8 text-zinc-800 dark:text-white text-center">
             <span className="border-b-2 border-[var(--app-secondary)] pb-1">Gestión de premios</span>
           </h1>
@@ -163,24 +505,60 @@ export default function IndexPage() {
               {!rewardsData && !error && <p>Cargando...</p>}
               {rewards.length > 0 ? (
                 <>
-                  <div className="space-y-4">
-                    {paginatedRewards.map((reward) => (
-                      <div key={reward.documentId} className="flex items-center gap-4 p-2 border-b dark:border-zinc-700">
-                        <span className="flex-1">{reward.procentaje}%</span>
-                        <button
-                          onClick={() => startEditing(reward)}
-                          className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => setIsDeleteModalOpen(reward.documentId)}
-                          className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full bg-white dark:bg-zinc-900 border dark:border-zinc-700 rounded-lg">
+                      <thead className="bg-gray-100 dark:bg-zinc-800">
+                        <tr>
+                          <th className="py-2 px-4 border-b dark:border-zinc-700 text-left">Nombre</th>
+                          <th className="py-2 px-4 border-b dark:border-zinc-700 text-left">Porcentaje</th>
+                          <th className="py-2 px-4 border-b dark:border-zinc-700 text-left">Tipo</th>
+                          <th className="py-2 px-4 border-b dark:border-zinc-700 text-left">Probabilidad</th>
+                          <th className="py-2 px-4 border-b dark:border-zinc-700 text-left">Productos</th>
+                          <th className="py-2 px-4 border-b dark:border-zinc-700 text-left">%Real</th>
+                          <th className="py-2 px-4 border-b dark:border-zinc-700 text-left">Duración</th>
+                          <th className="py-2 px-4 border-b dark:border-zinc-700 text-left">Usos</th>
+                          <th className="py-2 px-4 border-b dark:border-zinc-700 text-center">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {paginatedRewards.map((reward) => (
+                          <tr key={reward.documentId} className="hover:bg-gray-50 dark:hover:bg-zinc-800">
+                            <td className="py-2 px-4 border-b dark:border-zinc-700">{reward.nombre}</td>
+                            <td className="py-2 px-4 border-b dark:border-zinc-700">{reward.procentaje}%</td>
+                            <td className="py-2 px-4 border-b dark:border-zinc-700">{getTypeLabel(reward.type)}</td>
+                            <td className="py-2 px-4 border-b dark:border-zinc-700">{reward.probabilidad}%</td>
+                            <td className="py-2 px-4 border-b dark:border-zinc-700">
+                              <div className="max-w-xs truncate" title={formatProductDisplay(reward.productos)}>
+                                {formatProductDisplay(reward.productos)}
+                              </div>
+                            </td>
+                            <td className="py-2 px-4 border-b dark:border-zinc-700">{reward.probabilidadNormalizada}%</td>
+                            <td className="py-2 px-4 border-b dark:border-zinc-700">{reward.duracion}</td>
+                            <td className="py-2 px-4 border-b dark:border-zinc-700">{reward.usos}</td>
+                            <td className="py-2 px-4 border-b dark:border-zinc-700 text-center">
+                              <div className="flex justify-center gap-2">
+                                <button
+                                  onClick={() => startEditing(reward)}
+                                  className="p-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                  title="Editar"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                </button>
+                                <button
+                                  onClick={() => setIsDeleteModalOpen(reward.documentId)}
+                                  className="p-1 bg-red-600 text-white rounded hover:bg-red-700"
+                                  title="Eliminar"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                   <div className="mt-6 flex flex-col items-center gap-4">
                     <div className="flex items-center gap-2">
@@ -206,11 +584,10 @@ export default function IndexPage() {
                         <button
                           key={page}
                           onClick={() => goToPage(page)}
-                          className={`px-3 py-1 rounded-md transition-colors ${
-                            currentPage === page
-                              ? "bg-[var(--app-secondary)] text-white"
-                              : "text-zinc-700 dark:text-zinc-300 hover:bg-[var(--app-primary)]/10"
-                          }`}
+                          className={`px-3 py-1 rounded-md transition-colors ${currentPage === page
+                            ? "bg-[var(--app-secondary)] text-white"
+                            : "text-zinc-700 dark:text-zinc-300 hover:bg-[var(--app-primary)]/10"
+                            }`}
                         >
                           {page}
                         </button>
@@ -263,23 +640,232 @@ export default function IndexPage() {
         {/* Modal para Crear */}
         {isCreateModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-96">
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-full max-w-md">
               <h3 className="text-xl font-semibold mb-4 text-zinc-800 dark:text-white">Crear Nuevo Premio</h3>
               <form onSubmit={handleCreate}>
-                <input
-                  type="number"
-                  placeholder="Porcentaje"
-                  value={newReward.procentaje}
-                  onChange={(e) => setNewReward({ procentaje: e.target.value })}
-                  className="w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 mb-4"
-                  step="0.01"
-                  min="0"
-                  max="100"
-                />
-                <div className="flex justify-end gap-2">
+                <div className="space-y-4">
+                  {/* Nombre */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <div className="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Nombre
+                      </div>
+                    </label>
+                    <input
+                      type="text"
+                      name="nombre"
+                      placeholder="Nombre del premio"
+                      value={newReward.nombre}
+                      onChange={(e) => handleInputChange(e, setNewReward, newReward)}
+                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.nombre ? "border-red-500" : ""
+                        }`}
+                    />
+                    {formErrors.nombre && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.nombre}</p>
+                    )}
+                  </div>
+
+                  {/* Porcentaje */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <div className="flex items-center">
+                        <Percent className="w-4 h-4 mr-1" />
+                        Porcentaje
+                      </div>
+                    </label>
+                    <input
+                      type="number"
+                      name="procentaje"
+                      placeholder="Porcentaje"
+                      value={newReward.procentaje}
+                      onChange={(e) => handleInputChange(e, setNewReward, newReward)}
+                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.procentaje ? "border-red-500" : ""
+                        }`}
+                      step="0.01"
+                      min="0"
+                      max="100"
+                    />
+                    {formErrors.procentaje && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.procentaje}</p>
+                    )}
+                  </div>
+
+                  {/* Tipo */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <div className="flex items-center">
+                        <Tag className="w-4 h-4 mr-1" />
+                        Tipo
+                      </div>
+                    </label>
+                    <select
+                      name="type"
+                      value={newReward.type}
+                      onChange={(e) => handleInputChange(e, setNewReward, newReward)}
+                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.type ? "border-red-500" : ""
+                        }`}
+                    >
+                      {typeOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    {formErrors.type && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.type}</p>
+                    )}
+                  </div>
+
+                  {/* Probabilidad */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <div className="flex items-center">
+                        <PieChart className="w-4 h-4 mr-1" />
+                        Probabilidad
+                      </div>
+                    </label>
+                    <input
+                      type="number"
+                      name="probabilidad"
+                      placeholder="Probabilidad"
+                      value={newReward.probabilidad}
+                      onChange={(e) => handleInputChange(e, setNewReward, newReward)}
+                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.probabilidad ? "border-red-500" : ""
+                        }`}
+                      step="0.01"
+                      min="0"
+                      max="100"
+                    />
+                    {formErrors.probabilidad && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.probabilidad}</p>
+                    )}
+                  </div>
+
+                  {/* Productos */}
+                  <div>
+                    <ProductSelector
+                      selectedProductIds={newReward.productos}
+                      onChange={handleProductsChange}
+                      error={formErrors.productos}
+                    />
+                  </div>
+
+                  {/* Duración con opción de ilimitada */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <div className="flex items-center">
+                        <Clock className="w-4 h-4 mr-1" />
+                        Duración
+                      </div>
+                    </label>
+
+                    <div className="mb-2">
+                      <label className="inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isDurationUnlimited}
+                          onChange={(e) => setIsDurationUnlimited(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div
+                          className="
+      relative w-7 h-4 bg-gray-200 rounded-full transition-colors
+      peer-focus:outline-none dark:bg-gray-700
+      peer-checked:bg-gray-500
+      peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+      peer-checked:after:border-white
+      after:content-[''] after:absolute after:top-[2px] after:start-[2px]
+      after:bg-white after:border-gray-300 after:border after:rounded-full
+      after:h-3 after:w-3 after:transition-all dark:border-gray-600
+      hover:bg-gray-300 peer-checked:hover:bg-gray-600
+    "
+                        >
+                        </div>
+
+                        {/* Texto al lado del switch */}
+                        <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Ilimitado
+                        </span>
+                      </label>
+                    </div>
+
+                    {!isDurationUnlimited && (
+                      <div className="flex gap-2">
+                        <div className="flex-1">
+                          <input
+                            type="number"
+                            name="duracionNumero"
+                            placeholder="Número"
+                            value={newReward.duracionNumero}
+                            onChange={(e) => handleInputChange(e, setNewReward, newReward)}
+                            className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.duracionNumero ? "border-red-500" : ""}`}
+                            min="1"
+                          />
+                          {formErrors.duracionNumero && (
+                            <p className="text-red-500 text-xs mt-1">{formErrors.duracionNumero}</p>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <select
+                            name="duracionUnidad"
+                            value={newReward.duracionUnidad}
+                            onChange={(e) => handleInputChange(e, setNewReward, newReward)}
+                            className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.duracionUnidad ? "border-red-500" : ""}`}
+                          >
+                            {timeUnitOptions.map(option => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                          {formErrors.duracionUnidad && (
+                            <p className="text-red-500 text-xs mt-1">{formErrors.duracionUnidad}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    <p className="text-gray-500 text-xs mt-1">
+                      {isDurationUnlimited
+                        ? "El premio tendrá una duración ilimitada"
+                        : "Formato: número-unidad (ej: 2-dia, 1-semana, 3-mes)"}
+                    </p>
+                  </div>
+
+                  {/* Usos */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <div className="flex items-center">
+                        <RefreshCw className="w-4 h-4 mr-1" />
+                        Usos permitidos
+                      </div>
+                    </label>
+                    <input
+                      type="number"
+                      name="usos"
+                      placeholder="Número de usos"
+                      value={newReward.usos}
+                      onChange={(e) => handleInputChange(e, setNewReward, newReward)}
+                      className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.usos ? "border-red-500" : ""
+                        }`}
+                      min="1"
+                    />
+                    {formErrors.usos && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.usos}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 mt-6">
                   <button
                     type="button"
-                    onClick={() => setIsCreateModalOpen(false)}
+                    onClick={() => {
+                      setIsCreateModalOpen(false);
+                      setFormErrors({});
+                      setIsDurationUnlimited(false);
+                    }}
                     className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                   >
                     Cancelar
@@ -296,22 +882,226 @@ export default function IndexPage() {
         {/* Modal para Editar */}
         {editingId && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-96">
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-full max-w-md">
               <h3 className="text-xl font-semibold mb-4 text-zinc-800 dark:text-white">Editar Premio</h3>
-              <input
-                type="number"
-                value={editingValue}
-                onChange={(e) => setEditingValue(e.target.value)}
-                className="w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 mb-4"
-                step="0.01"
-                min="0"
-                max="100"
-              />
-              <div className="flex justify-end gap-2">
+              <div className="space-y-4">
+                {/* Nombre */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <div className="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Nombre
+                    </div>
+                  </label>
+                  <input
+                    type="text"
+                    name="nombre"
+                    placeholder="Nombre del premio"
+                    value={editingReward.nombre}
+                    onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
+                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.nombre ? "border-red-500" : ""
+                      }`}
+                  />
+                  {formErrors.nombre && (
+                    <p className="text-red-500 text-xs mt-1">{formErrors.nombre}</p>
+                  )}
+                </div>
+
+                {/* Porcentaje */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <div className="flex items-center">
+                      <Percent className="w-4 h-4 mr-1" />
+                      Porcentaje
+                    </div>
+                  </label>
+                  <input
+                    type="number"
+                    name="procentaje"
+                    value={editingReward.procentaje}
+                    onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
+                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.procentaje ? "border-red-500" : ""
+                      }`}
+                    step="0.01"
+                    min="0"
+                    max="100"
+                  />
+                  {formErrors.procentaje && (
+                    <p className="text-red-500 text-xs mt-1">{formErrors.procentaje}</p>
+                  )}
+                </div>
+
+                {/* Tipo */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <div className="flex items-center">
+                      <Tag className="w-4 h-4 mr-1" />
+                      Tipo
+                    </div>
+                  </label>
+                  <select
+                    name="type"
+                    value={editingReward.type}
+                    onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
+                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.type ? "border-red-500" : ""
+                      }`}
+                  >
+                    {typeOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  {formErrors.type && (
+                    <p className="text-red-500 text-xs mt-1">{formErrors.type}</p>
+                  )}
+                </div>
+
+                {/* Probabilidad */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <div className="flex items-center">
+                      <PieChart className="w-4 h-4 mr-1" />
+                      Probabilidad
+                    </div>
+                  </label>
+                  <input
+                    type="number"
+                    name="probabilidad"
+                    value={editingReward.probabilidad}
+                    onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
+                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.probabilidad ? "border-red-500" : ""
+                      }`}
+                    step="0.01"
+                    min="0"
+                    max="100"
+                  />
+                  {formErrors.probabilidad && (
+                    <p className="text-red-500 text-xs mt-1">{formErrors.probabilidad}</p>
+                  )}
+                </div>
+
+                {/* Productos */}
+                <div>
+                  <ProductSelector
+                    selectedProductIds={editingReward.productos || []}
+                    onChange={handleEditProductsChange}
+                    error={formErrors.productos}
+                  />
+                </div>
+
+                {/* Duración con opción de ilimitada */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <div className="flex items-center">
+                      <Clock className="w-4 h-4 mr-1" />
+                      Duración
+                    </div>
+                  </label>
+
+                  <div className="mb-2">
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={isEditDurationUnlimited}
+                        onChange={(e) => setIsEditDurationUnlimited(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div
+                        className="relative w-7 h-4 bg-gray-200 rounded-full transition-colors
+      peer-focus:outline-none dark:bg-gray-700
+      peer-checked:bg-gray-500
+      peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+      peer-checked:after:border-white
+      after:content-[''] after:absolute after:top-[2px] after:start-[2px]
+      after:bg-white after:border-gray-300 after:border after:rounded-full
+      after:h-3 after:w-3 after:transition-all dark:border-gray-600
+      hover:bg-gray-300 peer-checked:hover:bg-gray-600
+    "
+                      >
+                      </div>
+
+                      {/* Texto al lado del switch */}
+                      <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Ilimitado
+                      </span>
+                    </label>
+                  </div>
+
+                  {!isEditDurationUnlimited && (
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <input
+                          type="number"
+                          name="duracionNumero"
+                          placeholder="Número"
+                          value={editingReward.duracionNumero}
+                          onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
+                          className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.duracionNumero ? "border-red-500" : ""}`}
+                          min="1"
+                        />
+                        {formErrors.duracionNumero && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.duracionNumero}</p>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <select
+                          name="duracionUnidad"
+                          value={editingReward.duracionUnidad}
+                          onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
+                          className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.duracionUnidad ? "border-red-500" : ""}`}
+                        >
+                          {timeUnitOptions.map(option => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        {formErrors.duracionUnidad && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.duracionUnidad}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <p className="text-gray-500 text-xs mt-1">
+                    {isEditDurationUnlimited
+                      ? "El premio tendrá una duración ilimitada"
+                      : "Formato: número-unidad (ej: 2-dia, 1-semana, 3-mes)"}
+                  </p>
+                </div>
+
+                {/* Usos */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <div className="flex items-center">
+                      <RefreshCw className="w-4 h-4 mr-1" />
+                      Usos permitidos
+                    </div>
+                  </label>
+                  <input
+                    type="number"
+                    name="usos"
+                    value={editingReward.usos}
+                    onChange={(e) => handleInputChange(e, setEditingReward, editingReward)}
+                    className={`w-full p-2 border rounded dark:bg-zinc-900 dark:border-zinc-700 ${formErrors.usos ? "border-red-500" : ""
+                      }`}
+                    min="1"
+                  />
+                  {formErrors.usos && (
+                    <p className="text-red-500 text-xs mt-1">{formErrors.usos}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 mt-6">
                 <button
                   onClick={() => {
                     setEditingId(null);
-                    setEditingValue("");
+                    setEditingReward({});
+                    setFormErrors({});
+                    setIsEditDurationUnlimited(false);
                   }}
                   className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                 >
