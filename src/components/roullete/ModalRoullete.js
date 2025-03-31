@@ -8,35 +8,57 @@ import {
 } from "@/components/ui/dialog";
 import { Gift } from 'lucide-react';
 import TicketsList from './TicketsList';
-import Image from 'next/image'; // Importamos el componente Image de Next.js
+import { useSession } from "next-auth/react";
+import { useStrapiData as strapiJWT } from 'src/services/strapiServiceJWT';
 
-export default function ModalRoullete() {
+
+
+export default function ModalRoulette() {
+  const TICKET_ID = process.env.NEXT_PUBLIC_TICKET_ID || 0;
+  const { data: session, status } = useSession();
+  // console.log('session', session);
+  const { data: user, status: statusUser } = strapiJWT('users/me', session?.jwt || '');
+  const handleBuyTicket = () => {
+    // Aquí puedes agregar la lógica para comprar un ticket
+    console.log("Comprar ticket");
+    // const woocommerceId = matchingVariation?.id || selectedProduct.woocommerceId;
+    window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${TICKET_ID}&quantity=1&user_id=${user.documentId}`;
+  };
+
   return (
     <Dialog>
-      <DialogTrigger className="p-1 bg-black text-[var(--app-primary)] rounded-full hover:bg-[var(--app-primary)] hover:text-black transition-colors duration-300">
-        <img 
-          src="/images/sorteo.svg" 
-          alt="Sorteo" 
-          width={30} 
+      <DialogTrigger className="p-1 bg-zinc-900 text-amber-400 rounded-full hover:bg-amber-500 hover:text-black transition-colors duration-300">
+        <img
+          src="/images/sorteo.svg"
+          alt="Sorteo"
+          width={30}
           height={30}
           className="w-24 h-24"
         />
       </DialogTrigger>
-      <DialogContent className="bg-black text-[var(--app-primary)] p-0 rounded-lg border-2 border-[var(--app-primary)] shadow-[0_0_20px_rgba(255,215,0,0.3)] max-w-md w-full max-h-[90vh] overflow-hidden">
-        <DialogHeader className="p-6 border-b border-[var(--app-primary)]/20 bg-gradient-to-b from-black ">
+      <DialogContent className="bg-zinc-900 text-white p-0 rounded-lg border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.25)] max-w-md w-full max-h-[90vh] overflow-hidden">
+        <DialogHeader className="p-6 border-b border-amber-700 bg-gradient-to-b from-zinc-900 to-zinc-800">
           <DialogTitle className="text-2xl font-bold text-center flex flex-col items-center gap-3">
-            <div className="w-16 h-16 rounded-full bg-black border-2 border-[var(--app-primary)] flex items-center justify-center shadow-[0_0_10px_rgba(255,215,0,0.3)]">
-              <Gift className="h-8 w-8 text-[var(--app-primary)]" />
+            <div className="w-16 h-16 rounded-full bg-zinc-800 border-2 border-amber-500 flex items-center justify-center shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+              <Gift className="h-8 w-8 text-amber-400" />
             </div>
-            <span>Mis Tickets</span>
+            <span className="text-amber-300">Mis Tickets</span>
           </DialogTitle>
         </DialogHeader>
 
         {/* Scrollable content area with improved styling */}
-        <div className="overflow-y-auto max-h-[calc(80vh-140px)] py-4 px-4 bg-black">
+        <div className="overflow-y-auto max-h-[calc(80vh-140px)] py-4 px-4 bg-zinc-900">
+          <div className="mb-4 flex justify-center">
+            <button
+              onClick={() => handleBuyTicket()}
+              className="px-6 py-3 bg-[var(--app-primary)] text-white font-bold rounded-lg hover:brightness-110 transition-all duration-300 shadow-md w-full"
+            >
+              Comprar Ticket
+            </button>
+          </div>
           <TicketsList />
           {/* Hidden gradient at bottom to fade out scrollable content */}
-          <div className="sticky bottom-0 left-0 right-0 h-4 bg-gradient-to-t to-transparent pointer-events-none -mt-4"></div>
+          <div className="sticky bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-zinc-900 to-transparent pointer-events-none -mt-4"></div>
         </div>
       </DialogContent>
     </Dialog>
