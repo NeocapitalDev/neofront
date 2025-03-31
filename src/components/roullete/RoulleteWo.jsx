@@ -162,12 +162,12 @@ export default function RuletaSorteo({
       const lightX = centerX + Math.cos(midAngle) * (radius * 0.5);
       const lightY = centerY + Math.sin(midAngle) * (radius * 0.5);
       const lightGradient = ctx.createRadialGradient(
-      lightX,
-      lightY,
-      0,
-      lightX,
-      lightY,
-      radius * 0.8
+        lightX,
+        lightY,
+        0,
+        lightX,
+        lightY,
+        radius * 0.8
       );
       lightGradient.addColorStop(0, colorSet.light);
       lightGradient.addColorStop(0.6, colorSet.main);
@@ -186,14 +186,14 @@ export default function RuletaSorteo({
       ctx.beginPath();
       ctx.moveTo(centerX, centerY);
       ctx.lineTo(
-      centerX + Math.cos(angle) * (radius - 2),
-      centerY + Math.sin(angle) * (radius - 2)
+        centerX + Math.cos(angle) * (radius - 2),
+        centerY + Math.sin(angle) * (radius - 2)
       );
       const lineGradient = ctx.createLinearGradient(
-      centerX,
-      centerY,
-      centerX + Math.cos(angle) * radius,
-      centerY + Math.sin(angle) * radius
+        centerX,
+        centerY,
+        centerX + Math.cos(angle) * radius,
+        centerY + Math.sin(angle) * radius
       );
       lineGradient.addColorStop(0, "rgba(0, 0, 0, 0.2)");
       lineGradient.addColorStop(0.5, "rgba(255, 255, 255, 0.6)");
@@ -207,30 +207,30 @@ export default function RuletaSorteo({
       const textAngle = angle + arcSize / 2;
       const textX = centerX + Math.cos(textAngle) * textRadius;
       const textY = centerY + Math.sin(textAngle) * textRadius;
-      
+
       ctx.save();
       ctx.translate(textX, textY);
-      
+
       // Determinar la rotación correcta para que el texto siempre esté derecho
       let textRotation = textAngle;
       // Ajustar la rotación para que el texto esté siempre derecho
-      if (textAngle > Math.PI / 2 && textAngle < Math.PI * 3 / 2) {
-      textRotation += Math.PI; // Rotar 180 grados para la parte inferior de la rueda
+      if (textAngle > Math.PI / 2 && textAngle < (Math.PI * 3) / 2) {
+        textRotation += Math.PI; // Rotar 180 grados para la parte inferior de la rueda
       }
-      
+
       ctx.rotate(textRotation);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = "#212121";
       ctx.font = "bold 16px 'Arial', sans-serif";
-      
+
       // Si el texto está en la parte inferior, lo dibujamos invertido
-      if (textAngle > Math.PI / 2 && textAngle < Math.PI * 3 / 2) {
-      ctx.fillText(options[i].name, 0, 0);
+      if (textAngle > Math.PI / 2 && textAngle < (Math.PI * 3) / 2) {
+        ctx.fillText(options[i].name, 0, 0);
       } else {
-      ctx.fillText(options[i].name, 0, 0);
+        ctx.fillText(options[i].name, 0, 0);
       }
-      
+
       ctx.restore();
     }
 
@@ -463,13 +463,11 @@ export default function RuletaSorteo({
         setHasSpun(true); // Disable spin button
         return;
       }
-
       const winningIndex = winningOption.indice;
 
       if (winningIndex < 0 || winningIndex >= opciones.length) {
         throw new Error("El índice ganador está fuera de rango");
       }
-
       // Guardamos el índice ganador en el ref para usarlo en la celebración
       winningIndexRef.current = winningIndex;
       codigoRef.current = winningOption.cupon;
@@ -685,8 +683,25 @@ export default function RuletaSorteo({
                   width: "100%",
                 }}
               >
-                <p>¡Ganaste un descuento de: {selectedOption.name}%!</p>
+                {
+                  // Verifica si selectedOption.name es un valor numérico (con o sin "%")
+                  /^\d+%?$/.test(selectedOption.name) ? (
+                    <p>
+                      ¡Ganaste un descuento de:{" "}
+                      {selectedOption.name.endsWith("%")
+                        ? selectedOption.name
+                        : `${selectedOption.name}%`}
+                      !
+                    </p>
+                  ) : (
+                    <p>
+                      ¡Ganaste un descuento de {selectedOption.descuento}% en{" "}
+                      {selectedOption.name}!
+                    </p>
+                  )
+                }
 
+                {/* Resto del contenido (por ejemplo, botón para copiar el código, etc.) */}
                 <div className="flex items-center justify-center mt-2 w-full">
                   <span className="mr-2">Código: {codigoRef.current}</span>
                   <motion.button
