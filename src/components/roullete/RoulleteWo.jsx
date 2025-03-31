@@ -439,7 +439,7 @@ export default function RuletaSorteo({
     try {
       // Solicita al backend el índice ganador
       const response = await fetch(
-        "https://n8n.neocapitalfunding.com/webhook-test/roullete",
+        "https://n8n.neocapitalfunding.com/webhook/roullete",
         {
           method: "POST",
           headers: {

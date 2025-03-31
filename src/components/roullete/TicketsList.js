@@ -106,7 +106,11 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
                 {ticket.habilitado ? (
                   <span>Válido hasta: {formatDate(ticket.fechaExpiracionTicket)}</span>
                 ) : (
-                  <span>Recompensa: {ticket.reward?.nombre || 'No definido'}</span>
+                  <div className='flex justify-between w-full'>
+                    <span>Válido hasta: {formatDate(ticket.fechaExpiracionPremio)}</span>
+
+                    <span>Recompensa: {ticket.reward?.nombre || '-'}</span>
+                  </div>
                 )}
               </div>
             </div>
