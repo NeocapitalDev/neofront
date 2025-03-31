@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useStrapiData } from "src/services/strapiService";
 import { useSession } from "next-auth/react";
-import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { ClipboardDocumentIcon, CheckIcon } from "@heroicons/react/24/outline";
 
 export default function RuletaSorteo({
   customOptions,
@@ -13,21 +13,18 @@ export default function RuletaSorteo({
   documentId,
   onClose, // Added onClose prop for the Exit button
 }) {
-  // Hooks y estados
-  // console.log("documentId", documentId);
   const { data: session } = useSession();
   const { data, error, loading } = useStrapiData("rewards");
-  // console.log("document" + data);
   const [isSpinning, setIsSpinning] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [startAngle, setStartAngle] = useState(0);
   const canvasRef = useRef(null);
   const [centerImageLoaded, setCenterImageLoaded] = useState(false);
   const centerImageRef = useRef(null);
-  const [hasSpun, setHasSpun] = useState(false); // New state to track if wheel has been spun successfully
+  const [hasSpun, setHasSpun] = useState(false);
   const [ticketError, setTicketError] = useState("");
   const [codigoCopiad, setCodigoCopiad] = useState(false);
-  // Refs para controlar la animación
+
   const animationRef = useRef(null);
   const celebrationRef = useRef(null);
   const currentAngleRef = useRef(startAngle);
@@ -40,18 +37,14 @@ export default function RuletaSorteo({
     opciones = customOptions;
   } else if (data) {
     opciones = data.map((item) => ({
-      name: String(item.procentaje),
+      name: String(item.nombre),
       documentId: item.documentId,
     }));
   }
 
   // Constante: El puntero ahora está en la parte inferior (π/2 rad o 90 grados)
-  const angleOffset = Math.PI / 2; // 90 grados en radianes
+  const angleOffset = Math.PI / 2;
 
-  // ---------------------------
-  // Funciones de CÁLCULO y EASING
-  // ---------------------------
-  // Función de easing (easeOutCubic) para una transición suave
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
   // Normaliza un ángulo para que esté entre 0 y 2π
@@ -65,7 +58,6 @@ export default function RuletaSorteo({
     // Centro del sector ganador
     const sectorCenter = winningIndex * arcSize + arcSize / 2;
     const normalizedCurrent = normalizeAngle(currentAngle);
-    // Se busca que: normalize(finalAngle + sectorCenter) = angleOffset => finalAngle = angleOffset - sectorCenter (mod 2π)
     let delta = normalizeAngle(angleOffset - sectorCenter - normalizedCurrent);
     // Añadimos vueltas extras para efecto visual (por ejemplo, 5 vueltas completas)
     const extraSpins = 5 * 2 * Math.PI;
@@ -74,7 +66,8 @@ export default function RuletaSorteo({
 
   const copiarCodigoAlPortapapeles = () => {
     if (codigoRef.current) {
-      navigator.clipboard.writeText(codigoRef.current)
+      navigator.clipboard
+        .writeText(codigoRef.current)
         .then(() => {
           setCodigoCopiad(true);
           // Reinicia el estado después de 2 segundos
@@ -82,8 +75,8 @@ export default function RuletaSorteo({
             setCodigoCopiad(false);
           }, 2000);
         })
-        .catch(err => {
-          console.error('Error al copiar el código: ', err);
+        .catch((err) => {
+          console.error("Error al copiar el código: ", err);
         });
     }
   };
@@ -169,12 +162,12 @@ export default function RuletaSorteo({
       const lightX = centerX + Math.cos(midAngle) * (radius * 0.5);
       const lightY = centerY + Math.sin(midAngle) * (radius * 0.5);
       const lightGradient = ctx.createRadialGradient(
-        lightX,
-        lightY,
-        0,
-        lightX,
-        lightY,
-        radius * 0.8
+      lightX,
+      lightY,
+      0,
+      lightX,
+      lightY,
+      radius * 0.8
       );
       lightGradient.addColorStop(0, colorSet.light);
       lightGradient.addColorStop(0.6, colorSet.main);
@@ -193,14 +186,14 @@ export default function RuletaSorteo({
       ctx.beginPath();
       ctx.moveTo(centerX, centerY);
       ctx.lineTo(
-        centerX + Math.cos(angle) * (radius - 2),
-        centerY + Math.sin(angle) * (radius - 2)
+      centerX + Math.cos(angle) * (radius - 2),
+      centerY + Math.sin(angle) * (radius - 2)
       );
       const lineGradient = ctx.createLinearGradient(
-        centerX,
-        centerY,
-        centerX + Math.cos(angle) * radius,
-        centerY + Math.sin(angle) * radius
+      centerX,
+      centerY,
+      centerX + Math.cos(angle) * radius,
+      centerY + Math.sin(angle) * radius
       );
       lineGradient.addColorStop(0, "rgba(0, 0, 0, 0.2)");
       lineGradient.addColorStop(0.5, "rgba(255, 255, 255, 0.6)");
@@ -209,14 +202,35 @@ export default function RuletaSorteo({
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Texto del sector (rotado para mejor legibilidad)
+      // Texto del sector - ahora siempre derecho y legible
+      const textRadius = radius * 0.7;
+      const textAngle = angle + arcSize / 2;
+      const textX = centerX + Math.cos(textAngle) * textRadius;
+      const textY = centerY + Math.sin(textAngle) * textRadius;
+      
       ctx.save();
-      ctx.translate(centerX, centerY);
-      ctx.rotate(angle + arcSize / 2);
-      ctx.textAlign = "right";
+      ctx.translate(textX, textY);
+      
+      // Determinar la rotación correcta para que el texto siempre esté derecho
+      let textRotation = textAngle;
+      // Ajustar la rotación para que el texto esté siempre derecho
+      if (textAngle > Math.PI / 2 && textAngle < Math.PI * 3 / 2) {
+      textRotation += Math.PI; // Rotar 180 grados para la parte inferior de la rueda
+      }
+      
+      ctx.rotate(textRotation);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
       ctx.fillStyle = "#212121";
-      ctx.font = "bold 18px 'Arial', sans-serif";
-      ctx.fillText(options[i].name, radius * 0.85, 6);
+      ctx.font = "bold 16px 'Arial', sans-serif";
+      
+      // Si el texto está en la parte inferior, lo dibujamos invertido
+      if (textAngle > Math.PI / 2 && textAngle < Math.PI * 3 / 2) {
+      ctx.fillText(options[i].name, 0, 0);
+      } else {
+      ctx.fillText(options[i].name, 0, 0);
+      }
+      
       ctx.restore();
     }
 
@@ -425,7 +439,7 @@ export default function RuletaSorteo({
     try {
       // Solicita al backend el índice ganador
       const response = await fetch(
-        "https://n8n.neocapitalfunding.com/webhook/roullete",
+        "https://n8n.neocapitalfunding.com/webhook-test/roullete",
         {
           method: "POST",
           headers: {
@@ -631,7 +645,7 @@ export default function RuletaSorteo({
               style={{
                 position: "absolute",
                 bottom: "-65px",
-                left: "34%", // 
+                left: "34%", //
                 transform: "translateX(-50%)",
                 width: 80,
                 height: 30, // Increased height for the icon container
@@ -647,7 +661,7 @@ export default function RuletaSorteo({
                 style={{
                   width: "80%",
                   maxWidth: "80px",
-                  display: "block"
+                  display: "block",
                 }}
               />
             </motion.div>
@@ -668,7 +682,7 @@ export default function RuletaSorteo({
                   color: "#FFEB3B",
                   fontWeight: "bold",
                   textAlign: "center",
-                  width: "100%"
+                  width: "100%",
                 }}
               >
                 <p>¡Ganaste un descuento de: {selectedOption.name}%!</p>
