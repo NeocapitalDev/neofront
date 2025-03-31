@@ -10,6 +10,7 @@ import { useStrapiData } from '@/services/strapiServiceJWT';
 import { useSession } from "next-auth/react";
 import { createPortal } from 'react-dom';
 import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/outline';
+
 // Minimalistic TicketCard component
 const TicketCard = ({ ticket, onOpenRoulette }) => {
   const [copiado, setCopiado] = useState(false);
@@ -54,12 +55,10 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
 
             <div className="flex items-center text-xs">
               <div
-                className={`w-3 h-3 rounded-full mr-1 ${ticket.habilitado ? 'bg-emerald-500' : 'bg-rose-500'
-                  }`}
+                className={`w-3 h-3 rounded-full mr-1 ${ticket.habilitado ? 'bg-emerald-500' : 'bg-rose-500'}`}
               ></div>
               <span
-                className={`font-medium ${ticket.habilitado ? 'text-emerald-400' : 'text-rose-400'
-                  }`}
+                className={`font-medium ${ticket.habilitado ? 'text-emerald-400' : 'text-rose-400'}`}
               >
                 {ticket.habilitado ? 'Disponible' : 'Utilizado'}
               </span>
@@ -68,7 +67,7 @@ const TicketCard = ({ ticket, onOpenRoulette }) => {
 
           {/* Porcentaje de descuento o recompensa */}
           <span className="text-2xl font-semibold text-amber-400">
-            {ticket.reward.porcentaje}%
+            {ticket.reward?.porcentaje}%
           </span>
         </div>
 
@@ -181,11 +180,11 @@ const RouletteModal = ({ isOpen, onClose, ticket, onTicketUsed }) => {
     >
       {/* Contenido del modal con dimensiones responsivas */}
       <div
-        className="relative z-10 bg-zinc-900 rounded-lg w-full max-w-md mx-auto flex flex-col items-center overflow-hidden"
+        className="relative z-10 bg-[#18181b] rounded-lg w-full max-w-md mx-auto flex flex-col items-center overflow-hidden"
         style={{
           border: '2px solid #F59E0B',
           boxShadow: '0 0 20px rgba(245, 158, 11, 0.3)',
-          height: '520px',
+          height: '550px',
           maxHeight: '90vh'
         }}
         onClick={(e) => e.stopPropagation()} // Prevent clicks from reaching the backdrop
@@ -212,7 +211,7 @@ const RouletteModal = ({ isOpen, onClose, ticket, onTicketUsed }) => {
           <RuletaSorteo
             documentId={ticket?.documentId}
             onClose={onClose}
-            // Añadido: callback para cuando se recibe un premio
+            // Callback para cuando se recibe un premio
             onPrizeReceived={() => {
               // Llamar a onTicketUsed con el ID del ticket cuando se recibe un premio
               if (ticket && ticket.id) {
@@ -244,39 +243,43 @@ export default function TicketsList() {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const { data: session } = useSession();
 
-  // Nuevo: estado para rastrear tickets utilizados mediante la ruleta
+  // Estado para rastrear tickets utilizados mediante la ruleta
   const [usedTickets, setUsedTickets] = useState(new Set());
 
-  // Fetch tickets data
-  const { data, error, isLoading } = useStrapiData(
-    `users/me?populate[tickets][populate]=reward`, session?.jwt || ''
+  // Fetch tickets data (se asume que el hook retorna también un método refetch)
+  const { data, error, isLoading, refetch } = useStrapiData(
+    `users/me?populate[tickets][populate]=reward`,
+    session?.jwt || ''
   );
   const tickets = data?.tickets || [];
-  // console.log('tickets', tickets);
 
-
-  // Function to open roulette modal
+  // Función para abrir el modal de la ruleta
   const handleOpenRoulette = (ticket) => {
     setSelectedTicket(ticket);
     setIsRouletteOpen(true);
   };
 
-  // Nuevo: función para marcar un ticket como utilizado después de un giro exitoso
+  // Función para cerrar la ruleta y forzar una nueva consulta de tickets
+  const handleCloseRoulette = () => {
+    setIsRouletteOpen(false);
+    refetch();
+  };
+
+  // Función para marcar un ticket como utilizado después de un giro exitoso
   const handleTicketUsed = (ticketId) => {
-    // Actualiza el estado local para marcar este ticket como utilizado
-    setUsedTickets(prev => {
+    setUsedTickets((prev) => {
       const newSet = new Set(prev);
       newSet.add(ticketId);
       return newSet;
     });
   };
 
-  // Nuevo: función auxiliar para verificar si un ticket está utilizado (ya sea desde API o estado local)
+  // Función auxiliar para verificar si un ticket está utilizado (ya sea desde API o estado local)
   const isTicketUsed = (ticket) => {
     return !ticket.habilitado || usedTickets.has(ticket.id);
   };
 
-  // Loading state
+  // Estado de carga
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -286,7 +289,7 @@ export default function TicketsList() {
     );
   }
 
-  // Error state
+  // Estado de error
   if (error) {
     return (
       <div className="text-center p-6 text-red-500">
@@ -296,7 +299,7 @@ export default function TicketsList() {
     );
   }
 
-  // No tickets state
+  // Estado cuando no hay tickets
   if (!tickets || tickets.length === 0) {
     return (
       <div className="text-center py-8">
@@ -309,26 +312,35 @@ export default function TicketsList() {
     );
   }
 
-  // Render tickets list
+  // Render de la lista de tickets
   return (
     <div>
       <div className="space-y-3">
-        {tickets.map((ticket) => (
-          <TicketCard
-            key={ticket.id}
-            // Modificado: Sobreescribe la propiedad habilitado basado en estado local
-            ticket={{ ...ticket, habilitado: !isTicketUsed(ticket) }}
-            onOpenRoulette={handleOpenRoulette}
-          />
-        ))}
+        {tickets
+          .sort((a, b) => {
+            // Sort by habilitado: true first, then false
+            const aEnabled = !isTicketUsed(a);
+            const bEnabled = !isTicketUsed(b);
+            if (aEnabled && !bEnabled) return -1;
+            if (!aEnabled && bEnabled) return 1;
+            return 0; // Keep original order for items with same status
+          })
+          .map((ticket) => (
+            <TicketCard
+              key={ticket.id}
+              // Se sobreescribe la propiedad habilitado basado en el estado local
+              ticket={{ ...ticket, habilitado: !isTicketUsed(ticket) }}
+              onOpenRoulette={handleOpenRoulette}
+            />
+          ))}
       </div>
 
-      {/* Roulette modal - Modificado para pasar onTicketUsed */}
+      {/* Roulette modal con onClose modificado para forzar refetch */}
       <RouletteModal
         isOpen={isRouletteOpen}
-        onClose={() => setIsRouletteOpen(false)}
+        onClose={handleCloseRoulette}
         ticket={selectedTicket}
-        onTicketUsed={handleTicketUsed} // Nuevo: pasa el callback para marcar tickets como usados
+        onTicketUsed={handleTicketUsed}
       />
     </div>
   );

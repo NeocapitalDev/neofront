@@ -102,7 +102,7 @@ export default function ModalRoulette() {
         {/* Área scrollable con el comportamiento de scroll personalizado */}
         <div
           ref={scrollableRef}
-          className="overflow-y-auto max-h-[calc(80vh-140px)] py-4 px-4 bg-zinc-900 [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-amber-500 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-amber-600"
+          className="overflow-y-auto max-h-[calc(80vh-140px)] py-4 pb-20 px-4 bg-zinc-900 [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-amber-500 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-amber-600"
           style={{ overscrollBehavior: 'contain' }}
         >
           <TicketsList />
