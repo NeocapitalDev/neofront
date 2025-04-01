@@ -404,6 +404,20 @@ const Metrix = () => {
                 profitTargetAbsolute={profitTargetAbsolute}
               />
             </div>
+
+            {/* Objetivos para pantallas pequeñas - AÑADIDO AQUÍ */}
+            <div className="block lg:hidden mt-4 bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+              <h2 className="text-lg font-semibold flex items-center mb-2">
+                <FileChartColumn className="w-5 h-5 mr-2 text-[var(--app-primary)]" />
+                Objetivos
+              </h2>
+              <Objetivos 
+                challengeConfig={challengeConfig}
+                metricsData={metadataStats}
+                initBalance={initialBalance}
+              />
+            </div>
+            
             {/* Otros componentes: Win/Loss, Estadísticas, Resumen por instrumentos */}
             <div className="grid grid-cols-1 gap-4 mt-4">
               <h2 className="text-lg font-semibold flex items-center">
@@ -529,6 +543,16 @@ const Metrix = () => {
                       : "-"}
                   </span>
                 </div>
+              </div>
+
+              {/* Objetivos para pantallas grandes - AÑADIDO AQUÍ */}
+              <div className="hidden lg:block bg-white dark:bg-zinc-800 p-3 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
+                <h2 className="text-base font-semibold mb-2">Objetivos</h2>
+                <Objetivos 
+                  challengeConfig={challengeConfig}
+                  metricsData={metadataStats}
+                  initBalance={initialBalance}
+                />
               </div>
 
               {/* Certificados para pantallas grandes - MODIFICADO para usar enlaces directos */}

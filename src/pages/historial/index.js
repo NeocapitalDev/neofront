@@ -313,8 +313,8 @@ export default function Historial() {
                                                     )}
                                                 </button>
 
-                                                {/* Botón de metrix - PRIMERA MODIFICACIÓN */}
-                                                <Link href={`/metrix/${lastChallenge.documentId}`}>
+                                                {/* Botón de metrix - MODIFICADO para usar metrix2 */}
+                                                <Link href={`/metrix2/${lastChallenge.documentId}`}>
                                                     <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-sm transition-all duration-200">
                                                         <ChartBarIcon className="h-4 w-4 mr-1" />
                                                         <span>Metrix</span>
@@ -420,8 +420,8 @@ export default function Historial() {
                                                                 <div className="flex space-x-2 overflow-x-auto overflow-y-hidden">
                                                                     {/* Botones de certificado */}
                                                                     {renderCertificateButtons(challenge)}
-                                                                    {/* Botón de detalles - SEGUNDA MODIFICACIÓN */}
-                                                                    <Link href={`/metrix/${challenge.documentId}`}>
+                                                                    {/* Botón de detalles - MODIFICADO para usar metrix2 */}
+                                                                    <Link href={`/metrix2/${challenge.documentId}`}>
                                                                         <button className="flex h-8 bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
                                                                             <ChartBarIcon className="h-4 w-4 mr-1" />
                                                                             <span>Ver detalles</span>
