@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import DashboardLayout from "..";
+import { AlertCircle, InboxIcon } from "lucide-react";
 
 const withdrawColumns = [
   { accessorKey: "id", header: "ID" },
