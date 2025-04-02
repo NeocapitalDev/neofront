@@ -185,7 +185,7 @@ const RelatedChallenges = ({ currentChallenge }) => {
                       Actual
                     </span>
                   ) : challenge.result === 'progress' || challenge.result === 'init' ? (
-                    <Link href={`/metrix2/${challenge.documentId}`}>
+                    <Link href={`/metrix/${challenge.documentId}`}>
                       <button className="flex items-center justify-center space-x-2 px-3 py-1 border rounded-lg shadow-sm bg-blue-200 hover:bg-blue-300 dark:bg-blue-700 dark:hover:bg-blue-600 border-blue-300 dark:border-blue-500">
                         <ChartBarIcon className="h-4 w-4 text-blue-600 dark:text-blue-200" />
                         <span className="text-xs dark:text-blue-200">Metrix Live</span>
