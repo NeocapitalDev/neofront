@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -32,7 +31,7 @@ import { AlertCircle, InboxIcon } from "lucide-react";
 
 const withdrawColumns = [
   { accessorKey: "id", header: "ID" },
-  { accessorKey: "documentId", header: "Document ID" },
+  // { accessorKey: "documentId", header: "Document ID" },
   { accessorKey: "wallet", header: "Wallet" },
   { accessorKey: "amount", header: "Monto" },
   { accessorKey: "estado", header: "Estado" },
@@ -40,7 +39,6 @@ const withdrawColumns = [
   { accessorKey: "username", header: "Usuario" },
   { accessorKey: "challengeId", header: "ID del Challenge" },
   { accessorKey: "action", header: "Acciones" },
-  // { accessorKey: "challengeDocumentId", header: "Document ID del Challenge" },
 ];
 
 export default function WithdrawsTable() {
@@ -81,12 +79,10 @@ export default function WithdrawsTable() {
         },
       });
       if (response.ok) {
-        // console.log("Respuesta del servidor:", response);s
         toast.success("Retiro completado ", response.respuesta || response.ok);
-        // Force page reload after successful withresponse.respuesta || response.okdrawal acceptance
         setTimeout(() => {
-          // window.location.reload();
-        }, 1000); // Delay of 1 second to allow the toast to be visible
+          window.location.reload();
+        }, 1000);
       } else {
         throw new Error("Error en la respuesta del servidor", response.respuesta || response.error);
       }
@@ -127,6 +123,9 @@ export default function WithdrawsTable() {
       if (response.ok) {
         toast.success("Retiro rechazado y notificado al usuario. ", response.respuesta || response.ok);
         setIsRejectModalOpen(false);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
         throw new Error("Error en la respuesta del servidor", response.respuesta || response.error);
       }
@@ -171,12 +170,13 @@ export default function WithdrawsTable() {
       const matchesEstado = estadoFilter ? item.estado === estadoFilter : true;
 
       // Solo aplicar filtros de fecha si son fechas válidas
-      const validStartDate = item.startDate !== "N/A";
-      const validEndDate = item.endDate !== "N/A";
+      const itemDate = new Date(item.createdAt);
+      const startDate = startDateFilter ? new Date(startDateFilter) : null;
+      const endDate = endDateFilter ? new Date(endDateFilter) : null;
 
       const matchesDateRange =
-        (!startDateFilter || !validStartDate || new Date(item.startDate) >= new Date(startDateFilter)) &&
-        (!endDateFilter || !validEndDate || new Date(item.endDate) <= new Date(endDateFilter));
+        (!startDate || itemDate >= startDate) &&
+        (!endDate || itemDate <= endDate);
 
       return matchesEstado && matchesDateRange;
     });
@@ -184,20 +184,60 @@ export default function WithdrawsTable() {
 
   const table = useReactTable({
     data: filteredData,
-    columns: withdrawColumns,
+    columns: withdrawColumns.map(column => {
+      if (column.accessorKey === "action") {
+        return {
+          ...column,
+          cell: ({ row }) => (
+            <div className="flex space-x-2">
+              <Button
+                size="sm"
+                variant="success"
+                disabled={row.original.estado !== "proceso" || isSubmitting}
+                onClick={() => handleAccept(row.original.documentId)}
+                className={`px-3 py-1 text-xs font-medium rounded-md ${row.original.estado !== "proceso" || isSubmitting
+                  ? "bg-zinc-300 dark:bg-zinc-600 text-zinc-500 dark:text-zinc-400 cursor-not-allowed"
+                  : "bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black dark:text-white shadow-sm"
+                  } transition-colors`}
+              >
+                Completar
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                disabled={row.original.estado !== "proceso" || isSubmitting}
+                onClick={() => openRejectModal(row.original)}
+                className={`px-3 py-1 text-xs font-medium rounded-md ${row.original.estado !== "proceso" || isSubmitting
+                  ? "bg-zinc-300 dark:bg-zinc-600 text-zinc-500 dark:text-zinc-400 cursor-not-allowed"
+                  : "bg-red-600 hover:bg-red-700 text-white shadow-sm"
+                  } transition-colors`}
+              >
+                Rechazar
+              </Button>
+            </div>
+          )
+        };
+      }
+      return column;
+    }),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   });
 
   return (
     <DashboardLayout>
-      <div className="p-6 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-white rounded-lg shadow-lg border-t-4 border-[var(--app-secondary)]">
-        <h1 className="text-4xl font-bold mb-6 text-zinc-800 dark:text-white">
-          <span className=" pb-1">Retiros</span>
+      <div className="p-4 md:p-6 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-white rounded-lg shadow-lg border-t-4 border-[var(--app-secondary)]">
+        <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6 text-zinc-800 dark:text-white">
+          <span className="pb-1">Retiros</span>
         </h1>
 
         {/* Barra de búsqueda y filtros */}
-        <div className="mb-6 bg-[var(--app-primary)]/10 dark:bg-zinc-800 p-4 rounded-lg border border-[var(--app-primary)]/20 dark:border-zinc-700 flex flex-wrap gap-4">
+        <div className="mb-4 md:mb-6 bg-[var(--app-primary)]/10 dark:bg-zinc-800 p-3 md:p-4 rounded-lg border border-[var(--app-primary)]/20 dark:border-zinc-700 flex flex-col md:flex-row flex-wrap gap-3 md:gap-4">
           <label className="flex items-center gap-2">
             <span className="font-medium text-zinc-700 dark:text-zinc-300">Estado:</span>
             <select
@@ -234,17 +274,17 @@ export default function WithdrawsTable() {
         </div>
 
         {/* Tabla */}
-        <div className="bg-white dark:bg-zinc-900 p-4 rounded-lg border border-[var(--app-primary)]/30 dark:border-zinc-700 shadow-sm">
-          <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700">
+        <div className="bg-white dark:bg-zinc-900 p-2 md:p-4 rounded-lg border border-[var(--app-primary)]/30 dark:border-zinc-700 shadow-sm">
+          <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-x-auto">
             <Table>
-              <TableHeader className="bg-[var(--app-primary)] dark:bg-zinc-800 p-2">
+              <TableHeader className="bg-[var(--app-primary)] dark:bg-zinc-800">
                 <TableRow>
-                  {withdrawColumns.map((column) => (
+                  {table.getHeaderGroups()[0].headers.map((header) => (
                     <TableHead
-                      key={column.accessorKey}
-                      className="text-zinc-700 dark:text-zinc-300 border-b border-[var(--app-primary)]/30 dark:border-zinc-700 py-3 px-4 font-medium"
+                      key={header.id}
+                      className="text-xs md:text-sm text-zinc-700 dark:text-zinc-300 border-b border-[var(--app-primary)]/30 dark:border-zinc-700 py-2 px-2 md:py-3 md:px-4 font-medium whitespace-nowrap"
                     >
-                      {column.header}
+                      {header.column.columnDef.header}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -268,65 +308,52 @@ export default function WithdrawsTable() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : filteredData.length > 0 ? (
-                  filteredData.map((item, index) => (
+                ) : table.getRowModel().rows.length > 0 ? (
+                  table.getRowModel().rows.map((row) => (
                     <TableRow
-                      key={index}
-                      className={`border-b border-[var(--app-primary)]/20 dark:border-zinc-700 ${index % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-[var(--app-primary)]/5 dark:bg-zinc-800/40'
+                      key={row.id}
+                      className={`border-b border-[var(--app-primary)]/20 dark:border-zinc-700 ${row.index % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-[var(--app-primary)]/5 dark:bg-zinc-800/40'
                         } hover:bg-[var(--app-primary)]/10 dark:hover:bg-zinc-800 transition-colors`}
                     >
-                      <TableCell className="py-3 px-4 text-zinc-700 dark:text-zinc-300">{item.id}</TableCell>
-                      <TableCell className="py-3 px-4 text-zinc-700 dark:text-zinc-300">{item.documentId}</TableCell>
-                      <TableCell className="py-3 px-4 text-zinc-700 dark:text-zinc-300">{item.wallet}</TableCell>
-                      <TableCell className="py-3 px-4 text-zinc-700 dark:text-zinc-300 font-medium">{item.amount}</TableCell>
-                      <TableCell className="py-3 px-4">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${item.estado === "pagado"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                          : item.estado === "rechazado"
-                            ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                            : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                          }`}>
-                          {item.estado}
-                        </span>
-                      </TableCell>
-                      <TableCell className="py-3 px-4 text-zinc-700 dark:text-zinc-300">{formatDate(item.createdAt)}</TableCell>
-                      <TableCell className="py-3 px-4 text-zinc-700 dark:text-zinc-300">{item.username}</TableCell>
-                      <TableCell className="py-3 px-4 text-zinc-700 dark:text-zinc-300">{item.challengeId}</TableCell>
-                      <TableCell className="py-3 px-4">
-                        <div className="flex space-x-2">
-                          <Button
-                            size="sm"
-                            variant="success"
-                            disabled={item.estado !== "proceso" || isSubmitting}
-                            onClick={() => handleAccept(item.documentId)}
-                            className={`px-3 py-1 text-xs font-medium rounded-md ${item.estado !== "proceso" || isSubmitting
-                              ? "bg-zinc-300 dark:bg-zinc-600 text-zinc-500 dark:text-zinc-400 cursor-not-allowed"
-                              : "bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black dark:text-white shadow-sm"
-                              } transition-colors`}
-                          >
-                            Completar
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            disabled={item.estado !== "proceso" || isSubmitting}
-                            onClick={() => openRejectModal(item)}
-                            className={`px-3 py-1 text-xs font-medium rounded-md ${item.estado !== "proceso" || isSubmitting
-                              ? "bg-zinc-300 dark:bg-zinc-600 text-zinc-500 dark:text-zinc-400 cursor-not-allowed"
-                              : "bg-red-600 hover:bg-red-700 text-white shadow-sm"
-                              } transition-colors`}
-                          >
-                            Rechazar
-                          </Button>
-                        </div>
-                      </TableCell>
+                      {row.getVisibleCells().map((cell) => {
+                        const value = cell.getValue();
+
+                        if (cell.column.id === "estado") {
+                          return (
+                            <TableCell key={cell.id} className="py-2 px-2 md:py-3 md:px-4 text-xs md:text-sm">
+                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${value === "pagado"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                : value === "rechazado"
+                                  ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                                  : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                                }`}>
+                                {value}
+                              </span>
+                            </TableCell>
+                          );
+                        }
+
+                        if (cell.column.id === "createdAt") {
+                          return (
+                            <TableCell key={cell.id} className="py-2 px-2 md:py-3 md:px-4 text-xs md:text-sm text-zinc-700 dark:text-zinc-300 whitespace-nowrap">
+                              {formatDate(value)}
+                            </TableCell>
+                          );
+                        }
+
+                        return (
+                          <TableCell key={cell.id} className="py-2 px-2 md:py-3 md:px-4 text-xs md:text-sm text-zinc-700 dark:text-zinc-300">
+                            {cell.column.id === "action" ? cell.column.columnDef.cell({ row: row }) : cell.getValue()}
+                          </TableCell>
+                        );
+                      })}
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={withdrawColumns.length} className="text-center text-zinc-500 py-12">
-                      <div className="flex flex-col items-center justify-center bg-[var(--app-primary)]/5 dark:bg-zinc-800/40 p-6 rounded-lg border border-[var(--app-primary)]/10 dark:border-zinc-700">
-                        <InboxIcon className="w-10 h-10 text-[var(--app-primary)]/40 dark:text-zinc-400 mb-3" />
+                    <TableCell colSpan={withdrawColumns.length} className="text-center text-zinc-500 py-8 md:py-12">
+                      <div className="flex flex-col items-center justify-center bg-[var(--app-primary)]/5 dark:bg-zinc-800/40 p-4 md:p-6 rounded-lg border border-[var(--app-primary)]/10 dark:border-zinc-700">
+                        <InboxIcon className="w-8 h-8 md:w-10 md:h-10 text-[var(--app-primary)]/40 dark:text-zinc-400 mb-2 md:mb-3" />
                         <span>No se encontraron resultados.</span>
                       </div>
                     </TableCell>
@@ -335,6 +362,38 @@ export default function WithdrawsTable() {
               </TableBody>
             </Table>
           </div>
+
+          {/* Paginación */}
+          {table.getRowModel().rows.length > 0 && (
+            <div className="flex items-center justify-between mt-4 px-2">
+              <div className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+                <span>
+                  Página {table.getState().pagination.pageIndex + 1} de{" "}
+                  {table.getPageCount()}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                  className="px-3 py-1 text-xs rounded-md bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700"
+                >
+                  Anterior
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                  className="px-3 py-1 text-xs rounded-md bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700"
+                >
+                  Siguiente
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Modal de rechazo */}
