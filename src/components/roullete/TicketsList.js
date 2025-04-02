@@ -303,8 +303,8 @@ export default function TicketsList() {
   if (!tickets || tickets.length === 0) {
     return (
       <div className="text-center py-8">
-        <div className="bg-black/50 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center border border-[var(--app-primary)]/30">
-          <TicketIcon className="h-8 w-8 text-[var(--app-primary)]/70" />
+        <div className="bg-black/50 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center border border-[var(--app-primary)]">
+          <TicketIcon className="h-8 w-8 text-[var(--app-primary)]" />
         </div>
         <p className="text-[var(--app-primary)] mb-2">No tienes tickets disponibles</p>
         <p className="text-gray-400 text-sm">Los tickets que adquieras aparecerán aquí</p>
