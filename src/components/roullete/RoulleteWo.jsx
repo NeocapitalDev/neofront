@@ -202,8 +202,8 @@ export default function RuletaSorteo({
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Texto del sector - ahora siempre derecho y legible
-      const textRadius = radius * 0.7;
+      // Texto del sector - CÓDIGO MEJORADO PARA TEXTOS LARGOS
+      const textRadius = radius * 0.65; // Radio ligeramente reducido para dar más espacio
       const textAngle = angle + arcSize / 2;
       const textX = centerX + Math.cos(textAngle) * textRadius;
       const textY = centerY + Math.sin(textAngle) * textRadius;
@@ -222,13 +222,124 @@ export default function RuletaSorteo({
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = "#212121";
-      ctx.font = "bold 16px 'Arial', sans-serif";
 
-      // Si el texto está en la parte inferior, lo dibujamos invertido
-      if (textAngle > Math.PI / 2 && textAngle < (Math.PI * 3) / 2) {
-        ctx.fillText(options[i].name, 0, 0);
+      // Calcular el ancho máximo para el texto basado en el tamaño del sector
+      const maxTextWidth = Math.min(radius * 0.75 * Math.sin(arcSize / 2) * 2, 100);
+
+      // Usar un tamaño de fuente fijo para mantener la consistencia
+      const fontSize = 12; // Tamaño de fuente fijo para todos los textos
+      ctx.font = `bold ${fontSize}px 'Arial', sans-serif`;
+
+      const text = options[i].name;
+      
+      // Dividir el texto en múltiples líneas según sea necesario
+      if (text.length > 5) {
+        // Calcular cuántas líneas necesitamos
+        const lines = [];
+        
+        if (text.includes(' ')) {
+          // Dividir por palabras
+          const words = text.split(' ');
+          let currentLine = '';
+          
+          for (let n = 0; n < words.length; n++) {
+            const word = words[n];
+            const testLine = currentLine + (currentLine ? ' ' : '') + word;
+            
+            if (ctx.measureText(testLine).width <= maxTextWidth) {
+              currentLine = testLine;
+            } else {
+              // Si la línea actual más esta palabra es demasiado larga
+              if (currentLine !== '') {
+                lines.push(currentLine);
+                currentLine = word;
+              } else {
+                // Si una sola palabra es más larga que maxTextWidth, dividirla
+                const chars = word.split('');
+                let partWord = '';
+                
+                for (let c = 0; c < chars.length; c++) {
+                  const testPartWord = partWord + chars[c];
+                  if (ctx.measureText(testPartWord).width <= maxTextWidth) {
+                    partWord = testPartWord;
+                  } else {
+                    lines.push(partWord);
+                    partWord = chars[c];
+                  }
+                }
+                
+                if (partWord) {
+                  currentLine = partWord;
+                }
+              }
+            }
+          }
+          
+          // Añadir la última línea
+          if (currentLine) {
+            lines.push(currentLine);
+          }
+        } else {
+          // Si no hay espacios, dividir por caracteres
+          let currentLine = '';
+          const chars = text.split('');
+          
+          for (let c = 0; c < chars.length; c++) {
+            const testLine = currentLine + chars[c];
+            
+            if (ctx.measureText(testLine).width <= maxTextWidth) {
+              currentLine = testLine;
+            } else {
+              lines.push(currentLine);
+              currentLine = chars[c];
+            }
+          }
+          
+          // Añadir la última línea
+          if (currentLine) {
+            lines.push(currentLine);
+          }
+        }
+        
+        // Limitar a un máximo de 4 líneas si hay más
+        const maxLines = 4;
+        const usedLines = lines.slice(0, maxLines);
+        
+        // Si tenemos que truncar, añadir "..." al final
+        if (lines.length > maxLines) {
+          const lastLine = usedLines[maxLines - 1];
+          // Solo añadir "..." si hay espacio
+          if (ctx.measureText(lastLine + "...").width <= maxTextWidth) {
+            usedLines[maxLines - 1] = lastLine + "...";
+          } else {
+            // Si no hay espacio, acortar la última línea y añadir "..."
+            let shortenedLine = lastLine;
+            while (shortenedLine.length > 0 && 
+                   ctx.measureText(shortenedLine + "...").width > maxTextWidth) {
+              shortenedLine = shortenedLine.slice(0, -1);
+            }
+            
+            if (shortenedLine.length > 0) {
+              usedLines[maxLines - 1] = shortenedLine + "...";
+            }
+          }
+        }
+        
+        // Dibujar todas las líneas
+        const lineSpacing = fontSize * 1.2;
+        const totalHeight = (usedLines.length - 1) * lineSpacing;
+        const startY = -totalHeight / 2;
+        
+        for (let i = 0; i < usedLines.length; i++) {
+          ctx.fillText(
+            usedLines[i], 
+            0, 
+            startY + i * lineSpacing
+          );
+        }
       } else {
-        ctx.fillText(options[i].name, 0, 0);
+        // Si el texto es corto, mostrarlo en una sola línea
+        ctx.fillText(text, 0, 0);
       }
 
       ctx.restore();
@@ -776,8 +887,8 @@ export default function RuletaSorteo({
                 whileHover={!isSpinning ? { scale: 1.05 } : {}}
                 whileTap={!isSpinning ? { scale: 0.95 } : {}}
                 style={{
-                  marginTop: "20px",
-                  padding: "12px 30px",
+                  marginTop: "13px",
+                  padding: "10px 40px",
                   background: isSpinning ? "#777" : "#FFEB3B",
                   color: "#000",
                   fontSize: "16px",

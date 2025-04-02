@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 import DashboardLayout from "..";
@@ -104,6 +104,11 @@ export default function IndexPage() {
   const [isDurationUnlimited, setIsDurationUnlimited] = useState(false);
   const [isEditDurationUnlimited, setIsEditDurationUnlimited] = useState(false);
 
+  // Referencias para los modales
+  const createModalRef = useRef(null);
+  const editModalRef = useRef(null);
+  const deleteModalRef = useRef(null);
+
   const { data: rewardsData, error, mutate } = useSWR(
     session?.jwt
       ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rewards`, session.jwt]
@@ -123,6 +128,30 @@ export default function IndexPage() {
       setNormalizedRewards(normalized);
     }
   }, [rewardsData]);
+
+  // Funciones para manejar clics fuera de los modales
+  const handleOutsideClickCreate = (e) => {
+    if (createModalRef.current && !createModalRef.current.contains(e.target)) {
+      setIsCreateModalOpen(false);
+      setFormErrors({});
+      setIsDurationUnlimited(false);
+    }
+  };
+
+  const handleOutsideClickEdit = (e) => {
+    if (editModalRef.current && !editModalRef.current.contains(e.target)) {
+      setEditingId(null);
+      setEditingReward({});
+      setFormErrors({});
+      setIsEditDurationUnlimited(false);
+    }
+  };
+
+  const handleOutsideClickDelete = (e) => {
+    if (deleteModalRef.current && !deleteModalRef.current.contains(e.target)) {
+      setIsDeleteModalOpen(null);
+    }
+  };
 
   const formatProductDisplay = (productos) => {
     if (!productos) return "-";
@@ -588,9 +617,16 @@ export default function IndexPage() {
 
         {/* Modal para Crear */}
         {isCreateModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            onClick={handleOutsideClickCreate}
+          >
             {/* Se agrega max-h-[80vh] y overflow-y-auto para que el contenido sea scrollable */}
-            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-hide">
+            <div 
+              ref={createModalRef}
+              className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-hide"
+              onClick={(e) => e.stopPropagation()} // Esto evita que el clic en el contenido cierre el modal
+            >
               <h3 className="text-xl font-semibold mb-4 text-zinc-800 dark:text-white">Crear Nuevo Premio</h3>
               <form onSubmit={handleCreate}>
                 <div className="space-y-4">
@@ -824,8 +860,15 @@ export default function IndexPage() {
 
         {/* Modal para Editar */}
         {editingId && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            onClick={handleOutsideClickEdit}
+          >
+            <div 
+              ref={editModalRef}
+              className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h3 className="text-xl font-semibold mb-4 text-zinc-800 dark:text-white">Editar Premio</h3>
               <div className="space-y-4">
                 {/* Nombre */}
@@ -1057,8 +1100,15 @@ export default function IndexPage() {
 
         {/* Modal para Eliminar */}
         {isDeleteModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-96 max-h-[80vh] overflow-y-auto">
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            onClick={handleOutsideClickDelete}
+          >
+            <div 
+              ref={deleteModalRef}
+              className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg w-96 max-h-[80vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h3 className="text-xl font-semibold mb-4 text-zinc-800 dark:text-white">¿Eliminar Premio?</h3>
               <p className="mb-4 text-zinc-600 dark:text-zinc-300">¿Estás seguro de que quieres eliminar este premio? Esta acción no se puede deshacer.</p>
               <div className="flex justify-end gap-2">
