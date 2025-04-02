@@ -643,7 +643,7 @@ export default function RuletaSorteo({
               style={{
                 position: "absolute",
                 bottom: "-65px",
-                left: "34%", //
+                left: "38%", //
                 transform: "translateX(-50%)",
                 width: 80,
                 height: 30, // Increased height for the icon container

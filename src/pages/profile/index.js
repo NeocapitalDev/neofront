@@ -17,6 +17,7 @@ import {
   PencilIcon
 } from "@heroicons/react/24/solid";
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 const ProfilePage = () => {
   const [formData, setFormData] = useState({
@@ -204,8 +205,8 @@ const ProfilePage = () => {
           <div className="flex items-center">
             <span
               className={`px-3 py-1 rounded-full text-xs font-medium ${isVerified
-                  ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                  : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
                 }`}
             >
               {isVerified ? "Verificado" : "Por verificar"}
@@ -258,8 +259,8 @@ const ProfilePage = () => {
               <div className="flex items-center space-x-2">
                 <div
                   className={`p-1 rounded-full ${isVerified
-                      ? "bg-green-100 dark:bg-green-900/30"
-                      : "bg-yellow-100 dark:bg-yellow-900/30"
+                    ? "bg-green-100 dark:bg-green-900/30"
+                    : "bg-yellow-100 dark:bg-yellow-900/30"
                     }`}
                 >
                   {isVerified ? (
@@ -281,12 +282,13 @@ const ProfilePage = () => {
               </div>
 
               {!isVerified && (
-                <button
-                  className="text-xs px-3 py-1 rounded-md bg-[var(--app-primary)]/90 hover:bg-[var(--app-primary)] text-white transition-colors duration-200 font-medium"
-                // Aquí podrías disparar la lógica de verificación
-                >
-                  Verificar
-                </button>
+                <Link href="/verification">
+                  <button
+                    className="text-xs px-3 py-1 rounded-md bg-[var(--app-primary)] hover:opacity-90 text-white transition-colors duration-200 font-medium"
+                  // Aquí podrías disparar la lógica de verificación
+                  >
+                    Verificar
+                  </button></Link>
               )}
             </div>
           </div>

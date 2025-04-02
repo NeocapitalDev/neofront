@@ -180,11 +180,11 @@ const RouletteModal = ({ isOpen, onClose, ticket, onTicketUsed }) => {
     >
       {/* Contenido del modal con dimensiones responsivas */}
       <div
-        className="relative z-10 bg-[#18181b] rounded-lg w-full max-w-md mx-auto flex flex-col items-center overflow-hidden"
+        className="relative z-10 bg-[#18181b] rounded-lg w-full max-w-lg mx-auto flex flex-col items-center overflow-hidden"
         style={{
           border: '2px solid #F59E0B',
           boxShadow: '0 0 20px rgba(245, 158, 11, 0.3)',
-          height: '550px',
+          height: '650px',
           maxHeight: '90vh'
         }}
         onClick={(e) => e.stopPropagation()} // Prevent clicks from reaching the backdrop
@@ -202,12 +202,12 @@ const RouletteModal = ({ isOpen, onClose, ticket, onTicketUsed }) => {
         </div>
 
         {/* Header text - Mejor centrado */}
-        <div className="relative z-10 text-center pt-6 pb-3 bg-gradient-to-b from-zinc-900 to-zinc-800 w-full">
+        <div className="relative z-10 text-center pb-2 pt-6 w-full">
           <h3 className="text-2xl font-bold text-amber-400">¡Gira la Ruleta!</h3>
         </div>
 
         {/* Sección para la ruleta - Centrada verticalmente */}
-        <div className="flex-grow flex flex-col justify-center items-center w-full px-2 py-4 bg-zinc-800/30">
+        <div className="flex-grow flex flex-col justify-center items-center w-full">
           <RuletaSorteo
             documentId={ticket?.documentId}
             onClose={onClose}
@@ -218,8 +218,8 @@ const RouletteModal = ({ isOpen, onClose, ticket, onTicketUsed }) => {
                 onTicketUsed(ticket.id);
               }
             }}
-            width={240}
-            height={240}
+            width={330}
+            height={330}
             customStyle={{
               background: 'transparent',
               boxShadow: 'none',
@@ -247,7 +247,7 @@ export default function TicketsList() {
   const [usedTickets, setUsedTickets] = useState(new Set());
 
   // Fetch tickets data (se asume que el hook retorna también un método refetch)
-  const { data, error, isLoading, refetch } = useStrapiData(
+  const { data, error, isLoading, mutate: refetch } = useStrapiData(
     `users/me?populate[tickets][populate]=reward`,
     session?.jwt || ''
   );
