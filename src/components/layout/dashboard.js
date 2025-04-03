@@ -5,6 +5,7 @@ import Sidebar from '../structure/sidebar';
 import Breadcrumb from "../Breadcrumb";
 import ModalRoullete from '@/components/roullete/ModalRoullete';
 import { useEffect, useState } from 'react';
+import ChatwootWidget from "../ChatWidget";
 
 export default function Layout({ children }) {
     // Estado para almacenar la altura de la navbar
@@ -70,9 +71,9 @@ export default function Layout({ children }) {
                             <FooterInfo />
                         </div>
                     </div>
-                    <div style={{ position: 'fixed', bottom: '10px', right: '10px', zIndex: 1000 }} className='flex flex-col gap-4'>
+                    <div className='fixed bottom-[55px] -right-8 p-8'>
                         <ModalRoullete />
-                        {/* <ChatwootWidget /> */}
+                        <ChatwootWidget />
                     </div>
                 </div>
 

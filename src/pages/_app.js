@@ -15,19 +15,19 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }) {
   const getHexFromCSSVar = (varName) => {
     const root = getComputedStyle(document.documentElement);
     let color = root.getPropertyValue(varName).trim();
-  
+
     if (!color) return null;
-  
+
     // Si el color está en formato HSL, convertirlo a RGB primero
     if (color.startsWith('hsl')) {
       color = hslToRgb(color);
     }
-  
+
     // Si el color está en formato RGB, convertirlo a Hexadecimal
     if (color.startsWith('rgb')) {
       return rgbToHex(color);
     }
-  
+
     return color; // Si ya es hexadecimal, devolverlo directamente
   };
 
@@ -35,7 +35,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }) {
     const result = rgb.match(/\d+/g).map(Number);
     return `#${result.map((x) => x.toString(16).padStart(2, '0')).join('')}`;
   };
-  
+
   const hslToRgb = (hsl) => {
     const [h, s, l] = hsl.match(/\d+(\.\d+)?/g).map(Number);
     const a = s / 100;
@@ -73,11 +73,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }) {
           />
           <Toaster closeButton richColors position="top-right" />
           <Component {...pageProps} />
-          {/* <div style={{ position: 'fixed', bottom: '10px', right: '10px', zIndex: 1000 }} className='flex flex-col gap-4'>
-            <ModalRoullete />
-            {/* <ChatwootWidget /> 
-          </div> */}
-
+          {/* <ChatwootWidget /> */}
         </SessionProvider>
 
       </ThemeProvider>

@@ -3,7 +3,7 @@ import { useEffect } from "react";
 const ChatwootWidget = () => {
     useEffect(() => {
         (function (d, t) {
-            const BASE_URL = process.env.NEXT_PUBLIC_CHAT_BASE_URL || "https://web.wazend.net";
+            const BASE_URL = `${process.env.NEXT_PUBLIC_CHAT_BASE_URL || "https://web.wazend.net"}`;
             const g = d.createElement(t), s = d.getElementsByTagName(t)[0];
             g.src = `${BASE_URL}/packs/js/sdk.js`;
             g.defer = true;
