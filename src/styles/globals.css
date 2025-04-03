@@ -38,6 +38,8 @@
     --radius: 0.5rem;
     --app-primary: theme('colors.amber.500');
     --app-secondary: theme('colors.amber.500');
+    --app-primary800: theme('colors.amber.800');
+
   }
   .theme-swiss {
     --color-text-base: 255, 255, 255;

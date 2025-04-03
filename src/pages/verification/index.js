@@ -1,3 +1,4 @@
+// src/pages/verification/index.js
 import { useState, useMemo, useCallback } from "react";
 import Layout from "../../components/layout/dashboard";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";

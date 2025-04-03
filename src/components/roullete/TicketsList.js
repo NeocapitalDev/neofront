@@ -218,8 +218,8 @@ const RouletteModal = ({ isOpen, onClose, ticket, onTicketUsed }) => {
                 onTicketUsed(ticket.id);
               }
             }}
-            width={330}
-            height={330}
+            width={300}
+            height={300}
             customStyle={{
               background: 'transparent',
               boxShadow: 'none',
