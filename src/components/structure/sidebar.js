@@ -1,3 +1,4 @@
+// src/components/structure/sidebar.js
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { navigation } from './links'; // Importar desde links.js
