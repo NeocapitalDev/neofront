@@ -114,11 +114,11 @@ export default function SignIn() {
 
 
               {/* Separador con la línea en dos partes */}
-<div className="flex items-center justify-center my-4">
-  <div className="flex-grow border-t border-gray-700"></div>
-  <span className="px-4 text-sm text-gray-400">o</span>
-  <div className="flex-grow border-t border-gray-700"></div>
-</div>
+              <div className="flex items-center justify-center my-4">
+                <div className="flex-grow border-t border-gray-700"></div>
+                <span className="px-4 text-sm text-gray-400">o</span>
+                <div className="flex-grow border-t border-gray-700"></div>
+              </div>
             </div>
 
 
