@@ -4,6 +4,8 @@ import FooterInfo from "../structure/footer";
 import Sidebar from '../structure/sidebar';
 import Breadcrumb from "../Breadcrumb";
 import ModalRoullete from '@/components/roullete/ModalRoullete';
+import ModalRoullete2 from '@/components/roullete/ModalRoullete2';
+
 import { useEffect, useState } from 'react';
 import ChatwootWidget from "../ChatWidget";
 
@@ -71,12 +73,18 @@ export default function Layout({ children }) {
                             <FooterInfo />
                         </div>
                     </div>
-                    <div className='fixed bottom-[60px] -right-8 p-8'>
-                        <ModalRoullete />
-                        <ChatwootWidget />
+                    <div className='fixed bottom-[0px] -right-8 p-8'>
+
+                        <div className="mb-12">
+                            {process.env.NEXT_PUBLIC_NAME_APP === 'NeoCapital' && <ModalRoullete />}
+                            {process.env.NEXT_PUBLIC_NAME_APP === 'Zeven' && <ModalRoullete2 />}
+                        </div>
+
+                        {process.env.NEXT_PUBLIC_ISACTIVECHAT === true && (
+                                <ChatwootWidget />
+                        )}
                     </div>
                 </div>
-
             </main>
         </div>
     );

@@ -54,7 +54,7 @@ export default function ModalRoulette() {
 
   return (
     <Dialog>
-      <DialogTrigger className="z-10 p-1 bg-zinc-900 text-amber-400 rounded-full hover:bg-amber-500 hover:text-black transition-colors duration-300">
+      <DialogTrigger className="z-10 p-1 bg-zinc-900 text-blue-400 rounded-full hover:bg-blue-500 hover:text-black transition-colors duration-300">
         <img
           src="/images/sorteo.svg"
           alt="Sorteo"
@@ -81,12 +81,12 @@ export default function ModalRoulette() {
           overflow-hidden
         "
       >
-        <DialogHeader className="p-6 border-b border-amber-700 bg-gradient-to-b from-zinc-900 to-zinc-800">
+        <DialogHeader className="p-6 border-b border-[var(--app-primary800)] bg-gradient-to-b from-zinc-900 to-zinc-800">
           <DialogTitle className="text-2xl font-bold text-center flex flex-col items-center gap-3">
-            <div className="w-16 h-16 rounded-full bg-zinc-800 border-2 border-amber-500 flex items-center justify-center shadow-[0_0_10px_rgba(245,158,11,0.2)]">
-              <Gift className="h-8 w-8 text-amber-400" />
+            <div className="w-16 h-16 rounded-full bg-zinc-800 border-2 border-[var(--app-primary)] flex items-center justify-center shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+              <Gift className="h-8 w-8 text-[var(--app-primary)]" />
             </div>
-            <span className="text-amber-300">Mis Tickets</span>
+            <span className="text-[var(--app-primary)]">Mis Tickets</span>
           </DialogTitle>
         </DialogHeader>
 
