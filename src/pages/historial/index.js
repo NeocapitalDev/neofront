@@ -210,9 +210,9 @@ export default function Historial() {
 
     return (
         <Layout>
-            {/* Cabecera del historial con estilo consistente */}
-            <div className="relative overflow-hidden rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700 transition-all">
-                <div className="absolute h-1 top-0 left-0 right-0"></div>
+            {/* Cabecera del historial */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-white to-gray-50 dark:from-zinc-800 dark:to-zinc-900 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700 transition-all">
+                <div className="absolute h-1 top-0 left-0 right-0 bg-[var(--app-primary)]"></div>
 
                 <div className="p-6 flex justify-between items-center">
                     <div className="flex items-center space-x-3">
