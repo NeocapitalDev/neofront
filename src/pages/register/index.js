@@ -151,14 +151,11 @@ export default function SignUp() {
 </div>
 
 
-  {/* Separador */}
-  <div className="relative">
-    <div className="absolute inset-0 flex items-center">
-      <div className="w-full border-t border-gray-700"></div>
-    </div>
-    <div className="relative flex justify-center">
-      <span className="bg-zinc-800 rounded-full px-3 text-sm text-gray-400">o</span>
-    </div>
+  {/* Separador con la línea en dos partes */}
+  <div className="flex items-center justify-center my-4">
+    <div className="flex-grow border-t border-gray-700"></div>
+    <span className="px-4 text-sm text-gray-400">o</span>
+    <div className="flex-grow border-t border-gray-700"></div>
   </div>
 </div>
 
