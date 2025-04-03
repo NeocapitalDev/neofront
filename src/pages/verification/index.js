@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { CheckBadgeIcon } from '@heroicons/react/24/outline';
 import VeriffComponent from "./verification";
 
-const DEFAULT_CONTRACT_URL = "https://minio.neocapitalfunding.com/strapi/CONTRATO_278b458332.pdf";
+const DEFAULT_CONTRACT_URL = `${process.env.NEXT_PUBLIC_DEFAULT_CONTRACT_URL || "https://minio.neocapitalfunding.com/strapi/CONTRATO_278b458332.pdf"}`;
 
 const SocialsPage = () => {
     const { data: session } = useSession();
@@ -46,7 +46,7 @@ const SocialsPage = () => {
                 },
                 body: JSON.stringify({ statusSign: true, isVerified: true }),
             });
-            
+
             if (!response.ok) {
                 const errorData = await response.json();
                 toast.error(errorData?.error?.message || "Error en la firma del contrato");
@@ -229,35 +229,34 @@ const SocialsPage = () => {
                                             </p>
                                         )}
 
-<div className="flex flex-col items-center space-y-6">
-    {/* Botón de Descargar PDF con ancho completo */}
-    <Button
-        className="w-full bg-[var(--app-primary)] hover:bg-amber-600 text-white text-lg font-semibold px-6 py-4 rounded-lg shadow-md transition-all"
-        onClick={handleDownload}
-    >
-        Descargar PDF
-    </Button>
+                                        <div className="flex flex-col items-center space-y-6">
+                                            {/* Botón de Descargar PDF con ancho completo */}
+                                            <Button
+                                                className="w-full bg-[var(--app-primary)] hover:bg-amber-600 text-white text-lg font-semibold px-6 py-4 rounded-lg shadow-md transition-all"
+                                                onClick={handleDownload}
+                                            >
+                                                Descargar PDF
+                                            </Button>
 
-    {/* Contenedor para el input y el botón de subida */}
-    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0 w-full">
-        <input
-            type="file"
-            accept="application/pdf"
-            onChange={handleFileChange}
-            className="file:cursor-pointer file:border-none file:rounded-lg file:bg-[var(--app-primary)] file:text-white file:px-4 file:py-2 file:font-medium hover:file:bg-amber-600 disabled:opacity-50 w-full sm:w-auto"
-            disabled={loading || isUploadDisabled}
-        />
-        <Button
-            className={`w-full sm:w-auto bg-[var(--app-secondary)] hover:bg-[var(--app-primary)] text-white text-lg font-semibold px-6 py-4 rounded-lg shadow-md transition-all ${
-                (!pdfFile || loading || isUploadDisabled) ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={!pdfFile || loading || isUploadDisabled}
-            onClick={handlePdf}
-        >
-            {loading ? "Subiendo..." : isSigned ? "Subir PDF" : "Subir PDF"}
-        </Button>
-    </div>
-</div>
+                                            {/* Contenedor para el input y el botón de subida */}
+                                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0 w-full">
+                                                <input
+                                                    type="file"
+                                                    accept="application/pdf"
+                                                    onChange={handleFileChange}
+                                                    className="file:cursor-pointer file:border-none file:rounded-lg file:bg-[var(--app-primary)] file:text-white file:px-4 file:py-2 file:font-medium hover:file:bg-amber-600 disabled:opacity-50 w-full sm:w-auto"
+                                                    disabled={loading || isUploadDisabled}
+                                                />
+                                                <Button
+                                                    className={`w-full sm:w-auto bg-[var(--app-secondary)] hover:bg-[var(--app-primary)] text-white text-lg font-semibold px-6 py-4 rounded-lg shadow-md transition-all ${(!pdfFile || loading || isUploadDisabled) ? "opacity-50 cursor-not-allowed" : ""
+                                                        }`}
+                                                    disabled={!pdfFile || loading || isUploadDisabled}
+                                                    onClick={handlePdf}
+                                                >
+                                                    {loading ? "Subiendo..." : isSigned ? "Subir PDF" : "Subir PDF"}
+                                                </Button>
+                                            </div>
+                                        </div>
 
                                     </div>
                                 )}
@@ -272,12 +271,12 @@ const SocialsPage = () => {
 
 export default SocialsPage;
 
-    // const { data, error, isLoading, mutate } = useSWR(
-    //     token
-    //         ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate]=broker_account`, token]
-    //         : null,
-    //     ([url, token]) => fetcher(url, token)
-    // );
+// const { data, error, isLoading, mutate } = useSWR(
+//     token
+//         ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate]=broker_account`, token]
+//         : null,
+//     ([url, token]) => fetcher(url, token)
+// );
 
 
 
@@ -305,7 +304,7 @@ export default SocialsPage;
 
 
 
-                            {/* <div className="mt-6">
+{/* <div className="mt-6">
                                 <p className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">
                                     2. Firma de contrato
                                 </p>
