@@ -367,8 +367,8 @@ const Metrix = () => {
       </div>
     );
   }
-  console.log(currentChallenge);
-  console.log(currentChallenge.certificates?.length);
+  // console.log(currentChallenge);
+  // console.log(currentChallenge.certificates?.length);
 
   return (
     <div>
