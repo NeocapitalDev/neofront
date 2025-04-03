@@ -176,7 +176,7 @@ const SocialsPage = () => {
                     {((!hasPhase3Challenge && (hasPhase1Or2Challenge || newAccount)) && !isVerified) ? (
                         <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
                             <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-                                La sección de verificación se desbloqueará para usted una vez que esté a punto de firmar o cambiar un contrato con nosotros. Se desbloqueará automáticamente una vez que haya llegado a fase NeoTrader.
+                                La sección de verificación se desbloqueará para usted una vez que esté a punto de firmar o cambiar un contrato con nosotros. Se desbloqueará automáticamente una vez que haya llegado a fase Real.
                             </p>
                         </div>
                     ) : (
@@ -232,23 +232,23 @@ const SocialsPage = () => {
                                         <div className="flex flex-col items-center space-y-6">
                                             {/* Botón de Descargar PDF con ancho completo */}
                                             <Button
-                                                className="w-full bg-[var(--app-primary)] hover:bg-amber-600 text-white text-lg font-semibold px-6 py-4 rounded-lg shadow-md transition-all"
+                                                className="w-full bg-[var(--app-primary)] hover:bg-amber-600 text-white text-md font-semibold px-6 py-4 rounded-lg shadow-md transition-all"
                                                 onClick={handleDownload}
                                             >
                                                 Descargar PDF
                                             </Button>
 
                                             {/* Contenedor para el input y el botón de subida */}
-                                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0 w-full">
+                                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0 w-full justify-between">
                                                 <input
                                                     type="file"
                                                     accept="application/pdf"
                                                     onChange={handleFileChange}
-                                                    className="file:cursor-pointer file:border-none file:rounded-lg file:bg-[var(--app-primary)] file:text-white file:px-4 file:py-2 file:font-medium hover:file:bg-amber-600 disabled:opacity-50 w-full sm:w-auto"
+                                                    className="file:cursor-pointer file:border-none file:rounded-lg file:bg-[var(--app-primary)] file:text-white file:px-2 file:py-2 file:font-medium hover:file:bg-amber-600 disabled:opacity-50 w-full sm:w-auto text-sm file:mr-4"
                                                     disabled={loading || isUploadDisabled}
                                                 />
                                                 <Button
-                                                    className={`w-full sm:w-auto bg-[var(--app-secondary)] hover:bg-[var(--app-primary)] text-white text-lg font-semibold px-6 py-4 rounded-lg shadow-md transition-all ${(!pdfFile || loading || isUploadDisabled) ? "opacity-50 cursor-not-allowed" : ""
+                                                    className={`w-full sm:w-auto bg-[var(--app-secondary)] hover:bg-[var(--app-primary)] text-white text-sm font-semibold px-6 py-4 rounded-lg shadow-md transition-all ${(!pdfFile || loading || isUploadDisabled) ? "opacity-50 cursor-not-allowed" : ""
                                                         }`}
                                                     disabled={!pdfFile || loading || isUploadDisabled}
                                                     onClick={handlePdf}
