@@ -92,7 +92,7 @@ export default function SignIn() {
             <div>            <div className="flex justify-center">
               <button
                 type="button"
-                onClick={() => signIn('google', { callbackUrl: router.query.callbackUrl || '/' })}
+                //onClick={() => signIn('google', { callbackUrl: router.query.callbackUrl || '/' })}
                 className="flex items-center justify-center gap-2 w-full border border-gray-300 dark:border-gray-600 bg-gray-800 text-white px-4 py-2.5 rounded-md shadow-sm hover:bg-gray-900 transition-colors duration-300"
               >
                 {/* Logo de Google en blanco */}
