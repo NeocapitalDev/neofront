@@ -14,6 +14,8 @@ import {
     ClockIcon,
     DocumentIcon,
     XCircleIcon,
+    InformationCircleIcon,
+    DocumentTextIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
@@ -208,16 +210,23 @@ export default function Historial() {
 
     return (
         <Layout>
-            {/* Cabecera del historial - Mejorada para ambos modos */}
-            <div className="bg-gradient-to-r from-white to-gray-50 p-5 rounded-lg shadow-md border border-gray-100 dark:border-zinc-700/50 dark:bg-gradient-to-r dark:from-zinc-800 dark:to-zinc-900 dark:shadow-black dark:text-white transition-all duration-200">
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-2">
-                        <ClockIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-                        <h1 className="text-xl font-semibold">Historial de Challenges</h1>
+            {/* Cabecera del historial con estilo consistente */}
+            <div className="relative overflow-hidden rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700 transition-all">
+                <div className="absolute h-1 top-0 left-0 right-0"></div>
+
+                <div className="p-6 flex justify-between items-center">
+                    <div className="flex items-center space-x-3">
+                        <div className="p-2 rounded-full bg-[var(--app-primary)]/10">
+                            <ClockIcon className="w-5 h-5 text-[var(--app-primary)]" />
+                        </div>
+                        <h1 className="text-xl font-semibold text-zinc-800 dark:text-white">
+                            Historial de Challenges
+                        </h1>
                     </div>
+
                     <button
                         onClick={() => setIsFilterOpen(!isFilterOpen)}
-                        className="bg-[var(--app-primary)] rounded-lg text-black font-medium hover:bg-[var(--app-secondary)] inline-flex items-center px-4 py-2 space-x-2 transition-all duration-200 shadow-sm"
+                        className="bg-[var(--app-primary)] text-black hover:bg-[var(--app-secondary)] px-4 py-2 rounded-lg shadow-sm flex items-center space-x-2 transition-all"
                     >
                         <FunnelIcon className="h-5 w-5" />
                         <span className="font-medium">Filtros</span>
@@ -225,63 +234,100 @@ export default function Historial() {
                 </div>
             </div>
 
-            {/* Sección de filtros - Mejorada */}
-            <div className="mt-4">
+            {/* Sección de filtros mejorada */}
+            <div className="mt-6">
                 {isFilterOpen && (
-                    <div className="bg-white p-5 rounded-lg shadow-md border border-gray-100 dark:border-zinc-700/50 dark:bg-gradient-to-b dark:from-zinc-800 dark:to-zinc-900 dark:shadow-black dark:text-white transition-all duration-200">
-                        <p className="text-base font-semibold mb-3">Opciones de filtrado</p>
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                            <div className="relative">
-                                <div className="flex absolute inset-y-0 items-center left-0 pl-3 pointer-events-none">
-                                    <MagnifyingGlassIcon className="h-5 text-gray-400 w-5" />
+                    <div className="bg-white dark:bg-zinc-800/90 shadow-md rounded-xl border border-gray-100 dark:border-zinc-700 overflow-hidden transition-all">
+                        <div className="border-b border-gray-100 dark:border-zinc-700/50 p-6">
+                            <div className="flex items-center">
+                                <div className="p-2 rounded-full bg-[var(--app-primary)]/10 mr-3">
+                                    <FunnelIcon className="w-5 h-5 text-[var(--app-primary)]" />
                                 </div>
-                                <input
-                                    type="text"
-                                    placeholder="Buscar por ID"
-                                    value={searchParentId}
-                                    onChange={(e) => setSearchParentId(e.target.value)}
-                                    className="border p-2 rounded-lg w-full bg-gray-50 border-gray-200 text-gray-800 dark:bg-zinc-800/80 dark:border-zinc-600 dark:text-white focus:border-transparent focus:ring-[var(--app-primary)] focus:ring-2 pl-10 transition-all duration-200"
-                                />
+                                <h2 className="text-lg font-semibold text-zinc-800 dark:text-white">
+                                    Opciones de filtrado
+                                </h2>
                             </div>
-                            <div className="relative">
-                                <div className="flex absolute inset-y-0 items-center left-0 pl-3 pointer-events-none">
-                                    <CalendarIcon className="h-5 text-gray-400 w-5" />
+                        </div>
+
+                        <div className="p-6">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                                <div className="space-y-2">
+                                    <label htmlFor="searchId" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                                        Buscar por ID
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            id="searchId"
+                                            type="text"
+                                            placeholder="Ingrese ID del challenge"
+                                            value={searchParentId}
+                                            onChange={(e) => setSearchParentId(e.target.value)}
+                                            className="pl-10 w-full h-10 bg-gray-50 dark:bg-zinc-700/50 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-[var(--app-primary)]/30 focus:border-[var(--app-primary)] transition-all"
+                                        />
+                                    </div>
                                 </div>
-                                <input
-                                    type="date"
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                    className="border p-2 rounded-lg w-full bg-gray-50 border-gray-200 text-gray-800 dark:bg-zinc-800/80 dark:border-zinc-600 dark:text-white focus:border-transparent focus:ring-[var(--app-primary)] focus:ring-2 pl-10 transition-all duration-200"
-                                    placeholder="Fecha inicio"
-                                />
-                            </div>
-                            <div className="relative">
-                                <div className="flex absolute inset-y-0 items-center left-0 pl-3 pointer-events-none">
-                                    <CalendarIcon className="h-5 text-gray-400 w-5" />
+
+                                <div className="space-y-2">
+                                    <label htmlFor="startDate" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                                        Fecha inicio
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <CalendarIcon className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            id="startDate"
+                                            type="date"
+                                            value={startDate}
+                                            onChange={(e) => setStartDate(e.target.value)}
+                                            className="pl-10 w-full h-10 bg-gray-50 dark:bg-zinc-700/50 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-[var(--app-primary)]/30 focus:border-[var(--app-primary)] transition-all"
+                                        />
+                                    </div>
                                 </div>
-                                <input
-                                    type="date"
-                                    value={endDate}
-                                    onChange={(e) => setEndDate(e.target.value)}
-                                    className="border p-2 rounded-lg w-full bg-gray-50 border-gray-200 text-gray-800 dark:bg-zinc-800/80 dark:border-zinc-600 dark:text-white focus:border-transparent focus:ring-[var(--app-primary)] focus:ring-2 pl-10 transition-all duration-200"
-                                    placeholder="Fecha fin"
-                                />
+
+                                <div className="space-y-2">
+                                    <label htmlFor="endDate" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                                        Fecha fin
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <CalendarIcon className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            id="endDate"
+                                            type="date"
+                                            value={endDate}
+                                            onChange={(e) => setEndDate(e.target.value)}
+                                            className="pl-10 w-full h-10 bg-gray-50 dark:bg-zinc-700/50 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-[var(--app-primary)]/30 focus:border-[var(--app-primary)] transition-all"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
             </div>
 
-            {/* Contenedor principal de challenges - Mejorado para ambos modos */}
-            <div className="bg-gradient-to-b from-white to-gray-50 p-4 rounded-lg shadow-md border border-gray-100 dark:border-zinc-700/50 dark:bg-gradient-to-b dark:from-zinc-800 dark:to-black dark:shadow-black dark:text-white mt-4 transition-all duration-200">
-                {/* Grupos de Challenges */}
-                <div className="space-y-4">
-                    {Object.entries(filteredGroups).length === 0 ? (
-                        <div className="bg-white p-8 rounded-lg text-center dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700/70 shadow-sm transition-all duration-200">
-                            <p className="text-gray-500 dark:text-gray-400">No hay challenges que coincidan con los filtros.</p>
+            {/* Contenedor principal de challenges con el nuevo estilo */}
+            <div className="mt-6">
+                {Object.entries(filteredGroups).length === 0 ? (
+                    <div className="bg-white dark:bg-zinc-800/90 shadow-md rounded-xl border border-gray-100 dark:border-zinc-700 p-8 text-center">
+                        <div className="flex flex-col items-center justify-center">
+                            <div className="p-4 rounded-full bg-gray-100 dark:bg-zinc-700/50">
+                                <InformationCircleIcon className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                            </div>
+                            <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">No hay resultados</h3>
+                            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                No hay challenges que coincidan con los criterios de búsqueda.
+                            </p>
                         </div>
-                    ) : (
-                        Object.entries(filteredGroups).map(([parentId, challenges]) => {
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {Object.entries(filteredGroups).map(([parentId, challenges]) => {
                             const status = getGroupStatus(challenges);
                             const lastChallenge = challenges[challenges.length - 1];
                             const isExpanded = expandedGroups[parentId];
@@ -293,49 +339,32 @@ export default function Historial() {
                                     key={parentId}
                                     className={`bg-gradient-to-b ${statusGradients[status]} rounded-lg shadow-md border overflow-hidden relative transition-all duration-200`}
                                 >
-                                    {/* Cabecera del Challenge - Mejorada para ambos modos */}
-                                    <div className="flex flex-col p-4 relative z-10">
-                                        {/* Identificador del challenge y botón de expansión en una fila */}
-                                        <div className="flex justify-between items-center mb-3">
-                                            <div className="bg-[var(--app-primary)] rounded-lg shadow-md text-black text-center text-base font-bold px-3 py-1.5 transition-all duration-200"                                            >
-                                                <span className="block" title={parentId}>CH-{challenges[0].id}</span>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <button
-                                                    onClick={() => toggleGroup(parentId)}
-                                                    className="p-1.5 rounded-full hover:bg-gray-200/70 dark:hover:bg-zinc-600/70 mr-2 transition-all duration-200"
-                                                    aria-label={isExpanded ? "Collapse" : "Expand"}
-                                                >
-                                                    {isExpanded ? (
-                                                        <ChevronUpIcon className="h-5 text-gray-600 w-5 dark:text-gray-300" />
-                                                    ) : (
-                                                        <ChevronDownIcon className="h-5 text-gray-600 w-5 dark:text-gray-300" />
-                                                    )}
-                                                </button>
+                                    {/* Barra de estado */}
+                                    {/* <div className={`h-1 ${status === 'approved' ? 'bg-green-500 dark:bg-green-400' :
+                                        status === 'progress' ? 'bg-yellow-500 dark:bg-yellow-400' :
+                                            status === 'disapproved' ? 'bg-red-500 dark:bg-red-400' :
+                                                status === 'init' ? 'bg-blue-500 dark:bg-blue-400' :
+                                                    status === 'withdrawal' ? 'bg-purple-500 dark:bg-purple-400' :
+                                                        'bg-orange-500 dark:bg-orange-400'
+                                        }`}></div> */}
 
-                                                {/* Botón de metrix - MODIFICADO para usar metrix2 */}
-                                                <Link href={`/metrix/${lastChallenge.documentId}`}>
-                                                    <button className="flex bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500 dark:hover:bg-zinc-600 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-sm transition-all duration-200">
-                                                        <ChartBarIcon className="h-4 w-4 mr-1" />
-                                                        <span>Metrix</span>
-                                                    </button>
-                                                </Link>
-                                            </div>
-                                        </div>
+                                    {/* Cabecera del Challenge */}
+                                    <div className="p-6 border-b border-gray-100 dark:border-zinc-700/50">
+                                        <div className="flex justify-between items-center">
+                                            <div className="flex items-center space-x-4">
+                                                <div className="bg-[var(--app-primary)] text-black rounded-lg px-3 py-1.5 shadow-sm">
+                                                    <span className="text-base font-bold" title={parentId}>CH-{challenges[0].id}</span>
+                                                </div>
 
-                                        {/* Información principal - Mejorada para ambos modos */}
-                                        <div className="pl-1">
-                                            {/* Estado y fase actual */}
-                                            <div className="flex flex-wrap gap-2 items-center mb-2">
-                                                <div className="gap-1 inline-flex items-center">
-                                                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${status === 'approved' ? 'bg-green-500 dark:bg-green-400' :
+                                                <div className="flex items-center">
+                                                    <div className={`w-2.5 h-2.5 rounded-full mr-2 ${status === 'approved' ? 'bg-green-500 dark:bg-green-400' :
                                                         status === 'progress' ? 'bg-yellow-500 dark:bg-yellow-400' :
                                                             status === 'disapproved' ? 'bg-red-500 dark:bg-red-400' :
                                                                 status === 'init' ? 'bg-blue-500 dark:bg-blue-400' :
                                                                     status === 'withdrawal' ? 'bg-purple-500 dark:bg-purple-400' :
                                                                         'bg-orange-500 dark:bg-orange-400'
-                                                        }`} />
-                                                    <span className={`font-semibold text-sm ${statusColors[status]}`}>
+                                                        }`}></div>
+                                                    <span className={`font-medium ${statusColors[status]}`}>
                                                         {status === 'approved' ? 'Aprobado' :
                                                             status === 'progress' ? 'En progreso' :
                                                                 status === 'disapproved' ? 'Desaprobado' :
@@ -344,63 +373,96 @@ export default function Historial() {
                                                                             status === 'retry' ? 'Rechazado' : 'Desconocido'}
                                                     </span>
                                                 </div>
-                                                <span className="text-gray-500 dark:text-gray-400 hidden md:inline">|</span>
-                                                <span className="bg-white/90 backdrop-blur-sm rounded-md text-gray-600 text-xs dark:text-gray-300 px-2 py-0.5 dark:bg-zinc-700/60 border border-gray-200 dark:border-zinc-600/30 shadow-sm transition-all duration-200">
-                                                    Fase {lastChallenge.phase}
+
+                                                <div className="hidden md:flex items-center">
+                                                    <span className="text-gray-300 dark:text-gray-600 mx-2">|</span>
+                                                    <span className="bg-gray-100 dark:bg-zinc-700/60 text-gray-700 dark:text-gray-300 px-2.5 py-1 text-xs rounded-md font-medium">
+                                                        Fase {lastChallenge.phase}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center space-x-3">
+                                                <Link href={`/metrix/${lastChallenge.documentId}`}>
+                                                    <button className="bg-white hover:bg-gray-50 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 rounded-lg px-3 py-1.5 text-sm font-medium flex items-center space-x-1 shadow-sm transition-all">
+                                                        <ChartBarIcon className="h-4 w-4 mr-1" />
+                                                        <span>Metrix</span>
+                                                    </button>
+                                                </Link>
+
+                                                <button
+                                                    onClick={() => toggleGroup(parentId)}
+                                                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all"
+                                                    aria-label={isExpanded ? "Contraer" : "Expandir"}
+                                                >
+                                                    {isExpanded ? (
+                                                        <ChevronUpIcon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                                                    ) : (
+                                                        <ChevronDownIcon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-4 flex flex-wrap gap-4">
+                                            <div className="flex items-center">
+                                                <CalendarIcon className="h-4 w-4 text-gray-500 dark:text-gray-400 mr-2" />
+                                                <span className="text-sm text-gray-600 dark:text-gray-300">
+                                                    <span className="font-medium">Período:</span>
+                                                    <span className="ml-1">{startDateFormatted} - {endDateFormatted}</span>
                                                 </span>
                                             </div>
 
-                                            {/* Período */}
-                                            <div className="flex text-gray-500 text-xs dark:text-gray-400 items-center mb-2">
-                                                <span className="font-medium mr-1">Período:</span>
-                                                <span className="bg-white/90 backdrop-blur-sm rounded-md text-gray-700 dark:text-gray-300 px-2 py-0.5 dark:bg-zinc-700/60 text-xs border border-gray-200 dark:border-zinc-600/30 shadow-sm transition-all duration-200">
-                                                    {startDateFormatted} - {endDateFormatted}
-                                                </span>
-                                            </div>
-
-                                            {/* Última actualización */}
-                                            <div className="flex text-xs gap-1 items-center">
-                                                <span className="text-black dark:text-white font-semibold">Última actualización:</span>
-                                                <span className="bg-white/90 backdrop-blur-sm rounded-md text-gray-600 dark:text-gray-300 px-2 py-0.5 dark:bg-zinc-700/60 border border-gray-200 dark:border-zinc-600/30 shadow-sm transition-all duration-200">
-                                                    {formatDate(lastChallenge.endDate ? lastChallenge.endDate : lastChallenge.startDate)}
+                                            <div className="flex items-center">
+                                                <ClockIcon className="h-4 w-4 text-gray-500 dark:text-gray-400 mr-2" />
+                                                <span className="text-sm text-gray-600 dark:text-gray-300">
+                                                    <span className="font-medium">Última actualización:</span>
+                                                    <span className="ml-1">{formatDate(lastChallenge.endDate ? lastChallenge.endDate : lastChallenge.startDate)}</span>
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Detalles del Challenge - Mejorados para ambos modos */}
+                                    {/* Detalles del Challenge */}
                                     {isExpanded && (
-                                        <div className="bg-white/90 dark:bg-zinc-900/80 border-t border-gray-200 dark:border-zinc-700/60 px-4 py-3 transition-all duration-200">
-                                            <h3 className="text-gray-800 text-xs dark:text-gray-300 font-semibold mb-3">Historial de fases</h3>
-                                            <div className="space-y-3">
-                                                {challenges.map((challenge, index) => {
-                                                    return (
-                                                        <div
-                                                            key={index}
-                                                            className={`p-3 rounded-lg shadow-sm border bg-gradient-to-b ${statusGradients[challenge.result]} relative overflow-hidden transition-all duration-200`}
-                                                        >
-                                                            <div className="flex flex-col justify-between sm:flex-row relative z-10">
-                                                                {/* Info de la fase */}
-                                                                <div className="mb-2 sm:mb-0">
-                                                                    <div className="flex items-center mb-1">
-                                                                        <span className="text-gray-800 text-sm dark:text-white font-semibold">
+                                        <div className="p-6 bg-gray-50 dark:bg-zinc-900/40">
+                                            <div className="mb-4 flex items-center">
+                                                <div className="p-1.5 rounded-full bg-[var(--app-primary)]/10 mr-2">
+                                                    <DocumentTextIcon className="w-4 h-4 text-[var(--app-primary)]" />
+                                                </div>
+                                                <h3 className="text-base font-semibold text-zinc-800 dark:text-white">
+                                                    Historial de fases
+                                                </h3>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                {challenges.map((challenge, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className={`p-3 rounded-lg shadow-sm border bg-gradient-to-b ${statusGradients[challenge.result]} relative overflow-hidden transition-all duration-200`}
+                                                    >
+                                                        {/* <div className={`h-1 ${challenge.result === 'approved' ? 'bg-green-500 dark:bg-green-400' :
+                                                            challenge.result === 'progress' ? 'bg-yellow-500 dark:bg-yellow-400' :
+                                                                challenge.result === 'disapproved' ? 'bg-red-500 dark:bg-red-400' :
+                                                                    challenge.result === 'init' ? 'bg-blue-500 dark:bg-blue-400' :
+                                                                        challenge.result === 'withdrawal' ? 'bg-purple-500 dark:bg-purple-400' :
+                                                                            'bg-orange-500 dark:bg-orange-400'
+                                                            }`}></div> */}
+
+                                                        <div className="p-4">
+                                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                                                <div>
+                                                                    <div className="flex items-center mb-2">
+                                                                        <span className="text-base font-semibold text-zinc-800 dark:text-white mr-3">
                                                                             Fase {challenge.phase}
                                                                         </span>
-                                                                        <span className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[challenge.result]} backdrop-blur-sm ${challenge.result === 'approved' ? 'bg-green-100 dark:bg-green-900/50' :
-                                                                            challenge.result === 'progress' ? 'bg-yellow-100 dark:bg-yellow-900/50' :
-                                                                                challenge.result === 'disapproved' ? 'bg-red-100 dark:bg-red-900/50' :
-                                                                                    challenge.result === 'init' ? 'bg-blue-100 dark:bg-blue-900/50' :
-                                                                                        challenge.result === 'withdrawal' ? 'bg-purple-100 dark:bg-purple-900/50' :
-                                                                                            'bg-orange-100 dark:bg-orange-900/50'
-                                                                            } 
-                                                                        border ${challenge.result === 'approved' ? 'border-green-200 dark:border-green-700/50' :
-                                                                                challenge.result === 'progress' ? 'border-yellow-200 dark:border-yellow-700/50' :
-                                                                                    challenge.result === 'disapproved' ? 'border-red-200 dark:border-red-700/50' :
-                                                                                        challenge.result === 'init' ? 'border-blue-200 dark:border-blue-700/50' :
-                                                                                            challenge.result === 'withdrawal' ? 'border-purple-200 dark:border-purple-700/50' :
-                                                                                                'border-orange-200 dark:border-orange-700/50'
-                                                                            } 
-                                                                        shadow-sm transition-all duration-200`}>
+                                                                        <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${challenge.result === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                                                                            challenge.result === 'progress' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                                                challenge.result === 'disapproved' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                                                                                    challenge.result === 'init' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
+                                                                                        challenge.result === 'withdrawal' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
+                                                                                            'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+                                                                            }`}>
                                                                             {challenge.result === 'approved' ? 'Aprobado' :
                                                                                 challenge.result === 'progress' ? 'En progreso' :
                                                                                     challenge.result === 'disapproved' ? 'Desaprobado' :
@@ -409,20 +471,19 @@ export default function Historial() {
                                                                                                 challenge.result === 'retry' ? 'Rechazado' : challenge.result}
                                                                         </span>
                                                                     </div>
-                                                                    <div className="flex text-gray-600 text-xs dark:text-gray-300 items-center mt-1">
-                                                                        <CalendarIcon className="h-4 text-gray-500 w-3 mr-1" />
-                                                                        <span>
-                                                                            {formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}
-                                                                        </span>
+                                                                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                                                                        <CalendarIcon className="h-4 w-4 mr-2" />
+                                                                        <span>{formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}</span>
                                                                     </div>
                                                                 </div>
-                                                                {/* Botones de acción */}
-                                                                <div className="flex space-x-2 overflow-x-auto overflow-y-hidden">
+
+                                                                <div className="flex flex-wrap gap-2">
                                                                     {/* Botones de certificado */}
                                                                     {renderCertificateButtons(challenge)}
-                                                                    {/* Botón de detalles - MODIFICADO para usar metrix2 */}
+
+                                                                    {/* Botón de detalles */}
                                                                     <Link href={`/metrix/${challenge.documentId}`}>
-                                                                        <button className="flex h-8 bg-white border border-gray-300 justify-center rounded-lg shadow-sm dark:bg-zinc-700/90 dark:border-zinc-500/50 dark:hover:bg-zinc-600/80 hover:bg-gray-50 items-center px-3 py-1.5 space-x-1 text-xs transition-all duration-200">
+                                                                        <button className="bg-white hover:bg-gray-50 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 rounded-lg px-3 py-1.5 text-xs font-medium flex items-center shadow-sm transition-all">
                                                                             <ChartBarIcon className="h-4 w-4 mr-1" />
                                                                             <span>Ver detalles</span>
                                                                         </button>
@@ -430,16 +491,16 @@ export default function Historial() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    );
-                                                })}
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
                                     )}
                                 </div>
                             );
-                        })
-                    )}
-                </div>
+                        })}
+                    </div>
+                )}
             </div>
         </Layout>
     );

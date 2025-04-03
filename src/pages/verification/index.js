@@ -1,7 +1,7 @@
 // src/pages/verification/index.js
 import { useState, useMemo, useCallback } from "react";
 import Layout from "../../components/layout/dashboard";
-import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, DocumentIcon, DocumentTextIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { useStrapiData } from "src/services/strapiServiceJWT";
 import Loader from "../../components/loaders/loader";
@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { CheckBadgeIcon } from '@heroicons/react/24/outline';
 import VeriffComponent from "./verification";
+import { DownloadIcon, UploadIcon } from "lucide-react";
 
 const DEFAULT_CONTRACT_URL = `${process.env.NEXT_PUBLIC_DEFAULT_CONTRACT_URL || "https://minio.neocapitalfunding.com/strapi/CONTRATO_278b458332.pdf"}`;
 
@@ -164,100 +165,197 @@ const SocialsPage = () => {
             )}
             {!isLoading && !error && (
                 <>
-                    <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black mb-6">
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center space-x-2">
-                                <CheckBadgeIcon className="w-6 h-6 text-gray-600 dark:text-gray-200" />
-                                <h1 className="text-xl font-semibold">Verificación</h1>
+                    {/* Cabecera de verificación */}
+                    <div className="relative overflow-hidden bg-gradient-to-r from-white to-gray-50 dark:from-zinc-800 dark:to-zinc-900 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700 transition-all">
+                        <div className="absolute h-1 top-0 left-0 right-0 bg-[var(--app-primary)]"></div>
+
+                        <div className="p-6 flex justify-between items-center">
+                            <div className="flex items-center space-x-3">
+                                <div className="p-2 rounded-full bg-[var(--app-primary)]/10">
+                                    <CheckBadgeIcon className="w-5 h-5 text-[var(--app-primary)]" />
+                                </div>
+                                <h1 className="text-xl font-semibold text-zinc-800 dark:text-white">
+                                    Verificación
+                                </h1>
                             </div>
+
+                            {statusSign && (
+                                <div className="flex items-center">
+                                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                        Contrato verificado
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
                     {((!hasPhase3Challenge && (hasPhase1Or2Challenge || newAccount)) && !isVerified) ? (
-                        <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-                            <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-                                La sección de verificación se desbloqueará para usted una vez que esté a punto de firmar o cambiar un contrato con nosotros. Se desbloqueará automáticamente una vez que haya llegado a fase Real.
-                            </p>
+                        <div className="mt-6 bg-white dark:bg-zinc-800/90 shadow-md rounded-xl border border-gray-100 dark:border-zinc-700 overflow-hidden transition-all">
+                            <div className="p-6">
+                                <div className="flex items-center space-x-3 mb-4">
+                                    <InformationCircleIcon className="w-5 h-5 text-amber-500" />
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                                        La sección de verificación se desbloqueará para usted una vez que esté a punto de firmar o cambiar un contrato con nosotros. Se desbloqueará automáticamente una vez que haya llegado a fase Real.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     ) : (
                         <>
                             <VeriffComponent isVerified={isVerified} />
 
                             <div className="mt-6">
-                                <p className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">
-                                    2. Documento PDF
-                                </p>
+                                {/* <div className="flex items-center space-x-3 mb-4">
+                                    <div className="p-2 rounded-full bg-[var(--app-primary)]/10">
+                                        <DocumentTextIcon className="w-5 h-5 text-[var(--app-primary)]" />
+                                    </div>
+                                    <h2 className="text-lg font-semibold text-zinc-800 dark:text-white">
+                                        Documento de Contrato
+                                    </h2>
+                                </div> */}
+
                                 {statusSign ? (
-                                    <div className="p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-                                        <h2 className="text-xl font-semibold mb-0 flex items-center">
-                                            <CheckCircleIcon className="h-6 w-6 mr-2 text-green-500" />
-                                            Contrato verificado
-                                        </h2>
-                                        <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
-                                            Tu contrato ha sido verificado correctamente. Ahora puedes continuar con las operaciones sin restricciones y
-                                            acceder a todas las funcionalidades disponibles en la plataforma.
-                                        </p>
+                                    <div className="bg-white dark:bg-zinc-800/90 shadow-md rounded-xl border border-gray-100 dark:border-zinc-700 overflow-hidden transition-all">
+                                        <div className="p-6">
+                                            <div className="flex items-center space-x-3 mb-4">
+                                                <div className="p-2 rounded-full bg-green-100 dark:bg-green-900/30">
+                                                    <CheckCircleIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-lg font-semibold text-zinc-800 dark:text-white">
+                                                        Contrato verificado
+                                                    </h3>
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                        Tu contrato ha sido verificado correctamente. Ahora puedes continuar con las operaciones sin restricciones y
+                                                        acceder a todas las funcionalidades disponibles en la plataforma.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 ) : (
-                                    <div className="flex flex-col p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-                                        <div className="mb-4">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                    Contrato:
-                                                </p>
-                                                <span className={`flex items-center ${isSigned ? 'text-green-500' : 'text-red-500'}`}>
-                                                    {isSigned ? (
-                                                        <>
-                                                            <CheckCircleIcon className="w-5 h-5 mr-1" />
-                                                            Enviado
-                                                        </>
-                                                    ) : (
-                                                        "Falta enviar"
-                                                    )}
-                                                </span>
+                                    <div className="bg-white dark:bg-zinc-800/90 shadow-md rounded-xl border border-gray-100 dark:border-zinc-700 overflow-hidden transition-all">
+                                        <div className="border-b border-gray-100 dark:border-zinc-700/50 p-6">
+                                            <div className="flex justify-between items-center">
+                                                <div className="flex items-center">
+                                                    <div className="p-2 rounded-full bg-[var(--app-primary)]/10 mr-3">
+                                                        <DocumentTextIcon className="w-5 h-5 text-[var(--app-primary)]" />
+                                                    </div>
+                                                    <h3 className="text-lg font-semibold text-zinc-800 dark:text-white">
+                                                        Contrato
+                                                    </h3>
+                                                </div>
+
+                                                <div className="flex items-center">
+                                                    <span className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${isSigned ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
+                                                        {isSigned ? (
+                                                            <>
+                                                                <CheckCircleIcon className="w-4 h-4 mr-1" />
+                                                                Enviado
+                                                            </>
+                                                        ) : (
+                                                            "Pendiente de envío"
+                                                        )}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <embed
-                                                src={`${DEFAULT_CONTRACT_URL}#toolbar=0`}
-                                                type="application/pdf"
-                                                className="w-full min-h-[calc(120vh)]"
-                                            />
                                         </div>
 
-                                        {isUploadDisabled && (
-                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                                                No puedes subir un PDF porque el documento ya ha sido verificado por un administrador.
-                                            </p>
-                                        )}
-
-                                        <div className="flex flex-col items-center space-y-6">
-                                            {/* Botón de Descargar PDF con ancho completo */}
-                                            <Button
-                                                className="w-full bg-[var(--app-primary)] hover:bg-amber-600 text-white text-md font-semibold px-6 py-4 rounded-lg shadow-md transition-all"
-                                                onClick={handleDownload}
-                                            >
-                                                Descargar PDF
-                                            </Button>
-
-                                            {/* Contenedor para el input y el botón de subida */}
-                                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0 w-full justify-between">
-                                                <input
-                                                    type="file"
-                                                    accept="application/pdf"
-                                                    onChange={handleFileChange}
-                                                    className="file:cursor-pointer file:border-none file:rounded-lg file:bg-[var(--app-primary)] file:text-white file:px-2 file:py-2 file:font-medium hover:file:bg-amber-600 disabled:opacity-50 w-full sm:w-auto text-sm file:mr-4"
-                                                    disabled={loading || isUploadDisabled}
+                                        <div className="p-6">
+                                            {/* Visualizador de PDF con altura fija */}
+                                            <div className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg overflow-hidden mb-6">
+                                                <div className="p-2 bg-gray-100 dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 flex justify-between items-center">
+                                                    <div className="flex items-center space-x-2">
+                                                        <DocumentIcon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Contrato</span>
+                                                    </div>
+                                                    <Button
+                                                        className="bg-transparent hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded transition-colors"
+                                                        onClick={handleDownload}
+                                                    >
+                                                        <DownloadIcon className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
+                                                <embed
+                                                    src={`${DEFAULT_CONTRACT_URL}#toolbar=0`}
+                                                    type="application/pdf"
+                                                    className="w-full h-[500px]"
                                                 />
+                                            </div>
+
+                                            {isUploadDisabled && (
+                                                <div className="mb-6 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg text-sm flex items-center space-x-2">
+                                                    <InformationCircleIcon className="w-5 h-5 flex-shrink-0" />
+                                                    <p>No puedes subir un PDF porque el documento ya ha sido verificado por un administrador.</p>
+                                                </div>
+                                            )}
+
+                                            {/* Acciones */}
+                                            <div className="space-y-4">
                                                 <Button
-                                                    className={`w-full sm:w-auto bg-[var(--app-secondary)] hover:bg-[var(--app-primary)] text-white text-sm font-semibold px-6 py-4 rounded-lg shadow-md transition-all ${(!pdfFile || loading || isUploadDisabled) ? "opacity-50 cursor-not-allowed" : ""
-                                                        }`}
-                                                    disabled={!pdfFile || loading || isUploadDisabled}
-                                                    onClick={handlePdf}
+                                                    className="w-full bg-[var(--app-primary)] hover:bg-amber-600 text-white text-md font-semibold px-6 py-4 rounded-lg shadow-md transition-all flex items-center justify-center space-x-2"
+                                                    onClick={handleDownload}
                                                 >
-                                                    {loading ? "Subiendo..." : isSigned ? "Subir PDF" : "Subir PDF"}
+                                                    <DownloadIcon className="w-5 h-5" />
+                                                    <span>Descargar PDF</span>
                                                 </Button>
+
+                                                <div className="bg-gray-50 dark:bg-zinc-700/30 rounded-lg border border-gray-100 dark:border-zinc-700/50 p-4">
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                                                        Para completar la verificación, descargue el documento, fírmelo y súbalo nuevamente.
+                                                    </p>
+
+                                                    <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                                                        <div className="flex-grow">
+                                                            <div className="relative">
+                                                                <input
+                                                                    type="file"
+                                                                    accept="application/pdf"
+                                                                    onChange={handleFileChange}
+                                                                    className="file:cursor-pointer file:border-none file:rounded-lg file:bg-[var(--app-primary)] file:text-white file:px-3 file:py-2 file:mr-3 file:font-medium hover:file:bg-amber-600 disabled:opacity-50 w-full text-sm cursor-pointer focus:outline-none bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg py-2 px-3"
+                                                                    disabled={loading || isUploadDisabled}
+                                                                />
+                                                                {loading && (
+                                                                    <div className="absolute inset-0 bg-white/50 dark:bg-zinc-800/50 flex items-center justify-center rounded-lg">
+                                                                        <svg className="animate-spin h-5 w-5 text-[var(--app-primary)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                        </svg>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            {pdfFile && (
+                                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                                    {pdfFile.name} ({Math.round(pdfFile.size / 1024)} KB)
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-shrink-0">
+                                                            <Button
+                                                                className={`w-full sm:w-auto bg-[var(--app-secondary)] hover:bg-[var(--app-primary)] text-white text-sm font-semibold px-6 py-3 rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 ${(!pdfFile || loading || isUploadDisabled) ? "opacity-50 cursor-not-allowed" : ""}`}
+                                                                disabled={!pdfFile || loading || isUploadDisabled}
+                                                                onClick={handlePdf}
+                                                            >
+                                                                {loading ? (
+                                                                    <>
+                                                                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                        </svg>
+                                                                        <span>Subiendo...</span>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <UploadIcon className="w-4 h-4" />
+                                                                        <span>Subir documento</span>
+                                                                    </>
+                                                                )}
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 )}
                             </div>
@@ -271,80 +369,3 @@ const SocialsPage = () => {
 
 export default SocialsPage;
 
-// const { data, error, isLoading, mutate } = useSWR(
-//     token
-//         ? [`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me?populate[challenges][populate]=broker_account`, token]
-//         : null,
-//     ([url, token]) => fetcher(url, token)
-// );
-
-
-
-
-
-
-
-// const Verification = dynamic(() => import("../verification/verification"), { ssr: false });
-
-// const fetcher = async (url, token) => {
-//     try {
-//         const response = await fetch(url, {
-//             headers: { Authorization: `Bearer ${token}` },
-//         });
-//         if (!response.ok) throw new Error(`Error: ${response.status}`);
-//         return response.json();
-//     } catch (error) {
-//         console.error("Fetcher Error:", error);
-//         throw error;
-//     }
-// };
-
-
-
-
-
-
-{/* <div className="mt-6">
-                                <p className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">
-                                    2. Firma de contrato
-                                </p>
-                                <div className="flex flex-col p-6 dark:bg-zinc-800 bg-white shadow-md rounded-lg dark:text-white dark:border-zinc-700 dark:shadow-black">
-                                    <div className="h-64 overflow-y-auto border p-4 rounded-lg bg-gray-100 dark:bg-zinc-900">
-                                        <p className="text-sm text-zinc-900 dark:text-white whitespace-pre-line">
-                                            1. Términos...
-                                            2. Licencia de Uso...
-                                            3. Descargo de responsabilidad...
-                                            4. Limitaciones...
-                                            5. Precisión de los materiales...
-                                            6. Enlaces...
-                                            7. Modificaciones...
-                                            8. Ley Aplicable...
-                                        </p>
-                                    </div>
-
-                                    <label className="flex items-center space-x-2 mt-4">
-                                        <input
-                                            type="checkbox"
-                                            checked={statusSign || accepted}
-                                            onChange={() => !statusSign && setAccepted(prev => !prev)}
-                                            className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                                        />
-                                        <span className="text-sm text-zinc-900 dark:text-white">
-                                            Acepto los términos del contrato
-                                        </span>
-                                    </label>
-
-                                    <Button
-                                        className="mt-4 bg-[#1F6263] hover:bg-[#29716c] text-white text-sm font-medium px-6 py-5 rounded-md"
-                                        disabled={statusSign || !accepted || loading}
-                                        onClick={handleSign}
-                                    >
-                                        {loading ? "Firmando..." : "Firmar"}
-                                    </Button>
-
-
-               
-                                </div>
-
-
-                            </div> */}
