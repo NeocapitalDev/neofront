@@ -71,7 +71,7 @@ export default function Layout({ children }) {
                             <FooterInfo />
                         </div>
                     </div>
-                    <div className='fixed bottom-[55px] -right-8 p-8'>
+                    <div className='fixed bottom-[65px] -right-8 p-8'>
                         <ModalRoullete />
                         <ChatwootWidget />
                     </div>
