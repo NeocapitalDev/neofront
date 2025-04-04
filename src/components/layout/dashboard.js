@@ -73,16 +73,13 @@ export default function Layout({ children }) {
                             <FooterInfo />
                         </div>
                     </div>
-                    <div className="fixed bottom-0 -right-8 px-8 mx-1">
+                    <div className="fixed bottom-0 -right-8 px-8 m-1">
     {/* Modal con margen dinámico */}
-    {(process.env.NEXT_PUBLIC_NAME_APP === 'NeoCapital' || process.env.NEXT_PUBLIC_NAME_APP === 'Zeven') && (
-        <div className={process.env.NEXT_PUBLIC_ISACTIVECHAT === 'true' ? "mb-16" : "mb-6"}>
-            {process.env.NEXT_PUBLIC_NAME_APP === 'NeoCapital' && <ModalRoullete2 />}
-        </div>
-    )}
+    {process.env.NEXT_PUBLIC_NAME_APP === 'NeoCapital' && <ModalRoullete />}
+    {process.env.NEXT_PUBLIC_NAME_APP === 'Zeven' && <ModalRoullete2 />}
 
     {/* Chatwoot con margen superior aumentado */}
-    {process.env.NEXT_PUBLIC_ISACTIVECHAT === 'true' && (
+        {process.env.NEXT_PUBLIC_ISACTIVECHAT === 'true' && (
         <div className="mt-24">
             <ChatwootWidget />
         </div>
