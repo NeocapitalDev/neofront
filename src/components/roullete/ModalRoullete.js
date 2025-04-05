@@ -54,7 +54,7 @@ export default function ModalRoulette() {
 
   return (
     <Dialog>
-      <DialogTrigger className="z-10 p-1 bg-zinc-900 text-blue-400 rounded-full hover:bg-blue-500 hover:text-black transition-colors duration-300">
+      <DialogTrigger className="z-10 p-1 bg-zinc-900 text-amber-400 rounded-full hover:bg-amber-500 hover:text-black transition-colors duration-300">
         <img
           src="/images/sorteo.svg"
           alt="Sorteo"
