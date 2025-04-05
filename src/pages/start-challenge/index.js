@@ -120,11 +120,6 @@ const ChallengeRelations = () => {
       }
     }
   }, [stepsData]);
-
-  // WooCommerce variations fetching logic
-  // console.log("Selected Product:", selectedProduct);
-
-  // Set the endpoint only if selectedProduct and WoocomerceId are valid (fixed typo)
   const endpoint = selectedProduct && selectedProduct.WoocomerceId
     ? `products/${selectedProduct.WoocomerceId}/variations?per_page=100`
     : null;
@@ -135,11 +130,6 @@ const ChallengeRelations = () => {
   const hasCredentials = !!consumerKey;
   const shouldFetch = endpoint && hasCredentials;
 
-  // console.log("consumerKey", consumerKey)
-  // console.log("hasCredentials", hasCredentials)
-  // console.log("shouldFetch", shouldFetch)
-
-  // Use useSWR unconditionally to fetch variations
   const {
     data: productsvariations,
     error: productsErrorvariations,
@@ -265,9 +255,7 @@ const ChallengeRelations = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (selectedProduct) {
-      // console.log('Producto seleccionado:', selectedProduct);
-      // console.log('Variación seleccionada:', matchingVariation);
-      // console.log('Stage seleccionado:', selectedStage);
+
     }
   };
 
@@ -375,55 +363,6 @@ const ChallengeRelations = () => {
               </div>
             </section>
 
-            {/* Subcategorías Section */}
-            {/* {selectedStep && stepsData.length > 0 && (
-              <section className="bg-white rounded-lg p-5 shadow-md border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
-                <div className="flex items-center mb-3">
-                  <h3 className="text-[var(--app-primary)] font-medium">Tipo</h3>
-                  <div className="relative ml-2 group">
-                    <InformationCircleIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-300" />
-                    <div className="absolute z-10 invisible group-hover:visible bg-zinc-800 text-xs text-zinc-200 p-2 rounded-md w-48 top-full left-0 mt-1">
-                      Elige el tipo de challenge
-                    </div>
-                  </div>
-                </div>
-                <p className="text-zinc-600 mb-4 text-sm dark:text-zinc-400">
-                  Selecciona el tipo para el challenge {selectedStep}.
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {stepsData
-                    .find(item => item.step === selectedStep)
-                    .relations.map((relation, index) => (
-                      <div key={relation.id} className="relative">
-                        <input
-                          type="radio"
-                          id={`subcategory-${relation.id}`}
-                          name="subcategory"
-                          checked={selectedRelationId === relation.id}
-                          onChange={() => handleRelationClick(relation.id)}
-                          className="sr-only"
-                        />
-                        <label
-                          htmlFor={`subcategory-${relation.id}`}
-                          className={classNames(
-                            "block p-4 rounded-lg border cursor-pointer transition-all",
-                            selectedRelationId === relation.id
-                              ? "bg-amber-500 border-amber-600 text-black font-semibold"
-                              : "bg-white border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
-                          )}
-                        >
-                          <span className="block font-medium">{relation.challenge_subcategory?.name}</span>
-                          {selectedRelationId === relation.id && (
-                            <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-black" />
-                          )}
-                        </label>
-                      </div>
-                    ))}
-                </div>
-              </section>
-            )} */}
-
             {selectedRelationId && (
               <section className="bg-white rounded-lg p-5 shadow-md border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800">
                 <div className="flex items-center mb-3">
@@ -520,118 +459,16 @@ const ChallengeRelations = () => {
                   </h3>
                 </header>
 
-                {/* {selectedRelation && (
-                  <div className="bg-gray-50 p-4 border-b border-gray-200 dark:bg-zinc-800 dark:border-zinc-700">
-                    <h4 className="text-[var(--app-primary)] font-medium mb-2">Información Adicional</h4>
-                    <div className="text-gray-700 dark:text-zinc-300">
-                      <p className="flex justify-between mb-2">
-                        <span>Subcategoría:</span>
-                        <span className="font-medium">{selectedRelation.challenge_subcategory?.name}</span>
-                      </p>
-                      <div className="mb-2">
-                        <p className="mb-2">Etapas:</p>
-                        <div className="grid grid-cols-3 gap-2">
-                          {(() => {
-                            const stages = getRelationStages();
-                            return stages.length > 0 ? (
-                              stages.map((stage, index) => (
-                                <div key={index} className="relative">
-                                  <input
-                                    type="radio"
-                                    id={`stage-${index}`}
-                                    name="stage"
-                                    checked={selectedStage && selectedStage.id === stage.id}
-                                    onChange={() => handleStageClick(stage)}
-                                    className="sr-only"
-                                  />
-                                  <label
-                                    htmlFor={`stage-${index}`}
-                                    className={classNames(
-                                      "block text-center py-1 px-2 rounded-md border cursor-pointer transition-all text-sm",
-                                      selectedStage && selectedStage.id === stage.id
-                                        ? "bg-amber-500 border-amber-600 text-black font-medium"
-                                        : "bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200 dark:bg-zinc-700 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-600"
-                                    )}
-                                  >
-                                    {stage.name}
-                                  </label>
-                                </div>
-                              ))
-                            ) : (
-                              <span className="text-zinc-500 col-span-3">No hay etapas disponibles</span>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )} */}
 
                 {selectedProduct && selectedStage && (
                   <>
                     {selectedRelation && (
                       <div className="p-5">
                         <div className="grid grid-cols-1 gap-6">
-                          {/*  <div>
-                            <section>
-                              <h3 className="text-lg font-medium text-[var(--app-primary)] mb-4">Características:</h3>
-                              <ul className="space-y-3">
-                                <li className="flex items-center text-gray-700 dark:text-zinc-300">
-                                  <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>Leverage:</span>
-                                  <strong className="ml-auto">
-                                    {selectedStage.leverage ? (selectedStage.leverage + " %") : "-"}
-                                  </strong>
-                                </li>
-                                <li className="flex items-center text-gray-700 dark:text-zinc-300">
-                                  <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>Maximum Daily Loss:</span>
-                                  <strong className="ml-auto">
-                                    {selectedStage.maximumDailyLoss ? (selectedStage.maximumDailyLoss + " %") : "-"}
-                                  </strong>
-                                </li>
-                                <li className="flex items-center text-gray-700 dark:text-zinc-300">
-                                  <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>Minimum Trading Days:</span>
-                                  <strong className="ml-auto">
-                                    {selectedStage.minimumTradingDays ? (selectedStage.minimumTradingDays + " %") : "-"}
-                                  </strong>
-                                </li>
-                                <li className="flex items-center text-gray-700 dark:text-zinc-300">
-                                  <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>Profit Target:</span>
-                                  <strong className="ml-auto">
-                                    {selectedStage.profitTarget ? (selectedStage.profitTarget + " %") : "-"}
-                                  </strong>
-                                </li>
-                                <li className="flex items-center text-gray-700 dark:text-zinc-300">
-                                  <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>Maximum Total Loss:</span>
-                                  <strong className="ml-auto">
-                                    {selectedStage.maximumTotalLoss ? (selectedStage.maximumTotalLoss + " %") : "-"}
-                                  </strong>
-                                </li>
-                                <li className="flex items-center text-gray-700 dark:text-zinc-300">
-                                  <CheckIcon className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0" />
-                                  <span>Maximum Loss Per Trade:</span>
-                                  <strong className="ml-auto">
-                                    {selectedStage.maximumLossPerTrade ? (selectedStage.maximumLossPerTrade + " %") : "-"}
-                                  </strong>
-                                </li>
-                              </ul>
-                            </section>
-                          </div> */}
-
                           <div className="space-y-6">
                             {/* <div className="h-px bg-gray-200 dark:bg-zinc-800"></div> */}
 
                             <section>
-                              {/* <h4 className="text-gray-700 dark:text-zinc-300 font-medium mb-4">Subtotal</h4>
-                              <div className="flex justify-between mb-2 text-gray-700 dark:text-zinc-300">
-                                <span>{selectedProduct.name}</span>
-                                <span>${matchingVariation?.price || "N/A"}</span>
-                              </div> */}
-                              {/* <div className="h-px bg-gray-200 dark:bg-zinc-800 my-4"></div> */}
                               <div className="flex justify-between items-center mb-1">
                                 <span className="text-gray-700 dark:text-zinc-300">Total</span>
                                 <p className="text-2xl font-semibold text-[var(--app-primary)]">${matchingVariation?.price || "N/A"}</p>
@@ -649,8 +486,8 @@ const ChallengeRelations = () => {
                       <button
                         onClick={handleContinue}
                         type="submit"
-                        disabled={!selectedProduct}
-                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${selectedProduct
+                        disabled={productsLoadingvariations}
+                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${!productsLoadingvariations
                           ? "bg-[var(--app-primary)] hover:bg-[var(--app-secondary)] text-black font-bold"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-zinc-700 dark:text-zinc-500"
                           }`}
