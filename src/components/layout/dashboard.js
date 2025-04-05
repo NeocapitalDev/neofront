@@ -74,17 +74,17 @@ export default function Layout({ children }) {
                         </div>
                     </div>
                     <div className="fixed bottom-0 -right-8 px-8 m-1">
-    {/* Modal con margen dinámico */}
-    {process.env.NEXT_PUBLIC_NAME_APP === 'NeoCapital' && <ModalRoullete />}
-    {process.env.NEXT_PUBLIC_NAME_APP === 'Zeven' && <ModalRoullete2 />}
+                        {/* Modal con margen dinámico */}
+                        {process.env.NEXT_PUBLIC_NAME_APP === 'NeoCapital' && <ModalRoullete />}
+                        {process.env.NEXT_PUBLIC_NAME_APP === 'Zeven' && <ModalRoullete2 />}
 
-    {/* Chatwoot con margen superior aumentado */}
-        {process.env.NEXT_PUBLIC_ISACTIVECHAT === 'true' && (
-        <div className="mt-24">
-            <ChatwootWidget />
-        </div>
-    )}
-</div>
+                        {/* Chatwoot con margen superior aumentado */}
+                        {process.env.NEXT_PUBLIC_ISACTIVECHAT === 'true' && (
+                            <div className="mt-24">
+                                <ChatwootWidget />
+                            </div>
+                        )}
+                    </div>
 
 
 

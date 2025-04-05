@@ -21,7 +21,7 @@ export default function ModalRoulette() {
   const handleBuyTicket = () => {
     // Lógica para comprar ticket
     console.log("Comprar ticket");
-    window.location.href = `https://neocapitalfunding.com/checkout/?add-to-cart=${TICKET_ID}&quantity=1&user_id=${user.documentId}`;
+    window.location.href = `${process.env.NEXT_PUBLIC_PURCHARSE_TICKET_URL}?user_id=${user.documentId}` || `https://neocapitalfunding.com/checkout/?add-to-cart=${TICKET_ID}&quantity=1&user_id=${user.documentId}`;
   };
 
   // Prevenir el scroll-chaining cuando se alcanza el tope o el final del contenedor scrollable
