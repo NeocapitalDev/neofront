@@ -118,11 +118,27 @@ async function getChallengeData() {
     details: {},
   };
 
-  // Obtener stages para cada combinación (sin consultar precios de WooCommerce)
+  // Obtener precios y stages para cada combinación
   for (const step of stepsArray) {
     result.details[step.step] = {};
     for (const product of step.relations[0].products) {
-      const stages = step.relations[0].stages;
+      const endpoint = product.WoocomerceId ? `products/${product.WoocomerceId}/variations?per_page=100` : null;
+      let price = null;
+      let stages = step.relations[0].stages;
+
+      if (endpoint) {
+        try {
+          const variations = await wooFetcher(endpoint);
+          const matchingVariation = variations.find(variation =>
+            variation.attributes.some(attr => attr.name === "step" && attr.option.toLowerCase() === step.step.toLowerCase()) &&
+            variation.attributes.some(attr => attr.name === "subcategory" && attr.option.toLowerCase() === step.relations[0].challenge_subcategory.name.toLowerCase())
+          );
+          price = matchingVariation?.price || "N/A";
+        } catch (error) {
+          console.error(`Error fetching WooCommerce variations for product ${product.WoocomerceId}:`, error.message);
+          price = "N/A";
+        }
+      }
 
       result.details[step.step][product.name] = {
         stages: stages.map(stage => ({
@@ -135,7 +151,7 @@ async function getChallengeData() {
           maximumTotalLoss: stage.maximumTotalLoss,
           maximumLossPerTrade: stage.maximumLossPerTrade,
         })),
-     //   price: "N/A", // Asignando N/A como precio por defecto sin consultar WooCommerce
+        price,
       };
     }
   }
