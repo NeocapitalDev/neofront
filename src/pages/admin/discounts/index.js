@@ -234,6 +234,7 @@ export default function DiscountsManager() {
             const productId = productRef.id;
             const fullProduct = products.find(p => p.id === productId);
             
+            /*
             if (fullProduct && !existingSubcat.products.some(p => p.id === productId)) {
               const productName = fullProduct.attributes?.name || fullProduct.name;
               const productPrice = fullProduct.attributes?.precio || fullProduct.precio;
@@ -250,6 +251,29 @@ export default function DiscountsManager() {
                 descuento: descuento
               });
             }
+            */
+
+            // Inside the productRelations.forEach loop in organizarDatos:
+            if (fullProduct && !existingSubcat.products.some(p => p.id === productId)) {
+                const productName = fullProduct.attributes?.name || fullProduct.name;
+                const productPrice = fullProduct.attributes?.precio || fullProduct.precio;
+                const productWooId = fullProduct.attributes?.WoocomerceId || fullProduct.WoocomerceId;
+                const hasDiscount = fullProduct.attributes?.hasDiscount || fullProduct.hasDiscount || false;
+                const descuento = fullProduct.attributes?.descuento || fullProduct.descuento || "";
+                // Add documentId here
+                const documentId = fullProduct.attributes?.documentId || fullProduct.documentId;
+                
+                existingSubcat.products.push({
+                id: productId,
+                documentId: documentId, // Include documentId
+                name: productName || "Producto sin nombre",
+                precio: productPrice,
+                WoocomerceId: productWooId,
+                hasDiscount: hasDiscount,
+                descuento: descuento
+                });
+            }
+
           });
         }
       }
@@ -264,12 +288,14 @@ export default function DiscountsManager() {
       toast.error("No hay producto seleccionado o no existe sesión.");
       return;
     }
-
+  
     try {
       setSaving(true);
       
+      // Use the correct API endpoint format for Strapi v5
+      // Notice: singular name (challenge-product) and documentId instead of numeric ID
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-products/${selectedProduct.id}`, 
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenge-products/${selectedProduct.documentId}`, 
         {
           method: 'PUT',
           headers: {
