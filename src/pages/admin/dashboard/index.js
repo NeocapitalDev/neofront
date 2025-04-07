@@ -256,7 +256,7 @@ export default function Index() {
 
   return (
     <DashboardLayout>
-      <div className="p-8 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 rounded-xl shadow-xl min-h-screen border border-zinc-200 dark:border-zinc-800">
+      <div className="p-8 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 rounded-xl shadow-xl min-h-screen border border-zinc-200 dark:border-zinc-800 border-t-4 border-t-[var(--app-secondary)]">
         <div className="flex items-center justify-between mb-8">
           <div className="flex flex-wrap gap-2">
             {tabs.map((tab) => (
