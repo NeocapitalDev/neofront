@@ -83,7 +83,7 @@ const PhaseTitle = ({ stageName }) => {
 export default function Index() {
     const { data: session } = useSession();
     const router = useRouter();
-
+    console.log("Session data:", session);
     // URL modificada para incluir challenge_relation y sus stages
     const { data, error, isLoading } = useSWR(
         session?.jwt
