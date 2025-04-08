@@ -355,7 +355,7 @@ export default function PropDetails({
                       </span>
                       <Button
                         variant="destructive"
-                        size="xs"
+                        size="sm"
                         onClick={() => changeCategory(null)}
                         className="bg-red-500 hover:bg-red-600 text-white"
                       >
@@ -380,7 +380,7 @@ export default function PropDetails({
                       </span>
                       <Button
                         variant="destructive"
-                        size="xs"
+                        size="sm"
                         onClick={() => changeSubcategory(null)}
                         className="bg-red-500 hover:bg-red-600 text-white"
                       >
@@ -408,7 +408,7 @@ export default function PropDetails({
                         <div>
                           <Button
                             variant="default"
-                            size="xs"
+                            size="sm"
                             onClick={() => setSelectedStageId(stage.id)}
                             className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black mr-2"
                           >
@@ -416,7 +416,7 @@ export default function PropDetails({
                           </Button>
                           <Button
                             variant="destructive"
-                            size="xs"
+                            size="sm"
                             onClick={() => removeStage(stage.id)}
                             className="bg-red-500 hover:bg-red-600 text-white"
                           >
@@ -445,7 +445,7 @@ export default function PropDetails({
                         <span className="text-xs">{product.name}</span>
                         <Button
                           variant="destructive"
-                          size="xs"
+                          size="sm"
                           onClick={() => removeProduct(product.id)}
                           className="bg-red-500 hover:bg-red-600 text-white"
                         >
@@ -620,7 +620,7 @@ export default function PropDetails({
                         <span className="text-xs">{stage.name}</span>
                         <Button
                           variant="default"
-                          size="xs"
+                          size="sm"
                           onClick={() => addStage(stage)}
                           className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black"
                         >
@@ -650,7 +650,7 @@ export default function PropDetails({
                         <span className="text-xs">{subcategory.name}</span>
                         <Button
                           variant="default"
-                          size="xs"
+                          size="sm"
                           onClick={() => changeSubcategory(subcategory)}
                           className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black"
                         >
@@ -680,7 +680,7 @@ export default function PropDetails({
                         <span className="text-xs">{step.name}</span>
                         <Button
                           variant="default"
-                          size="xs"
+                          size="sm"
                           onClick={() => changeCategory(step)}
                           className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black"
                         >
