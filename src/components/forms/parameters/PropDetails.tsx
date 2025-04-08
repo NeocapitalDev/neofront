@@ -590,7 +590,7 @@ export default function PropDetails({
                         <span className="text-xs">{product.name}</span>
                         <Button
                           variant="default"
-                          size="xs"
+                          size="sm"
                           onClick={() => addProduct(product)}
                           className="bg-[var(--app-secondary)] hover:bg-[var(--app-secondary)]/90 text-black"
                         >
