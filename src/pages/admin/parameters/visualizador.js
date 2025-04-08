@@ -1,3 +1,4 @@
+// src/pages/admin/parameters/visualizador.js
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -68,9 +69,9 @@ export default function StepsOrganizado() {
         const stageJson = await stageRes.json();
         const stageItems = stageJson.data || [];
 
-        // console.log("Steps =>", stepsItems);
-        // console.log("ChallengeRelations =>", relItems);
-        // console.log("ChallengeStages =>", stageItems);
+        console.log("Steps =>", stepsItems);
+        console.log("ChallengeRelations =>", relItems);
+        console.log("ChallengeStages =>", stageItems);
 
         // Estructura reorganizada
         const organizedData = organizarDatos(stepsItems, relItems, stageItems);

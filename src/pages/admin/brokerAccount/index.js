@@ -145,7 +145,7 @@ export default function BrokerAccountsTable() {
 
     return (
         <DashboardLayout>
-            <div className="p-6 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-white rounded-lg shadow-lg border border-zinc-200 dark:border-zinc-700 border-t-4 border-t-[var(--app-secondary)]">
+            <div className="p-6 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-white rounded-lg shadow-lg border-t-4 border-[var(--app-secondary)]">
                 <h1 className="text-4xl font-bold mb-8 text-zinc-800 dark:text-white">
                     <span className="border-b-2 border-[var(--app-secondary)] pb-1">Creador de Broker Accounts</span>
                 </h1>
