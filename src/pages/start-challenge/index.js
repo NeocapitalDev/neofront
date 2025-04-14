@@ -301,14 +301,14 @@ const ChallengeRelations = () => {
                       className={classNames(
                         "block p-4 rounded-lg border cursor-pointer transition-all",
                         selectedStep === item.step
-                          ? "bg-amber-500 border-amber-600 text-white font-semibold"
-                          : "bg-white border-zinc-300 text-white hover:bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-700 dark:text-white dark:hover:bg-zinc-800"
+                          ? "bg-amber-500 border-amber-600 text-white font-semibold shadow-md"
+                          : "bg-white border-zinc-300 text-zinc-700 hover:bg-zinc-50 hover:border-zinc-400 hover:shadow-sm dark:bg-zinc-900 dark:border-zinc-700 dark:text-white dark:hover:bg-zinc-800"
                       )}
                     >
                       <div className="product-info">
                         <span className="block font-medium">{item.step}</span>
                         {item.relations.length > 1 && (
-                          <span className={`block text-xs mt-1 text-white`}>
+                          <span className={`block text-xs mt-1 ${selectedStep === item.step ? 'text-white' : 'text-zinc-500 dark:text-zinc-400'}`}>
                             {item.relations.length} opciones
                           </span>
                         )}
@@ -362,10 +362,10 @@ const ChallengeRelations = () => {
                               className={classNames(
                                 "block p-4 rounded-lg border cursor-pointer transition-all relative",
                                 selectedProduct && selectedProduct.name === product.name
-                                  ? "bg-amber-500 border-amber-600 text-white font-semibold"
+                                  ? "bg-amber-500 border-amber-600 text-white font-semibold shadow-md"
                                   : isInRelation
-                                    ? "bg-white border-zinc-300 text-white hover:bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-700 dark:text-white dark:hover:bg-zinc-800"
-                                    : "bg-gray-100 border-gray-200 text-white opacity-50 dark:bg-gray-900/20 dark:border-gray-700"
+                                    ? "bg-white border-zinc-300 text-zinc-700 hover:bg-zinc-50 hover:border-zinc-400 hover:shadow-sm dark:bg-zinc-900 dark:border-zinc-700 dark:text-white dark:hover:bg-zinc-800"
+                                    : "bg-gray-100 border-gray-200 text-gray-400 opacity-50 dark:bg-gray-900/20 dark:border-gray-700"
                               )}
                             >
                               {/* Insignia de descuento */}
@@ -375,17 +375,32 @@ const ChallengeRelations = () => {
                                 </div>
                               )}
                               
-                              <span className="block font-medium text-white">{product.name}</span>
+                              <span className={`block font-medium ${
+                                selectedProduct && selectedProduct.name === product.name
+                                  ? 'text-white'
+                                  : isInRelation
+                                    ? 'text-zinc-700 dark:text-white'
+                                    : 'text-gray-400'
+                              }`}>{product.name}</span>
+                              
                               {product.balance && (
-                                <span className="block text-xs mt-1 text-white">
+                                <span className={`block text-xs mt-1 ${
+                                  selectedProduct && selectedProduct.name === product.name
+                                    ? 'text-white'
+                                    : isInRelation
+                                      ? 'text-zinc-500 dark:text-zinc-400'
+                                      : 'text-gray-400'
+                                }`}>
                                   {product.balance}
                                 </span>
                               )}
+                              
                               {product.isPremium && (
                                 <span className="inline-block bg-amber-600 text-white text-xs px-2 py-1 rounded mt-2 font-semibold">
                                   Premium
                                 </span>
                               )}
+                              
                               {selectedProduct && selectedProduct.name === product.name && (
                                 <CheckIcon className="absolute top-4 right-4 h-5 w-5 text-white" />
                               )}
@@ -442,7 +457,7 @@ const ChallengeRelations = () => {
                   <h3 className="text-[var(--app-primary)] font-medium text-xl flex gap-4 items-center">
                     <span>Saldo de Cuenta Seleccionado:</span>
                     {selectedProduct ? (
-                      <span className="text-xl font-bold dark:text-white">{selectedProduct.name}</span>
+                      <span className="text-xl font-bold text-zinc-800 dark:text-white">{selectedProduct.name}</span>
                     ) : (
                       <p className="text-zinc-500">Ningún Saldo seleccionado</p>
                     )}
@@ -476,9 +491,9 @@ const ChallengeRelations = () => {
                         onClick={handleContinue}
                         type="submit"
                         disabled={productsLoadingvariations}
-                        className={`w-full flex items-center justify-center transition-colors py-3 px-4 rounded ${
+                        className={`w-full flex items-center justify-center transition-all py-3 px-4 rounded-md ${
                           !productsLoadingvariations
-                            ? "bg-[var(--app-primary)] hover:bg-[var(--app-secondary)] text-black font-bold"
+                            ? "bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-md hover:shadow-lg"
                             : "bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-zinc-700 dark:text-zinc-500"
                         }`}
                       >
