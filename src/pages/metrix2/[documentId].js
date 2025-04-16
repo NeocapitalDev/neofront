@@ -48,6 +48,36 @@ const determineCorrectStage = (currentPhase, stages) => {
   return stages[stageIndex];
 };
 
+// Utilidad para extraer correctamente los datos de la respuesta de Strapi v5
+const extractStrapiData = (response) => {
+  if (!response) return null;
+  
+  // Si la respuesta ya es un objeto simple, devolverlo
+  if (!response.data) return response;
+  
+  // Si es una respuesta Strapi v5 completa, extraer el objeto data
+  const data = Array.isArray(response.data) ? response.data[0] : response.data;
+  
+  // Si no hay ID pero hay attributes, es la estructura nueva
+  if (data.attributes && !data.id) {
+    return {
+      id: data.id,
+      ...data.attributes
+    };
+  }
+  
+  // Si ya tiene ID y attributes, combinarlos
+  if (data.attributes && data.id) {
+    return {
+      id: data.id,
+      ...data.attributes
+    };
+  }
+  
+  // Si no tiene attributes pero es un objeto con data, devolverlo directamente
+  return data;
+};
+
 const Metrix = () => {
   const router = useRouter();
   const { documentId } = router.query;
@@ -60,6 +90,7 @@ const Metrix = () => {
   const [dynamicBalance, setDynamicBalance] = useState(null);
   const [currentChallenge, setCurrentChallenge] = useState(null);
   const [challengeConfig, setChallengeConfig] = useState(null);
+  const [debugInfo, setDebugInfo] = useState(null); // Para debugging
 
   // Estados para valores monetarios para la gráfica
   const [ddPercent, setDdPercent] = useState(10);
@@ -81,24 +112,72 @@ const Metrix = () => {
   );
 
   // Para el rol Webmaster filtramos los challenges por documentId
-  if (session?.roleName === "Webmaster") {
-    userData = userData?.filter((user) =>
-      user.challenges.some((challenge) => challenge.documentId === documentId)
+  if (session?.roleName === "Webmaster" && userData) {
+    // Comprobar si userData es un array o si tiene una propiedad data con un array
+    const usersArray = Array.isArray(userData) 
+      ? userData 
+      : (userData.data && Array.isArray(userData.data)) 
+        ? userData.data.map(user => extractStrapiData(user))
+        : [];
+    
+    userData = usersArray.filter((user) =>
+      user.challenges && user.challenges.some((challenge) => 
+        challenge.documentId === documentId || 
+        (challenge.attributes && challenge.attributes.documentId === documentId)
+      )
     );
     userData = userData?.[0];
+  } else if (userData && userData.data) {
+    // Si no es Webmaster pero la respuesta tiene estructura Strapi v5
+    userData = extractStrapiData(userData);
   }
+
+  // Mostrar información de debug
+  useEffect(() => {
+    if (userData && documentId) {
+      console.log("User data structure:", JSON.stringify(userData, null, 2));
+      
+      // Preparar info de debug
+      const debug = {
+        userDataType: typeof userData,
+        hasChallenges: userData && !!userData.challenges,
+        challengesCount: userData && userData.challenges ? userData.challenges.length : 0,
+        challengeProperties: userData && userData.challenges && userData.challenges.length > 0
+          ? Object.keys(userData.challenges[0])
+          : []
+      };
+      
+      setDebugInfo(debug);
+    }
+  }, [userData, documentId]);
 
   // Buscar el challenge específico y obtener sus detalles completos
   useEffect(() => {
     if (userData?.challenges && documentId && session?.jwt) {
-      const basicChallenge = userData.challenges.find(
-        (challenge) => challenge.documentId === documentId
-      );
-      if (basicChallenge && basicChallenge.id) {
+      console.log("Buscando challenge con documentId:", documentId);
+      
+      // Navegar por challenges, manejando tanto la estructura antigua como la nueva
+      const basicChallenge = userData.challenges.find(challenge => {
+        // Extraer documentId considerando ambas estructuras (directa o en attributes)
+        const challengeDocId = challenge.documentId || 
+                              (challenge.attributes && challenge.attributes.documentId);
+        return challengeDocId === documentId;
+      });
+      
+      if (basicChallenge) {
+        console.log("Challenge encontrado:", basicChallenge);
+        
+        // Extraer ID considerando posibles estructuras anidadas
+        const challengeId = basicChallenge.id || 
+                          (basicChallenge.attributes && basicChallenge.attributes.id) || 
+                          basicChallenge.documentId;
+        
+        // Construir query params para obtener datos relacionados
         const queryParams = new URLSearchParams({
           "populate[broker_account]": "*",
           "populate[challenge_relation][populate][challenge_stages]": "*",
         }).toString();
+        
         fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/challenges/${basicChallenge.documentId}?${queryParams}`,
           { headers: { Authorization: `Bearer ${session.jwt}` } }
@@ -108,8 +187,20 @@ const Metrix = () => {
             return res.json();
           })
           .then((response) => {
-            const detailedChallenge = response.data || response;
+            console.log("Respuesta detallada del challenge:", response);
+            
+            // Extraer datos de la respuesta de Strapi v5
+            const detailedChallenge = extractStrapiData(response);
+            console.log("Challenge detallado procesado:", detailedChallenge);
+            
+            // Procesar broker_account considerando diferentes estructuras
             let brokerAccount = detailedChallenge.broker_account;
+            
+            // Si broker_account es un objeto con data, extraer el objeto interno
+            if (brokerAccount && brokerAccount.data) {
+              brokerAccount = extractStrapiData(brokerAccount);
+            }
+            
             setCurrentChallenge({
               ...basicChallenge,
               ...detailedChallenge,
@@ -130,23 +221,54 @@ const Metrix = () => {
   // Procesar la metadata del challenge
   useEffect(() => {
     if (!currentChallenge) return;
-    const brokerInitialBalance = currentChallenge.broker_account?.balance;
+    
+    console.log("Procesando challenge:", currentChallenge);
+    
+    // Extraer broker_account considerando diferentes estructuras
+    const brokerAccount = currentChallenge.broker_account;
+    console.log("Broker account:", brokerAccount);
+    
+    // Extraer balance inicial del broker
+    const brokerInitialBalance = brokerAccount?.balance || 
+                               (brokerAccount?.attributes && brokerAccount.attributes.balance);
+    
     setInitialBalance(brokerInitialBalance);
+    
+    // Extraer balance dinámico
     const dynBalance = currentChallenge.dynamic_balance || "-";
     setDynamicBalance(dynBalance);
+    
+    // PROCESAMIENTO DE METADATA - CLAVE DEL PROBLEMA
+    // Comprobar todas las posibles ubicaciones de la metadata
+    let metadata = null;
+    
     if (currentChallenge.metadata) {
+      console.log("Metadata encontrada directamente en currentChallenge.metadata");
+      metadata = currentChallenge.metadata;
+    } else if (currentChallenge.attributes && currentChallenge.attributes.metadata) {
+      console.log("Metadata encontrada en currentChallenge.attributes.metadata");
+      metadata = currentChallenge.attributes.metadata;
+    }
+    
+    console.log("Metadata raw:", metadata);
+    
+    if (metadata) {
       try {
-        const metadata =
-          typeof currentChallenge.metadata === "string"
-            ? JSON.parse(currentChallenge.metadata)
-            : currentChallenge.metadata;
-        if (metadata && (metadata.metrics || metadata.trades)) {
-          const statsToUse = { ...metadata.metrics || metadata };
-          if (metadata.equityChart) {
-            statsToUse.equityChart = metadata.equityChart;
-          } else if (metadata.metrics && metadata.metrics.equityChart) {
-            statsToUse.equityChart = metadata.metrics.equityChart;
+        // Asegurarse de que la metadata sea un objeto (parsearlo si es string)
+        const parsedMetadata = typeof metadata === "string" ? JSON.parse(metadata) : metadata;
+        console.log("Metadata parseada:", parsedMetadata);
+        
+        if (parsedMetadata && (parsedMetadata.metrics || parsedMetadata.trades)) {
+          const statsToUse = { ...parsedMetadata.metrics || parsedMetadata };
+          
+          // Procesar equityChart
+          if (parsedMetadata.equityChart) {
+            statsToUse.equityChart = parsedMetadata.equityChart;
+          } else if (parsedMetadata.metrics && parsedMetadata.metrics.equityChart) {
+            statsToUse.equityChart = parsedMetadata.metrics.equityChart;
           }
+          
+          // Agregar datos de balance y crear equityChart si no existe
           if (!statsToUse.equityChart) {
             if (statsToUse.balance && statsToUse.equity) {
               statsToUse.equityChart = [
@@ -161,46 +283,93 @@ const Metrix = () => {
                   balance: statsToUse.balance,
                 },
               ];
+            } else {
+              statsToUse.equityChart = [
+                {
+                  timestamp: new Date().getTime() - 86400000,
+                  equity: brokerInitialBalance || 0,
+                  balance: brokerInitialBalance || 0,
+                },
+                {
+                  timestamp: new Date().getTime(),
+                  equity: brokerInitialBalance || 0,
+                  balance: brokerInitialBalance || 0,
+                },
+              ];
             }
           }
-          statsToUse.broker_account = currentChallenge.broker_account;
+          
+          // Agregar información del broker account
+          statsToUse.broker_account = brokerAccount;
           statsToUse.initialBalance = brokerInitialBalance;
-          if (!statsToUse.equityChart) {
-            statsToUse.equityChart = [
-              {
-                timestamp: new Date().getTime() - 86400000,
-                equity: brokerInitialBalance || 0,
-                balance: brokerInitialBalance || 0,
-              },
-              {
-                timestamp: new Date().getTime(),
-                equity: brokerInitialBalance || 0,
-                balance: brokerInitialBalance || 0,
-              },
-            ];
-          }
+          
+          // Procesar las fases y parámetros
           const challengePhase = currentChallenge.phase;
-          const stages =
-            metadata.challenge_stages ||
-            (currentChallenge.challenge_relation &&
-              currentChallenge.challenge_relation.challenge_stages);
+          
+          // Obtener stages, considerando diferentes ubicaciones posibles
+          let stages = null;
+          
+          if (parsedMetadata.challenge_stages) {
+            stages = parsedMetadata.challenge_stages;
+          } else if (currentChallenge.challenge_relation) {
+            const relation = currentChallenge.challenge_relation;
+            // Si relation.data existe, estamos en estructura Strapi v5
+            if (relation.data) {
+              const relationData = extractStrapiData(relation);
+              stages = relationData.challenge_stages;
+              
+              // Si stages.data existe, extraer los objetos
+              if (stages && stages.data) {
+                stages = stages.data.map(stage => extractStrapiData(stage));
+              }
+            } else {
+              stages = relation.challenge_stages;
+            }
+          }
+          
+          console.log("Stages identificados:", stages);
+          
+          // Determinar el stage correcto para la fase actual
           const selectedStage = determineCorrectStage(challengePhase, stages);
+          
           if (selectedStage) {
-            const stageParameter = metadata.stage_parameters.find(
-              (param) => param.challenge_stage.documentId === selectedStage.documentId
+            console.log("Stage seleccionado:", selectedStage);
+            
+            // Buscar parámetros específicos del stage si están disponibles
+            let stageParameters = [];
+            if (parsedMetadata.stage_parameters && Array.isArray(parsedMetadata.stage_parameters)) {
+              stageParameters = parsedMetadata.stage_parameters;
+            }
+            
+            // Extraer el docId del stage, considerando diferentes estructuras
+            const stageDocId = selectedStage.documentId || 
+                             (selectedStage.attributes && selectedStage.attributes.documentId);
+            
+            const stageParameter = stageParameters.find(
+              param => {
+                const paramStageDocId = param.challenge_stage.documentId || 
+                                      (param.challenge_stage.attributes && 
+                                       param.challenge_stage.attributes.documentId);
+                return paramStageDocId === stageDocId;
+              }
             );
+            
             const newStage = {
               ...selectedStage,
-              maximumTotalLoss: stageParameter?.maximumTotalLoss,
-              profitTarget: stageParameter?.profitTarget,
-              maximumDailyLoss: stageParameter?.maximumDailyLoss,
-              minimumTradingDays: stageParameter?.minimumTradingDays,
+              maximumTotalLoss: stageParameter?.maximumTotalLoss || selectedStage.maximumTotalLoss,
+              profitTarget: stageParameter?.profitTarget || selectedStage.profitTarget,
+              maximumDailyLoss: stageParameter?.maximumDailyLoss || selectedStage.maximumDailyLoss,
+              minimumTradingDays: stageParameter?.minimumTradingDays || selectedStage.minimumTradingDays,
             };
+            
             setCurrentStage(newStage);
-            const maxLoss = selectedStage.maximumTotalLoss || 10;
-            const profitTarget = selectedStage.profitTarget || 10;
-            const maxDailyLoss = selectedStage.maximumDailyLoss || 5;
-            const minTradingDays = selectedStage.minimumTradingDays || 0;
+            
+            // Extraer configuración
+            const maxLoss = newStage.maximumTotalLoss || 10;
+            const profitTarget = newStage.profitTarget || 10;
+            const maxDailyLoss = newStage.maximumDailyLoss || 5;
+            const minTradingDays = newStage.minimumTradingDays || 0;
+            
             setDdPercent(maxLoss);
             setProfitTargetPercent(profitTarget);
             setChallengeConfig({
@@ -209,6 +378,8 @@ const Metrix = () => {
               maxDrawdownPercent: maxLoss,
               profitTargetPercent: profitTarget,
             });
+            
+            // Calcular valores absolutos para la gráfica
             if (brokerInitialBalance) {
               const ddAbsolute = brokerInitialBalance - (maxLoss / 100) * brokerInitialBalance;
               setMaxDrawdownAbsolute(ddAbsolute);
@@ -216,16 +387,22 @@ const Metrix = () => {
               setProfitTargetAbsolute(ptAbsolute);
             }
           }
+          
+          // Calcular drawdown si no existe
           if (!statsToUse.maxDrawdown && (statsToUse.balance || statsToUse.equity) && brokerInitialBalance) {
             const currentBalance = statsToUse.balance || statsToUse.equity;
             const drawdownAmount = brokerInitialBalance - currentBalance;
             statsToUse.maxDrawdown = drawdownAmount > 0 ? drawdownAmount : 0;
             statsToUse.maxDrawdownPercent = (statsToUse.maxDrawdown / brokerInitialBalance) * 100;
           }
+          
+          // Calcular profit si no existe
           if (!statsToUse.profit && statsToUse.balance && brokerInitialBalance) {
             statsToUse.profit = statsToUse.balance - brokerInitialBalance;
             statsToUse.profitPercent = (statsToUse.profit / brokerInitialBalance) * 100;
           }
+          
+          console.log("Stats procesadas:", statsToUse);
           setMetadataStats(statsToUse);
         } else {
           console.warn("La metadata no contiene datos válidos de métricas");
@@ -267,8 +444,20 @@ const Metrix = () => {
       };
       setMetadataStats(basicStats);
     }
-    if (challenge.challenge_relation && challenge.challenge_relation.challenge_stages) {
-      const stages = challenge.challenge_relation.challenge_stages;
+    
+    // Extraer challenge_relation considerando diferentes estructuras
+    let relation = challenge.challenge_relation;
+    if (relation && relation.data) {
+      relation = extractStrapiData(relation);
+    }
+    
+    if (relation && relation.challenge_stages) {
+      // Extraer stages considerando diferentes estructuras
+      let stages = relation.challenge_stages;
+      if (stages && stages.data) {
+        stages = stages.data.map(stage => extractStrapiData(stage));
+      }
+      
       const selectedStage = determineCorrectStage(challenge.phase, stages);
       if (selectedStage) {
         setCurrentStage(selectedStage);
@@ -301,6 +490,7 @@ const Metrix = () => {
       </div>
     );
   }
+  
   if (error || !userData) {
     return (
       <div>
@@ -315,11 +505,19 @@ const Metrix = () => {
                 Error: {error.message}
               </div>
             )}
+            {/* Debug info */}
+            {debugInfo && (
+              <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm text-left">
+                <h3 className="font-bold">Debug Info:</h3>
+                <pre className="text-xs overflow-auto">{JSON.stringify(debugInfo, null, 2)}</pre>
+              </div>
+            )}
           </div>
         </div>
       </div>
     );
   }
+  
   if (!currentChallenge) {
     return (
       <div>
@@ -330,6 +528,13 @@ const Metrix = () => {
               No challenge was found with the ID provided in your account.
               Verify that the ID is correct and that you have access to this Challenge.
             </p>
+            {/* Debug info */}
+            {debugInfo && (
+              <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm text-left">
+                <h3 className="font-bold">Debug Info:</h3>
+                <pre className="text-xs overflow-auto">{JSON.stringify(debugInfo, null, 2)}</pre>
+              </div>
+            )}
           </div>
         </div>
       </div>

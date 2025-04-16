@@ -1,4 +1,4 @@
-// src/pages/metrix2/winloss.tsx
+// src/components/metrix/winloss.tsx
 "use client";
 
 import { useEffect, useState } from "react";

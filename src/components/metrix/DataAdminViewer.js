@@ -1,4 +1,4 @@
-// src/components/DataAdminViewer.js
+// src/components/metrix/DataAdminViewer.js
 import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import {
@@ -13,6 +13,27 @@ import {
 
 // Usamos NEXT_PUBLIC_BACKEND_URL definida en tu .env
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+// Extraer datos de la respuesta de Strapi v5
+const extractStrapiData = (response) => {
+  if (!response) return null;
+  
+  // Si no hay data, devolver el objeto tal cual
+  if (!response.data) return response;
+  
+  // Si es un array, tomar el primer elemento
+  const data = Array.isArray(response.data) ? response.data[0] : response.data;
+  
+  // Si tiene attributes, combinarlos con el id
+  if (data && data.attributes) {
+    return {
+      id: data.id,
+      ...data.attributes
+    };
+  }
+  
+  return data;
+};
 
 // Fetcher que añade el header con el token
 const fetcherStrapi = (url) =>
@@ -29,6 +50,7 @@ const fetcherStrapi = (url) =>
 
 export default function DataAdminViewer({ documentId }) {
   const [viewMode, setViewMode] = useState('summary');
+  const [debug, setDebug] = useState(null);
 
   if (!documentId) {
     return <p className="text-gray-600 dark:text-gray-400">No se ha proporcionado un documentId.</p>;
@@ -41,6 +63,12 @@ export default function DataAdminViewer({ documentId }) {
   useEffect(() => {
     if (data) {
       console.log("Data recibida de Strapi:", data);
+      setDebug({
+        dataType: typeof data,
+        hasDataProperty: !!data.data,
+        dataStructure: data.data ? Object.keys(data.data) : [],
+        hasAttributes: data.data && data.data.attributes
+      });
     }
   }, [data]);
 
@@ -50,6 +78,14 @@ export default function DataAdminViewer({ documentId }) {
         <p className="text-red-500">
           Error al cargar dataAdmin: {error.message}
         </p>
+        {debug && (
+          <div className="mt-3 text-xs">
+            <h4 className="font-bold">Debug info:</h4>
+            <pre className="mt-1 bg-gray-100 dark:bg-zinc-900 p-2 rounded overflow-auto">
+              {JSON.stringify(debug, null, 2)}
+            </pre>
+          </div>
+        )}
       </div>
     );
 
@@ -59,16 +95,35 @@ export default function DataAdminViewer({ documentId }) {
     </div>
   );
 
-  // Si data.data es un array, se toma el primer elemento; de lo contrario, se usa directamente.
-  const challengeData = Array.isArray(data.data) ? data.data[0] : data.data;
-
-  // Extraer dataAdmin directamente (sin usar attributes)
-  const dataAdmin = challengeData?.dataAdmin;
+  // Procesar los datos teniendo en cuenta la estructura v5 de Strapi
+  const challengeData = extractStrapiData(data);
+  
+  // Acceder a dataAdmin considerando posibles estructuras
+  let dataAdmin = null;
+  
+  // En la v5 podría estar en challengeData.dataAdmin o challengeData.attributes.dataAdmin
+  if (challengeData?.dataAdmin) {
+    dataAdmin = challengeData.dataAdmin;
+  } else if (challengeData?.attributes?.dataAdmin) {
+    dataAdmin = challengeData.attributes.dataAdmin;
+  }
 
   if (!dataAdmin) {
     return (
       <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md dark:text-white dark:border-zinc-700 dark:shadow-black">
         <p className="text-center">No hay datos en el campo dataAdmin.</p>
+        {debug && (
+          <div className="mt-3 text-xs">
+            <h4 className="font-bold">Debug info:</h4>
+            <pre className="mt-1 bg-gray-100 dark:bg-zinc-900 p-2 rounded overflow-auto">
+              {JSON.stringify({
+                ...debug,
+                challengeDataKeys: challengeData ? Object.keys(challengeData) : [],
+                attributesKeys: challengeData?.attributes ? Object.keys(challengeData.attributes) : []
+              }, null, 2)}
+            </pre>
+          </div>
+        )}
       </div>
     );
   }
@@ -247,34 +302,6 @@ export default function DataAdminViewer({ documentId }) {
                 </div>
               </div>
             )}
-
-            {/* Línea de tiempo
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-4">Línea de Tiempo</h3>
-            <div className="relative">
-              {/* Línea base 
-              <div className="absolute h-1 bg-gray-300 dark:bg-gray-600 left-0 right-0 top-6"></div>
-              
-              {/* Transacciones en la línea de tiempo (mostrar máximo 5) 
-              <div className="flex justify-between relative h-14">
-                {metaHistory.slice(0, 5).map((item, index) => (
-                  <div key={index} className="relative z-10">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getDealTypeColor(item.type)} border-2 border-white dark:border-zinc-700 shadow-md`}>
-                      <span className={`font-bold ${getDealTypeTextColor(item.type)}`}>
-                        {index + 1}
-                      </span>
-                    </div>
-                    <div className={`mt-2 text-xs font-medium ${getDealTypeTextColor(item.type)}`}>
-                      {getOrderTypeText(item.type)}
-                    </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      {formatDate(item.time)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div> */}
 
             {/* Estadísticas de totales */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

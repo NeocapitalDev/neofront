@@ -1,4 +1,4 @@
-// src/pages/metrix2/barrascircular.js
+// src/components/metrix/barrascircular.js
 'use client'
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/router';

@@ -1,4 +1,4 @@
-// src/pages/historial/objetivos.js
+// src/components/metrix/objetivos.js
 "use client";
 
 import React, { useState, useEffect } from "react";

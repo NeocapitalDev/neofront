@@ -1,4 +1,4 @@
-// src/pages/metrix2/statistics.tsx
+// src/components/metrix/statistics.tsx
 "use client";
 
 interface MetricsData {
