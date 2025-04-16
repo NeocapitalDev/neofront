@@ -80,11 +80,12 @@ export default function PromotionBanner() {
         <img
           src={imageUrl}
           alt={promotion.name || "Promoción"}
-          className="w-full h-64 object-cover rounded-md"
+          className="w-full h-40 object-cover rounded-md"
         />
       </div>
     );
   }
+
 
   // Para múltiples promociones, usar el carrusel
   return (
